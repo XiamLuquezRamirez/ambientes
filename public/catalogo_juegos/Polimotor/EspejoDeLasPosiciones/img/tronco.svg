@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-58 -78 116 156" width="232" height="312">
+  <title>Tronco de Zeus</title>
+  <!-- Pieza de El Espejo de las Posiciones. Generado por scripts/generar-svg-espejo-posiciones.js -->
+  <g class="base">
+    <path class="m-piel" fill="#f3c6b6" d="M-8.6,-72 L-8.6,-52 L8.6,-52 L8.6,-72 Z"/>
+    <path class="m-short" fill="#0a5677" d="M-42.5,20 L42.5,20 L45.5,66 Q33,72.5 20,70.5 L6,56 Q0,53 -6,56 L-20,70.5 Q-33,72.5 -45.5,66 Z"/>
+    <path class="m-camiseta" fill="#2f8f70" d="M-16,-61 Q0,-52 16,-61 L31,-59.5 Q43,-57 45.5,-45 L44.5,28 Q0,37.5 -44.5,28 L-45.5,-45 Q-43,-57 -31,-59.5 Z"/>
+  </g>
+  <g class="detalle">
+    <path fill="#e5a796" d="M-8.6,-60 Q0,-55 8.6,-60 L8.6,-55 Q0,-51 -8.6,-55 Z"/>
+    <path fill="none" stroke="#8fd07f" stroke-width="6" stroke-linecap="round" d="M-17,-60.5 Q0,-47 17,-60.5"/>
+    <path fill="#24735a" opacity=".55" d="M32,-26 Q41,-4 39,25 Q44,8 44.5,-8 Z"/>
+    <path fill="#24735a" opacity=".35" d="M-32,-26 Q-41,-4 -39,25 Q-44,8 -44.5,-8 Z"/>
+    <path fill="#24735a" opacity=".75" d="M-44.5,24 Q0,33 44.5,24 L44.5,28 Q0,37.5 -44.5,28 Z"/>
+    <path fill="#ffe08a" stroke="#f2b632" stroke-width="1.6" stroke-linejoin="round" d="M0,-30 L4.4,-21 L14.2,-19.6 L7.1,-12.7 L8.8,-3 L0,-7.6 L-8.8,-3 L-7.1,-12.7 L-14.2,-19.6 L-4.4,-21 Z"/>
+    <path fill="none" stroke="#06405a" stroke-width="3" d="M-43,30.5 L43,30.5"/>
+    <path fill="none" stroke="#06405a" stroke-width="2" stroke-linecap="round" d="M-2,40 L-2,53"/>
+    <path fill="none" stroke="#06405a" stroke-width="2" stroke-linecap="round" d="M-33,44 Q-26,48.5 -19,44 M33,44 Q26,48.5 19,44"/>
+  </g>
+</svg>

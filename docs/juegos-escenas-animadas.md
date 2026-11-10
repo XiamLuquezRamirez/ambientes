@@ -314,7 +314,8 @@ cada responsabilidad va en su archivo y expone un global.
 | Archivo | Global | Qué hace |
 |---|---|---|
 | `postura.js` | `Postura` | Reglas puras (sin DOM, también `module.exports`): esqueleto, ángulos, validación, pasos, textos. |
-| `muneco.js` | `Muneco` | Dibujo SVG de Zeus articulado (modelo, figura, fichas, fantasma, silueta). |
+| `img/*.svg` | — | Las 6 piezas de Zeus (cabeza, tronco, brazos y piernas). Se generan con `node scripts/generar-svg-espejo-posiciones.js`; no editarlas a mano. |
+| `muneco.js` | `Muneco` | Lee `img/*.svg` y arma el dibujo articulado (modelo, figura, fichas, fantasma, silueta). Subir `VERSION_SVG` al regenerar las piezas. |
 | `animaciones.js` | `EspejoAnim` | Tweens de ángulos, `realizar` (la figura "hace" la postura) y `rutina` final. |
 | `articulaciones.js` | `Articulaciones` | Taller de giro: flechas del hombro/cadera (azul) y codo/rodilla (naranja). |
 | `arrastre.js` | `Arrastre` | Arrastre con Pointer Events, encaje y regreso suave. |
@@ -340,6 +341,11 @@ cada responsabilidad va en su archivo y expone un global.
   aparece una sombra punteada con la orientación correcta.
 - **Sin cortes en codos y rodillas**: cada extremidad se dibuja en dos pasadas iguales (`.m-contorno` con trazo
   grueso y `.m-relleno` encima). Los dos segmentos comparten el contorno de fondo y la unión no muestra línea.
+- **Formato de las piezas** (`img/*.svg`): pivote en (0,0); formas de color con `class="m-piel|m-camiseta|…"` en
+  `g.base` (son las que se engrosan como contorno) y adornos en `g.detalle`. Las extremidades traen `g#arriba[data-largo]`
+  y `g#abajo`. La manga y la bota del short tienen tapa redonda en el pivote y los hombros de la camiseta terminan
+  dentro de esa tapa: así no asoman esquinas al levantar el brazo o abrir la pierna.
+- El modelo marca la pieza pedida con el contorno amarillo latiendo (`.m-resalte`), no con un halo borroso.
 - **Pista de lateralidad visible**: pulsera y franja de la media en amarillo (izquierda) y verde (derecha), los
   mismos colores de Lateralidad; el pulgar mira al centro y la punta del zapato hacia afuera.
 - Las fichas muestran la extremidad estirada; el giro se ve en el taller. Una ficha girada lleva un punto azul.

@@ -403,6 +403,7 @@ body.demo-lock .tablero * {
 .m-contorno .m-media { fill: #aeb6c2; stroke: #aeb6c2; }
 .m-contorno .m-zapato { fill: #1d5e48; stroke: #1d5e48; }
 .m-contorno * { stroke-width: 4.6; stroke-linejoin: round; }
+.m-relleno .base * { stroke: none; }
 
 .m-relleno .m-piel { fill: #f3c6b6; }
 .m-relleno .m-camiseta { fill: #2f8f70; }
@@ -444,23 +445,28 @@ body.demo-lock .tablero * {
   50% { transform: rotate(2.5deg); }
 }
 
-/* Extremidad que pide el paso actual: brilla en el modelo. */
-#modelo-svg .m-parte.m-resalte .m-contorno {
-  animation: figResalte 1.3s ease-in-out infinite;
+/* Pieza que pide el paso actual: el contorno del modelo se vuelve amarillo y late (sin halo borroso). */
+#modelo-svg .m-parte.m-resalte .m-contorno * {
+  stroke: #fab005;
+  fill: #fab005;
+  animation: figResalte 1.2s ease-in-out infinite;
 }
 
 @keyframes figResalte {
-  0%, 100% { filter: drop-shadow(0 0 3px #ffe066); }
-  50% { filter: drop-shadow(0 0 10px #ffd43b) drop-shadow(0 0 4px #fff); }
+  0%, 100% { stroke-width: 6; }
+  50% { stroke-width: 10; }
 }
 
-#modelo-svg .m-parte.m-mira .m-contorno {
+/* "¡Observa otra vez!": la pieza del modelo parpadea en naranja. */
+#modelo-svg .m-parte.m-mira .m-contorno * {
+  stroke: #ff6b00;
+  fill: #ff6b00;
   animation: figMira 0.45s ease-in-out 4;
 }
 
 @keyframes figMira {
-  0%, 100% { filter: drop-shadow(0 0 2px #fff); }
-  50% { filter: drop-shadow(0 0 14px #ff922b) drop-shadow(0 0 6px #fff); }
+  0%, 100% { stroke-width: 6; }
+  50% { stroke-width: 12; }
 }
 
 svg.fig-salto { animation: figSalto 0.9s cubic-bezier(0.34, 1.56, 0.64, 1); }
