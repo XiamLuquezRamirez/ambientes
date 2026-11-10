@@ -252,6 +252,7 @@
             PIELES.forEach(function (id) { svg('qs_' + id, id + '.svg', 420, 320); });
             svg('qs_carrito', 'carrito.svg', 420, 314);
             svg('qs_escuchar', 'escuchar.svg', 300, 300);
+            svg('qs_topo', 'topo.svg', 300, 300);
             // Estrella del diseño: se carga con las mismas claves que usa el arte dibujado
             // (arte.js: 'pa:estrella@tam'), así la usan el marcador, los estallidos y el final.
             [64, 128, 256].forEach(function (t) { svg('pa:estrella@' + t, 'estrella.svg', t, t); });
@@ -1258,6 +1259,21 @@
 
         /** El topo saca la cabeza un momento, mira y se vuelve a meter. */
         asomaTopo: async function (x, y) {
+            if (this.textures.exists('qs_topo')) {
+                // Topo del diseño: sale de su montoncito de tierra (base apoyada en la arena),
+                // mira a los lados y se vuelve a meter.
+                var tm = this.L.tam * 0.85 * this.prof(y);
+                var base = y + tm * 0.28;
+                var topo = this.add.image(x, base, 'qs_topo').setOrigin(0.5, 0.9).setDepth(22);
+                var e0 = tm / topo.width;
+                topo.setScale(e0, e0 * 0.1);
+                efecto(this, 'boing');
+                await tw(this, { targets: topo, scaleY: e0, duration: 320, ease: 'Back.easeOut' });
+                await tw(this, { targets: topo, angle: 8, duration: 180, yoyo: true, repeat: 1, ease: 'Sine.easeInOut' });
+                await tw(this, { targets: topo, scaleY: e0 * 0.1, duration: 220, ease: 'Quad.easeIn' });
+                topo.destroy();
+                return;
+            }
             var t = this.L.tam * 0.34;
             var c = this.add.container(x, y + t * 0.6).setDepth(22).setScale(0.2);
             c.add([
