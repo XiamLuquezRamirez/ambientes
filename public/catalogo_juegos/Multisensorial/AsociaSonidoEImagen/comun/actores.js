@@ -963,11 +963,59 @@
         }
     };
 
+    /* ── Pieles: imágenes diseñadas por el equipo (una pieza) que reemplazan al dibujo ──
+     * El juego las registra con AsociaActores.piel(id, claveDeTextura) después de cargarlas.
+     * El objeto se anima entero según lo que es: los vehículos pasean, el avión vuela,
+     * reloj y teléfono vibran, los animales saltan. */
+
+    var PIELES = {};
+    var VEHICULOS = ['tren', 'bicicleta', 'camion', 'motocicleta', 'ambulancia', 'carro'];
+    var VIBRAN = ['reloj', 'telefono', 'licuadora', 'secador', 'aspiradora', 'lavadora', 'ventilador'];
+
+    function vestir(a, scene, clave) {
+        var src = scene.textures.get(clave).getSourceImage();
+        var ar = (src.width || 1) / (src.height || 1);
+        var w = ar >= 1 ? 96 : 96 * ar, h = ar >= 1 ? 96 / ar : 96;
+        var im = scene.add.image(0, 0, clave).setDisplaySize(w * a.k, h * a.k);
+        a.cont.add(im);
+        a.piel = im;
+        var tam = a.tam;
+        a.acierto = async function (ms) {
+            var dur = Math.max(900, Math.min(1800, ms || 1200));
+            if (a.id === 'avion') {
+                // Despega en curva, da una vuelta corta y aterriza.
+                var x0 = a.cont.x, y0 = a.cont.y;
+                await tw(scene, { targets: a.cont, x: x0 + tam * 0.45, y: y0 - tam * 0.5, angle: -15, duration: dur * 0.45, ease: 'Sine.easeOut' });
+                await tw(scene, { targets: a.cont, x: x0, y: y0, angle: 0, duration: dur * 0.55, ease: 'Sine.easeInOut' });
+                return;
+            }
+            if (VEHICULOS.indexOf(a.id) >= 0) {
+                // Avanza traqueteando y vuelve.
+                scene.tweens.add({ targets: im, y: -tam * 0.03, duration: 90, yoyo: true, repeat: Math.round(dur / 180) });
+                await a.paseo(tam * 0.5, dur);
+                return;
+            }
+            if (VIBRAN.indexOf(a.id) >= 0) {
+                await tw(scene, { targets: im, angle: { from: -9, to: 9 }, duration: 60, yoyo: true, repeat: Math.round(dur / 160), onComplete: function () { im.angle = 0; } });
+                await a.saltito(0.1, 1);
+                return;
+            }
+            // Animales y lo demás: saltan con un poco de estiramiento.
+            var sx = im.scaleX, sy = im.scaleY;
+            for (var i = 0; i < 2; i++) {
+                await tw(scene, { targets: im, scaleX: sx * 1.1, scaleY: sy * 0.88, duration: 110, yoyo: true });
+                await a.saltito(0.18, 1);
+            }
+        };
+    }
+
     function crear(scene, id, x, y, tam, o) {
         o = o || {};
         var a = base(scene, id, x, y, tam);
         if (id === 'telefono' && o.variante === 'movil') a.sonido = 'vibracion';
-        var f = FABRICAS[id] || ((hay3D() ? PERSONAS3D : PERSONAS)[id]);
+        var clavePiel = PIELES[id];
+        var f = clavePiel && scene.textures.exists(clavePiel) ? function (aa, sc) { vestir(aa, sc, clavePiel); }
+            : (FABRICAS[id] || ((hay3D() ? PERSONAS3D : PERSONAS)[id]));
         if (f) f(a, scene, o);
         else a.img(id, 50, 50, 100);
         // Los personajes 3D siguen al actor cuadro a cuadro y se borran con él.
@@ -981,6 +1029,8 @@
 
     global.AsociaActores = {
         crear: crear,
+        /** Registra la imagen diseñada de un objeto (clave de textura ya cargada en la escena). */
+        piel: function (id, clave) { PIELES[id] = clave; },
         sonidoDe: function (id) { return SONIDO[id] || id; },
         efectos: { anillos: anillos, vibraciones: vibraciones, humo: humo, gotas: gotas }
     };

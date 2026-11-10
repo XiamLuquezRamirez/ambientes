@@ -16,13 +16,107 @@
     var K = global.AsociaKit;
     var Ut = global.PedniaParejaBase.util;
     var Act = global.AsociaActores;
+    var A = global.PedniaArte;
     var esperar = Ut.esperar;
     var tw = Ut.tween;
     var rnd = Ut.rnd;
-    var EXTRA = ['bicicleta', 'reloj', 'tren', 'vaca', 'gallo'];
+    var EXTRA = ['aspiradora', 'bicicleta', 'reloj', 'tren', 'vaca', 'gallo'];
+
+    /** Imágenes diseñadas por el equipo (img/diseno/). Si falta alguna, queda el dibujo de antes. */
+    var DISENO = 'img/diseno/';
+    // Las mismas imágenes de ¿Qué suena? (avión, bici, gallo, reloj, teléfono, tren, vaca) + la aspiradora.
+    var PIELES = ['avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca', 'aspiradora'];
+    /**
+     * Muebles dentro de fondo.png (1281×721), en tanto por uno, para colocar encima los
+     * juguetes: donde se apoyan y hasta dónde llega cada mueble.
+     */
+    // Filas de fondo.png: la franja oscura del techo (0-30) y la pared rayada sin muebles ni el brillo de la ventana (hasta 80).
+    var TECHO = 30, PARED = 80;
+    var SALA = {
+        piso: 548 / 721,
+        sofa: { x: 47 / 1281, x1: 525 / 1281, asiento: 505 / 721 },
+        mesa: { x: 620 / 1281, x1: 817 / 1281, tapa: 425 / 721 },
+        repisa: { x: 684 / 1281, x1: 1238 / 1281, tapa: 222 / 721 },
+        ventana: { x: 243 / 1281, x1: 516 / 1281, y: 120 / 721, y1: 300 / 721 },
+        alfombra: { x: 622 / 1281, x1: 1102 / 1281, y: 600 / 721, y1: 694 / 721 }
+    };
 
     var escena = {
+        preload: function () {
+            var self = this;
+            var svg = function (k, f, w, h) { if (!self.textures.exists(k)) self.load.svg(k, DISENO + f, { width: w, height: h }); };
+            if (!this.textures.exists('qo_fondo')) this.load.image('qo_fondo', DISENO + 'fondo.png');
+            PIELES.forEach(function (id) { svg('qo_' + id, id + '.svg', 420, 420); });
+            svg('qo_cofre', 'cofre.svg', 420, 420);
+            svg('qo_escuchar', 'escuchar.svg', 300, 300);
+            for (var i = 1; i <= 5; i++) svg('qo_mariposa' + i, 'mariposa' + i + '.svg', 160, 160);
+            // Estrella de ¿Qué suena?: con las claves del arte dibujado ('pa:estrella@tam'), así la
+            // usan las estrellas del marcador, los estallidos y el final.
+            [64, 128, 256].forEach(function (t) { svg('pa:estrella@' + t, 'estrella.svg', t, t); });
+        },
+
+        /** HUD propio: el botón de escuchar y la estrella del diseño (el del kit dibuja los suyos). */
+        montarHud: function (keep) {
+            var L = this.L;
+            var b = keep(this.add.container(L.bocina.x, L.bocina.y).setDepth(80));
+            var halo = this.add.circle(0, 0, L.bocina.r * 1.25, 0xffffff, 0.35);
+            if (this.textures.exists('qo_escuchar')) {
+                b.add([halo, this.add.image(0, 0, 'qo_escuchar').setDisplaySize(L.bocina.r * 2.3, L.bocina.r * 2.3)]);
+            } else {
+                var plato = this.add.circle(0, 0, L.bocina.r, 0xff922b).setStrokeStyle(5, 0xffffff);
+                b.add([halo, plato, this.add.image(0, 0, A.textura(this, 'bocina', 128)).setDisplaySize(L.bocina.r * 1.35, L.bocina.r * 1.35)]);
+            }
+            b.halo = halo;
+            this.bocina = b;
+            this.ondasG = keep(this.add.graphics().setDepth(79));
+            this.estrellas = [];
+            // Placa rosada con las 4 estrellas, como en ¿Qué suena?. Cabe entre la bocina y el
+            // borde derecho (en vertical hay poco espacio).
+            var n = 4;
+            var x0 = L.bocina.x + L.bocina.r + 14;
+            var libre = L.W - x0 - 10;
+            var tam = Math.max(20, Math.min(40, L.bocina.r * 0.85, (libre - 12) / (n + 0.22 * (n - 1) + 0.6)));
+            var pad = tam * 0.3, radio = tam * 0.34;
+            var w = tam * n + tam * 0.22 * (n - 1) + pad * 2;
+            var h = tam + pad * 1.1;
+            var cy = L.bocina.y;
+            var g = keep(this.add.graphics().setDepth(79.5));
+            g.fillStyle(0xd62a7f, 1);                                  // borde rosado oscuro
+            g.fillRoundedRect(x0, cy - h / 2, w, h, radio);
+            g.fillStyle(0xf74d9c, 1);                                  // relleno rosado claro
+            g.fillRoundedRect(x0 + tam * 0.11, cy - h / 2 + tam * 0.11, w - tam * 0.22, h - tam * 0.22, radio * 0.82);
+            for (var i = 0; i < n; i++) {
+                var x = x0 + pad + tam / 2 + i * (tam + tam * 0.22);
+                var e = keep(this.add.image(x, cy, A.textura(this, 'estrella', 128)).setDisplaySize(tam, tam).setDepth(80));
+                if (i >= this.nivelActual) e.setTint(0x9b6f86).setAlpha(0.5);
+                this.estrellas.push(e);
+            }
+            this.montarPresentador();
+        },
+
+        /** Mariposas de ¿Qué suena? que entran por la ventana y revolotean por la sala. */
+        montarMariposas: function (keep) {
+            var self = this, L = this.L;
+            var tm = Math.max(26, Math.min(44, L.W * 0.04));
+            for (var i = 1; i <= 3; i++) {
+                if (!this.textures.exists('qo_mariposa' + i)) continue;
+                var x0 = L.ventana.x + L.ventana.w * (0.2 + 0.3 * (i - 1)), y0 = L.ventana.y + L.ventana.h * 0.45;
+                var m = keep(this.add.image(x0, y0, 'qo_mariposa' + i).setDisplaySize(tm, tm).setDepth(1));
+                m.base = m.scaleX;
+                // Aleteo (se encoge de lado) y un paseo lento ida y vuelta por la pared.
+                this.tweens.add({ targets: m, scaleX: m.base * 0.35, duration: 140 + i * 20, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+                this.tweens.add({
+                    targets: m, x: x0 + (i % 2 ? 1 : -1) * L.W * 0.12, y: y0 - L.H * 0.05 * i,
+                    duration: 3800 + i * 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: i * 400
+                });
+            }
+
+        },
+
         iniciar: function () {
+            var self = this;
+            // Los juguetes se visten con las imágenes del diseño (comun/actores.js: piel).
+            PIELES.forEach(function (id) { if (self.textures.exists('qo_' + id)) Act.piel(id, 'qo_' + id); });
             this.juguetes = [];
             this.burbuja = null;
         },
@@ -36,6 +130,7 @@
             L.bocina = { x: W / 2, y: Math.max(64, Math.min(120, 70 + hueco * 0.2)), r: Math.max(30, Math.min(42, hueco * 0.35)) };
             L.pres = W >= 760 ? { x: W - 78, piso: H - 104, alto: Math.min(170, H * 0.3) } : null;
             var der = L.pres ? W - 170 : W - 24;
+            if (this.textures.exists('qo_fondo')) return this.calcularConFondo(L, der);
             // Muebles.
             var sw = Math.min(W * 0.32, 380);
             var sh = Math.min(H * 0.26, sw * 0.62);
@@ -59,10 +154,91 @@
             return L;
         },
 
+        /**
+         * Con el fondo del diseño, los muebles ya están pintados: aquí solo se calcula dónde
+         * caen en pantalla (la imagen cubre el ancho y se ancla por la línea del piso) para
+         * apoyar encima los juguetes.
+         */
+        calcularConFondo: function (L, der) {
+            var W = L.W, H = L.H;
+            var f = this.textures.get('qo_fondo').getSourceImage();
+            // Se apoya abajo y entra el ancho completo. En pantallas altas crece hasta llenar
+            // desde 1/4 de la altura (recortando un poco los lados), para que no quede una franja.
+            var s = Math.max(W / f.width, H * 0.62 / f.height);
+            var ix = (W - f.width * s) / 2, iy = H - f.height * s;
+            var px = function (u) { return ix + u * f.width * s; };
+            var py = function (v) { return iy + v * f.height * s; };
+            L.fondo = { x: ix, y: iy, s: s, w: f.width * s, h: f.height * s };
+            // En pantalla angosta el globo de Zoe ocupa todo el ancho arriba: la bocina baja
+            // para quedar debajo del globo (sobra pared en vertical).
+            if (W < 700) L.bocina.y = Math.max(L.bocina.y, 190);
+            L.y0 = py(SALA.piso);
+            L.tam = Math.max(70, Math.min(130, H * 0.19, W / 5.6));
+            L.sofa = { x: px(SALA.sofa.x), y: py(SALA.sofa.asiento), w: px(SALA.sofa.x1) - px(SALA.sofa.x), h: H * 0.2 };
+            L.mesa = { x: px(SALA.mesa.x), y: py(SALA.mesa.tapa), w: px(SALA.mesa.x1) - px(SALA.mesa.x) };
+            L.repisa = { x: px(SALA.repisa.x), y: py(SALA.repisa.tapa), w: px(SALA.repisa.x1) - px(SALA.repisa.x) };
+            L.ventana = { x: px(SALA.ventana.x), y: py(SALA.ventana.y), w: px(SALA.ventana.x1) - px(SALA.ventana.x), h: py(SALA.ventana.y1) - py(SALA.ventana.y) };
+            L.alfombra = {
+                x: (px(SALA.alfombra.x) + px(SALA.alfombra.x1)) / 2,
+                y: (py(SALA.alfombra.y) + py(SALA.alfombra.y1)) / 2,
+                rx: (px(SALA.alfombra.x1) - px(SALA.alfombra.x)) / 2,
+                ry: (py(SALA.alfombra.y1) - py(SALA.alfombra.y)) / 2
+            };
+            // El cofre del diseño hace de caja de juguetes, abajo a la izquierda sobre el piso.
+            var cw = Math.max(100, Math.min(165, W * 0.13));
+            L.caja = { x: 14, y: H - cw * 0.62 - 26, w: cw, h: cw * 0.62 };
+            // Sitios donde se apoyan los juguetes (sus pies en `y`), sobre los muebles del fondo.
+            L.sitios = [
+                { x: L.sofa.x + L.sofa.w * 0.5, y: L.sofa.y, esc: 0.85 },
+                { x: L.mesa.x + L.mesa.w / 2, y: L.mesa.y, esc: 0.8 },
+                { x: L.repisa.x + L.repisa.w * 0.22, y: L.repisa.y, esc: 0.7 },
+                { x: L.repisa.x + L.repisa.w * 0.62, y: L.repisa.y, esc: 0.7 },
+                { x: L.alfombra.x - L.alfombra.rx * 0.45, y: L.alfombra.y + L.alfombra.ry * 0.3, esc: 1 },
+                { x: L.alfombra.x + L.alfombra.rx * 0.45, y: L.alfombra.y - L.alfombra.ry * 0.2, esc: 1 }
+            ];
+            // Con la sala recortada a los lados (pantalla vertical), ningún juguete queda fuera.
+            L.sitios.forEach(function (q) {
+                var m = L.tam * q.esc * 0.55;
+                q.x = Math.max(m + 6, Math.min(W - m - 6, q.x));
+            });
+            L.zona = { x: W * 0.06, y: L.y0 - H * 0.04, w: W * 0.8, h: H - L.y0 - 30 };
+            return L;
+        },
+
         armar: function (reubicar) {
             var self = this;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            if (L.fondo) {
+                // Sala del diseño (ventana, sofá, mesita, repisa y alfombra ya pintados).
+                // Y si la sala no llega abajo, el piso del mismo rosa completa el resto.
+                var pie = L.fondo.y + L.fondo.h;
+                if (pie < L.H) keep(this.add.rectangle(0, Math.floor(pie) - 1, L.W, L.H - pie + 2, 0xf3cedb).setOrigin(0, 0).setDepth(0));
+                // '__BASE' explícito: al agregarle los cuadros 'techo' y 'pared' a la textura,
+                // Phaser pasa a usar el primero como cuadro por defecto.
+                keep(this.add.image(L.fondo.x, L.fondo.y, 'qo_fondo', '__BASE').setOrigin(0, 0).setScale(L.fondo.s).setDepth(0.1));
+                // Si la imagen no llega arriba, se completa con la misma imagen (no con un color
+                // plano): la franja del techo va arriba de la pantalla y la pared rayada se estira
+                // hasta la sala, tapando la franja de techo que trae la imagen.
+                if (L.fondo.y > 0) {
+                    var tex = this.textures.get('qo_fondo');
+                    var fw = tex.getSourceImage().width;
+                    if (!tex.has('techo')) tex.add('techo', 0, 0, 0, fw, TECHO);
+                    if (!tex.has('pared')) tex.add('pared', 0, 0, TECHO + 4, fw, PARED - TECHO - 4);
+                    var s = L.fondo.s, alto = TECHO * s;
+                    // Pared: desde bajo el techo de la pantalla hasta donde termina el techo de la imagen.
+                    keep(this.add.image(L.fondo.x, alto, 'qo_fondo', 'pared').setOrigin(0, 0)
+                        .setDisplaySize(fw * s, L.fondo.y + 1).setDepth(0.2));
+                    keep(this.add.image(L.fondo.x, 0, 'qo_fondo', 'techo').setOrigin(0, 0).setDisplaySize(fw * s, alto).setDepth(0.3));
+                }
+                this.montarCofre(keep);
+                var V0 = this.montarVida(keep);
+                if (this.textures.exists('qo_mariposa1')) this.montarMariposas(keep);
+                else if (V0) V0.mariposas(1, { x: L.ventana.x, y: L.ventana.y + 10, w: L.ventana.w, h: L.ventana.h * 0.5, depth: 1 });
+                this.montarHud(keep);
+                if (reubicar) this.reubicar(L);
+                return;
+            }
             K.textura(this, 'sala_fondo', L.W, L.H, function (x, w, h) { self.pintarSala(x, w, h); });
             keep(this.add.image(0, 0, 'sala_fondo').setOrigin(0, 0).setDepth(0));
             // Frente de la caja (los juguetes caen detrás).
@@ -84,15 +260,33 @@
             if (V && px > L.sofa.x + 30 && largo > 36) V.pendulo(px, L.ventana.y + largo * 0.25, largo);
             if (V) V.mariposas(1, { x: L.ventana.x, y: L.ventana.y + 10, w: L.ventana.w, h: L.ventana.h * 0.5, depth: 1 });
             this.montarHud(keep);
-            if (reubicar) {
-                this.juguetes.forEach(function (j) {
-                    var s = L.sitios[j.sitio];
-                    if (!s || j.estado !== 'quieto') return;
-                    j.actor.cont.setPosition(s.x, s.y - L.tam * s.esc * 0.42).setScale(s.esc * L.tam / j.actor.tam);
-                });
-                this.coleccion.forEach(function (a) { a.cont.setPosition(L.caja.x + L.caja.w / 2, L.caja.y + L.caja.h * 0.3); });
-                if (this.burbuja) this.burbuja.base = { x: L.W * 0.5, y: L.y0 - L.H * 0.12 };
-            }
+            if (reubicar) this.reubicar(L);
+        },
+
+        /** Tras cambiar el tamaño: cada juguete vuelve a su sitio y la burbuja a su base. */
+        reubicar: function (L) {
+            this.juguetes.forEach(function (j) {
+                var s = L.sitios[j.sitio];
+                if (!s || j.estado !== 'quieto') return;
+                j.actor.cont.setPosition(s.x, s.y - L.tam * s.esc * 0.42).setScale(s.esc * L.tam / j.actor.tam);
+            });
+            this.coleccion.forEach(function (a) { a.cont.setPosition(L.caja.x + L.caja.w / 2, L.caja.y + L.caja.h * 0.3); });
+            if (this.burbuja) this.burbuja.base = { x: L.W * 0.5, y: L.y0 - L.H * 0.12 };
+        },
+
+        /**
+         * Cofre del diseño: hace de caja de juguetes. Una copia recortada de su mitad de abajo
+         * va delante, así los juguetes que entran quedan dentro y no encima.
+         */
+        montarCofre: function (keep) {
+            var c = this.L.caja;
+            if (!this.textures.exists('qo_cofre')) return;
+            var src = this.textures.get('qo_cofre').getSourceImage();
+            var k = c.w / src.width * 1.15;
+            var cx = c.x + c.w / 2, cy = c.y + c.h / 2;
+            keep(this.add.image(cx, cy, 'qo_cofre').setScale(k).setDepth(6));
+            var frente = keep(this.add.image(cx, cy, 'qo_cofre').setScale(k).setDepth(40));
+            frente.setCrop(0, src.height * 0.46, src.width, src.height * 0.54);
         },
 
         pintarSala: function (x, w, h) {

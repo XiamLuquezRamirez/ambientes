@@ -598,10 +598,70 @@
         montarEscenario();
         Promise.resolve(imagenesPromise).then(function () {
             if (!vivo(gen)) return;
+            if (window.PedniaJuego) {
+                iniciarMotor(gen);
+                return;
+            }
             if (mostrarIntroActiva()) iniciarDemo(gen);
             else iniciarReto(gen);
         });
     };
+
+    /* ── Motor Phaser propio del juego (comun/kit.js + su mundo); si no monta, queda el juego de tarjetas ── */
+
+    function ctxMotor(gen) {
+        return {
+            decir: function (linea, opts) { return vivo(gen) ? decir(linea, opts) : Promise.resolve(); },
+            callar: function () { TextoVoz.detener(); },
+            mano: function (opts) {
+                if (!window.PedniaTutorial) return Promise.resolve();
+                return PedniaTutorial.animarMano(opts);
+            },
+            quitarMano: function () { if (window.PedniaTutorial) PedniaTutorial.quitarManos(); },
+            sonido: function (id, o) { return reproducirSonido(id, o); },
+            callarSonido: detenerSonido,
+            efecto: efecto,
+            vivo: function () { return vivo(gen); },
+            enDemo: function () { return demoActiva; },
+            textos: textos(),
+            reto: (nivelElegido.retos || [])[0] || {},
+            nivel: nivelElegido,
+            elemento: elemento,
+            celebrar: celebrarPersonajes
+        };
+    }
+
+    async function iniciarMotor(gen) {
+        const M = window.PedniaJuego;
+        try {
+            await M.montar({ gameConfig: gameConfig, nivel: nivelElegido, ctx: ctxMotor(gen) });
+        } catch (e) {
+            console.warn("[MemoriaAuditiva] motor no disponible, uso las tarjetas:", e);
+            window.PedniaJuego = null;
+            if (mostrarIntroActiva()) iniciarDemo(gen);
+            else iniciarReto(gen);
+            return;
+        }
+        if (!vivo(gen)) return;
+        try {
+            if (M.frases && typeof TextoVoz.encolarFrases === "function") TextoVoz.encolarFrases(M.frases());
+        } catch (e) { /* noop */ }
+        if (mostrarIntroActiva() && window.PedniaTutorial && M.escena && M.escena() && M.escena().demo) {
+            demoActiva = true;
+            await PedniaTutorial.activarDemo();
+            await M.demo();
+            detenerDemo();
+            if (!vivo(gen)) return;
+        }
+        if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
+        await M.jugar();
+        if (!vivo(gen)) return;
+        juegoTerminado = true;
+        celebrarPersonajes(true);
+        await M.fiestaFinal();
+        if (gen !== rondaGen) return;
+        mostrarCierre();
+    }
 
     /* ── Escenario ────────────────────────────────────────────── */
 
