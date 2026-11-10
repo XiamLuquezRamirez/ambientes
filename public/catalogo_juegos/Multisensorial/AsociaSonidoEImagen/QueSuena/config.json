@@ -38,22 +38,19 @@
   },
   "elementos": {
     "bicicleta": {
-      "img": "img/bicicleta.svg",
+      "img": "img/diseno/bicicleta.svg",
       "nombre": "Bicicleta"
     },
     "telefono": {
-      "img": "img/telefono.svg",
+      "img": "img/diseno/telefono.svg",
       "nombre": "Teléfono"
     },
     "reloj": {
-      "img": "img/reloj.svg",
-      "nombre": "Reloj",
-      "fotogramas": [
-        "img/reloj_b.svg"
-      ]
+      "img": "img/diseno/reloj.svg",
+      "nombre": "Reloj"
     },
     "avion": {
-      "img": "img/avion.svg",
+      "img": "img/diseno/avion.svg",
       "nombre": "Avión"
     },
     "aspiradora": {
@@ -61,7 +58,7 @@
       "nombre": "Aspiradora"
     },
     "tren": {
-      "img": "img/tren.svg",
+      "img": "img/diseno/tren.svg",
       "nombre": "Tren"
     },
     "ambulancia": {
@@ -151,11 +148,11 @@
       "nombre": "Regadera"
     },
     "vaca": {
-      "img": "img/vaca.svg",
+      "img": "img/diseno/vaca.svg",
       "nombre": "Vaca"
     },
     "gallo": {
-      "img": "img/gallo.svg",
+      "img": "img/diseno/gallo.svg",
       "nombre": "Gallo"
     }
   },

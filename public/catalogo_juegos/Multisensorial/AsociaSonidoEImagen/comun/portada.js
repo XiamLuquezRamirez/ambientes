@@ -22,6 +22,16 @@
         LaGranAsociacion: ['movil', 'reloj', 'bicicleta', 'puerta']
     };
 
+    /**
+     * Juegos que ya tienen las imágenes del diseño en img/diseno/<id>.svg (las de ¿Qué suena?).
+     * En esos, la portada muestra el diseño; si una falta, queda el dibujo.
+     */
+    var CON_DISENO = {
+        QueSuena: ['bicicleta', 'telefono', 'reloj', 'avion', 'tren', 'vaca', 'gallo'],
+        QueObjetoSuena: ['bicicleta', 'telefono', 'reloj', 'avion', 'tren', 'vaca', 'gallo', 'aspiradora'],
+        EscuchaYAsocia: ['bicicleta', 'telefono', 'reloj', 'avion', 'tren', 'vaca', 'gallo', 'ambulancia']
+    };
+
     function dibujo(id) {
         var A = window.PedniaArte;
         if (A.existe('portada_' + id)) return 'portada_' + id;
@@ -32,8 +42,10 @@
     function aplicar() {
         if (!window.PedniaArte) return;
         var partes = window.location.pathname.split('/');
-        var lista = ITEMS[partes[partes.length - 2] || ''];
+        var juego = partes[partes.length - 2] || '';
+        var lista = ITEMS[juego];
         if (!lista) return;
+        var disenos = CON_DISENO[juego] || [];
         var spans = document.querySelectorAll('.inicio-elementos .inicio-el');
         Array.prototype.forEach.call(spans, function (s, i) {
             var img = s.querySelector('img');
@@ -47,6 +59,11 @@
             // Las acciones las pone fotos3d() con los personajes 3D (si la página los carga).
             if (POSES[id] && document.querySelector('script[src*="personajes3d"]')) return;
             var url = window.PedniaArte.dataURL(dibujo(id), 220);
+            if (disenos.indexOf(id) >= 0) {
+                img.onerror = function () { img.onerror = null; if (url) img.src = url; };
+                img.src = 'img/diseno/' + id + '.svg';
+                return;
+            }
             if (url) img.src = url;
         });
     }

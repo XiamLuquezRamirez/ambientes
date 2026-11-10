@@ -3,13 +3,12 @@
   <!-- Pieza de Puzle de Siluetas en Acción. Generado por scripts/generar-svg-puzle-siluetas.js -->
   <g class="base">
     <rect class="pz-forma" fill="#f2c6b9" x="-9.6" y="4" width="19.2" height="106" rx="9.6"/>
-    <circle class="pz-forma" fill="#004f6d" cx="0" cy="0" r="13.5"/>
-    <rect class="pz-forma" fill="#004f6d" x="-13.5" y="0" width="27" height="25" rx="4"/>
+    <circle class="pz-forma" fill="#004f6d" cx="0" cy="0" r="15.5"/>
+    <rect class="pz-forma" fill="#004f6d" x="-15.5" y="0" width="31" height="28" rx="4"/>
     <rect class="pz-forma" fill="#fffdfc" x="-10.4" y="102" width="20.8" height="24" rx="6"/>
   </g>
   <g class="detalle">
-    <path fill="#06405a" opacity=".75" d="M-13.5,20.5 Q0,23 13.5,20.5 L13.5,25 Q0,27.5 -13.5,25 Z"/>
-    <path fill="none" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" d="M1.5,-6 L1.5,20"/>
+    <path fill="#06405a" opacity=".75" d="M-15.5,23.5 Q0,26 15.5,23.5 L15.5,28 Q0,30.5 -15.5,28 Z"/>
     <path fill="none" stroke="#e5a796" stroke-width="2.2" stroke-linecap="round" d="M3,60 Q7,64 3,69"/>
     <path fill="none" stroke="#d5dbe3" stroke-width="1.4" stroke-linecap="round" d="M-7.4,106 L7.4,106 M-7.4,110 L7.4,110"/>
   </g>

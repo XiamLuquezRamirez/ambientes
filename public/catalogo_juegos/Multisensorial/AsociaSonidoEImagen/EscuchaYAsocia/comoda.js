@@ -21,9 +21,104 @@
     var rnd = Ut.rnd;
     var EXTRA = ['telefono', 'avion', 'vaca', 'gallo', 'ambulancia'];
     var ROPA = [0xff8787, 0x74c0fc, 0xffd43b, 0x8ce99a, 0xb197fc];
+    var A = global.PedniaArte;
+
+    /** Imágenes del diseño (img/diseno/): las de ¿Qué suena? + la ambulancia y el dormitorio. */
+    var DISENO = 'img/diseno/';
+    var PIELES = ['avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca', 'ambulancia'];
+    /**
+     * Muebles dentro de fondo.png (1281×721), medidos sobre la imagen. La cómoda no viene en el
+     * dibujo: se pinta en la zona libre de la derecha, apoyada en el piso.
+     */
+    var CUARTO = {
+        fw: 1281, fh: 721,
+        piso: 431,                                   // borde de abajo del zócalo
+        cama: { x: 10, x1: 586, y: 348 },            // colchón
+        repisa: { x: 33, x1: 367, y: 168 },
+        comoda: { x: 820, x1: 1140, y: 262, y1: 530 }
+    };
 
     var escena = {
-        iniciar: function () { this.cajones = []; this.osoDespierto = 0; },
+        preload: function () {
+            var self = this;
+            var svg = function (k, f, w, h) { if (!self.textures.exists(k)) self.load.svg(k, DISENO + f, { width: w, height: h }); };
+            if (!this.textures.exists('ea_fondo')) this.load.image('ea_fondo', DISENO + 'fondo.png');
+            PIELES.forEach(function (id) { svg('ea_' + id, id + '.svg', 420, 420); });
+            svg('ea_escuchar', 'escuchar.svg', 300, 300);
+            [64, 128, 256].forEach(function (t) { svg('pa:estrella@' + t, 'estrella.svg', t, t); });
+        },
+
+        iniciar: function () {
+            var self = this;
+            PIELES.forEach(function (id) { if (self.textures.exists('ea_' + id)) Act.piel(id, 'ea_' + id); });
+            this.cajones = []; this.osoDespierto = 0;
+        },
+
+        /** HUD como ¿Qué suena?: botón de la oreja y estrellas en placa rosada. */
+        montarHud: function (keep) {
+            var L = this.L;
+            var b = keep(this.add.container(L.bocina.x, L.bocina.y).setDepth(80));
+            var halo = this.add.circle(0, 0, L.bocina.r * 1.25, 0xffffff, 0.35);
+            if (this.textures.exists('ea_escuchar')) {
+                b.add([halo, this.add.image(0, 0, 'ea_escuchar').setDisplaySize(L.bocina.r * 2.3, L.bocina.r * 2.3)]);
+            } else {
+                var plato = this.add.circle(0, 0, L.bocina.r, 0xff922b).setStrokeStyle(5, 0xffffff);
+                b.add([halo, plato, this.add.image(0, 0, A.textura(this, 'bocina', 128)).setDisplaySize(L.bocina.r * 1.35, L.bocina.r * 1.35)]);
+            }
+            b.halo = halo;
+            this.bocina = b;
+            this.ondasG = keep(this.add.graphics().setDepth(79));
+            this.estrellas = [];
+            var n = 4;
+            var x0 = L.bocina.x + L.bocina.r + 14;
+            var libre = L.W - x0 - 10;
+            var tam = Math.max(20, Math.min(40, L.bocina.r * 0.85, (libre - 12) / (n + 0.22 * (n - 1) + 0.6)));
+            var pad = tam * 0.3, radio = tam * 0.34;
+            var w = tam * n + tam * 0.22 * (n - 1) + pad * 2, h = tam + pad * 1.1, cy = L.bocina.y;
+            if (L.marcador) { tam = Math.min(44, tam * 1.15); pad = tam * 0.3; radio = tam * 0.34; w = tam * n + tam * 0.22 * (n - 1) + pad * 2; h = tam + pad * 1.1; x0 = L.marcador.x - w / 2; cy = L.marcador.y; }
+            var g = keep(this.add.graphics().setDepth(79.5));
+            g.fillStyle(0xd62a7f, 1); g.fillRoundedRect(x0, cy - h / 2, w, h, radio);
+            g.fillStyle(0xf74d9c, 1); g.fillRoundedRect(x0 + tam * 0.11, cy - h / 2 + tam * 0.11, w - tam * 0.22, h - tam * 0.22, radio * 0.82);
+            for (var i = 0; i < n; i++) {
+                var e = keep(this.add.image(x0 + pad + tam / 2 + i * (tam * 1.22), cy, A.textura(this, 'estrella', 128)).setDisplaySize(tam, tam).setDepth(80));
+                if (i >= this.nivelActual) e.setTint(0x9b6f86).setAlpha(0.5);
+                this.estrellas.push(e);
+            }
+            this.montarPresentador();
+        },
+
+        /**
+         * Con el dormitorio del diseño: la imagen va abajo, de ancho completo (en vertical crece y
+         * recorta los lados) y los muebles salen de sus medidas.
+         */
+        calcularConFondo: function (L) {
+            var W = L.W, H = L.H, C = CUARTO;
+            var s = Math.max(W / C.fw, H * 0.62 / C.fh);
+            var ix = (W - C.fw * s) / 2, iy = H - C.fh * s;
+            var px = function (u) { return ix + u * s; }, py = function (v) { return iy + v * s; };
+            L.fondo = { x: ix, y: iy, s: s };
+            if (W < 700) L.bocina.y = Math.max(L.bocina.y, 190);
+            else {
+                // La oreja a media altura de la ventana; las estrellas en la pared libre de la derecha.
+                L.bocina.y = py(128);
+                var pa = px(870), pb = Math.min(W - 12, px(1270));
+                if (pb - pa > 160) L.marcador = { x: (pa + pb) / 2, y: py(150) };
+            }
+            L.y0 = py(C.piso);
+            L.cama = { x: px(C.cama.x), y: py(C.cama.y), w: px(C.cama.x1) - px(C.cama.x), h: H * 0.2 };
+            L.repisa = { x: px(C.repisa.x), y: py(C.repisa.y), w: px(C.repisa.x1) - px(C.repisa.x) };
+            // Si la repisa del dibujo queda fuera (vertical, imagen recortada), se pinta otra visible.
+            if (L.repisa.x < 8) {
+                var rw = Math.min(L.repisa.w, W * 0.5);
+                L.repisa = { x: 10, y: py(C.repisa.y), w: rw, propia: true };
+            }
+            var x0 = px(C.comoda.x), x1 = px(C.comoda.x1);
+            // En pantalla angosta la cómoda no puede salirse por la derecha.
+            if (x1 > W - 8) { x0 -= x1 - (W - 8); x1 = W - 8; }
+            L.comoda = { x: x0, y: py(C.comoda.y), w: x1 - x0, h: py(C.comoda.y1) - py(C.comoda.y) };
+            L.tam = Math.max(56, Math.min(120, L.comoda.h / 3 * 0.95, L.comoda.w / 2 * 0.7));
+            return L;
+        },
 
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
@@ -33,6 +128,7 @@
             L.bocina = { x: W / 2, y: Math.max(64, Math.min(116, 60 + hueco * 0.25)), r: Math.max(30, Math.min(42, hueco * 0.32)) };
             L.pres = W >= 760 ? { x: W - 78, piso: H - 104, alto: Math.min(170, H * 0.3) } : null;
             var der = L.pres ? W - 165 : W - 20;
+            if (this.textures.exists('ea_fondo')) return this.calcularConFondo(L);
             // Cómoda: 3 filas × 2 columnas.
             var cw = Math.min(W * 0.46, 520, (der - W * 0.36));
             var ch = Math.min(H * 0.5, cw * 0.82);
@@ -49,11 +145,21 @@
             var self = this;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            if (L.fondo) {
+                // Dormitorio del diseño. Si no llega arriba, la pared se completa estirando sus
+                // primeras filas (rayas verticales).
+                var tex = this.textures.get('ea_fondo');
+                if (L.fondo.y > 0) {
+                    if (!tex.has('arriba')) tex.add('arriba', 0, 0, 0, CUARTO.fw, 6);
+                    keep(this.add.image(L.fondo.x, 0, 'ea_fondo', 'arriba').setOrigin(0, 0).setDisplaySize(CUARTO.fw * L.fondo.s, L.fondo.y + 2).setDepth(-1));
+                }
+                keep(this.add.image(L.fondo.x, L.fondo.y, 'ea_fondo', '__BASE').setOrigin(0, 0).setScale(L.fondo.s).setDepth(-1));
+            }
             K.textura(this, 'cuarto_fondo', L.W, L.H, function (x, w, h) { self.pintarCuarto(x, w, h); });
             keep(this.add.image(0, 0, 'cuarto_fondo').setOrigin(0, 0).setDepth(0));
             // Estrellitas fosforescentes pegadas en la pared: titilan; al tocarlas cruza una estrella fugaz.
             var V = this.montarVida(keep);
-            if (V) {
+            if (V && !L.fondo) {
                 // Estrellas fosforescentes repartidas por la pared (no sobre la bocina ni la cómoda).
                 var techo = L.bocina.y + L.bocina.r + 12;
                 V.estrellas({ x: 24, y: techo, w: L.bocina.x - L.bocina.r - 60, h: Math.max(30, L.repisa.y - techo - 50), depth: 1, pegatina: true }, 6);
@@ -70,6 +176,16 @@
 
         pintarCuarto: function (x, w, h) {
             var L = this.L;
+            // Con el dormitorio del diseño (cama, osito, repisa, ventana ya pintados) solo falta la cómoda.
+            if (L.fondo) {
+                if (L.repisa.propia) {
+                    var r = L.repisa;
+                    x.fillStyle = 'rgba(0,0,0,0.15)'; x.fillRect(r.x + 4, r.y + 6, r.w, 10);
+                    K.madera(x, r.x, r.y, r.w, Math.max(10, h * 0.016), { r: 3, claro: '#d08a5c', medio: '#bf7655', oscuro: '#8f5333' });
+                }
+                this.pintarCuerpoComoda(x);
+                return;
+            }
             K.pared(x, w, L.y0, { arriba: '#e5dbff', abajo: '#d0bfff', raya: 'rgba(255,255,255,0.18)', motivo: 'rgba(255,255,255,0.35)' });
             K.piso(x, w, h, L.y0, { lejos: '#a9744a', cerca: '#cf9867' });
             // Ventana de noche con luna.
@@ -108,8 +224,12 @@
                 luz.addColorStop(0, 'rgba(255,236,153,0.45)'); luz.addColorStop(1, 'rgba(255,236,153,0)');
                 x.fillStyle = luz; x.fillRect(mx - h * 0.2, my - h * 0.4, h * 0.45, h * 0.45);
             }
-            // Cuerpo de la cómoda (los frentes de los cajones son objetos aparte).
-            var d = L.comoda;
+            this.pintarCuerpoComoda(x);
+        },
+
+        /** Cuerpo de la cómoda (los frentes de los cajones son objetos aparte). */
+        pintarCuerpoComoda: function (x) {
+            var d = this.L.comoda;
             K.sombra(x, d.x + d.w / 2, d.y + d.h + 6, d.w * 0.55, 14, 0.4);
             K.madera(x, d.x - 10, d.y - 16, d.w + 20, 18, { r: 6, claro: '#f3d9a4', medio: '#e0b66f', oscuro: '#b9853c' });
             x.fillStyle = '#7a4a1c'; K.rr(x, d.x - 4, d.y, d.w + 8, d.h, 6); x.fill();
@@ -137,6 +257,8 @@
             o.t = t;
             this.oso = o;
             this.dibujarOjos(false);
+            // El dormitorio del diseño ya trae su osito sobre la cama: el dibujado no se muestra.
+            if (L.fondo) o.setVisible(false);
         },
 
         dibujarOjos: function (abiertos) {

@@ -347,7 +347,9 @@ body.intro3d-activa #menu-acc {
 
 .info {
   align-self: flex-start;
-  max-width: calc(100% - 250px);
+  /* Deja libre la esquina de la medalla de progreso y los dos botones redondos (antes la medalla
+     quedaba encima del botón de ayuda). */
+  max-width: calc(100% - 340px);
   min-height: 74px;
   display: flex;
   align-items: center;
@@ -390,7 +392,10 @@ body.intro3d-activa #menu-acc {
 .info-linea { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
 .mision-nivel {
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   padding: 4px 12px;
   border-radius: 12px;
   background: var(--sil-morado-claro);

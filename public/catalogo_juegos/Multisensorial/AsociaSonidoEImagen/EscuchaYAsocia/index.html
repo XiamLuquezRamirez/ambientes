@@ -19,6 +19,12 @@
 	<link rel="stylesheet" href="../../../final/final.css">
 	<link rel="stylesheet" href="../../../intro3d/css/intro.css">
 	<link rel="stylesheet" href="../../EncuentraLaPareja/comun/hud.css?v=20261105a">
+	<style>
+		/* Globo de Zoe como en ¿Qué suena?: más abajo y sin tapar la bocina ni los botones. */
+		.cabecera { padding-top: 34px !important; }
+		@media (min-width: 700px) { .dialogo { max-width: calc(50vw - 90px) !important; } }
+		@media (max-width: 699px) { .dialogo { max-width: calc(100vw - 175px) !important; } }
+	</style>
 </head>
 <body class="esperando-inicio">
 	<div id="pantalla-inicio" class="pantalla-inicio">
@@ -40,9 +46,9 @@
 				<i class="fa-solid fa-play btn-empecemos-icono" aria-hidden="true"></i>
 			</button>
 			<div class="inicio-elementos area-seleccion" aria-hidden="true">
-				<span class="inicio-el ie1"><img src="img/bicicleta.svg" data-laboratorio="img/puerta.svg" alt="" draggable="false"></span>
-				<span class="inicio-el ie2"><img src="img/telefono.svg" data-laboratorio="img/aspiradora.svg" alt="" draggable="false"></span>
-				<span class="inicio-el ie3"><img src="img/reloj.svg" data-laboratorio="img/ambulancia.svg" alt="" draggable="false"></span>
+				<span class="inicio-el ie1"><img src="img/diseno/bicicleta.svg" data-laboratorio="img/puerta.svg" alt="" draggable="false"></span>
+				<span class="inicio-el ie2"><img src="img/diseno/telefono.svg" data-laboratorio="img/aspiradora.svg" alt="" draggable="false"></span>
+				<span class="inicio-el ie3"><img src="img/diseno/reloj.svg" data-laboratorio="img/diseno/ambulancia.svg" alt="" draggable="false"></span>
 				<span class="inicio-el ie4"><img src="img/pluma.svg" alt="" draggable="false"></span>
 			</div>
 		</div>
@@ -215,12 +221,12 @@
 	<script src="../../EncuentraLaPareja/comun/arte.js?v=20261106a"></script>
 	<script src="../../EncuentraLaPareja/comun/base.js?v=20261109z"></script>
 	<script src="../comun/objetos.js?v=20261108a"></script>
-	<script src="../comun/actores.js?v=20261108a"></script>
+	<script src="../comun/actores.js?v=20261110a"></script>
 	<script type="module" src="../comun/personajes3d.js?v=20261108a"></script>
 	<script src="../comun/vida.js?v=20261109zb"></script>
 	<script src="../comun/kit.js?v=20261109zd"></script>
-	<script src="comoda.js?v=20261109zb"></script>
+	<script src="comoda.js?v=20261110c"></script>
 	<script src="script.js?v=20261106a"></script>
-	<script src="../comun/portada.js?v=20261107a"></script>
+	<script src="../comun/portada.js?v=20261110b"></script>
 </body>
 </html>

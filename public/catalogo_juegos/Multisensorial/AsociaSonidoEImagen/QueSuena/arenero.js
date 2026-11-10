@@ -28,7 +28,8 @@
     var rnd = Ut.rnd;
 
     var CELDA = 12;
-    var EXTRA = ['tren', 'avion', 'vaca', 'gallo', 'ambulancia'];
+    var APLANA = 0.8;   // los hoyos se ven ovalados: el suelo está inclinado hacia el fondo
+    var EXTRA = ['tren', 'avion', 'vaca', 'gallo'];   // solo los que tienen imagen del diseño
     var BOTONES_ABAJO = { w: 150, h: 96 };   // accesibilidad (esquina inferior derecha)
 
     function efecto(scene, n) { if (scene.ctx.efecto) scene.ctx.efecto(n); }
@@ -118,65 +119,149 @@
         return t;
     }
 
-    function pintarMarco(x, R, W, H, grosor) {
-        // Tablas de madera alrededor del arenero, con veta, clavos y la tabla de adelante más ancha.
-        function tabla(px, py, pw, ph, vertical, oscuro) {
-            var g = vertical ? x.createLinearGradient(px, 0, px + pw, 0) : x.createLinearGradient(0, py, 0, py + ph);
-            g.addColorStop(0, oscuro ? '#b07636' : '#d39a55');
-            g.addColorStop(0.45, oscuro ? '#9a6229' : '#c0843f');
-            g.addColorStop(1, oscuro ? '#6f4119' : '#8c5724');
-            x.fillStyle = g;
+    /**
+     * Borde de arriba de la arena, sin marco: una fila de montoncitos (como los surcos de una
+     * huerta) que tapa la línea recta de la capa y se recorta contra el pasto.
+     * Lienzo de alto h = 2.2·r; la superficie de la arena empieza en y = 1.1·r.
+     */
+    function pintarBorde(x, w, h, r, baldosa) {
+        var base = r * 1.1;
+        var pat = x.createPattern(baldosa, 'repeat');
+        if (pat.setTransform && global.DOMMatrix) pat.setTransform(new global.DOMMatrix().scale(0.6, 0.47));
+        function lomo(cx, cy, rx, ry, oscuro) {
+            x.save();
             x.beginPath();
-            if (x.roundRect) x.roundRect(px, py, pw, ph, 6); else x.rect(px, py, pw, ph);
+            x.ellipse(cx, cy, rx, ry, 0, Math.PI, 0);          // media elipse: la panza queda enterrada
+            x.lineTo(cx + rx, cy + ry * 0.55);
+            x.lineTo(cx - rx, cy + ry * 0.55);
+            x.closePath();
+            x.fillStyle = pat;
             x.fill();
-            x.strokeStyle = 'rgba(80,45,15,0.35)';
+            x.clip();
+            // Luz arriba a la izquierda y sombra abajo: se lee como un montoncito con volumen.
+            var g = x.createLinearGradient(cx - rx * 0.4, cy - ry, cx + rx * 0.3, cy + ry * 0.5);
+            g.addColorStop(0, 'rgba(255,246,222,0.55)');
+            g.addColorStop(0.5, 'rgba(255,240,205,0.05)');
+            g.addColorStop(1, oscuro ? 'rgba(120,80,35,0.38)' : 'rgba(140,95,45,0.25)');
+            x.fillStyle = g;
+            x.fillRect(cx - rx, cy - ry, rx * 2, ry * 1.6);
+            x.restore();
+            x.strokeStyle = 'rgba(150,105,55,0.45)';
             x.lineWidth = 1.2;
-            for (var i = 0; i < 4; i++) {
-                x.beginPath();
-                if (vertical) {
-                    var vx = px + pw * (0.2 + i * 0.2);
-                    x.moveTo(vx, py + 4);
-                    for (var yy = py; yy < py + ph; yy += 30) x.lineTo(vx + Math.sin(yy / 40 + i) * 2.5, yy);
-                } else {
-                    var vy = py + ph * (0.22 + i * 0.19);
-                    x.moveTo(px + 4, vy);
-                    for (var xx = px; xx < px + pw; xx += 30) x.lineTo(xx, vy + Math.sin(xx / 47 + i) * 2.2);
-                }
-                x.stroke();
-            }
-            x.fillStyle = 'rgba(255,235,200,0.35)';
-            if (vertical) x.fillRect(px + 2, py + 2, 3, ph - 4); else x.fillRect(px + 4, py + 2, pw - 8, 3);
+            x.beginPath();
+            x.ellipse(cx, cy, rx, ry, 0, Math.PI * 1.08, Math.PI * 1.92);
+            x.stroke();
         }
-        function clavo(cx, cy) {
-            x.fillStyle = '#5c5f66';
-            x.beginPath(); x.arc(cx, cy, 3.2, 0, Math.PI * 2); x.fill();
-            x.fillStyle = 'rgba(255,255,255,0.6)';
-            x.beginPath(); x.arc(cx - 1, cy - 1, 1.2, 0, Math.PI * 2); x.fill();
-        }
-        var gf = grosor;
-        // Sombra del arenero sobre el pasto.
-        x.fillStyle = 'rgba(0,0,0,0.18)';
+        // Sombra suave de los montoncitos sobre el pasto.
+        x.fillStyle = 'rgba(40,70,0,0.18)';
         x.beginPath();
-        if (x.roundRect) x.roundRect(R.x - gf + 6, R.y - gf * 0.6 + 10, R.w + gf * 2, R.h + gf * 1.6, 14); else x.rect(R.x - gf + 6, R.y - gf * 0.6 + 10, R.w + gf * 2, R.h + gf * 1.6);
+        x.ellipse(w / 2, base - r * 0.15, w * 0.6, r * 0.8, 0, Math.PI, 0);
         x.fill();
-        tabla(R.x - gf, R.y - gf * 0.6, R.w + gf * 2, gf * 0.6 + 4, false, true);       // fondo (lejos)
-        tabla(R.x - gf, R.y - gf * 0.6, gf, R.h + gf * 0.6, true, false);               // izquierda
-        tabla(R.x + R.w, R.y - gf * 0.6, gf, R.h + gf * 0.6, true, false);              // derecha
-        tabla(R.x - gf, R.y + R.h - 2, R.w + gf * 2, gf + 2, false, false);              // frente
-        [[R.x - gf * 0.5, R.y - gf * 0.3], [R.x + R.w + gf * 0.5, R.y - gf * 0.3], [R.x - gf * 0.5, R.y + R.h + gf * 0.45], [R.x + R.w + gf * 0.5, R.y + R.h + gf * 0.45]].forEach(function (q) { clavo(q[0], q[1]); });
-        // Sombra interior de la tabla de atrás sobre la arena.
-        var s = x.createLinearGradient(0, R.y, 0, R.y + 26);
-        s.addColorStop(0, 'rgba(60,35,10,0.35)');
-        s.addColorStop(1, 'rgba(60,35,10,0)');
-        x.fillStyle = s;
-        x.fillRect(R.x, R.y, R.w, 26);
+        // Fila de atrás (más chicos y más oscuros) y fila de adelante, intercaladas.
+        var paso = r * 1.5;
+        var semilla = 7;
+        var rnd = function () { semilla = (semilla * 9301 + 49297) % 233280; return semilla / 233280; };
+        for (var cx = -r * 0.5; cx < w + r; cx += paso) {
+            lomo(cx + paso * 0.5, base - r * 0.05, r * (0.75 + rnd() * 0.25), r * (0.6 + rnd() * 0.2), true);
+        }
+        for (cx = -r * 0.2; cx < w + r; cx += paso) {
+            lomo(cx + (rnd() - 0.5) * r * 0.3, base + r * 0.25, r * (0.9 + rnd() * 0.3), r * (0.6 + rnd() * 0.25), false);
+        }
+        // Granitos sueltos que se escaparon al pasto.
+        for (var i = 0; i < w / 14; i++) {
+            x.fillStyle = ['#e8c486', '#d4a868', '#f5dcaa'][i % 3];
+            x.globalAlpha = 0.7;
+            x.beginPath();
+            x.arc(rnd() * w, base - r * (0.55 + rnd() * 0.4), 0.8 + rnd() * 1.3, 0, Math.PI * 2);
+            x.fill();
+        }
+        x.globalAlpha = 1;
+    }
+
+    /**
+     * Pinta la arena "acostada" en el suelo: la textura se achica y se aplana hacia el fondo
+     * y converge con los lados del cajón (trapecio). Se pinta fila por fila desde una lámina plana.
+     */
+    function pintarSuelo(ctx, w, h, ins, baldosa) {
+        var prof = function (v) { return 0.62 + 0.38 * v; };   // escala de la textura según la profundidad
+        var anchoMax = Math.ceil(w / prof(0)) + 4;
+        var srcH = 0, filas = [];
+        var paso = 2;
+        for (var y = 0; y < h; y += paso) {
+            var v = y / h, d = prof(v);
+            var ancho = w - 2 * ins * (1 - v);
+            filas.push({ y: y, x0: ins * (1 - v), ancho: ancho, sw: ancho / d, sy: srcH });
+            srcH += paso / (d * 0.78);
+        }
+        var lam = global.document.createElement('canvas');
+        lam.width = anchoMax; lam.height = Math.ceil(srcH) + 4;
+        var lx = lam.getContext('2d');
+        lx.fillStyle = lx.createPattern(baldosa, 'repeat');
+        lx.fillRect(0, 0, lam.width, lam.height);
+        filas.forEach(function (f) {
+            var sx = (anchoMax - f.sw) / 2;
+            var sh = paso / ((0.62 + 0.38 * f.y / h) * 0.78);
+            ctx.drawImage(lam, sx, f.sy, f.sw, Math.max(1, sh), f.x0, f.y, f.ancho, paso + 0.5);
+        });
+        // Más luz lejos (bruma) y un poco más de contraste cerca.
+        var g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, 'rgba(255,248,230,0.18)');
+        g.addColorStop(0.5, 'rgba(255,248,230,0)');
+        g.addColorStop(1, 'rgba(90,60,25,0.06)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+    }
+
+    /** Borra lo que queda fuera del trapecio del cajón. */
+    function recortarTrapecio(ctx, w, h, ins) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.moveTo(0, 0); ctx.lineTo(ins, 0); ctx.lineTo(0, h); ctx.closePath();
+        ctx.moveTo(w, 0); ctx.lineTo(w - ins, 0); ctx.lineTo(w, h); ctx.closePath();
+        ctx.fill();
+        ctx.restore();
     }
 
     /* ══ Escena ══ */
 
+    /** Imágenes diseñadas por el equipo para este juego (img/diseno/). Si falta alguna, queda el dibujo. */
+    var DISENO = 'img/diseno/';
+    var PIELES = ['avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca'];
+    // Hueco del cajón dentro de carrito.svg (medido sobre la imagen de 420×314).
+    var CAJON = { x0: 29, x1: 350, y0: 82, y1: 157 };
+    // Sol y nubes recortados de fondo.png: centro y ancho en píxeles de la imagen original (1281×721).
+    var CIELO = [
+        { id: 'sol', x: 960, y: 112, w: 138 },     // entre los dos árboles del fondo nuevo (ya no viene dibujado en fondo.png)
+        { id: 'nube1', x: 1058.5, y: 33, w: 107 },
+        { id: 'nube2', x: 341.5, y: 36.5, w: 107 },
+        { id: 'nube3', x: 771.5, y: 36.5, w: 107 },
+        { id: 'nube4', x: 1225, y: 99, w: 90 },
+        { id: 'nube5', x: 1055, y: 125.5, w: 44 },
+        { id: 'nube6', x: 40.5, y: 166.5, w: 45 }
+    ];
+
     var escena = {
-        create: function () {
+        preload: function () {
             var self = this;
+            var svg = function (k, f, w, h) { if (!self.textures.exists(k)) self.load.svg(k, DISENO + f, { width: w, height: h }); };
+            if (!this.textures.exists('qs_fondo')) this.load.image('qs_fondo', DISENO + 'fondo.png');
+            // El mismo fondo sin sol ni nubes, y esas piezas por separado para animarlas.
+            if (!this.textures.exists('qs_fondo_frente')) this.load.image('qs_fondo_frente', DISENO + 'fondo_frente.png');
+            CIELO.forEach(function (c) { if (!self.textures.exists('qs_' + c.id)) self.load.image('qs_' + c.id, DISENO + c.id + '.png'); });
+            PIELES.forEach(function (id) { svg('qs_' + id, id + '.svg', 420, 320); });
+            svg('qs_carrito', 'carrito.svg', 420, 314);
+            svg('qs_escuchar', 'escuchar.svg', 300, 300);
+            // Estrella del diseño: se carga con las mismas claves que usa el arte dibujado
+            // (arte.js: 'pa:estrella@tam'), así la usan el marcador, los estallidos y el final.
+            [64, 128, 256].forEach(function (t) { svg('pa:estrella@' + t, 'estrella.svg', t, t); });
+            for (var i = 1; i <= 5; i++) svg('qs_mariposa' + i, 'mariposa' + i + '.svg', 160, 160);
+        },
+
+        create: function () {
+            // Los juguetes se visten con las imágenes del diseño (comun/actores.js: piel).
+            var self = this;
+            PIELES.forEach(function (id) { if (self.textures.exists('qs_' + id)) Act.piel(id, 'qs_' + id); });
             this.fase = 'intro';
             this.errores = 0;
             this.hechos = 0;
@@ -208,16 +293,20 @@
             var W = this.scale.width, H = this.scale.height;
             var L = { W: W, H: H };
             L.grosor = Math.max(16, Math.min(30, H * 0.045));
-            var arriba = Math.max(H * 0.4, Math.min(250, H * 0.46));
-            L.R = { x: L.grosor + 8, y: arriba, w: W - (L.grosor + 8) * 2, h: H - arriba - L.grosor - 10 };
+            var arriba = Math.max(H * 0.48, Math.min(300, H * 0.54));   // la arena ocupa algo menos de la mitad de abajo
+            // La arena va directo en el suelo, sin marco: de borde a borde y hasta abajo de la pantalla.
+            // Arriba la cierra una fila de montoncitos (L.grosor es su alto) y encima queda el pasto.
+            L.R = { x: 0, y: arriba, w: W, h: H - arriba };
+            L.ins = 0;
             L.tam = Math.max(78, Math.min(160, L.R.h * 0.44, L.R.w / 4.6));
             L.pincel = Math.max(26, L.tam * 0.24);
             var hueco = arriba - 70;
             L.bocina = { x: W / 2, y: Math.max(64, Math.min(132, 70 + hueco * 0.35)), r: Math.max(30, Math.min(44, hueco * 0.3)) };
             L.carrito = { w: Math.max(110, Math.min(190, W * 0.17)) };
             L.carrito.h = L.carrito.w * 0.42;
-            L.carrito.x = L.R.x + L.carrito.w * 0.55;
-            L.carrito.y = L.R.y - L.grosor * 0.6 - L.carrito.h * 0.5 - 4;
+            L.carrito.x = 14 + L.carrito.w * 0.55;
+            // Apoyado en el pasto, justo encima de los montoncitos del borde de la arena.
+            L.carrito.y = L.R.y - L.grosor * 1.25 - L.carrito.h * 0.5;
             L.pres = W >= 700;
             L.presAlto = Math.min(170, Math.max(110, L.R.y - 70));
             L.presX = W - Math.max(70, L.presAlto * 0.42);
@@ -235,41 +324,65 @@
 
             // Parque vivo por capas (comun/vida.js): cielo, sol, nubes, montañas, árboles y pájaros que se mueven y se pueden tocar.
             this.vidaAmb = global.AsociaVida ? global.AsociaVida.montar(this, keep) : null;
-            if (this.vidaAmb) this.vidaAmb.parque({ horizonte: R.y - L.grosor - 8, arboles: [0.3, 0.46, 0.7, 0.9], solX: 0.2 });
-            // Pasto delante y a los costados del arenero.
-            var pasto = keep(this.add.graphics().setDepth(1));
-            pasto.fillStyle(0x6fbf4a, 1);
-            pasto.fillRect(0, R.y - L.grosor, L.W, L.H - R.y + L.grosor);
-            pasto.fillStyle(0x5aa83a, 1);
-            for (var i = 0; i < L.W; i += 7) pasto.fillTriangle(i, R.y - L.grosor + 2, i + 3, R.y - L.grosor - 6 - (i * 7 % 5), i + 6, R.y - L.grosor + 2);
+            if (this.textures.exists('qs_fondo')) {
+                // Fondo del diseño (parque con cerca, sol y árboles): cubre la pantalla y su línea del
+                // pasto queda justo detrás del borde de arriba del arenero.
+                var f = this.textures.get('qs_fondo').getSourceImage();
+                var pastoY = 308 / 721;                         // dónde empieza el pasto en la imagen
+                var meta = R.y - L.grosor * 1.8;              // franja de pasto entre la cerca y la arena
+                // Solo ancho y cielo: el pasto de abajo lo completa el relleno del mismo verde, así
+                // la imagen no se agranda de más y no se cortan el sol ni las copas de los árboles.
+                var s = Math.max(L.W / f.width, meta / (f.height * pastoY));
+                var cielo = keep(this.add.graphics().setDepth(0));
+                cielo.fillStyle(0x95dff6, 1); cielo.fillRect(0, 0, L.W, meta);
+                cielo.fillStyle(0x8bc10a, 1); cielo.fillRect(0, meta, L.W, L.H - meta);
+                var arriba = meta - f.height * pastoY * s;
+                var separado = this.textures.exists('qs_fondo_frente') && this.textures.exists('qs_sol');
+                // Con las piezas separadas, el fondo va con el cielo transparente y por encima del sol y
+                // las nubes (profundidad 0.6): así pasan por detrás de los árboles.
+                keep(this.add.image(L.W / 2, arriba, separado ? 'qs_fondo_frente' : 'qs_fondo').setOrigin(0.5, 0).setScale(s).setDepth(separado ? 0.7 : 0.5));
+                if (separado) this.montarCielo(keep, f.width, arriba, s);
+            } else {
+                if (this.vidaAmb) this.vidaAmb.parque({ horizonte: R.y - L.grosor - 8, arboles: [0.3, 0.46, 0.7, 0.9], solX: 0.2 });
+                // Pasto delante y a los costados del arenero.
+                var pasto = keep(this.add.graphics().setDepth(1));
+                pasto.fillStyle(0x6fbf4a, 1);
+                pasto.fillRect(0, R.y - L.grosor, L.W, L.H - R.y + L.grosor);
+                pasto.fillStyle(0x5aa83a, 1);
+                for (var i = 0; i < L.W; i += 7) pasto.fillTriangle(i, R.y - L.grosor + 2, i + 3, R.y - L.grosor - 6 - (i * 7 % 5), i + 6, R.y - L.grosor + 2);
+            }
 
-            // Marco de madera (una textura).
-            var mk = 'arenero_marco';
-            texturaCanvas(this, mk, L.W, L.H, function (x) { pintarMarco(x, R, L.W, L.H, L.grosor); });
-            keep(this.add.image(0, 0, mk).setOrigin(0, 0).setDepth(3));
-
-            // Fondo del hoyo: arena húmeda y más oscura, con sombra en el borde.
+            // Fondo del hoyo: arena húmeda y más oscura, acostada en el suelo como la seca.
             texturaCanvas(this, 'arenero_hoyo', R.w, R.h, function (x, w, h) {
-                x.fillStyle = x.createPattern(self.baldosaHumeda, 'repeat');
-                x.fillRect(0, 0, w, h);
+                pintarSuelo(x, w, h, L.ins, self.baldosaHumeda);
+                recortarTrapecio(x, w, h, L.ins);
             });
             keep(this.add.image(R.x, R.y, 'arenero_hoyo').setOrigin(0, 0).setDepth(4));
 
+            // Lámina de arena seca en perspectiva: de acá se copia al tapar hoyos.
+            this.arenaSeca = global.document.createElement('canvas');
+            this.arenaSeca.width = Math.max(2, Math.ceil(R.w));
+            this.arenaSeca.height = Math.max(2, Math.ceil(R.h));
+            pintarSuelo(this.arenaSeca.getContext('2d'), R.w, R.h, L.ins, this.baldosaSeca);
+
             // Capa de arena seca que se borra con el dedo.
             this.capa = texturaCanvas(this, 'arenero_capa', R.w, R.h, function (x, w, h) {
-                x.fillStyle = x.createPattern(self.baldosaSeca, 'repeat');
-                x.fillRect(0, 0, w, h);
+                x.drawImage(self.arenaSeca, 0, 0);
+                recortarTrapecio(x, w, h, L.ins);
             });
             this.capaCtx = this.capa.getContext();
-            this.patron = this.capaCtx.createPattern(this.baldosaSeca, 'repeat');
             keep(this.add.image(R.x, R.y, 'arenero_capa').setOrigin(0, 0).setDepth(20));
+            // Borde de arriba: una fila de montoncitos de arena sobre el pasto (sin marco), como un surco.
+            var alto = L.grosor * 2.2;
+            texturaCanvas(this, 'arenero_borde', L.W, alto, function (x, w, h) { pintarBorde(x, w, h, L.grosor, self.baldosaSeca); });
+            keep(this.add.image(0, R.y - L.grosor * 1.1, 'arenero_borde').setOrigin(0, 0).setDepth(20.5));
             this.cols = Math.ceil(R.w / CELDA);
             this.filas = Math.ceil(R.h / CELDA);
             this.tapado = new Uint8Array(this.cols * this.filas).fill(1);
 
             this.montarBocina(keep);
-            this.montarEstrellas(keep);
-            this.montarCarrito(keep);
+            this.montarCarrito(keep);        // monta también la placa de estrellas, encima del cajón
+            this.montarEstrellas(keep);      // respaldo si no está la imagen del carrito
             this.montarVida(keep);
             this.montarPresentador();
 
@@ -280,7 +393,7 @@
                     j.x = R.x + j.u * R.w;
                     j.y = R.y + j.v * R.h;
                     j.actor.cont.setPosition(j.x, j.y);
-                    j.actor.cont.setScale(L.tam / j.tam0);
+                    j.actor.cont.setScale(L.tam / j.tam0 * self.prof(j.y));
                     if (j.estado === 'visto') self.cavarElipse(j, 1.05);
                     else self.montonDe(j);
                 });
@@ -289,26 +402,140 @@
             this.capa.refresh();
         },
 
+        /**
+         * Sol y nubes del fondo, recortados de la imagen del diseño (img/diseno/sol.png, nubeN.png)
+         * y puestos en el mismo lugar: el sol respira y se balancea, las nubes viajan despacio.
+         * Al tocarlos responden (el sol gira y sonríe más grande, la nube se infla).
+         */
+        montarCielo: function (keep, fw, arriba, s) {
+            var self = this, L = this.L;
+            var aPantalla = function (p) { return { x: L.W / 2 + (p.x - fw / 2) * s, y: arriba + p.y * s }; };
+            this.cielo = [];
+            this.sol = null;
+            CIELO.forEach(function (c) {
+                var clave = 'qs_' + c.id;
+                if (!self.textures.exists(clave)) return;
+                var p = aPantalla(c);
+                if (c.id === 'sol') {
+                    var halo = keep(self.add.circle(p.x, p.y, c.w * s * 0.62, 0xfff3a3, 0.35).setDepth(0.64));
+                    var sol = keep(self.add.image(p.x, p.y, clave).setScale(s).setDepth(0.65));   // delante de las nubes y detrás de los árboles
+                    sol.base = s; sol.halo = halo; sol.r = c.w * s * 0.5;
+                    self.sol = sol;
+                    return;
+                }
+                // Si el fondo queda recortado arriba, la nube baja lo justo para verse entera.
+                var y = Math.max(p.y, c.w * s * 0.25 + 10);
+                var n = keep(self.add.image(p.x, y, clave).setScale(s).setDepth(0.6));
+                n.base = s; n.y0 = y; n.fase = Math.random() * 6;
+                n.vx = (6 + Math.random() * 6) * (c.w / 100);   // las grandes (más cerca) van un poco más rápido
+                self.cielo.push(n);
+            });
+        },
+
+        /** Toque arriba: el sol o una nube responden. Devuelve true si tocó alguno. */
+        tocarCielo: function (p) {
+            var self = this;
+            var sol = this.sol;
+            if (sol && sol.active && Math.hypot(p.x - sol.x, p.y - sol.y) < sol.r * 1.1) {
+                if (sol.girando) return true;
+                sol.girando = true;
+                efecto(this, 'boing');
+                this.tweens.add({ targets: sol, angle: sol.angle + 360, duration: 900, ease: 'Back.easeInOut' });
+                this.tweens.add({ targets: sol, scale: sol.base * 1.25, duration: 300, yoyo: true, hold: 300, ease: 'Sine.easeOut', onComplete: function () { sol.girando = false; } });
+                Ut.estallido(this, sol.x, sol.y, { n: 10, tex: 'chispa', tam: 16, dist: sol.r * 1.6, colores: [0xffe066, 0xffffff], depth: 1 });
+                return true;
+            }
+            var nube = null;
+            (this.cielo || []).forEach(function (n) {
+                if (n.active && !n.inflada && Math.abs(p.x - n.x) < n.displayWidth * 0.55 && Math.abs(p.y - n.y) < n.displayHeight * 0.8) nube = n;
+            });
+            if (nube) {
+                nube.inflada = true;
+                efecto(this, 'clic');
+                this.tweens.add({ targets: nube, scaleX: nube.base * 1.3, scaleY: nube.base * 1.2, duration: 220, yoyo: true, ease: 'Sine.easeOut', onComplete: function () { nube.inflada = false; } });
+                nube.vx *= 2.5;
+                this.time.delayedCall(1500, function () { if (nube.active) nube.vx /= 2.5; });
+                return true;
+            }
+            return false;
+        },
+
+        animarCielo: function (time, delta) {
+            var L = this.L, sol = this.sol;
+            var quieto = Ut.reducido && Ut.reducido();
+            if (sol && sol.active && !sol.girando && !quieto) {
+                sol.setScale(sol.base * (1 + Math.sin(time / 900) * 0.035));
+                sol.angle = Math.sin(time / 1300) * 6;
+            }
+            if (sol && sol.halo && sol.halo.active) {
+                var k = quieto ? 1 : 1 + Math.sin(time / 700) * 0.12;
+                sol.halo.setScale(k).setAlpha(0.22 + (quieto ? 0 : Math.sin(time / 700) * 0.1));
+            }
+            (this.cielo || []).forEach(function (n) {
+                if (!n.active) return;
+                n.fase += delta / 1000;
+                n.x += n.vx * (quieto ? 0.3 : 1) * delta / 1000;
+                n.y = n.y0 + Math.sin(n.fase * 0.6) * 3;
+                if (n.x - n.displayWidth / 2 > L.W + 10) n.x = -n.displayWidth / 2 - 10;
+            });
+        },
+
         montarBocina: function (keep) {
             var L = this.L;
             var b = keep(this.add.container(L.bocina.x, L.bocina.y).setDepth(30));
             var halo = this.add.circle(0, 0, L.bocina.r * 1.25, 0xffffff, 0.35);
-            var plato = this.add.circle(0, 0, L.bocina.r, 0xff922b).setStrokeStyle(5, 0xffffff);
-            var luz = this.add.circle(-L.bocina.r * 0.3, -L.bocina.r * 0.35, L.bocina.r * 0.35, 0xffffff, 0.3);
-            var icono = this.add.image(0, 0, A.textura(this, 'bocina', 128)).setDisplaySize(L.bocina.r * 1.35, L.bocina.r * 1.35);
-            b.add([halo, plato, luz, icono]);
+            if (this.textures.exists('qs_escuchar')) {
+                // Botón de escuchar del diseño (la oreja morada).
+                b.add([halo, this.add.image(0, 0, 'qs_escuchar').setDisplaySize(L.bocina.r * 2.3, L.bocina.r * 2.3)]);
+            } else {
+                var plato = this.add.circle(0, 0, L.bocina.r, 0xff922b).setStrokeStyle(5, 0xffffff);
+                var luz = this.add.circle(-L.bocina.r * 0.3, -L.bocina.r * 0.35, L.bocina.r * 0.35, 0xffffff, 0.3);
+                var icono = this.add.image(0, 0, A.textura(this, 'bocina', 128)).setDisplaySize(L.bocina.r * 1.35, L.bocina.r * 1.35);
+                b.add([halo, plato, luz, icono]);
+            }
             b.halo = halo;
             this.bocina = b;
             this.ondasG = keep(this.add.graphics().setDepth(29));
         },
 
+        /**
+         * Marcador del diseño: una placa rosada con borde encima del carrito, con una estrella
+         * por nivel. Se apagan en gris hasta que el niño gana el nivel.
+         */
+        montarMarcador: function (keep, j) {
+            var self = this;
+            this.estrellas = [];
+            var n = 4;
+            var ancho = (j.x1 - j.x0) * 1.04;
+            var tam = Math.min(ancho / n * 0.82, (j.y1 - j.y0) * 0.72);
+            var pad = tam * 0.3, radio = tam * 0.34;
+            var w = tam * n + tam * 0.22 * (n - 1) + pad * 2;
+            var h = tam + pad * 1.1;
+            // Despegada del carrito, flotando sobre el pasto.
+            var cx = (j.x0 + j.x1) / 2, cy = j.y0 - h * 1.95;
+            var g = keep(this.add.graphics().setDepth(29));
+            g.fillStyle(0xd62a7f, 1);                                  // borde rosado oscuro
+            g.fillRoundedRect(cx - w / 2, cy - h / 2, w, h, radio);
+            g.fillStyle(0xf74d9c, 1);                                  // relleno rosado claro
+            g.fillRoundedRect(cx - w / 2 + tam * 0.11, cy - h / 2 + tam * 0.11, w - tam * 0.22, h - tam * 0.22, radio * 0.82);
+            for (var i = 0; i < n; i++) {
+                var x = cx - w / 2 + pad + tam / 2 + i * (tam + tam * 0.22);
+                var e = keep(this.add.image(x, cy, A.textura(this, 'estrella', 128)).setDisplaySize(tam, tam).setDepth(30));
+                if (i >= this.nivelActual) e.setTint(0x9b6f86).setAlpha(0.5);
+                this.estrellas.push(e);
+            }
+            this.marcador = { x: cx, y: cy, w: w, h: h, tam: tam };
+        },
+
+        /** Sin la imagen del carrito no hay placa: las estrellas van junto a la bocina. */
         montarEstrellas: function (keep) {
+            if (this.textures.exists('qs_carrito')) return;
             var L = this.L;
             this.estrellas = [];
-            var tam = Math.max(22, L.bocina.r * 0.62);
+            var tam = Math.max(30, Math.min(48, L.bocina.r * 0.95, (L.W - L.bocina.x - L.bocina.r - 130) / 4.3));
             for (var i = 0; i < 4; i++) {
-                var x = L.bocina.x + L.bocina.r + 26 + i * (tam + 6);
-                var e = keep(this.add.image(x, L.bocina.y, A.textura(this, 'estrella', 64)).setDisplaySize(tam, tam).setDepth(30));
+                var x = L.bocina.x + L.bocina.r + 10 + tam / 2 + i * (tam + 4);
+                var e = keep(this.add.image(x, L.bocina.y, A.textura(this, 'estrella', 128)).setDisplaySize(tam, tam).setDepth(30));
                 if (i >= this.nivelActual) e.setTint(0x8a8f98).setAlpha(0.45);
                 this.estrellas.push(e);
             }
@@ -316,6 +543,32 @@
 
         montarCarrito: function (keep) {
             var c = this.L.carrito;
+            if (this.textures.exists('qs_carrito')) {
+                // Carrito del diseño. Una copia recortada de su mitad de abajo va adelante, así los
+                // juguetes quedan DENTRO del cajón y no flotando encima.
+                var src = this.textures.get('qs_carrito').getSourceImage();
+                var w = c.w * 1.3, k = w / src.width;
+                var cx = c.x + c.w * 0.08, cy = c.y + c.h * 0.05;
+                keep(this.add.ellipse(c.x, c.y + c.h * 0.62, c.w * 1.05, c.h * 0.22, 0x000000, 0.18).setDepth(5));
+                keep(this.add.image(cx, cy, 'qs_carrito').setScale(k).setDepth(6));
+                var frente = keep(this.add.image(cx, cy, 'qs_carrito').setScale(k).setDepth(9));
+                // El cajón, medido en la imagen (420×314): va de x 29-350 y de y 82-157.
+                // El recorte empieza en la mitad del cajón: lo de abajo tapa a los juguetes.
+                // Corta justo bajo el borde de arriba del cajón: lo de abajo tapa a los juguetes,
+                // de los que solo asoma la parte de arriba (como si estuvieran metidos dentro).
+                var corte = CAJON.y0 + (CAJON.y1 - CAJON.y0) * 0.22;
+                frente.setCrop(0, corte, src.width, src.height - corte);
+                this.frenteCarrito = frente;
+                // Hueco real del cajón en coordenadas de pantalla: ahí van los juguetes.
+                var ix = cx - src.width * k / 2, iy = cy - src.height * k / 2;
+                this.cajon = {
+                    x0: ix + CAJON.x0 * k, x1: ix + CAJON.x1 * k,
+                    y0: iy + CAJON.y0 * k, y1: iy + CAJON.y1 * k
+                };
+                this.montarMarcador(keep, this.cajon);
+                return;
+            }
+            this.cajon = null;
             var g = keep(this.add.graphics().setDepth(6));
             var x0 = c.x - c.w / 2, y0 = c.y - c.h / 2;
             g.fillStyle(0x000000, 0.18);
@@ -353,11 +606,28 @@
 
         ubicarEnCarrito: function (a, k, animar) {
             var c = this.L.carrito;
-            var por = 3;
-            var col = k % por, fila = Math.floor(k / por);
-            var tam = c.w * 0.5;
-            var x = c.x - c.w * 0.3 + col * (c.w * 0.3);
-            var y = c.y - c.h * 0.35 - fila * tam * 0.3;
+            var j = this.cajon;
+            var x, y, tam;
+            if (j) {
+                // Dentro del cajón: en fila, apoyados en su piso y de un tamaño que quepa en el hueco.
+                var ancho = j.x1 - j.x0, alto = j.y1 - j.y0;
+                var por = 4;
+                var col = k % por, fila = Math.floor(k / por);
+                // Hundidos en el cajón: su centro queda por debajo del borde de arriba, así el
+                // frente del carrito los tapa y solo se les ve la parte superior.
+                tam = Math.min(ancho / por * 0.98, alto * 2.2);
+                x = j.x0 + ancho * (col + 0.5) / por;
+                // El frente tapa desde el 22 % del cajón: el centro va justo ahí, de modo que
+                // asoma la mitad de arriba del juguete y la de abajo queda dentro.
+                y = j.y0 + alto * 0.22 - fila * tam * 0.3;
+            } else {
+                var por2 = 3;
+                var col2 = k % por2, fila2 = Math.floor(k / por2);
+                tam = c.w * 0.5;
+                x = c.x - c.w * 0.3 + col2 * (c.w * 0.3);
+                y = c.y - c.h * 0.35 - fila2 * tam * 0.3;
+                col = col2; fila = fila2;
+            }
             var esc = tam / a.tam;
             a.cont.setDepth(8 - fila * 0.01 + col * 0.001);
             if (!animar) { a.cont.setPosition(x, y).setScale(esc).setAngle(rnd(-14, 14)); return Promise.resolve(); }
@@ -368,6 +638,18 @@
             var self = this;
             var L = this.L;
             this.vida = [];
+            if (this.textures.exists('qs_mariposa1')) {
+                // Mariposas del diseño revoloteando sobre la cerca y el pasto.
+                for (var i = 1; i <= 5; i++) {
+                    if (!this.textures.exists('qs_mariposa' + i)) continue;
+                    var tm = Math.max(30, Math.min(54, L.W * 0.05));
+                    var y0 = rnd(L.R.y * 0.35, L.R.y - L.grosor - tm * 0.6);
+                    var m = keep(this.add.image(rnd(0, L.W), y0, 'qs_mariposa' + i).setDisplaySize(tm, tm).setDepth(7));
+                    m.y0 = y0; m.fase = Math.random() * 6; m.base = m.scaleX; m.vel = rnd(0.25, 0.6);
+                    this.vida.push(m);
+                }
+                return;
+            }
             // Mariposas sobre el pasto (de comun/vida.js: se pueden tocar y escapan).
             if (this.vidaAmb) this.vidaAmb.mariposas(3, { x: 0, y: L.R.y - L.grosor - 70, w: L.W, h: 45, depth: 7 });
         },
@@ -384,7 +666,7 @@
                 this.reaccion('Saludar', 2600);
             }
             this.pres.visible(true);
-            this.pres.ubicar(L.presX, L.R.y - L.grosor * 0.5 - L.presAlto / 2 + 6);
+            this.pres.ubicar(L.presX, L.R.y - L.grosor * 1.0 - L.presAlto / 2 + 6);
         },
 
         reaccion: function (clip, ms) {
@@ -406,18 +688,22 @@
             var lx = x - R.x, ly = y - R.y;
             if (lx < -r || ly < -r || lx > R.w + r || ly > R.h + r) return false;
             var c = this.capaCtx;
+            // Hoyo ovalado (el suelo se ve inclinado) y más chico al fondo.
+            var k = this.prof(y);
             c.save();
             c.globalCompositeOperation = 'destination-out';
-            var g = c.createRadialGradient(lx, ly, r * 0.25, lx, ly, r);
+            c.translate(lx, ly);
+            c.scale(k, k * APLANA);
+            var g = c.createRadialGradient(0, 0, r * 0.25, 0, 0, r);
             g.addColorStop(0, 'rgba(0,0,0,1)');
             g.addColorStop(0.7, 'rgba(0,0,0,0.85)');
             g.addColorStop(1, 'rgba(0,0,0,0)');
             c.fillStyle = g;
             c.beginPath();
-            c.arc(lx, ly, r, 0, Math.PI * 2);
+            c.arc(0, 0, r, 0, Math.PI * 2);
             c.fill();
             c.restore();
-            this.marcar(lx, ly, r * 0.78, 0);
+            this.marcar(lx, ly, r * 0.78 * k, 0, APLANA);
             this.sucio();
             return true;
         },
@@ -427,22 +713,47 @@
             var lx = x - R.x, ly = y - R.y;
             var c = this.capaCtx;
             c.save();
+            this.clipCajon(c);
             c.beginPath();
             c.arc(lx, ly, r, 0, Math.PI * 2);
             c.clip();
-            c.fillStyle = this.patron;
-            c.fillRect(lx - r, ly - r, r * 2, r * 2);
+            c.clearRect(lx - r, ly - r, r * 2, r * 2);
+            c.drawImage(this.arenaSeca, lx - r, ly - r, r * 2, r * 2, lx - r, ly - r, r * 2, r * 2);
             c.restore();
             this.marcar(lx, ly, r, 1);
             this.sucio();
         },
 
-        marcar: function (lx, ly, r, v) {
+        /** Recorta el dibujo de la capa al trapecio del cajón. */
+        clipCajon: function (c) {
+            var R = this.L.R, ins = this.L.ins;
+            c.beginPath();
+            c.moveTo(ins, 0); c.lineTo(R.w - ins, 0); c.lineTo(R.w, R.h); c.lineTo(0, R.h); c.closePath();
+            c.clip();
+        },
+
+        /** Escala según la profundidad: 1 adelante, más chico al fondo del cajón. */
+        prof: function (y) {
+            var R = this.L.R;
+            var v = Math.max(0, Math.min(1, (y - R.y) / R.h));
+            return 0.74 + 0.26 * v;
+        },
+
+        /** Límites izquierdo y derecho de la arena a la altura y. */
+        bordesEn: function (y) {
+            var R = this.L.R;
+            var v = Math.max(0, Math.min(1, (y - R.y) / R.h));
+            var m = this.L.ins * (1 - v);
+            return { a: R.x + m, b: R.x + R.w - m };
+        },
+
+        marcar: function (lx, ly, r, v, ey) {
+            ey = ey || 1;
             var c0 = Math.max(0, Math.floor((lx - r) / CELDA)), c1 = Math.min(this.cols - 1, Math.floor((lx + r) / CELDA));
-            var f0 = Math.max(0, Math.floor((ly - r) / CELDA)), f1 = Math.min(this.filas - 1, Math.floor((ly + r) / CELDA));
+            var f0 = Math.max(0, Math.floor((ly - r * ey) / CELDA)), f1 = Math.min(this.filas - 1, Math.floor((ly + r * ey) / CELDA));
             for (var f = f0; f <= f1; f++) {
                 for (var k = c0; k <= c1; k++) {
-                    var dx = (k + 0.5) * CELDA - lx, dy = (f + 0.5) * CELDA - ly;
+                    var dx = (k + 0.5) * CELDA - lx, dy = ((f + 0.5) * CELDA - ly) / ey;
                     if (dx * dx + dy * dy <= r * r) this.tapado[f * this.cols + k] = v;
                 }
             }
@@ -453,7 +764,8 @@
             var R = this.L.R;
             var c = this.capaCtx;
             var lx = j.x - R.x, ly = j.y - R.y;
-            var rx = this.L.tam * 0.46, ry = this.L.tam * 0.3;
+            var kp = this.prof(j.y);
+            var rx = this.L.tam * 0.46 * kp, ry = this.L.tam * 0.3 * kp;
             c.save();
             var s = c.createRadialGradient(lx + rx * 0.1, ly + ry * 0.55, 2, lx + rx * 0.1, ly + ry * 0.55, rx);
             s.addColorStop(0, 'rgba(120,80,35,0.38)');
@@ -482,14 +794,16 @@
         },
 
         cavarElipse: function (j, k) {
-            var rx = this.L.tam * 0.4 * (k || 1), ry = this.L.tam * 0.32 * (k || 1);
+            var kp = this.prof(j.y);
+            var rx = this.L.tam * 0.4 * (k || 1) * kp, ry = this.L.tam * 0.32 * (k || 1) * kp;
             for (var a = -1; a <= 1; a += 0.5) for (var b = -1; b <= 1; b += 0.5) this.cavar(j.x + a * rx * 0.7, j.y + b * ry * 0.7, this.L.pincel);
         },
 
         /** Fracción descubierta del juguete (celdas dentro de su elipse). */
         descubierto: function (j) {
             var R = this.L.R;
-            var rx = this.L.tam * 0.36, ry = this.L.tam * 0.3;
+            var kp = this.prof(j.y);
+            var rx = this.L.tam * 0.36 * kp, ry = this.L.tam * 0.3 * kp;
             var tot = 0, lib = 0;
             for (var f = 0; f < this.filas; f++) {
                 var cy = R.y + (f + 0.5) * CELDA;
@@ -537,8 +851,9 @@
             var m = L.tam * 0.55;
             var pts = [];
             for (var intento = 0; intento < 400 && pts.length < n; intento++) {
-                var x = rnd(R.x + m, R.x + R.w - m);
                 var y = rnd(R.y + L.tam * 0.5, R.y + R.h - L.tam * 0.42);
+                var bd = this.bordesEn(y);
+                var x = rnd(bd.a + m, bd.b - m);
                 if (x > L.W - BOTONES_ABAJO.w - m * 0.4 && y > L.H - BOTONES_ABAJO.h - m) continue;
                 if (x < L.carrito.x + L.carrito.w * 0.5 && y < R.y + L.tam * 0.55) continue;
                 var ok = pts.every(function (p) { return Math.hypot(p.x - x, (p.y - y) * 1.35) > L.tam * 1.15; });
@@ -560,7 +875,8 @@
                 var p = pts[i];
                 var a = Act.crear(self, id, p.x, p.y, L.tam);
                 if (a.animarIdle) a.animarIdle(false);
-                a.cont.setDepth(12).setAngle(rnd(-10, 10));
+                // Más chico y más atrás cuanto más al fondo del cajón.
+                a.cont.setScale(a.cont.scale * self.prof(p.y)).setDepth(12 + (p.y - R.y) / R.h * 0.5).setAngle(rnd(-10, 10));
                 a.sonido = self.sonidoDe(id);
                 var j = { id: id, actor: a, x: p.x, y: p.y, u: (p.x - R.x) / R.w, v: (p.y - R.y) / R.h, estado: 'enterrado', tam0: L.tam };
                 self.juguetes.push(j);
@@ -578,7 +894,8 @@
             var self = this;
             var L = this.L, R = L.R;
             var alto = R.h + 20;
-            var r = this.add.container(R.x - 30, R.y + R.h / 2).setDepth(26);
+            // Arranca fuera de la pantalla (la arena ahora llega al borde izquierdo).
+            var r = this.add.container(R.x - 60, R.y + R.h / 2).setDepth(26);
             var palo = this.add.rectangle(10, -alto * 0.1, 8, alto * 0.75, 0x9c6b30).setAngle(-12);
             var peine = this.add.rectangle(0, 0, 14, alto * 0.95, 0x2f9e44).setStrokeStyle(2, 0x2b8a3e);
             r.add([palo, peine]);
@@ -601,9 +918,11 @@
             // Rayitas del rastrillo sobre la arena lisa.
             var c = this.capaCtx;
             c.save();
+            this.clipCajon(c);
             c.strokeStyle = 'rgba(160,115,60,0.09)';
             c.lineWidth = 2;
-            for (var yy = 18; yy < R.h; yy += 16) {
+            // Las rayas se juntan hacia el fondo (perspectiva).
+            for (var yy = 12; yy < R.h; yy += 9 + 9 * yy / R.h) {
                 c.beginPath();
                 for (var xx = 0; xx <= R.w; xx += 20) c.lineTo(xx, yy + Math.sin(xx / 60 + yy) * 2);
                 c.stroke();
@@ -649,6 +968,7 @@
             actx();
             // Arriba del arenero: el parque responde (sol, nubes, árboles, pájaros, mariposas).
             if (p.y < this.L.R.y - this.L.grosor * 0.6 && !(this.fase === 'jugar' && this.tocaBocina(p))) {
+                if (this.tocarCielo(p)) return;
                 if (this.vidaAmb) this.vidaAmb.tocar(p);
                 return;
             }
@@ -886,6 +1206,7 @@
             this.tweens.add({ targets: bulto, alpha: 0, duration: 200, onComplete: function () { bulto.destroy(); } });
             j.x = dest.x; j.y = dest.y;
             j.u = (j.x - R.x) / R.w; j.v = (j.y - R.y) / R.h;
+            j.actor.cont.setScale(L.tam / j.tam0 * this.prof(j.y)).setDepth(12 + j.v * 0.5);
             this.tapar(j.x, j.y, L.tam * 0.5);
             this.montonDe(j);
             await this.asomaTopo(j.x + L.tam * 0.35, j.y - L.tam * 0.05);
@@ -1319,6 +1640,7 @@
             var L = this.L;
             if (!L) return;
             if (this.vidaAmb) this.vidaAmb.actualizar(time, delta);
+            this.animarCielo(time, delta);
             this.juguetes.forEach(function (j) { if (j.estado !== 'fuera' && j.actor.actualizar) j.actor.actualizar(time, delta); });
             this.enCarrito.forEach(function (a) { if (a.actualizar) a.actualizar(time, delta); });
             if (this.capaSucia && time - (this.ultimaSubida || 0) > 33) {
@@ -1354,8 +1676,8 @@
                 o.x += Math.sin(o.fase * 0.7) * 0.9 + 0.3;
                 o.y = o.y0 + Math.sin(o.fase * 1.6) * 16;
                 var ab = Math.abs(Math.sin(time / 70 + o.fase));
-                o.alas[0].scaleX = ab;
-                o.alas[1].scaleX = ab;
+                if (o.alas) { o.alas[0].scaleX = ab; o.alas[1].scaleX = ab; }
+                else o.scaleX = o.base * (0.35 + 0.65 * ab);   // mariposa del diseño: aletea encogiéndose
                 if (o.x > L.W + 20) o.x = -20;
             });
         }
