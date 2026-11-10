@@ -87,7 +87,9 @@
     function destelloFigura(sombra, intensidad) {
         var img = doc.getElementById('img-completo');
         if (!img) return;
-        detener(img, 'filter');
+        // Solo el brillo: matar todo cortaba el fundido de entrada y la figura quedaba en opacidad 0.
+        gsap.killTweensOf(img, 'filter');
+        gsap.set(img, { clearProps: 'filter' });
         // yoyo termina en el inicio: GSAP no aplica clearProps → se limpia en onComplete.
         gsap.fromTo(img, { filter: 'brightness(1) drop-shadow(0 0 0px ' + sombra + ')' }, {
             filter: 'brightness(' + intensidad + ') drop-shadow(0 0 14px ' + sombra + ')',

@@ -63,6 +63,11 @@ function sonido() {
 }
 
 /** Evento sonoro del tema; false si el tema no lo cubre. */
+/** Cuarto animado del fondo (habitacion.js); null si no cargó. */
+function hab() {
+    return window.Habitacion || null;
+}
+
 function sonarEvento(nombre, opts) {
     return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
 }
@@ -530,6 +535,8 @@ function nombrePieza(p) {
         pierna_izq: "Pierna izquierda",
         pierna_der: "Pierna derecha",
         piernas: "Piernas",
+        pie_izq: "Pie izquierdo",
+        pie_der: "Pie derecho",
         pies: "Pies"
     };
     return (p && nombres[p.id]) || (p && p.id) || "";
@@ -1276,6 +1283,7 @@ function armarTablero() {
     mostrarReferenciaAyuda();
     tableroListo = true;
     actualizarProgreso();
+    if (hab()) hab().listo();
     lanzarTutorialPieza();
     if (anim()) anim().preparar();
 }
@@ -1512,6 +1520,7 @@ function iniciarArrastre(ev, el, pieza) {
     sonarEvento("agarrar");
     moverFantasma(ev);
     resaltarZona(pieza.id);
+    if (hab()) hab().arrastre(true);
 }
 
 function moverFantasma(ev) {
@@ -1526,6 +1535,7 @@ function moverFantasma(ev) {
 // `destino` (opcional, solo visual): hueco correcto hacia el que vuela la pieza al soltarla.
 function cancelarArrastre(el, destino) {
     dragActivo = null;
+    if (hab()) hab().arrastre(false);
     if (el) el.classList.remove("arrastrando");
     restaurarTamanoPiezas();
     if (fantasma) {
@@ -1731,6 +1741,12 @@ function colocarPieza(pieza) {
     }
 
     if (anim()) anim().encaje(pieza.id, pieza.color);
+    // La parte hace su gesto y Zoe dice su nombre.
+    if (hab()) {
+        hab().acierto(pieza.id, nombrePieza(pieza), function (texto) {
+            if (feedbackActivo()) TextoVoz.hablar(texto, "zoe");
+        });
+    }
     actualizarProgreso();
     if (!sonarEvento("encaje")) {
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto);
@@ -1777,6 +1793,7 @@ function fallarPieza(pieza) {
     const ficha = document.querySelector('.pieza[data-id="' + pieza.id + '"]');
     rebotar(ficha);
     mostrarFeedback("error");
+    if (hab()) hab().error();
     if (!sonarEvento("error")) {
         reproducirAudio(gameConfig.audios && gameConfig.audios.error);
     }
@@ -1878,6 +1895,20 @@ function terminarJuego() {
     juegoTerminado = true;
     if (typeof Swal !== "undefined") Swal.close();
     ocultarVistaCompleta();
+    const t = gameConfig.textos || {};
+    // Fiesta en el cuarto: baile, repaso de las partes y despedida; después la victoria.
+    const fiesta = hab()
+        ? hab().final({
+            despedida: t.despedida || "¡Adiós! ¡Gracias por armarme!",
+            hablar: function (texto) {
+                return feedbackActivo() ? TextoVoz.hablar(texto, "zoe") : Promise.resolve();
+            }
+        }).catch(function () {})
+        : Promise.resolve();
+    fiesta.then(mostrarVictoria);
+}
+
+function mostrarVictoria() {
     if (sonarEvento("victoria")) {
         // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
         // fanfarria son tonos puros agudos (se oía como "pitido").
