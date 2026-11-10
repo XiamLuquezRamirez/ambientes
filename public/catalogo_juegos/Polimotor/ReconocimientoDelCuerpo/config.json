@@ -18,6 +18,8 @@
     "textos": {
         "eligeNivel": "Elige tu edad",
         "cierre": "Reconociste las partes del cuerpo.",
+    "diploma": "Diploma de Doctor del cuerpo",
+    "diplomaSub": "¡Ya conoces las partes de tu cuerpo!",
         "demostracion": "¡Vamos con un ejemplo! Mira: el dedo presiona la barriga.",
         "demostracionFin": "¡Ahora te toca a ti! Escucha y toca la parte del cuerpo.",
         "acierto": "¡Muy bien!",

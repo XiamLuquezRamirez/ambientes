@@ -1,0 +1,302 @@
+/* Estadio de Atletismo Mágico — fondo vivo, presentación, rótulos y reacciones (estadio.js). */
+
+.est-fondo,
+.est-phaser,
+.est-capa {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.est-fondo { z-index: 0; overflow: hidden; }
+.est-phaser { z-index: 0; }
+.est-capa { z-index: 30; }
+.est-phaser canvas { display: block; }
+
+.est-svg { width: 100%; height: 100%; display: block; transition: filter 0.6s ease; }
+
+/* El estadio se atenúa un poco mientras se juega para que la silueta y las piezas resalten. */
+body:not(.esperando-inicio) .est-svg { filter: brightness(0.82) saturate(1.05); }
+body.est-luces .est-svg { filter: brightness(1.12) saturate(1.2); }
+
+/* ---------------------------------------------------------------- cielo y torres */
+
+.est-estrellas circle { animation: estTitila 2.6s ease-in-out infinite; animation-delay: calc(var(--i) * -0.23s); }
+
+@keyframes estTitila {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.25; }
+}
+
+.est-foco { filter: drop-shadow(0 0 8px #fff3bf); animation: estFoco 3s ease-in-out infinite; animation-delay: calc(var(--i) * -0.4s); }
+
+@keyframes estFoco {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.est-haz {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  opacity: 0.55;
+  animation: estHaz 7s ease-in-out infinite;
+}
+
+.est-haz-der { animation-delay: -3.5s; }
+
+@keyframes estHaz {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(5deg); }
+}
+
+body.est-luces .est-haz { opacity: 0.95; }
+
+/* ---------------------------------------------------------------- público */
+
+.est-fan-cuerpo {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: estFan 1.6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.12s);
+}
+
+@keyframes estFan {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.est-fan-bandera { transform-box: fill-box; transform-origin: 0% 100%; animation: estBandera 1.1s ease-in-out infinite alternate; }
+
+@keyframes estBandera {
+  from { transform: rotate(-8deg); }
+  to { transform: rotate(10deg); }
+}
+
+/* El público salta al acertar y al final. */
+.est-fondo.est-acierto .est-fan-cuerpo,
+.est-fondo.est-postura .est-fan-cuerpo,
+body.est-fiesta .est-fan-cuerpo { animation: estFanSalta 0.45s ease-in-out infinite alternate; }
+
+@keyframes estFanSalta {
+  from { transform: translateY(0); }
+  to { transform: translateY(-12px); }
+}
+
+.est-banderin { transform-box: fill-box; transform-origin: 50% 0%; animation: estBanderin 2s ease-in-out infinite; animation-delay: calc(var(--i) * -0.15s); }
+
+@keyframes estBanderin {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+
+/* ---------------------------------------------------------------- pantalla LED */
+
+.est-led-kicker { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 26px; fill: #7cf3ff; letter-spacing: 6px; }
+.est-led-texto { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 56px; fill: #ffffff; letter-spacing: 3px; paint-order: stroke; stroke: #e64980; stroke-width: 4; }
+.est-led-sub { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 28px; fill: #ffe066; }
+/* La pantalla queda detrás de la bandeja de piezas y del panel de misión: sus letras salían cortadas
+   y encimadas. El nivel, la pose y las piezas ya están en el panel de misión y en el rótulo grande
+   de cada nivel, así que la pantalla solo luce sus luces y ondas (sin texto). */
+.est-led-kicker, .est-led-texto, .est-led-sub { display: none; }
+.est-led-marco { animation: estMarco 2.2s ease-in-out infinite; }
+.est-led-ondas { animation: estOndas 4s ease-in-out infinite alternate; }
+
+@keyframes estMarco {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes estOndas {
+  from { transform: translateX(-20px); }
+  to { transform: translateX(20px); }
+}
+
+.est-fondo.est-led-cambia .est-led-texto,
+.est-fondo.est-led-cambia .est-led-sub { animation: estLed 0.7s steps(4); }
+
+@keyframes estLed {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  75% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------- neón y pista */
+
+.est-tubo { fill: none; stroke-width: 6; stroke-linecap: round; }
+.est-tubo-a { stroke: #7cf3ff; }
+.est-tubo-b { stroke: #ff6ec7; }
+.est-energia { fill: none; stroke: #ffffff; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 70 430; animation: estEnergia 3.2s linear infinite; }
+.est-energia-2 { stroke: #fff3bf; animation-duration: 4.4s; }
+
+@keyframes estEnergia { to { stroke-dashoffset: -500; } }
+
+.est-carril { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 28px; fill: rgba(255, 255, 255, 0.8); }
+.est-podio-num { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 26px; fill: #8a5a00; }
+.est-podio-estrella { transform-box: fill-box; transform-origin: center; animation: estEstrella 2.4s ease-in-out infinite; }
+
+@keyframes estEstrella {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.15) rotate(12deg); }
+}
+
+/* ---------------------------------------------------------------- reacciones (pulsos en #est-fondo) */
+
+.est-fondo.est-encender .est-svg { animation: estEncender 1.8s ease-out; }
+
+@keyframes estEncender {
+  0% { filter: brightness(0.4); }
+  30% { filter: brightness(1.3); }
+  100% { filter: brightness(0.82); }
+}
+
+.est-fondo.est-acierto .est-tubo-a,
+.est-fondo.est-postura .est-tubo-a { stroke: #b2f2bb; }
+.est-fondo.est-acierto .est-energia { animation-duration: 0.9s; }
+.est-fondo.est-orientada .est-led-marco { stroke: #69db7c; }
+.est-fondo.est-seleccion .est-led-marco { stroke: #ffe066; }
+.est-fondo.est-error .est-foco { fill: #ffc078; }
+.est-fondo.est-error .est-tubo-b { stroke: #ffa94d; }
+
+body.est-fiesta .est-tubo-a { animation: estArcoiris 1.2s linear infinite; }
+body.est-fiesta .est-foco { animation-duration: 0.5s; }
+
+@keyframes estArcoiris {
+  0% { stroke: #7cf3ff; }
+  33% { stroke: #ff6ec7; }
+  66% { stroke: #ffe066; }
+  100% { stroke: #7cf3ff; }
+}
+
+/* ---------------------------------------------------------------- presentación */
+
+.est-presenta {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: radial-gradient(ellipse at 50% 60%, rgba(124, 243, 255, 0.18), rgba(11, 15, 51, 0.55) 70%);
+}
+
+.est-presenta[hidden] { display: none; }
+.est-presenta.entra { animation: estPresenta 0.6s ease-out both; }
+.est-presenta.sale { animation: estPresenta 0.6s ease-in reverse both; }
+
+@keyframes estPresenta {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.est-cartel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 34px 12px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #2b1d6b, #1b1446);
+  border: 5px solid #7cf3ff;
+  box-shadow: 0 0 24px rgba(124, 243, 255, 0.75), inset 0 0 18px rgba(255, 110, 199, 0.4);
+  color: #fff;
+  text-align: center;
+  animation: estCartel 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.est-cartel small { color: #7cf3ff; font-size: clamp(13px, 1.6vw, 18px); letter-spacing: 4px; }
+.est-cartel strong { font-size: clamp(24px, 4vw, 46px); line-height: 1.05; text-shadow: 0 0 12px #ff6ec7; }
+.est-cartel span:last-child { color: #ffe066; font-size: clamp(15px, 2vw, 22px); }
+
+.est-cartel-luz {
+  position: absolute;
+  inset: -5px;
+  border-radius: 24px;
+  border: 5px solid transparent;
+  border-top-color: #ffffff;
+  animation: estCartelLuz 1.6s linear infinite;
+}
+
+@keyframes estCartel {
+  from { transform: translateY(-40px) scale(0.8); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes estCartelLuz { to { transform: rotate(360deg); } }
+
+.est-zoe { width: min(60vh, 70vw); height: min(54vh, 64vw); overflow: visible; }
+.est-presenta .est-fig .pz-sombra .pz-forma { fill: #1d1a45; }
+.est-presenta .est-fig .pieza .pz-neon .pz-forma { stroke-width: 10; stroke-linejoin: round; transition: stroke 0.6s; }
+
+/* Zoe se vuelve sombra con borde neón: así es la silueta que hay que armar. */
+.est-presenta.sombra .est-fig .pieza .pz-sombra { opacity: 0.95; }
+.est-presenta.sombra .est-fig .pieza .pz-detalle { opacity: 0; transition: opacity 0.6s; }
+.est-presenta.sombra .est-fig .pieza .pz-neon .pz-forma { stroke: #ff6ec7; }
+
+/* ---------------------------------------------------------------- rótulo de nivel y avisos */
+
+.est-rotulo {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 44px 18px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #5f3dc4, #2b1d6b);
+  border: 6px solid #fff;
+  box-shadow: 0 0 0 5px #7cf3ff, 0 0 40px rgba(124, 243, 255, 0.8);
+  color: #fff;
+  text-align: center;
+}
+
+.est-rotulo[hidden] { display: none; }
+.est-rotulo-kicker { font-size: clamp(16px, 2vw, 22px); color: #ffe066; letter-spacing: 3px; }
+.est-rotulo-titulo { font-size: clamp(34px, 6vw, 70px); line-height: 1; }
+.est-rotulo-sub { font-size: clamp(16px, 2.2vw, 26px); color: #c5f6fa; }
+.est-rotulo.entra { animation: estRotulo 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.est-rotulo.sale { animation: estRotuloSale 0.5s ease-in both; }
+
+@keyframes estRotulo {
+  from { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+@keyframes estRotuloSale {
+  to { transform: translate(-50%, -80%) scale(0.8); opacity: 0; }
+}
+
+.est-aviso {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  transform: translateX(-50%);
+  padding: 10px 26px;
+  border-radius: 999px;
+  background: #fff;
+  color: #2b1d6b;
+  font-size: clamp(18px, 2.4vw, 28px);
+  box-shadow: 0 0 0 4px #ffe066;
+}
+
+.est-aviso[hidden] { display: none; }
+.est-aviso.entra { animation: estRotulo 0.5s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .est-estrellas circle,
+  .est-foco,
+  .est-haz,
+  .est-fan-cuerpo,
+  .est-fan-bandera,
+  .est-banderin,
+  .est-led-marco,
+  .est-led-ondas,
+  .est-energia,
+  .est-podio-estrella,
+  .est-cartel-luz {
+    animation: none !important;
+  }
+}

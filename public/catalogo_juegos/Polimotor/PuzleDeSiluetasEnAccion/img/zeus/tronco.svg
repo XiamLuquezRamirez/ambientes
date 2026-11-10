@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -98 64 112" width="128" height="224">
+  <title>Tronco de Zeus</title>
+  <!-- Pieza de Puzle de Siluetas en Acción. Generado por scripts/generar-svg-puzle-siluetas.js -->
+  <g class="base">
+    <rect class="pz-forma" fill="#f2c6b9" x="-7.5" y="-103" width="15" height="15" rx="3"/>
+    <path class="pz-forma" fill="#004f6d" d="M-23,-28 L27,-28 L22,1 Q21.5,5 17.5,5 L-14,5 Q-18,5 -18.5,1 Z"/>
+    <path class="pz-forma" fill="#2b896f" d="M-20.5,-14 L-22.5,-70 Q-22,-90 -3,-92 L8,-92 Q27,-90 28,-70 L27,-14 Q3,-9 -20.5,-14 Z"/>
+  </g>
+  <g class="detalle">
+    <path fill="#24735a" opacity=".55" d="M-20.5,-14 L-22.5,-70 Q-22,-84 -14,-88 Q-16,-60 -12,-15 Z"/>
+    <path fill="#24735a" opacity=".5" d="M-20.5,-18 Q3,-13 27,-18 L27,-14 Q3,-9 -20.5,-14 Z"/>
+    <path fill="none" stroke="#8cc97c" stroke-width="5.5" stroke-linecap="round" d="M-8,-91.5 Q1,-88 10,-88.5"/>
+    <path fill="none" stroke="#6db85f" stroke-width="1" stroke-linecap="round" stroke-dasharray="1.4 1.6" d="M-7.2,-90.4 Q1,-87.2 9.4,-87.6"/>
+    <rect x="12" y="-62" width="14" height="18" rx="3.5" fill="#ffffff" stroke="#24735a" stroke-width="1.3"/>
+    <circle cx="14.6" cy="-59.4" r="1" fill="#b8c2cc"/>
+    <circle cx="23.4" cy="-59.4" r="1" fill="#b8c2cc"/>
+    <g transform="translate(19,-52) scale(0.72) translate(-14,57)"><path fill="#ffd43b" stroke="#e0a800" stroke-width="1.5" stroke-linejoin="round" d="M17.5,-64.5 L9,-55 L14,-55 L10.5,-48.5 L19.5,-58 L14.5,-58 L18,-64.5 Z"/></g>
+    <path fill="#06405a" opacity=".6" d="M-20.5,-14 Q3,-9 27,-14 L27.2,-11 Q3,-6 -20.8,-11 Z"/>
+    <path fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" d="M2.5,-10 L3,6"/>
+  </g>
+</svg>

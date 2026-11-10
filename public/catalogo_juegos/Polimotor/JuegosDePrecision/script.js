@@ -27,6 +27,12 @@
     let aroNodes = [];
     let stageRect = null;
     let lastPointer = null;
+    // Giro suave del cohete: el ángulo se acerca a su rumbo en cada cuadro (sin saltos).
+    let angMostrado = 90;
+    let angMeta = 90;
+    let giroRaf = 0;
+    let giroPrev = 0;
+    let rumboAncla = null;
 
     function readText(ruta) {
         const xhr = new XMLHttpRequest();
@@ -41,6 +47,11 @@
 
     // Capa de animación GSAP + partículas Phaser 4 (precision-anim.js). Solo visual:
     // si no está disponible se usa el comportamiento original.
+    // Fondo vivo del espacio (espacio.js). Solo visual.
+    function esp() {
+        return (window.Espacio && window.Espacio.activo) ? window.Espacio : null;
+    }
+
     function anim() {
         return (window.PrecisionAnim && window.PrecisionAnim.activo) ? window.PrecisionAnim : null;
     }
@@ -283,7 +294,8 @@
 
     function urlsImagenesCriticas() {
         const urls = [];
-        if (gameConfig.fondo) urls.push(gameConfig.fondo);
+        // Con el espacio vivo (espacio.js) la imagen de fondo ya no se usa.
+        if (gameConfig.fondo && !esp()) urls.push(gameConfig.fondo);
         if (gameConfig.cohete && gameConfig.cohete.img) urls.push(gameConfig.cohete.img);
         if (gameConfig.estrella && gameConfig.estrella.img) urls.push(gameConfig.estrella.img);
         Object.keys(gameConfig.aros || {}).forEach(function (color) {
@@ -553,7 +565,9 @@
     function pintarDecoracion() {
         const capa = document.getElementById("capa-decoro");
         const fondo = document.getElementById("capa-fondo");
-        if (fondo && gameConfig.fondo) {
+        if (fondo && esp()) {
+            esp().montar(fondo);
+        } else if (fondo && gameConfig.fondo) {
             fondo.style.backgroundImage = "url('" + gameConfig.fondo + "')";
         }
         (gameConfig.planetas || []).forEach(function (p) {
@@ -654,7 +668,8 @@
                 back: back,
                 front: front,
                 // Radio del hueco interior del aro (~32% del sprite). Centro lógico = [x,y].
-                radioPx: tamAro * 0.32
+                radioPx: tamAro * 0.32,
+                tam: tamAro
             });
         });
 
@@ -676,16 +691,69 @@
         actualizarEstilosAros();
     }
 
-    function colocarCohete(fx, fy, angDeg) {
+    function colocarCohete(fx, fy, angDeg, conservarGiro) {
         if (!coheteEl) return;
         coheteEl.style.left = (fx * 100) + "%";
         coheteEl.style.top = (fy * 100) + "%";
-        // Asset apunta arriba; 90° = hacia la derecha (recorrido típico).
-        const ang = (angDeg != null && isFinite(angDeg)) ? angDeg : 90;
-        coheteEl.style.transform = "translate(-50%, -50%) rotate(" + ang + "deg)";
         coheteEl.dataset.fx = String(fx);
         coheteEl.dataset.fy = String(fy);
+        // Asset apunta arriba; 90° = hacia la derecha (recorrido típico).
+        const ang = (angDeg != null && isFinite(angDeg)) ? angDeg : 90;
+        if (!conservarGiro) {
+            detenerGiro();
+            angMeta = ang;
+        }
+        girarCohete(ang);
+    }
+
+    function girarCohete(ang) {
+        angMostrado = ang;
+        if (!coheteEl) return;
+        coheteEl.style.transform = "translate(-50%, -50%) rotate(" + ang.toFixed(2) + "deg)";
         coheteEl.dataset.ang = String(ang);
+    }
+
+    function detenerGiro() {
+        if (giroRaf) cancelAnimationFrame(giroRaf);
+        giroRaf = 0;
+    }
+
+    // Nuevo rumbo: por el camino corto (nunca da la vuelta entera) y girando poco a poco.
+    function apuntarCohete(objetivo) {
+        const delta = ((((objetivo - angMeta) % 360) + 540) % 360) - 180;
+        angMeta += delta;
+        if (!giroRaf) {
+            giroPrev = performance.now();
+            giroRaf = requestAnimationFrame(pasoGiro);
+        }
+    }
+
+    function pasoGiro(t) {
+        giroRaf = 0;
+        if (!coheteEl) return;
+        const dt = Math.min(64, Math.max(1, t - giroPrev));
+        giroPrev = t;
+        const resta = angMeta - angMostrado;
+        if (Math.abs(resta) < 0.4) {
+            girarCohete(angMeta);
+            return;
+        }
+        // Suavizado independiente de los fps: recorre ~70 % de lo que falta cada 100 ms.
+        const k = 1 - Math.pow(0.3, dt / 100);
+        girarCohete(angMostrado + resta * k);
+        giroRaf = requestAnimationFrame(pasoGiro);
+    }
+
+    // El rumbo se mide cuando el dedo avanzó un tramo, no en cada temblor del pulso.
+    function rumboDesde(pos) {
+        const p = pctToPx(pos.x, pos.y);
+        if (!rumboAncla) { rumboAncla = p; return null; }
+        const dx = p.x - rumboAncla.x;
+        const dy = p.y - rumboAncla.y;
+        if (dx * dx + dy * dy < 16 * 16) return null;
+        rumboAncla = p;
+        // 0° = arriba en el asset → +90 para alinear con atan2 (0 = derecha).
+        return (Math.atan2(dy, dx) * 180 / Math.PI) + 90;
     }
 
     function actualizarEstilosAros() {
@@ -748,6 +816,7 @@
         // El dedo sujeta el punto que tocó. El cohete no salta al centro.
         dragState = { pointerId: ev.pointerId, ox: frac.x - x0, oy: frac.y - y0 };
         lastPointer = { x: x0, y: y0 };
+        rumboAncla = pctToPx(x0, y0);
         coheteEl.classList.add("is-dragging");
         if (anim()) anim().agarrar(coheteEl);
         sonarEvento("agarrar");
@@ -761,10 +830,30 @@
         if (!aceptaArrastre || esperandoFeedback) return;
         ev.preventDefault();
         const pos = posicionArrastre(clientToFrac(ev.clientX, ev.clientY));
-        const ang = anguloDesdeMovimiento(lastPointer, pos);
-        colocarCohete(pos.x, pos.y, ang != null ? ang : Number(coheteEl.dataset.ang) || 90);
+        const previo = lastPointer;
+        colocarCohete(pos.x, pos.y, angMostrado, true);
+        const rumbo = rumboDesde(pos);
+        if (rumbo != null) apuntarCohete(rumbo);
         lastPointer = pos;
-        evaluarPaso(pos.x, pos.y);
+        if (esp()) {
+            esp().mover(pos.x, pos.y);
+            esp().estela(pos.x, pos.y, angMostrado, coheteEl);
+        }
+        evaluarTrayecto(previo, pos);
+    }
+
+    // Revisa también los puntos intermedios: con un movimiento rápido, el cohete puede
+    // cruzar el aro entre dos eventos sin que ninguno caiga dentro del hueco.
+    function evaluarTrayecto(desde, hasta) {
+        if (!desde) { evaluarPaso(hasta.x, hasta.y); return; }
+        const a = pctToPx(desde.x, desde.y);
+        const b = pctToPx(hasta.x, hasta.y);
+        const pasos = Math.min(30, Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / 6)));
+        for (let k = 1; k <= pasos; k++) {
+            if (esperandoFeedback || juegoTerminado) return;
+            const t = k / pasos;
+            evaluarPaso(desde.x + (hasta.x - desde.x) * t, desde.y + (hasta.y - desde.y) * t);
+        }
     }
 
     function onPointerUp(ev) {
@@ -776,6 +865,7 @@
         dragState = null;
         if (coheteEl) coheteEl.classList.remove("is-dragging");
         if (anim()) anim().soltar(coheteEl);
+        if (esp()) esp().soltar();
         // Si soltó sobre la estrella sin completar aros → error.
         if (arosPasados < aroNodes.length && tocaMeta(fx, fy)) {
             fallarYReiniciar();
@@ -816,6 +906,20 @@
         return aro.radioPx * factor;
     }
 
+    // ¿El cohete está dentro del hueco del aro? El hueco es un óvalo alto y angosto
+    // (medido en el PNG: ±13 % de ancho y ±33 % de alto del aro), no un círculo central.
+    function dentroDelHueco(aro, fx, fy) {
+        const tol = Number(nivelElegido.tolerancia);
+        const f = 0.8 + (isFinite(tol) ? tol : 0.5) * 0.4;
+        const rx = aro.tam * 0.16 * f;
+        const ry = aro.tam * 0.31 * f;
+        const p = pctToPx(fx, fy);
+        const c = pctToPx(aro.x, aro.y);
+        const dx = (p.x - c.x) / rx;
+        const dy = (p.y - c.y) / ry;
+        return dx * dx + dy * dy <= 1;
+    }
+
     function tocaMeta(fx, fy) {
         if (!rutaActual) return false;
         const m = metaRuntime || rutaActual.meta;
@@ -838,10 +942,11 @@
 
         if (arosPasados < aroNodes.length) {
             const next = aroNodes[arosPasados];
-            if (distanciaPx(fx, fy, next.x, next.y) <= radioHit(next)) {
+            if (dentroDelHueco(next, fx, fy)) {
                 arosPasados += 1;
                 actualizarEstilosAros();
                 if (anim()) anim().aroPasado(next, colorAro(next.idx), arosPasados >= aroNodes.length);
+                if (esp()) esp().aro(colorAro(next.idx));
                 // Tema: el cohete "zumba" al cruzar el aro (sin ok.mp3).
                 if (!sonarEvento("acierto")) {
                     reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.7, false);
@@ -861,6 +966,7 @@
         aceptaArrastre = false;
         if (coheteEl) coheteEl.classList.add("is-bloqueado");
         if (anim()) anim().fallo(coheteEl, document.getElementById("enunciado"));
+        if (esp()) esp().error();
         await feedbackError();
         if (juegoTerminado) return;
         arosPasados = 0;
@@ -881,6 +987,7 @@
         aceptaArrastre = false;
         if (coheteEl) coheteEl.classList.add("is-bloqueado");
         if (anim()) anim().llegada(document.getElementById("meta-estrella"), coheteEl);
+        if (esp()) esp().llegada();
         const gen = rutaGen;
         await feedbackAciertoRecorrido();
         if (gen !== rutaGen || juegoTerminado) return;
@@ -965,18 +1072,31 @@
         }
         if (anim()) anim().celebrar(document.getElementById("escena-wrap"));
         TextoVoz.hablar(cierre, "zoe");
-        setTimeout(function () {
-            const caja = document.getElementById("final");
-            if (caja) {
-                caja.hidden = false;
-                caja.style.display = "block";
-            }
-            if (typeof iniciarSecuenciaVictoria === "function") {
-                iniciarSecuenciaVictoria();
-            } else if (typeof iniciarVictoria === "function") {
-                iniciarVictoria();
-            }
-        }, 400);
+        // Escena final: el cohete se va al hiperespacio y luego la pantalla de victoria.
+        const escena = esp()
+            ? esp().final(coheteEl, {
+                estrellas: totalRutas,
+                // Vuela con la llama pintada (COHETE.png) y aterriza sin ella (imgAlt).
+                imgVuelo: (gameConfig.cohete && gameConfig.cohete.img) || "",
+                imgCohete: (gameConfig.cohete && (gameConfig.cohete.imgAlt || gameConfig.cohete.img)) || "",
+                imgEstrella: (gameConfig.estrella && gameConfig.estrella.img) || "",
+                texto: textos().mision || "¡Misión cumplida!"
+            })
+            : Promise.resolve();
+        escena.then(function () { setTimeout(mostrarVictoria, 400); });
+    }
+
+    function mostrarVictoria() {
+        const caja = document.getElementById("final");
+        if (caja) {
+            caja.hidden = false;
+            caja.style.display = "block";
+        }
+        if (typeof iniciarSecuenciaVictoria === "function") {
+            iniciarSecuenciaVictoria();
+        } else if (typeof iniciarVictoria === "function") {
+            iniciarVictoria();
+        }
     }
 
     /* ── Niveles ──────────────────────────────────────────────── */
@@ -1067,7 +1187,8 @@
                         const t = k / n;
                         const x = a[0] + (b[0] - a[0]) * t;
                         const y = a[1] + (b[1] - a[1]) * t;
-                        colocarCohete(x, y, 90);
+                        colocarCohete(x, y, angMostrado, true);
+                        apuntarCohete(90);
                         if (!aroMarcado && arosPasados < aroNodes.length) {
                             const next = aroNodes[arosPasados];
                             if (distanciaPx(x, y, next.x, next.y) <= radioHit(next)) {
@@ -1102,6 +1223,7 @@
         actualizarProgreso();
         pintarRuta(rutas[indiceRuta]);
         if (anim()) anim().nuevaRuta(aroNodes, document.getElementById("meta-estrella"), coheteEl, false);
+        if (esp()) esp().nuevaRuta(indiceRuta);
         aceptaArrastre = true;
         esperandoFeedback = false;
         TextoVoz.hablar(textos().enunciado || "Lleva el cohete por cada aro hasta la estrella", "zoe");
@@ -1154,7 +1276,7 @@
             pintarRuta(rutaActual);
             arosPasados = guardados;
             actualizarEstilosAros();
-            if (isFinite(fx) && isFinite(fy)) colocarCohete(fx, fy, 0);
+            if (isFinite(fx) && isFinite(fy)) colocarCohete(fx, fy, angMostrado);
         });
 
         imagenesPromise = precargarImagenesCriticas();

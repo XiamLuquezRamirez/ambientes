@@ -1,0 +1,376 @@
+/* Fondo vivo de "Juegos de precisión" (espacio.js). */
+
+/* Sin flash del fondo claro antes de que se pinte el espacio. */
+body.esp-activo #principal { background: #2d1470; }
+
+.esp-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  --px: 0;
+  --py: 0;
+  --tinte: #ffd54f;
+}
+
+/* ── Paralaje (lo mueve el cohete) ───────────────────────── */
+
+.esp-capa { transition: transform 0.9s cubic-bezier(.2, .7, .3, 1); }
+.esp-capa-1 { transform: translate(calc(var(--px) * 8px), calc(var(--py) * 6px)); }
+.esp-capa-2 { transform: translate(calc(var(--px) * 20px), calc(var(--py) * 14px)); }
+.esp-capa-3 { transform: translate(calc(var(--px) * 38px), calc(var(--py) * 26px)); }
+
+/* ── Movimiento propio ───────────────────────────────────── */
+
+.esp-titila {
+  animation: espTitila var(--d, 3s) ease-in-out infinite;
+  animation-delay: var(--r, 0s);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes espTitila {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.25; transform: scale(0.6); }
+}
+
+.esp-nebula { transform-box: fill-box; transform-origin: center; }
+.esp-nebula-a { animation: espNebula 18s ease-in-out infinite; }
+.esp-nebula-b { animation: espNebula 22s ease-in-out infinite reverse; }
+.esp-nebula-c { animation: espNebula 26s ease-in-out -9s infinite; }
+
+@keyframes espNebula {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -24px) scale(1.12); }
+}
+
+.esp-galaxia { animation: espGira 60s linear infinite; }
+
+@keyframes espGira {
+  to { transform: rotate(360deg); }
+}
+
+/* El satélite cruza despacio de izquierda a derecha y vuelve a empezar. */
+.esp-satelite-orbita { animation: espSatelite 34s linear infinite; }
+.esp-satelite { animation: espGira 14s linear infinite; }
+
+@keyframes espSatelite {
+  from { transform: translate(-80px, 760px); }
+  to { transform: translate(1700px, 120px); }
+}
+
+.esp-led { animation: espLed 1s steps(1) infinite; }
+
+@keyframes espLed {
+  50% { opacity: 0.15; }
+}
+
+/* Estrellas fugaces: cada 13 s, con desfase. */
+.esp-fugaz {
+  opacity: 0;
+  animation: espFugaz 13s linear infinite;
+  animation-delay: var(--r, 0s);
+}
+
+@keyframes espFugaz {
+  0% { opacity: 0; translate: 0 0; }
+  2% { opacity: 1; }
+  9% { opacity: 0; translate: 520px 280px; }
+  100% { opacity: 0; translate: 520px 280px; }
+}
+
+/* ── Reacciones ──────────────────────────────────────────── */
+
+.esp-tinte { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.esp-tinte-stop { stop-color: var(--tinte); }
+.esp-svg.tinte .esp-tinte { animation: espTinte 1.2s ease-out; }
+
+@keyframes espTinte {
+  0% { opacity: 0; transform: scale(0.4); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+
+.esp-svg.tinte .esp-capa-2 .esp-titila,
+.esp-svg.tinte .esp-capa-3 .esp-titila {
+  animation: espDestella 0.5s ease-out 2;
+}
+
+@keyframes espDestella {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  40% { opacity: 1; transform: scale(2.2); }
+}
+
+.esp-alerta { opacity: 0; pointer-events: none; }
+.esp-svg.alerta .esp-alerta { animation: espAlerta 0.6s ease-out; }
+.esp-svg.alerta .esp-capa-2,
+.esp-svg.alerta .esp-capa-3 { animation: espTiembla 0.4s ease-in-out; }
+
+@keyframes espAlerta {
+  0% { opacity: 0.32; }
+  100% { opacity: 0; }
+}
+
+@keyframes espTiembla {
+  0%, 100% { translate: 0 0; }
+  25% { translate: -10px 0; }
+  75% { translate: 10px 0; }
+}
+
+.esp-lluvia { opacity: 0; }
+.esp-svg.lluvia .esp-lluvia { animation: espLluvia 1.1s ease-in forwards; animation-delay: var(--r, 0s); }
+
+@keyframes espLluvia {
+  0% { opacity: 0; translate: 0 0; }
+  15% { opacity: 1; }
+  100% { opacity: 0; translate: 420px 260px; }
+}
+
+/* Hiperespacio: salto corto entre recorridos y viaje largo en el final. */
+.esp-warp {
+  opacity: 0;
+  transform-origin: 800px 450px;
+}
+
+.esp-svg.salto .esp-warp { animation: espSalto 0.85s ease-out; }
+.esp-svg.salto .esp-capa { animation: espAcerca 0.85s ease-out; }
+
+@keyframes espSalto {
+  0% { opacity: 0; transform: scale(0.3); }
+  30% { opacity: 0.9; }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+
+@keyframes espAcerca {
+  0% { scale: 1; }
+  40% { scale: 1.08; }
+  100% { scale: 1; }
+}
+
+.esp-capa { transform-origin: 800px 450px; }
+
+/* ── Estela del cohete ───────────────────────────────────── */
+
+.esp-estela {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.esp-humo,
+.esp-chispa {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.esp-humo {
+  width: 22px;
+  height: 22px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.85), rgba(186, 160, 255, 0.35) 60%, transparent 72%);
+  animation: espHumo 0.8s ease-out forwards;
+}
+
+.esp-chispa {
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, #fffde7, #ffb300 60%, transparent 72%);
+  animation: espChispa 0.55s ease-out forwards;
+}
+
+@keyframes espHumo {
+  from { opacity: 0.9; transform: translate(-50%, -50%) scale(0.6); }
+  to { opacity: 0; transform: translate(-50%, -50%) scale(2.2); }
+}
+
+@keyframes espChispa {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  to { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+}
+
+/* ── Final: se esconde el tablero (el cohete sigue en pantalla) ── */
+
+body.esp-final .enunciado-wrap { transition: opacity 0.4s ease; opacity: 0; }
+body.esp-final .aro,
+body.esp-final .meta-estrella,
+body.esp-final .punto-inicio,
+body.esp-final .planeta-deco { transition: opacity 0.6s ease; opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .esp-capa,
+  .esp-titila,
+  .esp-nebula,
+  .esp-galaxia,
+  .esp-satelite-orbita,
+  .esp-satelite,
+  .esp-fugaz,
+  .esp-led {
+    animation: none !important;
+    transition: none;
+  }
+}
+
+/* ── Final: llegada al planeta de fiesta ──── */
+
+.esp-escena {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+  transition: opacity 0.8s ease;
+}
+
+.esp-escena.sale { opacity: 0; }
+
+.esp-planeta {
+  position: absolute;
+  animation: espPlanetaSube 0.9s cubic-bezier(.25, 1.3, .5, 1) both;
+}
+
+.esp-planeta svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+@keyframes espPlanetaSube {
+  from { transform: translateY(70vh); }
+  to { transform: translateY(0); }
+}
+
+.esp-planeta.rebota svg { animation: espPlanetaRebota 0.5s ease-out; transform-origin: 50% 20%; }
+
+@keyframes espPlanetaRebota {
+  0%, 100% { transform: scale(1, 1); }
+  35% { transform: scale(1.04, 0.95); }
+  70% { transform: scale(0.99, 1.02); }
+}
+
+.esp-planeta.fiesta svg circle:first-child {
+  animation: espAura 0.9s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes espAura {
+  from { transform: scale(1); opacity: 0.8; }
+  to { transform: scale(1.08); opacity: 1; }
+}
+
+.esp-bandera { transform-box: fill-box; transform-origin: 0 100%; scale: 0; transition: scale 0.45s cubic-bezier(.3, 1.6, .5, 1) 0.15s; }
+.esp-planeta.con-bandera .esp-bandera { scale: 1; }
+.esp-bandera-tela { animation: espTela 0.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 0 50%; }
+
+@keyframes espTela {
+  from { transform: scaleX(1) skewY(0); }
+  to { transform: scaleX(0.85) skewY(6deg); }
+}
+
+/* El cohete de la llegada recorre un camino con un rizo (offset-path). */
+.esp-nave {
+  position: absolute;
+  left: 0;
+  top: 0;
+  offset-anchor: 50% 50%;
+  offset-rotate: auto 90deg;
+  offset-distance: 0%;
+  filter: drop-shadow(0 0 14px rgba(255, 213, 79, 0.8));
+}
+
+.esp-nave.vuela { offset-distance: 100%; transition: offset-distance 3.9s cubic-bezier(.4, .05, .4, 1); }
+
+.esp-nave.sin-ruta { transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.6s ease; }
+.esp-nave.sin-ruta.vuela { opacity: 1; }
+
+.esp-nave-cuerpo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 1s cubic-bezier(.4, 0, .3, 1);
+}
+
+.esp-nave-cuerpo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+/* Enderezarse (la nave viene girada 90° por offset-rotate) y bajar en pantalla. */
+.esp-nave.aterriza .esp-nave-cuerpo { transform: rotate(var(--enderezar, -90deg)) translateY(var(--baja, 0px)); }
+.esp-nave.sin-ruta.aterriza .esp-nave-cuerpo { transform: translateY(var(--baja, 0px)); }
+
+/* La llama viene pintada en COHETE.png; al aterrizar se cambia por COHETE_2.png (sin llama). */
+.esp-nave.en-suelo { filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35)); }
+
+.esp-polvo {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #e8fff4, rgba(185, 251, 224, 0.4) 60%, transparent 72%);
+  transform: translate(-50%, -50%);
+  animation: espPolvo 0.8s ease-out forwards;
+}
+
+@keyframes espPolvo {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+  to { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(2); }
+}
+
+/* Constelación: las estrellas salen del cohete y una línea las une. */
+.esp-constelacion {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.esp-constelacion polyline {
+  fill: none;
+  stroke: #fff59d;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+  stroke-dasharray: var(--largo);
+  stroke-dashoffset: var(--largo);
+  filter: drop-shadow(0 0 6px #fff59d);
+}
+
+.esp-constelacion.dibuja polyline { stroke-dashoffset: 0; transition: stroke-dashoffset 1.6s ease-in-out; }
+
+.esp-estrella-final {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 12px rgba(255, 213, 79, 0.95));
+  animation: espEstrellaSale 0.55s cubic-bezier(.3, 1.4, .5, 1) both, espEstrellaBrilla 1.2s ease-in-out 0.6s infinite alternate;
+}
+
+@keyframes espEstrellaSale {
+  from { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.2) rotate(-90deg); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes espEstrellaBrilla {
+  from { scale: 1; }
+  to { scale: 1.15; }
+}
+
+.esp-letrero {
+  position: absolute;
+  left: 50%;
+  top: 12vh;
+  padding: 12px 34px;
+  border-radius: 999px;
+  border: 4px solid #fff;
+  background: linear-gradient(180deg, #ffe27a, #ffb300);
+  box-shadow: 0 8px 0 #e08a00, 0 14px 30px rgba(0, 0, 0, 0.35);
+  color: #4a2391;
+  font-size: clamp(26px, 4.6vw, 54px);
+  font-weight: 700;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  animation: espLetrero 0.6s cubic-bezier(.3, 1.6, .5, 1) both;
+}
+
+@keyframes espLetrero {
+  from { transform: translateX(-50%) scale(0.2) rotate(-8deg); opacity: 0; }
+  to { transform: translateX(-50%) scale(1) rotate(0); opacity: 1; }
+}

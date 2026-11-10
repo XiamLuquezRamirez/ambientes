@@ -1,0 +1,407 @@
+{
+  "nombre": "El Puzle de Siluetas en Acción",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "resaltarDestino": true,
+    "pistaPorFallos": true,
+    "fallosPista": 2,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "nombreCorto": "Las poses del atleta",
+    "desafio": "¡Desafío de velocidad y acción! Mi cuerpo está haciendo un súper salto de atleta. Mira la forma de la sombra, gira mis brazos y piernas, y encaja cada pieza para dar vida a la pose.",
+    "demostracion": "¡Mira cómo se arma la pose del súper salto!",
+    "demoRodilla": "¡Fíjate bien en la rodilla! Una pierna está doblada para saltar y la otra está estirada. ¡Busca la pieza que encaja en esa curva!",
+    "demostracionFin": "¡Ahora te toca a ti! Mira la sombra, gira cada pieza y dale vida a la pose.",
+    "botonComenzar": "¡A jugar!",
+    "paso": {
+      "cabeza": "Primero la cabeza. Mira hacia dónde se inclina en la sombra.",
+      "tronco": "Ahora el tronco. ¿Está derecho o inclinado? ¡Gíralo antes de encajarlo!",
+      "brazos": "Ahora los brazos. ¿Cuál está estirado y cuál está doblado?",
+      "piernas": "Ahora las piernas. Mira las rodillas: ¿doblada o estirada?",
+      "tenis": "¡Los tenis! El amarillo va en el pie izquierdo y el verde en el derecho. Mira el color del tobillo."
+    },
+    "titulosPaso": {
+      "cabeza": "Coloca la cabeza",
+      "tronco": "Coloca el tronco",
+      "brazos": "Coloca los brazos",
+      "piernas": "Coloca las piernas",
+      "tenis": "Coloca los tenis"
+    },
+    "seleccion": "¡{Pieza}! Gírala con las flechas y arrástrala a la sombra.",
+    "orientada": "¡Así! Ya tiene la inclinación de la sombra.",
+    "colocada": ["¡Hup! ¡Encajó!", "¡Muy bien!", "¡Eso es, atleta!", "¡Perfecto!", "¡Encajó justo!"],
+    "errorFormaPierna": "¡Observa la rodilla! ¿La pierna está doblada o estirada?",
+    "errorFormaBrazo": "¡Mira el codo! ¿El brazo está doblado o estirado?",
+    "errorOrientacion": "¡Casi! Gira {pieza} con las flechas hasta que tenga la misma inclinación de la sombra.",
+    "errorLado": "¡Ese tenis es del otro pie! Busca el color en el tobillo de la sombra.",
+    "errorLugar": "{Pieza} no va ahí. ¡Compara su forma con la sombra!",
+    "errorVecino": "Primero coloca {vecino}.",
+    "otraPieza": "Ahora buscamos {pieza}.",
+    "pista": "Mira la sombra punteada: así va {pieza}.",
+    "ayuda": "Busca {pieza}. ¡Mira dónde brilla la sombra!",
+    "posturaLista": ["¡Lo lograste! ¡Mira cómo se mueve!", "¡Pose completa! ¡A moverse!", "¡Le diste vida al atleta!"],
+    "nuevaPostura": "¡Nueva pose! Mira la sombra.",
+    "final": "¡ESPECTACULAR! Armaste todo el cuerpo en pleno movimiento. ¡Tienes un control visual y espacial de atleta profesional!",
+    "cierre": "¡Excelente! Armaste las poses del atleta con mucha atención y precisión.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Bienvenidos al Estadio de Atletismo Mágico de PedNia!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Y yo soy Zeus! Aquí las sombras de los atletas esperan que alguien les dé vida."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Desafío de velocidad y acción! Mi cuerpo está haciendo un súper salto de atleta. Mira la forma de la sombra, gira mis brazos y piernas, y encaja cada pieza para dar vida a la pose."
+      },
+      {
+        "personaje": 0,
+        "texto": "Toca una pieza, gírala con las flechas y arrástrala a la sombra. ¡Tú puedes!"
+      }
+    ]
+  },
+  "juego": {
+    "pasoGiro": 15,
+    "toleranciaGrados": 20,
+    "radioEncaje": 55,
+    "radioEncajeOrientada": 90,
+    "posturasPorEtapa": 5
+  },
+  "demo": {
+    "id": "demo-super-salto",
+    "personaje": "zoe",
+    "nombre": "El súper salto de Zoe",
+    "animacion": "salto",
+    "cuerpo": { "tronco": 15, "cabeza": 8 },
+    "brazos": [
+      { "lado": "der", "forma": "extendido", "angulo": -135 },
+      { "lado": "izq", "forma": "flexionado", "angulo": 70 }
+    ],
+    "piernas": [
+      { "lado": "der", "forma": "doblada", "angulo": -80 },
+      { "lado": "izq", "forma": "recta", "angulo": 35, "tenis": 50 }
+    ],
+    "desorden": { "cabeza": 45, "tronco": -60, "brazo_izq": 90, "brazo_der": -45, "pierna_der": 60, "pierna_izq": -45, "tenis_der": 45, "tenis_izq": -60 }
+  },
+  "etapas": [
+    {
+      "id": 1,
+      "titulo": "Nivel 1",
+      "subtitulo": "Primeros movimientos",
+      "intro": "¡Nivel 1! Primeros movimientos. Mira la sombra y arma al atleta.",
+      "giroInicial": [45, 60, 90],
+      "resaltarPaso": true,
+      "toleranciaGrados": 22,
+      "posturas": [
+        {
+          "id": "salto-sencillo",
+          "personaje": "zoe",
+          "nombre": "Salto sencillo",
+          "nivel": 1,
+          "animacion": "salto",
+          "audio": "¡Zoe da un salto sencillo con los brazos arriba! Mira su sombra.",
+          "pista": "Los brazos de Zoe apuntan hacia el cielo y una rodilla se dobla hacia atrás.",
+          "cuerpo": { "tronco": 0, "cabeza": -5 },
+          "brazos": [
+            { "lado": "ambos", "doble": true, "forma": "extendido", "angulo": -155 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "recta", "angulo": -15 },
+            { "lado": "izq", "forma": "doblada", "angulo": 10 }
+          ]
+        },
+        {
+          "id": "brazos-extendidos",
+          "personaje": "zeus",
+          "nombre": "Brazos extendidos",
+          "nivel": 1,
+          "animacion": "equilibrio",
+          "audio": "¡Zeus estira los brazos al frente y abre las piernas! Mira su sombra.",
+          "pista": "Los brazos de Zeus van derechos hacia adelante, como un avión.",
+          "cuerpo": { "tronco": 5, "cabeza": 0 },
+          "brazos": [
+            { "lado": "ambos", "doble": true, "forma": "extendido", "angulo": -90 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "recta", "angulo": -25 },
+            { "lado": "izq", "forma": "recta", "angulo": 25 }
+          ]
+        },
+        {
+          "id": "corriendo-a-la-meta",
+          "personaje": "zoe",
+          "nombre": "Corriendo a la meta",
+          "nivel": 1,
+          "animacion": "carrera",
+          "audio": "¡Zoe corre hacia la meta, inclinada hacia adelante! Mira su sombra.",
+          "pista": "Zoe se inclina hacia adelante y lleva los brazos hacia atrás.",
+          "cuerpo": { "tronco": 25, "cabeza": 15 },
+          "brazos": [
+            { "lado": "ambos", "doble": true, "forma": "extendido", "angulo": 55 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "doblada", "angulo": -70 },
+            { "lado": "izq", "forma": "recta", "angulo": 35, "tenis": 45 }
+          ]
+        },
+        {
+          "id": "brazos-al-cielo",
+          "personaje": "zeus",
+          "nombre": "Brazos al cielo",
+          "nivel": 1,
+          "animacion": "equilibrio",
+          "audio": "¡Zeus se pone de puntillas y estira los brazos hacia el cielo!",
+          "pista": "Los brazos de Zeus suben derechos, un poco hacia adelante, y está de puntillas.",
+          "cuerpo": { "tronco": 0, "cabeza": -8 },
+          "brazos": [
+            { "lado": "ambos", "doble": true, "forma": "extendido", "angulo": -145 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "recta", "angulo": -4, "tenis": 35 },
+            { "lado": "izq", "forma": "recta", "angulo": 4, "tenis": 35 }
+          ]
+        },
+        {
+          "id": "sentadilla",
+          "personaje": "zoe",
+          "nombre": "La sentadilla",
+          "nivel": 1,
+          "animacion": "equilibrio",
+          "audio": "¡Zoe baja en sentadilla con los brazos al frente!",
+          "pista": "Las dos rodillas de Zoe se doblan y los brazos van derechos hacia adelante.",
+          "cuerpo": { "tronco": 25, "cabeza": 0 },
+          "brazos": [
+            { "lado": "ambos", "doble": true, "forma": "extendido", "angulo": -85 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "doblada", "angulo": -75, "tenis": 0 },
+            { "lado": "izq", "forma": "doblada", "angulo": -60, "tenis": 0 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "titulo": "Nivel 2",
+      "subtitulo": "Atletas en acción",
+      "intro": "¡Nivel 2! Atletas en acción. Ahora hay brazos doblados y troncos inclinados.",
+      "giroInicial": [60, 90, 120, 135],
+      "resaltarPaso": true,
+      "posturas": [
+        {
+          "id": "salto-de-obstaculos",
+          "personaje": "zeus",
+          "nombre": "Salto de obstáculos",
+          "nivel": 2,
+          "animacion": "salto",
+          "audio": "¡Zeus salta una valla! Una pierna va estirada al frente y la otra doblada atrás.",
+          "pista": "La pierna estirada de Zeus va derecha al frente, por encima de la valla.",
+          "cuerpo": { "tronco": 35, "cabeza": 20 },
+          "brazos": [
+            { "lado": "der", "forma": "extendido", "angulo": -100 },
+            { "lado": "izq", "forma": "flexionado", "angulo": 75 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "recta", "angulo": -88 },
+            { "lado": "izq", "forma": "doblada", "angulo": 50 }
+          ]
+        },
+        {
+          "id": "carrera-brazos-flexionados",
+          "personaje": "zoe",
+          "nombre": "Carrera con brazos doblados",
+          "nivel": 2,
+          "animacion": "carrera",
+          "audio": "¡Zoe corre con los dos brazos doblados! Mira cómo se mueven.",
+          "pista": "Un codo de Zoe va adelante y el otro atrás.",
+          "cuerpo": { "tronco": 15, "cabeza": 8 },
+          "brazos": [
+            { "lado": "der", "forma": "flexionado", "angulo": -40 },
+            { "lado": "izq", "forma": "flexionado", "angulo": 80 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "doblada", "angulo": -60 },
+            { "lado": "izq", "forma": "recta", "angulo": 30, "tenis": 45 }
+          ]
+        },
+        {
+          "id": "rodilla-arriba",
+          "personaje": "zeus",
+          "nombre": "Rodilla arriba",
+          "nivel": 2,
+          "animacion": "carrera",
+          "audio": "¡Zeus levanta una rodilla bien alto, con el tronco inclinado!",
+          "pista": "La rodilla de Zeus sube hasta la cintura y la otra pierna queda derecha.",
+          "cuerpo": { "tronco": 12, "cabeza": 5 },
+          "brazos": [
+            { "lado": "ambos", "doble": true, "forma": "flexionado", "angulo": -20 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "doblada", "angulo": -95 },
+            { "lado": "izq", "forma": "recta", "angulo": 0 }
+          ]
+        },
+        {
+          "id": "lanzamiento",
+          "personaje": "zoe",
+          "nombre": "Lanzamiento de pelota",
+          "nivel": 2,
+          "animacion": "equilibrio",
+          "audio": "¡Zoe lleva un brazo atrás para lanzar la pelota!",
+          "pista": "Un brazo de Zoe sube hacia atrás y el otro apunta al frente; una pierna adelante y la otra atrás.",
+          "cuerpo": { "tronco": -5, "cabeza": 0 },
+          "brazos": [
+            { "lado": "der", "forma": "extendido", "angulo": 145 },
+            { "lado": "izq", "forma": "extendido", "angulo": -75 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "recta", "angulo": -25, "tenis": -10 },
+            { "lado": "izq", "forma": "recta", "angulo": 20, "tenis": 0 }
+          ]
+        },
+        {
+          "id": "patada-al-balon",
+          "personaje": "zeus",
+          "nombre": "Patada al balón",
+          "nivel": 2,
+          "animacion": "carrera",
+          "audio": "¡Zeus patea el balón con la pierna estirada hacia adelante!",
+          "pista": "Una pierna de Zeus sube estirada al frente y la otra lo sostiene derecha.",
+          "cuerpo": { "tronco": -12, "cabeza": 0 },
+          "brazos": [
+            { "lado": "der", "forma": "extendido", "angulo": 50 },
+            { "lado": "izq", "forma": "flexionado", "angulo": -45 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "recta", "angulo": -65 },
+            { "lado": "izq", "forma": "recta", "angulo": 5, "tenis": 0 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "titulo": "Nivel 3",
+      "subtitulo": "Grandes atletas",
+      "intro": "¡Nivel 3! Grandes atletas: saltos en el aire, equilibrio y gimnasia. ¡Mira cada detalle!",
+      "giroInicial": [90, 120, 150, 180],
+      "resaltarPaso": false,
+      "toleranciaGrados": 18,
+      "posturas": [
+        {
+          "id": "salto-en-el-aire",
+          "personaje": "zoe",
+          "nombre": "Salto de tijera en el aire",
+          "nivel": 3,
+          "animacion": "giro",
+          "audio": "¡Zoe vuela en un salto de tijera! Las piernas se abren en el aire.",
+          "pista": "Una pierna va estirada al frente y la otra se dobla hacia atrás, muy alto.",
+          "cuerpo": { "tronco": 5, "cabeza": -5 },
+          "brazos": [
+            { "lado": "der", "forma": "extendido", "angulo": -135 },
+            { "lado": "izq", "forma": "extendido", "angulo": 160 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "recta", "angulo": -80, "tenis": -70 },
+            { "lado": "izq", "forma": "doblada", "angulo": 70 }
+          ]
+        },
+        {
+          "id": "equilibrio-en-una-pierna",
+          "personaje": "zeus",
+          "nombre": "Equilibrio en una pierna",
+          "nivel": 3,
+          "animacion": "equilibrio",
+          "audio": "¡Zeus hace equilibrio en una pierna, como un avión! El tronco se inclina mucho.",
+          "pista": "El tronco de Zeus casi queda acostado y una pierna se estira hacia atrás.",
+          "cuerpo": { "tronco": 70, "cabeza": 50 },
+          "brazos": [
+            { "lado": "der", "forma": "extendido", "angulo": -105 },
+            { "lado": "izq", "forma": "flexionado", "angulo": 30 }
+          ],
+          "piernas": [
+            { "lado": "izq", "forma": "recta", "angulo": 0 },
+            { "lado": "der", "forma": "recta", "angulo": 105, "tenis": 165 }
+          ]
+        },
+        {
+          "id": "gimnasta",
+          "personaje": "zoe",
+          "nombre": "Pose de gimnasta",
+          "nivel": 3,
+          "animacion": "giro",
+          "audio": "¡Zoe hace una pose de gimnasia con los brazos en V y una rodilla arriba!",
+          "pista": "Los brazos de Zoe forman una V y su rodilla sube al frente.",
+          "cuerpo": { "tronco": -10, "cabeza": -15 },
+          "brazos": [
+            { "lado": "der", "forma": "extendido", "angulo": -150 },
+            { "lado": "izq", "forma": "extendido", "angulo": 140 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "doblada", "angulo": -100, "tenis": 15 },
+            { "lado": "izq", "forma": "recta", "angulo": 0 }
+          ]
+        },
+        {
+          "id": "salto-de-longitud",
+          "personaje": "zeus",
+          "nombre": "Salto de longitud",
+          "nivel": 3,
+          "animacion": "salto",
+          "audio": "¡Zeus vuela en el salto largo con las piernas al frente!",
+          "pista": "Los brazos de Zeus van arriba y las dos piernas se estiran hacia adelante.",
+          "cuerpo": { "tronco": 25, "cabeza": 10 },
+          "brazos": [
+            { "lado": "der", "forma": "extendido", "angulo": -160 },
+            { "lado": "izq", "forma": "extendido", "angulo": -130 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "recta", "angulo": -80, "tenis": -85 },
+            { "lado": "izq", "forma": "doblada", "angulo": -85 }
+          ]
+        },
+        {
+          "id": "gran-zancada",
+          "personaje": "zoe",
+          "nombre": "La gran zancada",
+          "nivel": 3,
+          "animacion": "equilibrio",
+          "audio": "¡Zoe da una gran zancada con los brazos abiertos!",
+          "pista": "La rodilla de adelante se dobla, la pierna de atrás queda estirada y los brazos se abren adelante y atrás.",
+          "cuerpo": { "tronco": 10, "cabeza": 0 },
+          "brazos": [
+            { "lado": "der", "forma": "extendido", "angulo": -100 },
+            { "lado": "izq", "forma": "extendido", "angulo": 105 }
+          ],
+          "piernas": [
+            { "lado": "der", "forma": "doblada", "angulo": -50, "tenis": 0 },
+            { "lado": "izq", "forma": "recta", "angulo": 40, "tenis": 20 }
+          ]
+        }
+      ]
+    }
+  ],
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Transición: 3 niveles de poses"
+    }
+  ]
+}

@@ -45,6 +45,17 @@ function sonido() {
 }
 
 /** Evento sonoro del tema; false si el tema no lo cubre. */
+/** Consultorio animado del fondo (consultorio.js); null si no cargó. */
+function con() {
+    return window.Consultorio || null;
+}
+
+/** "Toca las manos." → "Manos" (para el diploma). */
+function nombreDePregunta(p) {
+    const t = String((p && p.texto) || "").replace(/^\s*toca\s+(la|las|el|los)\s+/i, "").replace(/[.!¡]/g, "").trim();
+    return t ? t.charAt(0).toUpperCase() + t.slice(1) : "";
+}
+
 function sonarEvento(nombre, opts) {
     return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
 }
@@ -447,6 +458,7 @@ function iniciarEscenario() {
     const img = document.getElementById("img-completo");
     img.onload = function () {
         sizeLienzo();
+        if (con()) con().reacomodar();
     };
     img.src = src;
     img.alt = "Figura de " + (cuerpo.nombre || cuerpoElegido);
@@ -460,6 +472,7 @@ function iniciarEscenario() {
     }
     sonarEvento("aparece");
     tableroListo = true;
+    if (con()) con().listo();
     aplicarAccesibilidadInicial();
     cargarMascaraFigura(src);
 
@@ -467,6 +480,7 @@ function iniciarEscenario() {
     if (wrap && typeof ResizeObserver !== "undefined" && !wrap._obsLienzo) {
         wrap._obsLienzo = new ResizeObserver(function () {
             if (tableroListo) sizeLienzo();
+            if (con()) con().reacomodar();
         });
         wrap._obsLienzo.observe(wrap);
     }
@@ -891,6 +905,8 @@ function resolverAcierto(idsTocadas) {
     limpiarEstadosZona();
     iluminarZonas(idsTocadas);
     if (anim()) anim().acierto(idsTocadas);
+    const preguntaOk = preguntaActual();
+    if (con()) con().acierto(idsTocadas[0], (preguntaOk && preguntaOk.targets) || [], nombreDePregunta(preguntaOk));
     confirmar("acierto").then(function () {
         indicePregunta += 1;
         if (indicePregunta >= preguntas.length) {
@@ -909,6 +925,7 @@ function resolverError(idTocada) {
     const zona = idTocada ? document.querySelector('.zona-toque[data-id="' + idTocada + '"]') : null;
     if (zona) zona.classList.add("error");
     if (anim()) anim().error();
+    if (con()) con().error();
     confirmar("error").then(function () {
         if (zona) zona.classList.remove("error");
         actualizarAyudasVisuales();
@@ -925,6 +942,19 @@ function terminarJuego() {
     if (juegoTerminado) return;
     juegoTerminado = true;
     if (typeof Swal !== "undefined") Swal.close();
+    const t = gameConfig.textos || {};
+    // Diploma de doctor en el consultorio; después la victoria.
+    const diploma = con()
+        ? con().final({
+            titulo: t.diploma || "Diploma de Doctor del cuerpo",
+            subtitulo: t.diplomaSub || "¡Ya conoces las partes de tu cuerpo!",
+            hablar: function (texto) { return TextoVoz.hablar(texto, "zoe"); }
+        }).catch(function () {})
+        : Promise.resolve();
+    diploma.then(mostrarVictoria);
+}
+
+function mostrarVictoria() {
     if (sonarEvento("victoria")) {
         // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
         // fanfarria son tonos puros agudos (se oía como "pitido").

@@ -1,0 +1,297 @@
+{
+  "nombre": "El Espejo de las Posiciones y Lateralidad",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "resaltarDestino": false,
+    "pistaPorFallos": true,
+    "fallosPista": 2,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "desafio": "¡Desafío de posturas y lateralidad! Mira mi reflejo a la izquierda. Arma el rompecabezas a la derecha asegurándote de que el brazo izquierdo y la pierna derecha estén en la misma posición.",
+    "demostracion": "¡Mira bien! ¿Hacia dónde apunta el brazo izquierdo en el modelo? ¡Gíralo y encájalo!",
+    "demostracionFin": "¡Ahora te toca a ti! Mira a {nombre} en el espejo y arma su postura.",
+    "botonComenzar": "¡A jugar!",
+    "paso": {
+      "cabeza_tronco": "Primero, la cabeza y el tronco. ¡Arrástralos a la silueta!",
+      "brazo_izq": "Ahora el brazo izquierdo. ¿Hacia dónde apunta en {nombre}?",
+      "brazo_der": "Ahora el brazo derecho. ¡Míralo en el espejo!",
+      "pierna_izq": "Ahora la pierna izquierda. ¿Cómo la tiene {nombre}?",
+      "pierna_der": "Ahora la pierna derecha. ¿Está estirada o doblada?",
+      "brazo_der_pierna_izq": "¡Ya casi! Faltan el brazo derecho y la pierna izquierda.",
+      "brazo_izq_pierna_der": "¡Ya casi! Faltan el brazo izquierdo y la pierna derecha."
+    },
+    "titulosPaso": {
+      "cabeza_tronco": "Cabeza y tronco",
+      "brazo_izq": "Brazo izquierdo",
+      "brazo_der": "Brazo derecho",
+      "pierna_izq": "Pierna izquierda",
+      "pierna_der": "Pierna derecha",
+      "brazo_der_pierna_izq": "Brazo derecho y pierna izquierda",
+      "brazo_izq_pierna_der": "Brazo izquierdo y pierna derecha"
+    },
+    "seleccion": "¡{Pieza}! Usa las flechas para girar y arrastra la pieza a su lugar.",
+    "seleccionSinGiro": "¡{Pieza}! Arrastra la pieza a la silueta.",
+    "orientada": "¡Así! Ya está como el de {nombre}.",
+    "colocada": "¡{Pieza}! ¡Encajó!",
+    "errorLado": "¡Observa otra vez! ¿Dónde está tu {parte}?",
+    "errorLugar": "¡Observa otra vez! {Pieza} va en {articulacion}.",
+    "errorOrientacion": "¡Casi! Mira a {nombre} y gira {pieza} igual que {el}.",
+    "otraPieza": "Ahora buscamos {pieza}.",
+    "pista": "Mira la sombra: así va {pieza}.",
+    "posturaLista": "¡Lo lograste! ¡Mira cómo se mueve!",
+    "nuevaPostura": "¡Nueva postura! Mira a {nombre} en el espejo.",
+    "final": "¡Todas las posturas! ¡Ahora bailamos juntos frente al espejo!",
+    "cierre": "¡Excelente control de la lateralidad y del espacio! Replicaste la postura del cuerpo a la perfección.",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola! Soy Zeus. ¡Bienvenidos a mi estudio de danza y gimnasia!"
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Yo soy Zoe! Aquí los espejos nos muestran posturas muy divertidas."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Desafío de posturas y lateralidad! Mira mi reflejo a la izquierda. Arma el rompecabezas a la derecha asegurándote de que el brazo izquierdo y la pierna derecha estén en la misma posición."
+      },
+      {
+        "personaje": 1,
+        "texto": "Toca las flechas para girar brazos y piernas. ¡Tú puedes!"
+      }
+    ]
+  },
+  "juego": {
+    "pasoGiro": 30,
+    "toleranciaGrados": 22,
+    "toleranciaFlexion": 32,
+    "radioEncaje": 46,
+    "radioEncajeOrientada": 70,
+    "personajes": ["zeus", "zoe"],
+    "ordenPasos": [["cabeza", "tronco"], ["brazo_izq"], ["pierna_der"], ["brazo_der", "pierna_izq"]]
+  },
+  "demo": {
+    "nombre": "Saludo con pierna doblada",
+    "partes": {
+      "brazo_izq": { "a": 180, "b": 0 },
+      "brazo_der": { "a": 60, "b": 0 },
+      "pierna_der": { "a": 60, "b": -90 },
+      "pierna_izq": { "a": 0, "b": 0 }
+    }
+  },
+  "etapas": [
+    {
+      "id": 1,
+      "titulo": "Nivel 1",
+      "subtitulo": "Posiciones básicas",
+      "intro": "¡Nivel 1! Posiciones básicas: arriba, abajo, izquierda y derecha.",
+      "flexion": false,
+      "resaltarPieza": true,
+      "etiquetas": true,
+      "posturas": [
+        {
+          "id": "saludo-izquierdo",
+          "nombre": "Saludo izquierdo",
+          "partes": {
+            "brazo_izq": { "a": 180, "b": 0 },
+            "brazo_der": { "a": 0, "b": 0 },
+            "pierna_der": { "a": 0, "b": 0 },
+            "pierna_izq": { "a": 0, "b": 0 }
+          }
+        },
+        {
+          "id": "saludo-derecho",
+          "nombre": "Saludo derecho",
+          "orden": [["cabeza", "tronco"], ["brazo_der"], ["pierna_izq"], ["brazo_izq", "pierna_der"]],
+          "partes": {
+            "brazo_izq": { "a": 0, "b": 0 },
+            "brazo_der": { "a": 180, "b": 0 },
+            "pierna_der": { "a": 0, "b": 0 },
+            "pierna_izq": { "a": 0, "b": 0 }
+          }
+        },
+        {
+          "id": "senal-izquierda",
+          "nombre": "Señal a la izquierda",
+          "partes": {
+            "brazo_izq": { "a": 90, "b": 0 },
+            "brazo_der": { "a": 0, "b": 0 },
+            "pierna_der": { "a": 30, "b": 0 },
+            "pierna_izq": { "a": 30, "b": 0 }
+          }
+        },
+        {
+          "id": "senal-derecha",
+          "nombre": "Señal a la derecha",
+          "orden": [["cabeza", "tronco"], ["brazo_der"], ["pierna_izq"], ["brazo_izq", "pierna_der"]],
+          "partes": {
+            "brazo_izq": { "a": 0, "b": 0 },
+            "brazo_der": { "a": 90, "b": 0 },
+            "pierna_der": { "a": 30, "b": 0 },
+            "pierna_izq": { "a": 30, "b": 0 }
+          }
+        },
+        {
+          "id": "estrella",
+          "nombre": "La estrella",
+          "partes": {
+            "brazo_izq": { "a": 150, "b": 0 },
+            "brazo_der": { "a": 150, "b": 0 },
+            "pierna_der": { "a": 30, "b": 0 },
+            "pierna_izq": { "a": 30, "b": 0 }
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "titulo": "Nivel 2",
+      "subtitulo": "Posiciones combinadas",
+      "intro": "¡Nivel 2! Posiciones combinadas: ahora una pierna se dobla. Usa las flechas naranjas de la rodilla.",
+      "flexion": true,
+      "pistaFlexion": true,
+      "resaltarPieza": false,
+      "etiquetas": true,
+      "posturas": [
+        {
+          "id": "saludo-flamenco",
+          "nombre": "Saludo del flamenco",
+          "partes": {
+            "brazo_izq": { "a": 180, "b": 0 },
+            "brazo_der": { "a": 60, "b": 0 },
+            "pierna_der": { "a": 60, "b": -90 },
+            "pierna_izq": { "a": 0, "b": 0 }
+          }
+        },
+        {
+          "id": "avion-de-lado",
+          "nombre": "Avión de lado",
+          "orden": [["cabeza", "tronco"], ["brazo_der"], ["pierna_izq"], ["brazo_izq", "pierna_der"]],
+          "partes": {
+            "brazo_izq": { "a": 90, "b": 0 },
+            "brazo_der": { "a": 180, "b": 0 },
+            "pierna_der": { "a": 0, "b": 0 },
+            "pierna_izq": { "a": 60, "b": -90 }
+          }
+        },
+        {
+          "id": "rodilla-al-lado",
+          "nombre": "Rodilla al lado",
+          "partes": {
+            "brazo_izq": { "a": 120, "b": 0 },
+            "brazo_der": { "a": 90, "b": 0 },
+            "pierna_der": { "a": 90, "b": -90 },
+            "pierna_izq": { "a": 0, "b": 0 }
+          }
+        },
+        {
+          "id": "flamenco-otro-lado",
+          "nombre": "Flamenco al otro lado",
+          "orden": [["cabeza", "tronco"], ["brazo_der"], ["pierna_izq"], ["brazo_izq", "pierna_der"]],
+          "partes": {
+            "brazo_izq": { "a": 60, "b": 0 },
+            "brazo_der": { "a": 180, "b": 0 },
+            "pierna_der": { "a": 0, "b": 0 },
+            "pierna_izq": { "a": 60, "b": -90 }
+          }
+        },
+        {
+          "id": "rodilla-otro-lado",
+          "nombre": "Rodilla al otro lado",
+          "orden": [["cabeza", "tronco"], ["brazo_der"], ["pierna_izq"], ["brazo_izq", "pierna_der"]],
+          "partes": {
+            "brazo_izq": { "a": 90, "b": 0 },
+            "brazo_der": { "a": 120, "b": 0 },
+            "pierna_der": { "a": 0, "b": 0 },
+            "pierna_izq": { "a": 90, "b": -90 }
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "titulo": "Nivel 3",
+      "subtitulo": "Posturas complejas",
+      "intro": "¡Nivel 3! Posturas de gimnasia: codos y rodillas doblados. ¡Mira cada detalle!",
+      "flexion": true,
+      "pistaFlexion": false,
+      "resaltarPieza": false,
+      "etiquetas": false,
+      "posturas": [
+        {
+          "id": "equilibrista",
+          "nombre": "La equilibrista",
+          "partes": {
+            "brazo_izq": { "a": 90, "b": 0 },
+            "brazo_der": { "a": 90, "b": 90 },
+            "pierna_der": { "a": 60, "b": -90 },
+            "pierna_izq": { "a": 0, "b": 0 }
+          }
+        },
+        {
+          "id": "bailarina",
+          "nombre": "La bailarina",
+          "partes": {
+            "brazo_izq": { "a": 150, "b": 30 },
+            "brazo_der": { "a": 60, "b": -120 },
+            "pierna_der": { "a": 90, "b": -120 },
+            "pierna_izq": { "a": 0, "b": 0 }
+          }
+        },
+        {
+          "id": "gimnasta",
+          "nombre": "El gimnasta",
+          "orden": [["cabeza", "tronco"], ["brazo_der"], ["pierna_izq"], ["brazo_izq", "pierna_der"]],
+          "partes": {
+            "brazo_izq": { "a": 60, "b": -120 },
+            "brazo_der": { "a": 150, "b": 30 },
+            "pierna_der": { "a": 30, "b": 0 },
+            "pierna_izq": { "a": 90, "b": -90 }
+          }
+        },
+        {
+          "id": "robot",
+          "nombre": "El robot",
+          "partes": {
+            "brazo_izq": { "a": 90, "b": 90 },
+            "brazo_der": { "a": 90, "b": 90 },
+            "pierna_der": { "a": 30, "b": 0 },
+            "pierna_izq": { "a": 30, "b": 0 }
+          }
+        },
+        {
+          "id": "patinadora",
+          "nombre": "La patinadora",
+          "orden": [["cabeza", "tronco"], ["brazo_der"], ["pierna_izq"], ["brazo_izq", "pierna_der"]],
+          "partes": {
+            "brazo_izq": { "a": 60, "b": -90 },
+            "brazo_der": { "a": 150, "b": 0 },
+            "pierna_der": { "a": 0, "b": 0 },
+            "pierna_izq": { "a": 60, "b": -90 }
+          }
+        }
+      ]
+    }
+  ],
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Transición: 3 niveles de posturas"
+    }
+  ]
+}

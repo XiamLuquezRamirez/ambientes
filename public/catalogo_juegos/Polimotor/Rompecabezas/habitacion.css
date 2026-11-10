@@ -1,0 +1,353 @@
+/* Cuarto animado del rompecabezas del cuerpo (habitacion.js). */
+
+.hab-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: #8f79b8;
+}
+
+.hab-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hab-capa {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Los brazos se levantan por encima de la caja de la figura: que no se recorten. */
+body.modo-svg #lienzo {
+  overflow: visible;
+}
+
+/* ── Fondo en movimiento ────────────────────────────────── */
+
+.hab-lampara {
+  transform-origin: 0 0;
+  animation: habLampara 5s ease-in-out infinite;
+}
+
+.hab-lampara.l2 {
+  animation-duration: 6.2s;
+  animation-delay: -2s;
+}
+
+@keyframes habLampara {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.hab-cubo {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: habCubo 3.4s ease-in-out infinite;
+}
+
+.hab-cubo.c2 { animation-delay: -1.1s; }
+.hab-cubo.c3 { animation-delay: -2.2s; }
+
+@keyframes habCubo {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-4deg); }
+}
+
+.hab-pelota {
+  animation: habPelota 4s ease-in-out infinite;
+}
+
+@keyframes habPelota {
+  0%, 70%, 100% { transform: translateY(0); }
+  78% { transform: translateY(-34px); }
+  86% { transform: translateY(0); }
+  92% { transform: translateY(-12px); }
+}
+
+/* Al arrastrar: el cuarto se atenúa y la silueta brilla. */
+.hab-sombra {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hab-svg.arrastrando .hab-sombra { opacity: 0.3; }
+
+#figura-svg.hab-brilla .svg-parte.sombra {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.85));
+}
+
+/* Acierto y error: destello del cuarto y luces del tapete. */
+.hab-destello { opacity: 0; }
+
+.hab-svg.ok .hab-destello,
+.hab-svg.error .hab-destello {
+  animation: habDestello 0.7s ease-out;
+}
+
+@keyframes habDestello {
+  0% { opacity: 0.3; }
+  100% { opacity: 0; }
+}
+
+/* ── Tapete con luces bajo la figura ────────────────────── */
+
+.hab-tapete {
+  position: absolute;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at center, #e872a8 0 45%, #f48fc0 46% 70%, #ff9fcf 71%);
+  box-shadow: 0 6px 0 #d9659a;
+}
+
+.hab-tapete[hidden] { display: none; }
+
+.hab-tapete-luces {
+  position: absolute;
+  inset: 0;
+}
+
+.hab-tapete-luces span {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: #fff3bf;
+  box-shadow: 0 0 8px #ffd43b;
+  animation: habLuz 1.6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.1s);
+}
+
+@keyframes habLuz {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.hab-tapete.ok .hab-tapete-luces span {
+  background: #69db7c;
+  box-shadow: 0 0 12px #2f9e44;
+  animation-duration: 0.3s;
+}
+
+.hab-tapete.error .hab-tapete-luces span {
+  background: #ff6b6b;
+  box-shadow: 0 0 12px #e03131;
+  animation-duration: 0.25s;
+}
+
+.hab-tapete.fiesta .hab-tapete-luces span {
+  animation: habLuzFiesta 0.8s linear infinite;
+  animation-delay: calc(var(--i) * -0.05s);
+}
+
+@keyframes habLuzFiesta {
+  0% { background: #ffd43b; box-shadow: 0 0 12px #ffd43b; }
+  33% { background: #ff6b6b; box-shadow: 0 0 12px #ff6b6b; }
+  66% { background: #4dabf7; box-shadow: 0 0 12px #4dabf7; }
+  100% { background: #ffd43b; box-shadow: 0 0 12px #ffd43b; }
+}
+
+/* ── Gestos de las partes (habitacion.js pone --tx, --ty y el pivote) ── */
+
+#figura-svg .svg-parte.hab-asiente,
+#figura-svg .svg-parte.hab-latido,
+#figura-svg .svg-parte.hab-paso,
+#figura-svg .svg-parte.hab-respira {
+  transform-box: view-box;
+}
+
+#figura-svg .svg-parte.hab-asiente { animation: habAsiente 1.1s ease-in-out; }
+
+@keyframes habAsiente {
+  0%, 100% { transform: translate(var(--tx), var(--ty)) rotate(0) scaleY(1); }
+  20% { transform: translate(var(--tx), var(--ty)) rotate(-7deg) scaleY(1); }
+  40% { transform: translate(var(--tx), var(--ty)) rotate(6deg) scaleY(1); }
+  60% { transform: translate(var(--tx), var(--ty)) rotate(0) scaleY(0.94); }
+  70% { transform: translate(var(--tx), var(--ty)) rotate(0) scaleY(1); }
+}
+
+/* Brazos y manos: un latido en su lugar (sin girar, para que no se vea el corte). */
+#figura-svg .svg-parte.hab-latido { animation: habLatido 0.9s ease-in-out; }
+
+@keyframes habLatido {
+  0%, 100% { transform: translate(var(--tx), var(--ty)) scale(1); }
+  30% { transform: translate(var(--tx), var(--ty)) scale(1.08); }
+  55% { transform: translate(var(--tx), var(--ty)) scale(0.97); }
+  75% { transform: translate(var(--tx), var(--ty)) scale(1.03); }
+}
+
+#figura-svg .svg-parte.hab-paso { animation: habPaso 0.8s ease-in-out; }
+
+@keyframes habPaso {
+  0%, 100% { transform: translate(var(--tx), var(--ty)) translateY(0); }
+  40% { transform: translate(var(--tx), var(--ty)) translateY(var(--salto)); }
+  70% { transform: translate(var(--tx), var(--ty)) translateY(0); }
+  85% { transform: translate(var(--tx), var(--ty)) translateY(calc(var(--salto) * 0.3)); }
+}
+
+#figura-svg .svg-parte.hab-respira { animation: habRespira 1.6s ease-in-out; }
+
+@keyframes habRespira {
+  0%, 100% { transform: translate(var(--tx), var(--ty)) scale(1, 1); }
+  35% { transform: translate(var(--tx), var(--ty)) scale(1.04, 1.03); }
+  65% { transform: translate(var(--tx), var(--ty)) scale(0.98, 0.99); }
+}
+
+/* Baile: el cuerpo entero rebota y se balancea (los brazos no se levantan). */
+#lienzo.hab-baila {
+  animation: habBaila 0.5s ease-in-out infinite;
+}
+
+@keyframes habBaila {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  25% { transform: translateY(-14px) rotate(-3deg); }
+  50% { transform: translateY(0) rotate(0); }
+  75% { transform: translateY(-14px) rotate(3deg); }
+}
+
+/* ── Fiesta final ───────────────────────────────────────── */
+
+body.hab-final #bandeja {
+  transition: opacity 0.5s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hab-svg.fiesta .hab-luz {
+  animation: habLuzColor 1.2s linear infinite;
+}
+
+@keyframes habLuzColor {
+  0% { fill: #ffd43b; }
+  33% { fill: #ff6b6b; }
+  66% { fill: #4dabf7; }
+  100% { fill: #ffd43b; }
+}
+
+.hab-svg.fiesta .hab-lampara {
+  animation-duration: 1.2s;
+}
+
+.hab-svg.fiesta .hab-pared-color {
+  animation: habPared 1.2s steps(3) infinite;
+}
+
+@keyframes habPared {
+  0% { fill: rgba(255, 107, 107, 0.18); }
+  33% { fill: rgba(77, 171, 247, 0.18); }
+  66% { fill: rgba(255, 212, 59, 0.18); }
+}
+
+.hab-bola {
+  position: absolute;
+  left: 58%;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hab-bola-cuerda {
+  width: 3px;
+  height: 0;
+  background: #2f2a45;
+  transition: height 0.9s cubic-bezier(.3, 1.3, .5, 1);
+}
+
+.hab-bola.baja .hab-bola-cuerda { height: 14vh; }
+
+.hab-bola-esfera {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 10px, rgba(0, 0, 0, 0.12) 10px 12px),
+    repeating-linear-gradient(90deg, transparent 0 10px, rgba(0, 0, 0, 0.12) 10px 12px),
+    radial-gradient(circle at 35% 30%, #ffffff, #ced4da 45%, #868e96);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+  animation: habBola 1.4s linear infinite;
+}
+
+@keyframes habBola {
+  0% { filter: hue-rotate(0deg) brightness(1); }
+  50% { filter: hue-rotate(180deg) brightness(1.3); }
+  100% { filter: hue-rotate(360deg) brightness(1); }
+}
+
+/* Galería final: las partes del cuerpo aparecen con su nombre. */
+.hab-galeria {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.hab-galeria-carta {
+  margin: 0;
+  width: clamp(96px, 12vw, 150px);
+  padding: 10px 10px 8px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 0 rgba(60, 30, 100, 0.25);
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.4) rotate(-8deg);
+  animation: habCarta 0.5s cubic-bezier(.3, 1.6, .5, 1) forwards;
+}
+
+.hab-galeria-carta img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.hab-galeria-carta figcaption {
+  margin-top: 4px;
+  font-size: clamp(14px, 1.6vw, 19px);
+  font-weight: 700;
+  color: #5f3dc4;
+  line-height: 1.1;
+}
+
+@keyframes habCarta {
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+.hab-confeti {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 16px;
+  border-radius: 3px;
+  animation-name: habConfeti;
+  animation-timing-function: cubic-bezier(.3, .5, .6, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes habConfeti {
+  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  100% { transform: translate(var(--dx), 105vh) rotate(var(--giro)); opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hab-lampara,
+  .hab-cubo,
+  .hab-pelota,
+  .hab-tapete-luces span,
+  .hab-bola-esfera,
+  #lienzo.hab-baila,
+  .hab-svg.fiesta .hab-luz,
+  .hab-svg.fiesta .hab-pared-color {
+    animation: none;
+  }
+}
