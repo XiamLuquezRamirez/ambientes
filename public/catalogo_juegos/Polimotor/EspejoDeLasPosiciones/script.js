@@ -460,6 +460,7 @@ async function iniciarJuego() {
 
     if (acc().mostrarIntro && window.EspejoDemo) {
         enDemo = true;
+        ajustarPersonajeDemo();
         try {
             await window.EspejoDemo.correr(apiDemo());
         } catch (e) {
@@ -471,6 +472,24 @@ async function iniciarJuego() {
     }
     document.body.classList.remove("demo-lock");
     empezarRonda(0);
+}
+
+/**
+ * El personaje 3D de la demo se para en el piso del espejo del modelo, sin taparle las piernas:
+ * su alto va desde el borde inferior de la pantalla hasta un poco bajo los pies de Zeus.
+ */
+function ajustarPersonajeDemo() {
+    const modelo = svgModelo();
+    if (!modelo) return;
+    const pies = Postura.ESQUELETO.sockets.cadera_der.y + Postura.ESQUELETO.pierna.l1 + 66;
+    const ctm = modelo.getScreenCTM();
+    if (!ctm) return;
+    const pt = modelo.createSVGPoint();
+    pt.x = 0;
+    pt.y = pies;
+    const yPies = pt.matrixTransform(ctm).y;
+    const alto = Math.max(210, Math.min(window.innerHeight * 0.45, window.innerHeight - yPies + 50));
+    document.documentElement.style.setProperty("--tutorial-alto", Math.round(alto) + "px");
 }
 
 function esperarBotonComenzar() {
@@ -520,6 +539,11 @@ function montarTablero() {
         '<g class="c-silueta">' + Muneco.silueta() + "</g>" +
         '<g class="c-pista"></g>' +
         '<g class="c-piezas">' + Muneco.ranuras() + "</g>");
+    // Los puntos de las articulaciones van encima de las piezas: al colocar el tronco
+    // siguen viéndose los hombros y las caderas donde encaja lo que sigue.
+    const svg = svgConstruccion();
+    const sockets = svg && svg.querySelector(".c-sockets");
+    if (sockets) svg.appendChild(sockets);
 }
 
 function limpiarConstruccion() {
@@ -1148,6 +1172,7 @@ $(document).ready(function () {
         });
     }
     window.addEventListener("victory-continue", empezarJuegoTrasIntro);
+    window.addEventListener("resize", function () { if (enDemo) ajustarPersonajeDemo(); });
     window.addEventListener("message", function (ev) {
         if (ev.origin !== window.location.origin) return;
         if (ev.data && ev.data.type === "pednia:perfil") {

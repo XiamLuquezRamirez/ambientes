@@ -528,6 +528,7 @@ body.arrastrando-pieza .tapete {
 
 .c-silueta-cuerpo .oculta { opacity: 0; transition: opacity 0.4s ease; }
 
+.c-sockets { pointer-events: none; }
 .c-socket-halo { fill: rgba(112, 72, 232, 0.14); transition: fill 0.2s, r 0.2s; }
 .c-socket-aro { fill: rgba(112, 72, 232, 0.55); stroke: #fff; stroke-width: 3; }
 .c-socket-punto { fill: #fff; }
@@ -1105,4 +1106,16 @@ body.alto-contraste .menu-acc-cerrar { color: #fff; }
   .pantalla-inicio.is-out .inicio-mancha,
   .pantalla-inicio.is-out .inicio-contenido { animation: none; }
   .pantalla-inicio.is-out { opacity: 0; }
+}
+
+/* Personaje 3D de la demo: abajo a la izquierda, entra y sale por el borde izquierdo
+   (el panel compartido de intro.css va a la derecha y tapaba la bandeja de piezas).
+   Su alto (--tutorial-alto) lo calcula script.js para que quede bajo los pies del modelo. */
+#tutorial-3d.tutorial-3d {
+  right: auto;
+  left: 0;
+  bottom: 0;
+  height: var(--tutorial-alto, min(30vh, 260px));
+  width: calc(var(--tutorial-alto, min(30vh, 260px)) * 0.62);
+  transform: scaleX(-1);
 }

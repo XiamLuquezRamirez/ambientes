@@ -346,6 +346,11 @@ cada responsabilidad va en su archivo y expone un global.
   y `g#abajo`. La manga y la bota del short tienen tapa redonda en el pivote y los hombros de la camiseta terminan
   dentro de esa tapa: así no asoman esquinas al levantar el brazo o abrir la pierna.
 - El modelo marca la pieza pedida con el contorno amarillo latiendo (`.m-resalte`), no con un halo borroso.
+- Los puntos de las articulaciones (`.c-sockets`) se mueven al final del SVG de construcción, encima de las piezas:
+  si quedan debajo, el tronco tapa hombros y caderas y el niño no ve dónde va la siguiente pieza.
+- El personaje 3D de la demo (`#tutorial-3d`, compartido en `intro3d/css/intro.css` a la derecha) se sobreescribe
+  solo en este juego: abajo a la izquierda, reflejado (`scaleX(-1)`) para que entre y salga por el borde izquierdo, y
+  con alto `--tutorial-alto` calculado en `ajustarPersonajeDemo()` para pararse bajo los pies del modelo.
 - **Pista de lateralidad visible**: pulsera y franja de la media en amarillo (izquierda) y verde (derecha), los
   mismos colores de Lateralidad; el pulgar mira al centro y la punta del zapato hacia afuera.
 - Las fichas muestran la extremidad estirada; el giro se ve en el taller. Una ficha girada lleva un punto azul.
