@@ -248,7 +248,7 @@ function troncoZeus() {
     const base = [
         CUELLO,
         // Short (las caderas quedan en (±18,64), tapadas por la bota de cada pierna).
-        `<path class="m-short" fill="${R.short}" d="M-42.5,20 L42.5,20 L45.5,66 Q33,72.5 20,70.5 L6,56 Q0,53 -6,56 L-20,70.5 Q-33,72.5 -45.5,66 Z"/>`,
+        `<path class="m-short" fill="${R.short}" d="M-43,20 L43,20 L40.6,63.5 Q0,67.5 -40.6,63.5 Z"/>`,
         // Camiseta: hombros redondeados que terminan dentro de la tapa de la manga (±42,-46).
         `<path class="m-camiseta" fill="${R.camiseta}" d="M-16,-70 Q0,-50 16,-70 L31,-66 Q43,-61 45,-46 L44.5,28 Q0,37.5 -44.5,28 L-45,-46 Q-43,-61 -31,-66 Z"/>`
     ];
@@ -260,13 +260,13 @@ function troncoZeus() {
         `<path fill="${R.camisetaSombra}" opacity=".5" d="M32,-26 Q41,-4 39,25 Q44,8 44.5,-8 Z"/>`,
         `<path fill="${R.camisetaSombra}" opacity=".32" d="M-32,-26 Q-41,-4 -39,25 Q-44,8 -44.5,-8 Z"/>`,
         `<path fill="none" stroke="${R.camisetaSombra}" stroke-width="1.4" stroke-linecap="round" opacity=".5" d="M30,-60 Q33,-44 31,-28 M-30,-60 Q-33,-44 -31,-28"/>`,
-        `<path fill="${R.camisetaSombra}" opacity=".7" d="M-44.5,24 Q0,33 44.5,24 L44.5,28 Q0,37.5 -44.5,28 Z"/>`,
+        `<path fill="${R.camisetaSombra}" opacity=".45" d="M-44.5,25 Q0,34 44.5,25 L44.5,28 Q0,37.5 -44.5,28 Z"/>`,
         // Pretina, bragueta y bolsillos del short.
-        `<path fill="none" stroke="${R.shortSombra}" stroke-width="3" d="M-43,30.5 L43,30.5"/>`,
-        `<path fill="none" stroke="${R.shortSombra}" stroke-width="2" stroke-linecap="round" d="M-2,40 L-2,53"/>`,
-        `<path fill="none" stroke="${R.shortSombra}" stroke-width="2" stroke-linecap="round" d="M-36,34 Q-30,43 -19,44 M36,34 Q30,43 19,44"/>`
+        `<path fill="none" stroke="${R.shortSombra}" stroke-width="2.4" opacity=".8" d="M-43,31 Q0,36 43,31"/>`,
+        `<path fill="none" stroke="${R.shortSombra}" stroke-width="1.8" stroke-linecap="round" opacity=".8" d="M-1.5,37.5 Q-1,46 -4,52"/>`,
+        `<path fill="none" stroke="${R.shortSombra}" stroke-width="1.6" stroke-linecap="round" opacity=".75" d="M-33,35 Q-31,44 -38,52 M33,35 Q31,44 38,52"/>`
     ];
-    const silueta = `  <path class="silueta" d="M-16,-70 Q0,-50 16,-70 L31,-66 Q43,-61 45,-46 L44.5,28 L45.5,66 Q33,72.5 20,70.5 L6,56 Q0,53 -6,56 L-20,70.5 Q-33,72.5 -45.5,66 L-44.5,28 L-45,-46 Q-43,-61 -31,-66 Z" fill="none"/>
+    const silueta = `  <path class="silueta" d="M-16,-70 Q0,-50 16,-70 L31,-66 Q43,-61 45,-46 L44.5,28 L40.6,63.5 Q0,67.5 -40.6,63.5 L-44.5,28 L-45,-46 Q-43,-61 -31,-66 Z" fill="none"/>
 `;
     return svgPieza("-58 -78 116 156", 232, 312, "Tronco de Zeus", grupoSimple(base, detalle, silueta));
 }
@@ -394,12 +394,12 @@ function pierna(pj, lado) {
         : [
             `<path class="m-piel" fill="${piel}" d="M-11.4,12 C-11.6,28 -11,44 -10.4,56 A10.4,10.4 0 0 0 10.4,56 C11,44 11.6,28 11.4,12 Z"/>`,
             // Bota del short con tapa redonda en la cadera (el short del tronco la cubre).
-            `<path class="m-short" fill="${R.short}" d="M-16.6,0 A16.6,16.6 0 0 1 16.6,0 L17.4,18.5 Q0,23 -17.4,18.5 Z"/>`
+            `<path class="m-short" fill="${R.short}" d="M-16.6,0 A16.6,16.6 0 0 1 16.6,0 L17.6,18.5 Q0,20.5 -17.6,18.5 Z"/>`
         ];
     const arribaDetalle = esZoe
         ? [`<path fill="none" stroke="${COMUN.pielSombra}" stroke-width="2" stroke-linecap="round" d="M${r(o * 7)},22 Q${r(o * 8.5)},40 ${r(o * 6.5)},52"/>`]
         : [
-            `<path fill="${R.shortSombra}" d="M-17.2,14.5 Q0,19 17.2,14.5 L17.4,18.5 Q0,23 -17.4,18.5 Z"/>`,
+            `<path fill="${R.shortSombra}" opacity=".7" d="M-17.4,16.4 Q0,18.4 17.4,16.4 L17.6,18.5 Q0,20.5 -17.6,18.5 Z"/>`,
             `<path fill="none" stroke="${COMUN.pielSombra}" stroke-width="2" stroke-linecap="round" d="M${r(o * 7)},27 Q${r(o * 8.5)},40 ${r(o * 6.5)},52"/>`
         ];
     // Zapato con la punta hacia afuera; suela gruesa.

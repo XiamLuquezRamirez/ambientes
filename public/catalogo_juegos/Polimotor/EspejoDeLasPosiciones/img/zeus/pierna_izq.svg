@@ -4,10 +4,10 @@
   <g id="arriba" data-largo="56">
     <g class="base"><g transform="scale(1.28,1)">
       <path class="m-piel" fill="#f2c6b9" d="M-11.4,12 C-11.6,28 -11,44 -10.4,56 A10.4,10.4 0 0 0 10.4,56 C11,44 11.6,28 11.4,12 Z"/>
-      <path class="m-short" fill="#004f6d" d="M-16.6,0 A16.6,16.6 0 0 1 16.6,0 L17.4,18.5 Q0,23 -17.4,18.5 Z"/>
+      <path class="m-short" fill="#004f6d" d="M-16.6,0 A16.6,16.6 0 0 1 16.6,0 L17.6,18.5 Q0,20.5 -17.6,18.5 Z"/>
     </g></g>
     <g class="detalle"><g transform="scale(1.28,1)">
-      <path fill="#06405a" d="M-17.2,14.5 Q0,19 17.2,14.5 L17.4,18.5 Q0,23 -17.4,18.5 Z"/>
+      <path fill="#06405a" opacity=".7" d="M-17.4,16.4 Q0,18.4 17.4,16.4 L17.6,18.5 Q0,20.5 -17.6,18.5 Z"/>
       <path fill="none" stroke="#e5a796" stroke-width="2" stroke-linecap="round" d="M7,27 Q8.5,40 6.5,52"/>
     </g></g>
   </g>

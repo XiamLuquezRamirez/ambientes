@@ -19,7 +19,7 @@
     "use strict";
 
     var P = global.Postura;
-    var VERSION_SVG = "20261110i";
+    var VERSION_SVG = "20261110j";
     var PERSONAJES = ["zeus", "zoe"];
     var personaje = "zeus";
 
