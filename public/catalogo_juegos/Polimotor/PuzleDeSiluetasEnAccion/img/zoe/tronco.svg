@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-34 -98 72 114" width="144" height="228">
+  <title>Tronco de Zoe</title>
+  <!-- Pieza de Puzle de Siluetas en Acción. Generado por scripts/generar-svg-puzle-siluetas.js -->
+  <g class="base">
+    <path class="pz-forma" fill="#e1709c" d="M-23.5,-30 L27.5,-30 L35,7 Q3,13.5 -31,7 Z"/>
+    <path class="pz-forma" fill="#95d3f0" d="M-20.5,-20 L-22.5,-70 Q-22,-90 -3,-92 L8,-92 Q27,-90 28,-70 L27,-20 Q3,-15 -20.5,-20 Z"/>
+  </g>
+  <g class="detalle">
+    <path fill="none" stroke="#86c3e8" stroke-width="1.3" stroke-linecap="round" d="M-16,-84 L-15,-20 M-10,-88 L-9.5,-19 M-4,-89 L-3.5,-18 M2,-83 L2,-17 M26,-74 L25.5,-20"/>
+    <path fill="#6fbfe6" opacity=".45" d="M-20.5,-20 L-22.5,-70 Q-22,-84 -14,-88 Q-16,-60 -12,-21 Z"/>
+    <path fill="none" stroke="#02a1dd" stroke-width="4.2" stroke-linecap="round" d="M-5,-91 Q4,-84 14,-91"/>
+    <circle cx="-4.0" cy="-87.8" r="2.1" fill="#02a1dd"/>
+    <circle cx="-0.2" cy="-84.4" r="2.1" fill="#02a1dd"/>
+    <circle cx="3.6" cy="-83.0" r="2.1" fill="#02a1dd"/>
+    <circle cx="7.4" cy="-84.4" r="2.1" fill="#02a1dd"/>
+    <circle cx="11.2" cy="-87.8" r="2.1" fill="#02a1dd"/>
+    <path fill="none" stroke="#5cc3ee" stroke-width="0.9" stroke-linecap="round" opacity=".8" d="M-4.4,-91.4 Q4,-85 13.4,-91.4"/>
+    <rect x="3" y="-68" width="22" height="22" rx="4" fill="#ffffff" stroke="#6fbfe6" stroke-width="1.4"/>
+    <circle cx="6.6" cy="-64.4" r="1.2" fill="#b8c2cc"/>
+    <circle cx="21.4" cy="-64.4" r="1.2" fill="#b8c2cc"/>
+    <path fill="#f0e387" stroke="#d9c55a" stroke-width="1.2" d="M14,-49.5 C7.5,-54 4.6,-57.6 6.4,-61.4 C8.2,-64.6 12,-64 14,-60.8 C16,-64 19.8,-64.6 21.6,-61.4 C23.4,-57.6 20.5,-54 14,-49.5 Z"/>
+    <path fill="#c85a86" opacity=".35" d="M-23,-20 L-31,7 Q-25.5,8.6 -19.5,9.6 L-16.5,-19 Z"/>
+    <path fill="#c85a86" opacity=".5" d="M-20.5,-20 Q3,-15 27,-20 L27.2,-17.5 Q3,-12.5 -20.8,-17.5 Z"/>
+    <path fill="none" stroke="#c85a86" stroke-width="1.5" stroke-linecap="round" opacity=".7" d="M-12,-16.5 L-17,9.6 M-1,-15.5 L-3,11.5 M10,-15.5 L12.5,11.8 M20.5,-17 L26,10"/>
+    <path fill="none" stroke="#f093b8" stroke-width="1.2" stroke-linecap="round" opacity=".8" d="M-9.5,-16 L-14,10.4 M1.6,-15.3 L0,11.9 M12.6,-15.6 L15.5,11.6"/>
+    <path fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" d="M-29.4,4.4 Q3,10.8 33.4,4.4"/>
+  </g>
+</svg>

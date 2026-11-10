@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 80 84" width="160" height="168">
+  <title>Brazo doblado de Zeus</title>
+  <!-- Pieza de Puzle de Siluetas en Acción. Generado por scripts/generar-svg-puzle-siluetas.js -->
+  <g class="base">
+    <circle class="pz-forma" fill="#2b896f" cx="0" cy="0" r="11.5"/>
+    <rect class="pz-forma" fill="#2b896f" x="-11.5" y="0" width="23" height="21" rx="4"/>
+    <rect class="pz-forma" fill="#f2c6b9" x="-7.6" y="14" width="15.2" height="47" rx="7.6"/>
+    <rect class="pz-forma" fill="#f2c6b9" x="-6" y="46.5" width="46" height="15" rx="7.5"/>
+    <circle class="pz-forma" fill="#f2c6b9" cx="50" cy="54" r="10"/>
+    <ellipse class="pz-forma" fill="#f2c6b9" cx="48" cy="46" rx="5" ry="3.6"/>
+  </g>
+  <g class="detalle">
+    <path fill="#8cc97c" d="M-11.5,16 Q0,19 11.5,16 L11.5,21 Q0,24.5 -11.5,21 Z"/>
+    <path fill="none" stroke="#24735a" stroke-width="1.6" stroke-linecap="round" opacity=".45" d="M-6,-6 Q-9,4 -10,14"/>
+    <path fill="none" stroke="#e5a796" stroke-width="2" stroke-linecap="round" d="M-3,52 Q1,57 5,55"/>
+    <rect x="33" y="45.8" width="7.4" height="16.4" rx="2.5" fill="#ffffff"/>
+    <path fill="none" stroke="#8cc97c" stroke-width="1.6" stroke-linecap="round" d="M36.7,47.5 L36.7,60.5"/>
+    <path fill="none" stroke="#c98a7a" stroke-width="1.1" stroke-linecap="round" opacity=".6" d="M53,48 Q58,51 58,56 M52,53 Q56,55 56,59 M50,58 Q53,60 53,62.5"/>
+  </g>
+</svg>

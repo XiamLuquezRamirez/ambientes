@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 72 42" width="144" height="84">
+  <title>Tenis izquierdo de Zeus</title>
+  <!-- Pieza de Puzle de Siluetas en Acción. Generado por scripts/generar-svg-puzle-siluetas.js -->
+  <g class="base">
+    <path class="pz-forma" fill="#ffd43b" d="M-12,-9.5 Q-17.5,0 -15,13 L40,13 Q48.5,12 47,3.5 Q45,-4.5 32,-5.5 Q22,-6.5 15.5,-12.5 Q2,-17.5 -12,-9.5 Z"/>
+    <rect class="pz-forma" fill="#ffffff" x="-17" y="10.5" width="66" height="8.5" rx="4.2"/>
+  </g>
+  <g class="detalle">
+    <rect x="-17" y="10.5" width="66" height="8.5" rx="4.2" fill="none" stroke="#e0a800" stroke-width="1.5"/>
+    <path fill="#e0a800" d="M-12,-9.5 Q-17.5,0 -15,13 L-9.5,13 Q-11.5,2 -7.5,-8 Z"/>
+    <path fill="#e0a800" opacity=".55" d="M36,13 L40,13 Q48.5,12 47,3.5 Q46,0 42.5,-2 Q45,6 36,13 Z"/>
+    <path fill="none" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" d="M8,-11 Q15,-3 13,7.5 M18,-7.5 Q25,-1 23.5,8.5"/>
+    <path fill="#fffdfc" stroke="#e0a800" stroke-width="1.2" d="M-9.5,-10.5 Q0,-15 9.5,-12 Q3,-8.5 -9.5,-10.5 Z"/>
+  </g>
+</svg>

@@ -55,9 +55,11 @@
         "tenis": 36
     };
 
-    /** Orden de dibujo: lo de atrás primero (lado izquierdo), lo de adelante al final. La cabeza va
-     *  encima de todo: así un brazo levantado pasa por detrás de la cara y no la tapa. */
-    var CAPAS = ["brazo_izq", "pierna_izq", "tenis_izq", "tronco", "pierna_der", "tenis_der", "brazo_der", "brazos", "cabeza"];
+    /** Orden de dibujo: lo de atrás primero (lado izquierdo), lo de adelante al final. El tronco va
+     *  sobre las dos piernas para que la falda o la pantaloneta tapen el arranque del muslo (también
+     *  al levantar la pierna de adelante). La cabeza va encima de todo: así un brazo levantado pasa
+     *  por detrás de la cara y no la tapa. Solo es el orden visual: el encaje no depende de él. */
+    var CAPAS = ["brazo_izq", "pierna_izq", "tenis_izq", "pierna_der", "tronco", "tenis_der", "brazo_der", "brazos", "cabeza"];
 
     /** Orden sugerido por defecto: cabeza, tronco, brazos, piernas, pies. */
     var ORDEN_BASE = [["cabeza"], ["tronco"], ["brazos", "brazo_der", "brazo_izq"], ["pierna_der", "pierna_izq"], ["tenis_der", "tenis_izq"]];

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-18 -18 36 148" width="72" height="296">
+  <title>Pierna estirada de Zoe</title>
+  <!-- Pieza de Puzle de Siluetas en Acción. Generado por scripts/generar-svg-puzle-siluetas.js -->
+  <g class="base">
+    <rect class="pz-forma" fill="#f2c6b9" x="-9.6" y="4" width="19.2" height="106" rx="9.6"/>
+    <circle class="pz-forma" fill="#e1709c" cx="0" cy="0" r="11"/>
+    <rect class="pz-forma" fill="#e1709c" x="-10.6" y="0" width="21.2" height="13" rx="4"/>
+    <rect class="pz-forma" fill="#e892b5" x="-10.4" y="102" width="20.8" height="24" rx="6"/>
+  </g>
+  <g class="detalle">
+    <path fill="#c85a86" opacity=".8" d="M-10.6,9.6 Q0,11.2 10.6,9.6 L10.6,13 Q0,14.6 -10.6,13 Z"/>
+    <path fill="none" stroke="#e5a796" stroke-width="2.2" stroke-linecap="round" d="M3,60 Q7,64 3,69"/>
+    <path fill="#d6779f" d="M-10.4,102 Q-7.800000000000001,106 -5.2,102 Q-2.5999999999999996,106 0,102 Q2.5999999999999996,106 5.200000000000001,102 Q7.799999999999999,106 10.4,102 L10.4,104.6 Q7.799999999999999,108.6 5.200000000000001,104.6 Q2.5999999999999996,108.6 0,104.6 Q-2.5999999999999996,108.6 -5.2,104.6 Q-7.800000000000001,108.6 -10.4,104.6 Z"/>
+  </g>
+</svg>
