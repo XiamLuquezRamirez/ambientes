@@ -126,10 +126,8 @@ function cara(R, pestanas) {
         // Oreja: borde suave e interior rosado.
         `<ellipse cx="-7.5" cy="-46" rx="6.6" ry="8.6" fill="none" stroke="${C.pielSombra}" stroke-width="1.5"/>`,
         trazo(C.oreja, 2.6, "M-5.5,-51 Q-11,-47 -8.5,-40.5"),
-        // Sombra bajo la mandíbula.
-        `<path fill="${C.pielSombra}" opacity=".45" d="M-12,-16 Q4,-8 20,-12.5 Q6,-6.5 -6,-10 Z"/>`,
-        // Cejas gruesas.
-        trazo(R.ceja, 3.4, "M8,-58.5 Q14.5,-63 21.5,-58.5 M26.5,-59 Q30.5,-62 34.5,-57.5"),
+        // Cejas gruesas y redondeadas, con la frente libre (el flequillo no las tapa).
+        trazo(R.ceja, 3, "M8.5,-57.5 Q14.5,-61.5 21,-57.8 M26.5,-58 Q30.5,-60.8 34.2,-57"),
         // Ojos: el cercano grande, el lejano más angosto; el iris mira un poco hacia abajo.
         `<g class="pz-ojos">
       <ellipse cx="15" cy="-46.5" rx="7.4" ry="7.8" fill="#fff"/>
@@ -138,11 +136,12 @@ function cara(R, pestanas) {
       <ellipse cx="31.2" cy="-43.8" rx="3.3" ry="4.3" fill="${C.iris}"/>
       <circle cx="18.2" cy="-45.2" r="1.3" fill="#fff"/>
       <circle cx="32.3" cy="-45.4" r="1" fill="#fff"/>
-      <path fill="none" stroke="${C.parpado}" stroke-width="1.05" stroke-linecap="round" d="M7.6,-47.5 Q14.5,-56.5 22.4,-48 M25,-48 Q30,-55.5 35,-48.5"/>
+      <path fill="none" stroke="${C.parpado}" stroke-width="0.9" stroke-linecap="round" d="M7.6,-47.5 Q14.5,-56.5 22.4,-48 M25,-48 Q30,-55.5 35,-48.5"/>
     </g>`
     ];
     if (pestanas) {
-        det.push(trazo(C.iris, 1.5, "M22.2,-49.6 L25.2,-51.4 M22.7,-47.6 L25.8,-48.4 M34.9,-50.2 L37.1,-51.8"));
+        // Pestañas en la esquina de afuera de cada ojo: la izquierda del ojo cercano y la derecha del lejano.
+        det.push(trazo(C.iris, 1.2, "M8.6,-49.6 L5.6,-51.6 M7.9,-47.6 L4.9,-48.4 M34.4,-50.4 L36.8,-52.4 M35,-48.6 L37.6,-49.4"));
     }
     det.push(
         `<ellipse cx="23" cy="-31" rx="7" ry="4.4" fill="${C.mejilla}" opacity=".45"/>`,
@@ -158,7 +157,9 @@ function cara(R, pestanas) {
     return det;
 }
 
-const CUELLO_PIEL = formaEl("rect", C.piel, 'x="-7.5" y="-22" width="15" height="26" rx="6"');
+// El cuello termina justo en la base: el tronco trae su propio arranque de cuello bajo el cuello de la
+// camiseta (la cabeza se dibuja encima de todo y, si bajara más, taparía ese cuello).
+const CUELLO_PIEL = formaEl("rect", C.piel, 'x="-7.5" y="-22" width="15" height="19" rx="6"');
 // Cabeza redonda con el mentón un poco adelante y la nariz que sobresale.
 const CRANEO = forma(C.piel, "M2,-82 C22,-82 35,-67 35,-50 C35,-43 37,-38 36,-32 C35,-21 28,-11 13,-10.5 C-1,-10 -15,-15 -22,-23 C-29,-31 -31,-41 -31,-51 C-31,-68 -17,-82 2,-82 Z");
 const NARIZ = formaEl("ellipse", C.piel, 'cx="36.4" cy="-38" rx="4.8" ry="3.9"');
@@ -170,19 +171,18 @@ function cabezaZeus() {
         CUELLO_PIEL,
         CRANEO,
         NARIZ,
-        // Pelo: casco que cubre la nuca y flequillo barrido hacia la frente en puntas.
-        forma(R.pelo, "M-30,-30 C-36,-46 -34,-72 -16,-84 C-2,-92 22,-90 34,-76 C39,-70 40,-63 38,-57 L33.5,-61 L31.5,-55 L26,-61 L22,-54.5 L16.5,-60.5 C11,-62.5 4,-62 -1,-58 C-6,-61.5 -12,-60 -15,-54 C-17,-46 -18.5,-38 -22.5,-31 Z"),
-        // Remolino: mechones parados arriba.
-        forma(R.pelo, "M-15,-83 Q-20.5,-91 -15.5,-96 Q-14.5,-90 -9,-86 Z"),
-        forma(R.pelo, "M-6.5,-86.5 Q-6.5,-94 -0.5,-97.5 Q-2.5,-91.5 2,-88 Z"),
+        // Pelo: casco que cubre la nuca (redondeada, dentro de la cabeza) y flequillo barrido hacia la
+        // frente en puntas cortas que dejan ver las cejas.
+        forma(R.pelo, "M-27.5,-29 C-36,-46 -34,-72 -16,-84 C-2,-92 22,-90 34,-76 C39,-71 40,-66 38.5,-62 L34,-66.5 L32,-62.5 L27,-67 L23,-62.5 L17.5,-66.5 C11,-67.5 4,-66.5 -1,-62.5 C-6,-65 -12,-63.5 -15,-57.5 C-17,-49 -18.5,-40 -21.5,-32.5 Q-24,-27.5 -27.5,-29 Z"),
         OREJA
     ];
     const detalle = [
         ...cara(R, false),
+        // Remolino: dos pelitos sueltos en la coronilla (como el oficial), no cuernos.
+        trazo(R.pelo, 2.4, "M-11.5,-84.5 Q-15,-88.5 -13.5,-93 M-6.5,-86.5 Q-7.5,-91 -4.5,-94"),
         // Vetas del pelo siguiendo el peinado (de la coronilla hacia la frente).
-        trazo(R.peloSombra, 1.5, "M-10,-82 Q12,-84 30,-68 M-6,-74 Q10,-76 24,-64 M-22,-74 Q-28,-60 -27,-42 M-14,-66 Q-20,-56 -20,-42 M2,-87 Q22,-86 35,-72", 'opacity=".55"'),
-        trazo(R.peloSombra, 0.8, "M-16,-78 Q4,-82 22,-70 M-2,-80 Q16,-80 30,-64 M-26,-66 Q-31,-54 -29,-38 M8,-70 Q18,-68 26,-62", 'opacity=".4"'),
-        trazo(R.peloSombra, 1.2, "M-14.5,-86 Q-17,-90.5 -15,-94 M-4.5,-89 Q-4.5,-93.5 -1,-96", 'opacity=".45"'),
+        trazo(R.peloSombra, 1.5, "M-10,-82 Q12,-84 30,-70 M-6,-75 Q10,-77 24,-67 M-22,-74 Q-28,-60 -27,-42 M-14,-67 Q-20,-56 -20,-44 M2,-87 Q22,-86 35,-73", 'opacity=".55"'),
+        trazo(R.peloSombra, 0.8, "M-16,-78 Q4,-82 22,-71 M-2,-80 Q16,-80 30,-67 M-26,-66 Q-31,-54 -28.5,-38 M8,-72 Q18,-70 26,-66", 'opacity=".4"'),
         // Sombra del cuello bajo la mandíbula.
         `<path fill="${C.pielSombra}" d="M-7.5,-14 Q0,-9 7.5,-12 L7.5,-8 Q0,-5 -7.5,-10 Z"/>`
     ];
@@ -198,24 +198,24 @@ function cabezaZoe() {
         CRANEO,
         NARIZ,
         // Pelo con raya al medio: cae liso hacia la nuca y el flequillo en mechas sobre la frente.
-        forma(R.pelo, "M-29,-27 C-37,-46 -33,-74 -12,-85 C4,-92 24,-88 35,-75 C39,-69 40,-62 38.5,-56 L34,-60.5 L32,-54 L27,-60.5 L23.5,-53.5 L18.5,-60 C12,-62.5 5,-62 -0.5,-58 C-6,-61 -12,-59.5 -15,-54 C-17,-46 -18,-36 -21.5,-28 Z"),
+        forma(R.pelo, "M-29,-27 C-37,-46 -33,-74 -12,-85 C4,-92 24,-88 35,-75 C39,-71 40,-66 38.5,-62 L34,-66 L32,-62.5 L27.5,-66.5 L24,-62 L19,-66 C12,-67 5,-66 -0.5,-62 C-6,-64.5 -12,-63 -15,-57 C-17,-48 -18,-37 -21.5,-28 Z"),
         OREJA
     ];
     const detalle = [
         ...cara(R, true),
         // Raya al medio y mechas.
-        trazo(R.peloSombra, 1.8, "M-2,-88 Q2,-80 4,-72", 'opacity=".55"'),
-        trazo(R.peloSombra, 1.4, "M4,-84 Q20,-82 31,-68 M6,-76 Q18,-74 26,-64 M-6,-84 Q-22,-76 -27,-56 M-8,-76 Q-18,-66 -21,-46 M-28,-50 Q-30,-40 -27,-30", 'opacity=".5"'),
+        trazo(R.peloSombra, 1.8, "M-1.5,-85.5 Q2,-80 4,-73", 'opacity=".55"'),
+        trazo(R.peloSombra, 1.4, "M4,-84 Q20,-82 31,-70 M6,-76 Q18,-74 26,-68 M-6,-84 Q-22,-76 -27,-56 M-8,-76 Q-18,-66 -21,-46 M-28,-50 Q-30,-40 -27,-30", 'opacity=".5"'),
         trazo(R.peloSombra, 1.2, "M-42,-30 Q-48,-20 -46,-8 M-36,-28 Q-41,-18 -40,-8", 'opacity=".5"'),
         // Moño azul de la coleta.
         `<g transform="translate(-26.5,-31) rotate(-35)">
       <ellipse rx="5.2" ry="7.2" fill="${R.mono}" stroke="${R.monoRaya}" stroke-width="1.1"/>
       <path fill="none" stroke="${R.monoRaya}" stroke-width="1" d="M-3.6,-3.4 L3.6,-3.4 M-4.2,0 L4.2,0 M-3.6,3.4 L3.6,3.4"/>
     </g>`,
-        // Gancho amarillo en el flequillo.
-        `<g transform="translate(12,-74) rotate(-62)">
-      <path fill="${R.gancho}" stroke="${R.ganchoBorde}" stroke-width="1.2" d="M0,-8 C4.6,-4.5 5.4,3.5 0,8.2 C-5.4,3.5 -4.6,-4.5 0,-8 Z"/>
-      <path fill="${R.pelo}" d="M0,-2.6 C1.6,-1 1.8,1.8 0,3.6 C-1.8,1.8 -1.6,-1 0,-2.6 Z"/>
+        // Gancho amarillo en el flequillo: gota lisa con brillo (sin hueco, que parecía un ojo).
+        `<g transform="translate(12,-75) rotate(-62)">
+      <path fill="${R.gancho}" stroke="${R.ganchoBorde}" stroke-width="1.2" d="M0,-7.5 C4.4,-4.2 5,3.4 0,7.8 C-5,3.4 -4.4,-4.2 0,-7.5 Z"/>
+      <ellipse cx="-1.4" cy="-1.5" rx="1.1" ry="2.6" fill="#fff" opacity=".7"/>
     </g>`,
         `<path fill="${C.pielSombra}" d="M-7.5,-14 Q0,-9 7.5,-12 L7.5,-8 Q0,-5 -7.5,-10 Z"/>`
     ];
@@ -224,21 +224,36 @@ function cabezaZoe() {
 
 // ------------------------------------------------------------------ tronco
 
-/** Dorsal de atleta en el pecho con el ícono del personaje. */
-function dorsal(R, icono) {
+/**
+ * Dorsal de atleta en el pecho con el ícono del personaje. De perfil se ve angosto y pegado al pecho,
+ * delante del brazo (antes quedaba debajo de la manga). El ícono viene dibujado alrededor de (14,-57).
+ */
+function dorsal(R, icono, escala) {
     return [
-        `<rect x="3" y="-68" width="22" height="22" rx="4" fill="#ffffff" stroke="${R.camisetaSombra}" stroke-width="1.4"/>`,
-        `<circle cx="6.6" cy="-64.4" r="1.2" fill="${C.pin}"/>`,
-        `<circle cx="21.4" cy="-64.4" r="1.2" fill="${C.pin}"/>`,
-        icono
+        `<rect x="12" y="-62" width="14" height="18" rx="3.5" fill="#ffffff" stroke="${R.camisetaSombra}" stroke-width="1.3"/>`,
+        `<circle cx="14.6" cy="-59.4" r="1" fill="${C.pin}"/>`,
+        `<circle cx="23.4" cy="-59.4" r="1" fill="${C.pin}"/>`,
+        `<g transform="translate(19,-52) scale(${escala}) translate(-14,57)">${icono}</g>`
     ];
+}
+
+/** Arranque del cuello (va bajo el cuello de la camiseta; la cabeza lo continúa por encima). */
+const CUELLO_TRONCO = formaEl("rect", C.piel, 'x="-7.5" y="-103" width="15" height="15" rx="3"');
+
+/** Cuello redondo de la camiseta visto de lado: abraza el cuello y baja hacia el pecho. */
+const CUELLO_CAMISETA = "M-8,-91.5 Q1,-88 10,-88.5";
+function puntoCuello(t) {
+    const u = 1 - t;
+    return [u * u * -8 + 2 * t * u * 1 + t * t * 10, u * u * -91.5 + 2 * t * u * -88 + t * t * -88.5];
 }
 
 function troncoZeus() {
     const R = ROPA.zeus;
     const base = [
-        // Pantaloneta deportiva (la camiseta va por fuera).
-        forma(R.short, "M-23,-28 L27,-28 L28.5,4 Q2,10 -24.5,4 Z"),
+        CUELLO_TRONCO,
+        // Pantaloneta deportiva (la camiseta va por fuera). Se angosta hacia abajo hasta el ancho de las
+        // botas de las piernas, que llevan el ruedo: así no quedan dos dobladillos ni un escalón.
+        forma(R.short, "M-23,-28 L27,-28 L22,1 Q21.5,5 17.5,5 L-14,5 Q-18,5 -18.5,1 Z"),
         // Camiseta: espalda a la izquierda, pecho a la derecha.
         forma(R.camiseta, "M-20.5,-14 L-22.5,-70 Q-22,-90 -3,-92 L8,-92 Q27,-90 28,-70 L27,-14 Q3,-9 -20.5,-14 Z")
     ];
@@ -247,13 +262,12 @@ function troncoZeus() {
         `<path fill="${R.camisetaSombra}" opacity=".55" d="M-20.5,-14 L-22.5,-70 Q-22,-84 -14,-88 Q-16,-60 -12,-15 Z"/>`,
         `<path fill="${R.camisetaSombra}" opacity=".5" d="M-20.5,-18 Q3,-13 27,-18 L27,-14 Q3,-9 -20.5,-14 Z"/>`,
         // Cuello redondo acanalado en verde claro.
-        trazo(R.ribete, 5.5, "M-5,-91 Q4,-83 14,-91"),
-        trazo(R.ribeteRaya, 1, "M-4,-89 Q4,-82 13,-89", 'stroke-dasharray="1.4 1.6"'),
-        ...dorsal(R, `<path fill="${R.icono}" stroke="${R.iconoBorde}" stroke-width="1.3" stroke-linejoin="round" d="M17.5,-64.5 L9,-55 L14,-55 L10.5,-48.5 L19.5,-58 L14.5,-58 L18,-64.5 Z"/>`),
-        // Pretina, franja blanca lateral y dobladillo de la pantaloneta.
-        `<path fill="${R.shortSombra}" d="M-24.5,-1 Q2,5 28.3,-1 L28.5,4 Q2,10 -24.5,4 Z" opacity=".8"/>`,
-        trazo(R.franja, 3.6, "M2.5,-10 L3.5,4.5"),
-        trazo(R.shortSombra, 1.4, "M8,-12 Q14,-8 20,-12", 'opacity=".8"')
+        trazo(R.ribete, 5.5, CUELLO_CAMISETA),
+        trazo(R.ribeteRaya, 1, "M-7.2,-90.4 Q1,-87.2 9.4,-87.6", 'stroke-dasharray="1.4 1.6"'),
+        ...dorsal(R, `<path fill="${R.icono}" stroke="${R.iconoBorde}" stroke-width="1.5" stroke-linejoin="round" d="M17.5,-64.5 L9,-55 L14,-55 L10.5,-48.5 L19.5,-58 L14.5,-58 L18,-64.5 Z"/>`, 0.72),
+        // Sombra de la camiseta sobre la pantaloneta y franja blanca lateral.
+        `<path fill="${R.shortSombra}" opacity=".6" d="M-20.5,-14 Q3,-9 27,-14 L27.2,-11 Q3,-6 -20.8,-11 Z"/>`,
+        trazo(R.franja, 3.6, "M2.5,-10 L3,6")
     ];
     return svgPieza("-30 -98 64 112", "Tronco de Zeus", base, detalle);
 }
@@ -262,13 +276,14 @@ function troncoZoe() {
     const R = ROPA.zoe;
     // Cuello de la camiseta: banda azul con el borde de abajo en ondas (como la blusa oficial).
     const ondas = [];
-    for (let i = 0; i < 5; i++) {
-        const x = -4 + i * 3.8;
-        ondas.push(`<circle cx="${x.toFixed(1)}" cy="${(-87.8 + Math.sin((i / 4) * Math.PI) * 4.8).toFixed(1)}" r="2.1" fill="${R.ribete}"/>`);
+    for (let i = 0; i < 6; i++) {
+        const [x, y] = puntoCuello(0.06 + i * 0.176);
+        ondas.push(`<circle cx="${x.toFixed(1)}" cy="${(y + 2.3).toFixed(1)}" r="1.9" fill="${R.ribete}"/>`);
     }
     const base = [
+        CUELLO_TRONCO,
         // Falda deportiva de tablas, en A (debajo lleva licra rosada: ver la pierna).
-        forma(R.short, "M-23.5,-30 L27.5,-30 L35,7 Q3,13.5 -31,7 Z"),
+        forma(R.short, "M-20.5,-30 L27.5,-30 L35,7 Q3,13.5 -31,7 Z"),
         // Camiseta.
         forma(R.camiseta, "M-20.5,-20 L-22.5,-70 Q-22,-90 -3,-92 L8,-92 Q27,-90 28,-70 L27,-20 Q3,-15 -20.5,-20 Z")
     ];
@@ -277,13 +292,13 @@ function troncoZoe() {
         trazo(R.camisetaRaya, 1.3, "M-16,-84 L-15,-20 M-10,-88 L-9.5,-19 M-4,-89 L-3.5,-18 M2,-83 L2,-17 M26,-74 L25.5,-20"),
         `<path fill="${R.camisetaSombra}" opacity=".45" d="M-20.5,-20 L-22.5,-70 Q-22,-84 -14,-88 Q-16,-60 -12,-21 Z"/>`,
         // Cuello azul con ondas.
-        trazo(R.ribete, 4.2, "M-5,-91 Q4,-84 14,-91"),
         ...ondas,
-        trazo(R.ribeteRaya, 0.9, "M-4.4,-91.4 Q4,-85 13.4,-91.4", 'opacity=".8"'),
-        ...dorsal(R, `<path fill="${R.icono}" stroke="${R.iconoBorde}" stroke-width="1.2" d="M14,-49.5 C7.5,-54 4.6,-57.6 6.4,-61.4 C8.2,-64.6 12,-64 14,-60.8 C16,-64 19.8,-64.6 21.6,-61.4 C23.4,-57.6 20.5,-54 14,-49.5 Z"/>`),
+        trazo(R.ribete, 4.2, CUELLO_CAMISETA),
+        trazo(R.ribeteRaya, 0.9, "M-7.6,-92.4 Q1,-89 9.6,-89.6", 'opacity=".8"'),
+        ...dorsal(R, `<path fill="${R.icono}" stroke="${R.iconoBorde}" stroke-width="1.5" d="M14,-49.5 C7.5,-54 4.6,-57.6 6.4,-61.4 C8.2,-64.6 12,-64 14,-60.8 C16,-64 19.8,-64.6 21.6,-61.4 C23.4,-57.6 20.5,-54 14,-49.5 Z"/>`, 0.6),
         // Sombra de la espalda y bajo la camiseta, tablas y ribete blanco en el ruedo
         // (la pretina queda tapada por la camiseta).
-        `<path fill="${R.shortSombra}" opacity=".35" d="M-23,-20 L-31,7 Q-25.5,8.6 -19.5,9.6 L-16.5,-19 Z"/>`,
+        `<path fill="${R.shortSombra}" opacity=".35" d="M-20.5,-20 L-31,7 Q-25.5,8.6 -19.5,9.6 L-16.5,-19 Z"/>`,
         `<path fill="${R.shortSombra}" opacity=".5" d="M-20.5,-20 Q3,-15 27,-20 L27.2,-17.5 Q3,-12.5 -20.8,-17.5 Z"/>`,
         trazo(R.shortSombra, 1.5, "M-12,-16.5 L-17,9.6 M-1,-15.5 L-3,11.5 M10,-15.5 L12.5,11.8 M20.5,-17 L26,10", 'opacity=".7"'),
         trazo(R.shortClaro, 1.2, "M-9.5,-16 L-14,10.4 M1.6,-15.3 L0,11.9 M12.6,-15.6 L15.5,11.6", 'opacity=".8"'),
@@ -294,17 +309,21 @@ function troncoZoe() {
 
 // ------------------------------------------------------------------ brazos
 
-/** Puño de perfil con el pulgar adelante. cx,cy = centro; dir = 1 si el antebrazo baja, 0 si va al frente. */
+/**
+ * Puño de perfil: bloque redondeado con los dedos doblados hacia adentro y el pulgar encima de ellos.
+ * cx,cy = centro. alFrente: el antebrazo va hacia +x (brazo doblado); si no, baja hacia +y.
+ * Se dibuja en el sistema del antebrazo que baja y se gira -90° cuando va al frente.
+ */
 function puno(cx, cy, alFrente) {
-    const base = [formaEl("circle", C.piel, `cx="${cx}" cy="${cy}" r="10"`)];
-    const det = [];
-    if (alFrente) {
-        base.push(formaEl("ellipse", C.piel, `cx="${cx - 2}" cy="${cy - 8}" rx="5" ry="3.6"`));
-        det.push(trazo(C.pielLinea, 1.1, `M${cx + 3},${cy - 6} Q${cx + 8},${cy - 3} ${cx + 8},${cy + 2} M${cx + 2},${cy - 1} Q${cx + 6},${cy + 1} ${cx + 6},${cy + 5} M${cx},${cy + 4} Q${cx + 3},${cy + 6} ${cx + 3},${cy + 8.5}`, 'opacity=".6"'));
-    } else {
-        base.push(formaEl("ellipse", C.piel, `cx="${cx + 7.5}" cy="${cy - 3}" rx="3.6" ry="5"`));
-        det.push(trazo(C.pielLinea, 1.1, `M${cx - 6},${cy + 3} Q${cx - 2},${cy + 8} ${cx + 3},${cy + 7} M${cx - 6},${cy - 1} Q${cx - 2},${cy + 4} ${cx + 3},${cy + 3}`, 'opacity=".6"'));
-    }
+    const g = alFrente ? `transform="translate(${cx},${cy}) rotate(-90)"` : `transform="translate(${cx},${cy})"`;
+    const base = [
+        `<g ${g}>${formaEl("rect", C.piel, 'x="-9" y="-9.5" width="18" height="20" rx="8.5"')}</g>`
+    ];
+    const det = [`<g ${g}>
+      <path fill="${C.pielSombra}" opacity=".55" d="M1.5,-6.5 Q9.5,-6 9,2 Q8.5,9 2.5,10 Q6.5,2 1.5,-6.5 Z"/>
+      ${trazo(C.pielLinea, 1.1, "M3.2,-1.5 L8.6,-1.2 M3.6,2.8 L8.6,3.2 M3.4,7 L7.4,7.4", 'opacity=".55"')}
+      <path fill="${C.piel}" stroke="${C.pielLinea}" stroke-width="1" stroke-opacity=".5" d="M-1,-8.5 Q5.5,-9 6.5,-4 Q7,0 3.5,1.5 Q1.5,-2.5 -1.5,-4 Z"/>
+    </g>`];
     return { base, det };
 }
 
@@ -370,16 +389,17 @@ function pierna(pj, doblada) {
             formaEl("circle", R.short, 'cx="0" cy="0" r="11"'),
             formaEl("rect", R.short, 'x="-10.6" y="0" width="21.2" height="13" rx="4"')
         ]
-        // Bota de la pantaloneta con tapa redonda en la cadera.
+        // Bota de la pantaloneta con tapa redonda en la cadera. Es un poco más larga que la mitad del
+        // ancho del tronco: con la rodilla arriba asoma por delante y el muslo no sale "pelado".
         : [
-            formaEl("circle", R.short, 'cx="0" cy="0" r="13.5"'),
-            formaEl("rect", R.short, 'x="-13.5" y="0" width="27" height="25" rx="4"')
+            formaEl("circle", R.short, 'cx="0" cy="0" r="15.5"'),
+            formaEl("rect", R.short, 'x="-15.5" y="0" width="31" height="28" rx="4"')
         ];
     const det = esZoe
         ? [`<path fill="${R.shortSombra}" opacity=".8" d="M-10.6,9.6 Q0,11.2 10.6,9.6 L10.6,13 Q0,14.6 -10.6,13 Z"/>`]
         : [
-            `<path fill="${R.shortSombra}" opacity=".75" d="M-13.5,20.5 Q0,23 13.5,20.5 L13.5,25 Q0,27.5 -13.5,25 Z"/>`,
-            trazo(R.franja, 3.4, "M1.5,-6 L1.5,20")
+            // Solo el ruedo: la franja blanca va en el tronco (en la pierna de atrás quedaba como un punto suelto).
+            `<path fill="${R.shortSombra}" opacity=".75" d="M-15.5,23.5 Q0,26 15.5,23.5 L15.5,28 Q0,30.5 -15.5,28 Z"/>`
         ];
     // Borde superior de la media: liso con rayas (Zeus) o en ondas (Zoe, como la calceta oficial).
     const bordeMedia = (x0, y0, ancho, alto, vertical) => {
@@ -414,7 +434,8 @@ function pierna(pj, doblada) {
         );
         det.push(
             trazo(C.pielSombra, 2.2, "M3,58 Q8,64 3,70"),
-            trazo(C.pielSombra, 2, "M-30,58 Q-26,64 -30,70", 'opacity=".6"'),
+            // Pantorrilla: sombra suave por debajo de la canilla.
+            `<path fill="${C.pielSombra}" opacity=".35" d="M-44,69 Q-26,74.5 -8,70.5 Q-26,71.6 -44,69 Z"/>`,
             bordeMedia(-66, 53.6, 22, 20.8, false)
         );
     } else {

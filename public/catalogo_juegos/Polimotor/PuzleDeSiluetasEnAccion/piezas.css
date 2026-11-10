@@ -91,6 +91,8 @@
 .pieza .pz-sombra { opacity: 0; pointer-events: none; }
 .pieza .pz-sombra .pz-forma { fill: #1d1a45; stroke: none; }
 .pz-toque { fill: transparent; }
+/* Brazos juntos: el de atrás un poco más oscuro para que se lean los dos. */
+.pz-color .pz-atras { filter: brightness(0.86); }
 
 .pieza-libre { cursor: grab; }
 .pieza .pz-cuerpo,

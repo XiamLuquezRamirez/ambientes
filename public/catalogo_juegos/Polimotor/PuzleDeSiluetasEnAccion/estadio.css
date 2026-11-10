@@ -94,6 +94,10 @@ body.est-fiesta .est-fan-cuerpo { animation: estFanSalta 0.45s ease-in-out infin
 .est-led-kicker { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 26px; fill: #7cf3ff; letter-spacing: 6px; }
 .est-led-texto { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 56px; fill: #ffffff; letter-spacing: 3px; paint-order: stroke; stroke: #e64980; stroke-width: 4; }
 .est-led-sub { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 28px; fill: #ffe066; }
+/* La pantalla queda detrás de la bandeja de piezas y del panel de misión: sus letras salían cortadas
+   y encimadas. El nivel, la pose y las piezas ya están en el panel de misión y en el rótulo grande
+   de cada nivel, así que la pantalla solo luce sus luces y ondas (sin texto). */
+.est-led-kicker, .est-led-texto, .est-led-sub { display: none; }
 .est-led-marco { animation: estMarco 2.2s ease-in-out infinite; }
 .est-led-ondas { animation: estOndas 4s ease-in-out infinite alternate; }
 

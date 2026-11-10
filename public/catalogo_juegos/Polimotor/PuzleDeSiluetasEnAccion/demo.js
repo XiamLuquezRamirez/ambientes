@@ -137,7 +137,9 @@
         await pieza(api, "tenis_izq");
         if (T()) T().quitarManos();
         mano = null;
-        api.mision("Demostración", (t && t.posturaLista) || "¡Pose completa!");
+        // posturaLista es una lista de frases: se muestra una sola (antes salían todas unidas por comas).
+        var lista = t && t.posturaLista;
+        api.mision("Demostración", (Array.isArray(lista) ? lista[0] : lista) || "¡Pose completa!");
         await api.completar(); // 12
         await sleep(400);
     }

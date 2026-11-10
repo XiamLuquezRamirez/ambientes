@@ -15,7 +15,7 @@
 (function (global) {
     "use strict";
 
-    var VERSION_SVG = "20261110b";
+    var VERSION_SVG = "20261110c";
     var PERSONAJES = ["zeus", "zoe"];
 
     /** Colores de lateralidad (los mismos de Lateralidad y del Espejo): izquierda amarillo, derecha verde. */
@@ -68,20 +68,34 @@
         }
     }
 
-    function formas(pj, nombreArchivo) {
-        var clave = pj + "/" + nombreArchivo;
-        if (cache[clave]) return cache[clave];
-        var texto = leer(clave + ".svg");
+    var ARCHIVOS = ["cabeza", "tronco", "brazo_extendido", "brazo_flexionado", "pierna_recta", "pierna_doblada", "tenis_izq", "tenis_der"];
+
+    /** Guarda las formas de un archivo leído. Devuelve null si el texto no trae piezas. */
+    function guardar(clave, texto) {
         var doc = texto ? new DOMParser().parseFromString(texto, "image/svg+xml") : null;
         var raiz = doc ? doc.documentElement : null;
-        cache[clave] = {
-            base: interior(raiz && raiz.querySelector(".base")),
-            detalle: interior(raiz && raiz.querySelector(".detalle"))
-        };
+        var base = interior(raiz && raiz.querySelector(".base"));
+        if (!base) return null;
+        cache[clave] = { base: base, detalle: interior(raiz.querySelector(".detalle")) };
         return cache[clave];
     }
 
-    /** Dibujo de una pieza: { base, detalle }. p = { tipo, forma, lado, doble }. */
+    /**
+     * Formas de un archivo. Una lectura fallida NO se guarda: se vuelve a intentar la próxima vez (antes
+     * quedaba vacía para siempre y la pose salía sin silueta ni piezas, con el juego trabado).
+     */
+    function formas(pj, nombreArchivo) {
+        var clave = pj + "/" + nombreArchivo;
+        if (cache[clave]) return cache[clave];
+        return guardar(clave, leer(clave + ".svg")) || { base: "", detalle: "" };
+    }
+
+    /**
+     * Dibujo de una pieza: { base, detalle, atras? }. p = { tipo, forma, lado, doble }.
+     * atras (solo brazos juntos): el brazo de atrás completo, con sus detalles, para pintarlo antes que
+     * el de adelante; si sus detalles fueran en la capa de detalle, la muñequera de atrás quedaría
+     * encima del brazo de adelante.
+     */
     function dibujo(pj, p) {
         pj = PERSONAJES.indexOf(pj) !== -1 ? pj : "zoe";
         var n = archivo(p);
@@ -89,19 +103,39 @@
         var uno = formas(pj, n);
         if (p.tipo !== "brazo" || !p.doble) return { base: uno.base, detalle: uno.detalle };
         // Brazos juntos (de perfil se ven superpuestos): el de atrás un poco desplazado y más oscuro.
+        var desfase = '<g transform="translate(-7,-3)"';
         return {
-            base: '<g transform="translate(-7,-3)">' + uno.base + "</g>" + uno.base,
-            detalle: '<g transform="translate(-7,-3)" class="pz-atras">' + uno.detalle + "</g>" + uno.detalle,
-            atras: true
+            base: desfase + ">" + uno.base + "</g>" + uno.base,
+            detalle: uno.detalle,
+            atras: desfase + ' class="pz-atras">' + uno.base + '<g class="pz-detalle">' + uno.detalle + "</g></g>",
+            frente: uno.base
         };
     }
 
-    /** Lee de una vez todas las piezas de los dos personajes (evita pausas al armar la primera figura). */
+    /**
+     * Lee en segundo plano todas las piezas de los dos personajes al abrir el juego: así una pose de Zeus
+     * o de Zoe no depende de la red justo cuando aparece (y no hay pausas al armar la primera figura).
+     * Si un archivo falla, se reintenta un par de veces. Devuelve una promesa.
+     */
     function precargar() {
-        PERSONAJES.forEach(function (pj) {
-            ["cabeza", "tronco", "brazo_extendido", "brazo_flexionado", "pierna_recta", "pierna_doblada", "tenis_izq", "tenis_der"]
-                .forEach(function (n) { formas(pj, n); });
-        });
+        if (typeof fetch !== "function") {
+            PERSONAJES.forEach(function (pj) { ARCHIVOS.forEach(function (n) { formas(pj, n); }); });
+            return Promise.resolve();
+        }
+        function traer(clave, intentos) {
+            if (cache[clave]) return Promise.resolve();
+            return fetch(CARPETA + clave + ".svg?v=" + VERSION_SVG)
+                .then(function (r) { return r.ok ? r.text() : ""; })
+                .catch(function () { return ""; })
+                .then(function (texto) {
+                    if (cache[clave] || guardar(clave, texto)) return;
+                    if (intentos > 0) return new Promise(function (ok) { setTimeout(ok, 1500); }).then(function () { return traer(clave, intentos - 1); });
+                    console.warn("[Personajes] No se pudo precargar img/" + clave + ".svg");
+                });
+        }
+        var todas = [];
+        PERSONAJES.forEach(function (pj) { ARCHIVOS.forEach(function (n) { todas.push(traer(pj + "/" + n, 2)); }); });
+        return Promise.all(todas);
     }
 
     global.Personajes = {

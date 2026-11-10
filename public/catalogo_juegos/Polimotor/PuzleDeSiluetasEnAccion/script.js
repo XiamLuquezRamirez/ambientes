@@ -452,18 +452,27 @@ function barajar(lista) {
     return a;
 }
 
-/** 3 rondas: una silueta al azar de cada nivel, en orden (nivel 1, 2 y 3). */
+/**
+ * Rondas por nivel, en orden (nivel 1, 2 y 3): juego.posturasPorEtapa poses de cada nivel (por
+ * defecto todas), en orden al azar dentro del nivel. Cada ronda sabe su número dentro del nivel.
+ */
 function armarRondas() {
     rondas = [];
+    const porEtapa = Number(cfgJuego().posturasPorEtapa) || 0;
     (gameConfig.etapas || []).forEach(function (etapa) {
-        const lista = etapa.posturas || [];
-        if (!lista.length) return;
-        rondas.push({ etapa: etapa, postura: lista[Math.floor(Math.random() * lista.length)] });
+        const lista = barajar(etapa.posturas || []);
+        const elegidas = porEtapa > 0 ? lista.slice(0, porEtapa) : lista;
+        elegidas.forEach(function (postura, i) {
+            rondas.push({ etapa: etapa, postura: postura, n: i + 1, deN: elegidas.length });
+        });
     });
 }
 
+/** "Nivel 2 · Pose 3 de 5". */
 function textoRonda(i) {
-    return "Ronda " + (i + 1) + " de " + rondas.length;
+    const r = rondas[i];
+    if (!r) return "";
+    return r.etapa.titulo + " · Pose " + r.n + " de " + r.deN;
 }
 
 /** Arranque único (el selector de edad puede avisar más de una vez: no repetir la demo). */
@@ -545,6 +554,10 @@ function desordenInicial(postura, etapa, cruda) {
 async function cargarPostura(cruda, etapa, opts) {
     opts = opts || {};
     const postura = Posturas.normalizarPostura(cruda);
+    // Si alguna pieza no se pudo leer (red lenta o caída), se espera la precarga con reintentos antes de
+    // pintar: una pose sin formas deja la silueta invisible y la bandeja vacía.
+    const sinFormas = postura.piezas.some(function (p) { return !Piezas.formas(postura.personaje, p); });
+    if (sinFormas && window.Personajes && Personajes.precargar) await Personajes.precargar();
     ronda = {
         etapa: etapa || { titulo: "Demostración", resaltarPaso: true },
         cruda: cruda,
@@ -669,10 +682,15 @@ async function empezarRonda(i) {
         return;
     }
     bloqueo = true;
-    // Cada ronda es un nivel: rótulo "Ronda N de 3 · Nivel N" antes de su silueta.
+    // Al empezar cada nivel: rótulo grande del nivel y su presentación hablada. Entre poses del mismo
+    // nivel, un rótulo corto con el nombre de la pose.
     if (estadio()) {
-        const voz = hablar(r.etapa.intro, "zoe");
-        await Promise.all([estadio().etapa(textoRonda(i), r.etapa.titulo + " · " + r.etapa.subtitulo, r.postura.nombre, 2600), voz]);
+        if (r.n === 1) {
+            const voz = hablar(r.etapa.intro, "zoe");
+            await Promise.all([estadio().etapa(textoRonda(i), r.etapa.titulo + " · " + r.etapa.subtitulo, r.postura.nombre, 2600), voz]);
+        } else {
+            await estadio().etapa(textoRonda(i), r.postura.nombre, r.etapa.subtitulo, 1300);
+        }
     }
     await cargarPostura(r.postura, r.etapa);
     actualizarProgreso();
@@ -1112,7 +1130,9 @@ function apiDemo() {
 // ------------------------------------------------------------------ arranque
 
 $(document).ready(function () {
-    gameConfig = JSON.parse(readText("config.json"));
+    // Las piezas SVG de Zeus y Zoe se leen ya, en segundo plano (no al aparecer cada pose).
+    if (window.Personajes && Personajes.precargar) Personajes.precargar();
+    gameConfig = JSON.parse(readText("config.json?v=20261110a")); // subir ?v= al cambiar las poses
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = textos().conversacion || [];
     sincronizarDialogoIntro3d();

@@ -23,8 +23,10 @@
 
     function capasPieza(pj, p) {
         var d = PJ.dibujo(pj, p);
+        // Brazos juntos: el de atrás va completo (formas y detalles) y luego el de adelante.
+        var formasColor = d.atras ? d.atras + d.frente : d.base;
         return '<g class="pz-neon">' + d.base + "</g>" +
-            '<g class="pz-color">' + d.base + '<g class="pz-detalle">' + d.detalle + "</g></g>" +
+            '<g class="pz-color">' + formasColor + '<g class="pz-detalle">' + d.detalle + "</g></g>" +
             '<g class="pz-sombra">' + d.base + "</g>";
     }
 
