@@ -1,0 +1,159 @@
+{
+  "nombre": "¿Dónde se pone?",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "rondas": 3,
+    "ordenInicial": ["gafas", "sombrero", "zapatos", "bufanda"],
+    "tolerancia": 1.25,
+    "ayudaMs": 8000,
+    "ayudaRepetirMs": 9000,
+    "erroresParaBrillo": 2
+  },
+  "zonas": {
+    "cabeza": { "nombre": "la cabeza" },
+    "ojos": { "nombre": "los ojos" },
+    "cuello": { "nombre": "el cuello" },
+    "pies": { "nombre": "los pies" }
+  },
+  "lugares": [
+    { "x": 0.15, "y": 0.3 },
+    { "x": 0.85, "y": 0.4 },
+    { "x": 0.15, "y": 0.58 },
+    { "x": 0.85, "y": 0.7 }
+  ],
+  "lugaresRetrato": [
+    { "x": 0.15, "y": 0.1 },
+    { "x": 0.85, "y": 0.1 },
+    { "x": 0.13, "y": 0.43 },
+    { "x": 0.87, "y": 0.43 }
+  ],
+  "accesorios": [
+    {
+      "id": "gafas",
+      "nombre": "las gafas de sol",
+      "imagen": "gafas",
+      "zona": "ojos",
+      "posicionInicial": 0,
+      "posicionFinal": { "contenedor": "cabeza", "x": 0, "y": -150 },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": ["¡Hora de disfrazarse! Ayúdame a ponerme cada cosa en su lugar. ¿Dónde van las gafas de sol?", "¿Dónde van mis gafas de sol?"],
+        "ayuda": "¡Las gafas sirven para ver! Mira la carita de Zeus: ¿dónde están sus ojos?",
+        "acierto": "¡Qué bien me quedan!"
+      }
+    },
+    {
+      "id": "sombrero",
+      "nombre": "el sombrero",
+      "imagen": "sombrero",
+      "zona": "cabeza",
+      "posicionInicial": 1,
+      "posicionFinal": { "contenedor": "cabeza", "x": 0, "y": -238 },
+      "escalaFinal": 1,
+      "encaje": "caer",
+      "animacionPersonaje": "sombrero",
+      "sonido": "aparece",
+      "textos": {
+        "instruccion": ["¡Ahora busca mi sombrero! ¿Dónde debo colocarlo?", "¿Dónde me pongo el sombrero?"],
+        "ayuda": "El sombrero va arriba, arriba, ¡en lo más alto de Zeus!",
+        "acierto": "¡Qué estilo! ¡Mi sombrero está perfecto!"
+      }
+    },
+    {
+      "id": "zapatos",
+      "nombre": "los tenis",
+      "imagen": "tenis_par",
+      "zona": "pies",
+      "posicionInicial": 2,
+      "posicionFinal": { "contenedor": "pies", "x": 0, "y": 0 },
+      "escalaFinal": 1,
+      "encaje": "calzar",
+      "animacionPersonaje": "baile",
+      "sonido": "bote",
+      "textos": {
+        "instruccion": ["¡Necesito mis zapatos! ¿Dónde van mis tenis?", "¿Dónde me pongo los tenis?"],
+        "ayuda": "Los tenis son para caminar. Mira abajo, ¿dónde están los pies de Zeus?",
+        "acierto": "¡Listos para correr y bailar!"
+      }
+    },
+    {
+      "id": "bufanda",
+      "nombre": "la bufanda",
+      "imagen": "bufanda_icono",
+      "zona": "cuello",
+      "posicionInicial": 3,
+      "posicionFinal": { "contenedor": "zeus", "x": 0, "y": -548 },
+      "escalaFinal": 1,
+      "encaje": "envolver",
+      "animacionPersonaje": "bufanda",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": ["¡Me falta mi bufanda! ¿Dónde debo ponérmela?", "¿Dónde va mi bufanda?"],
+        "ayuda": "La bufanda abriga. Va entre la cabeza y la camiseta de Zeus: ¡en su cuello!",
+        "acierto": "¡Calientito y elegante! ¡Mi bufanda quedó perfecta!"
+      }
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "nombreCorto": "¿Dónde se pone?",
+    "bienvenida": "¡Hola, amiguito! ¡Hora de disfrazarse! Ayúdame a colocar mis accesorios en el lugar correcto. ¡Vamos a descubrir dónde va cada cosa!",
+    "saludoCorto": "¡Hola, amiguito! ¡Hora de disfrazarse!",
+    "demostracion": "¡Mira cómo se juega! Lleva las gafas directamente a mis ojos para ver qué bien me quedan.",
+    "demostracionFin": "¡Ahora te toca a ti! Arrastra cada cosa hasta su lugar.",
+    "botonComenzar": "¡A jugar!",
+    "error": [
+      "¡Ups! ¡Inténtalo en otro lugar!",
+      "¡Uy! Ahí no va. ¡Prueba otra vez!",
+      "¡Casi! ¡Busca otro lugar!"
+    ],
+    "orden": "¡Ese va ahí! ¡Qué bien!",
+    "rondaCompleta": "¡Qué estilo! Ahora Zeus se quita todo y lo pide en otro orden.",
+    "rondaRotulo": "Ronda {n} de {total}",
+    "otraVez": "¡Otra vez! ¿Me ayudas a vestirme de nuevo?",
+    "final": "¡SÚPER! Pusiste las gafas en los ojos, el sombrero en la cabeza y los zapatos en los pies. ¡Quedé listo para la fiesta! ¡Y mi bufanda quedó perfecta!",
+    "finalTitulo": "¡QUÉ ESTILO!",
+    "finalSub": "Ayudaste a Zeus a vestirse correctamente.",
+    "cierre": "¡Muy bien! Pusiste cada accesorio en su lugar.",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola, amiguito! Soy Zeus. ¡Mira este baúl mágico lleno de disfraces!"
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Y yo soy Zoe! Zeus quiere ir a una fiesta, pero no sabe dónde va cada cosa."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Hora de disfrazarse! Ayúdame a colocar mis accesorios en el lugar correcto. ¡Vamos a descubrir dónde va cada cosa!"
+      }
+    ]
+  },
+  "demo": ["gafas", "sombrero", "zapatos", "bufanda"],
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Prejardín: partes del cuerpo"
+    }
+  ]
+}

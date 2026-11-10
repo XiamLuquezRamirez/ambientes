@@ -1,0 +1,261 @@
+{
+  "nombre": "El Toque Mágico de las Cosquillas",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "rondas": 3,
+    "partesPorRonda": 4,
+    "ayudaVozMs": 8000,
+    "ayudaRepetirMs": 9000,
+    "erroresParaBrillo": 2
+  },
+  "partes": {
+    "ojos": {
+      "nombre": "los ojos",
+      "icono": "ojos",
+      "sonido": "acierto"
+    },
+    "nariz": {
+      "nombre": "la nariz",
+      "icono": "nariz",
+      "sonido": "bote"
+    },
+    "boca": {
+      "nombre": "la boca",
+      "icono": "boca",
+      "sonido": "acierto"
+    },
+    "manos": {
+      "nombre": "las manos",
+      "icono": "manos",
+      "sonido": "correcto"
+    },
+    "orejas": {
+      "nombre": "las orejas",
+      "icono": "orejas",
+      "sonido": "aparece"
+    },
+    "cabello": {
+      "nombre": "el cabello",
+      "icono": "cabello",
+      "sonido": "acierto"
+    },
+    "barriga": {
+      "nombre": "la barriga",
+      "icono": "barriga",
+      "sonido": "bote"
+    },
+    "rodillas": {
+      "nombre": "las rodillas",
+      "icono": "rodillas",
+      "sonido": "bote"
+    },
+    "pies": {
+      "nombre": "los pies",
+      "icono": "pies",
+      "sonido": "acierto"
+    }
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "nombreCorto": "Las cosquillas mágicas",
+    "bienvenida": "¡Hola, amiguito! ¡Vamos a jugar a las cosquillas mágicas! ¿Puedes encontrar las partes de mi cuerpo? ¡Toca donde te diga y veremos qué sucede!",
+    "saludoCorto": "¡Hola, amiguito! ¡Aquí estoy, en el espejo mágico!",
+    "demostracion": "¡Mira cómo se juega! La manito toca el cuerpo de Zoe.",
+    "demostracionFin": "¡Ahora te toca a ti! Toca la parte de Zoe que te diga.",
+    "botonComenzar": "¡A jugar!",
+    "error": [
+      "¡Ups! ¡Esa no es! Inténtalo otra vez.",
+      "¡Casi! Busca otra vez.",
+      "¡Uy, esa no! ¡Tú puedes!"
+    ],
+    "rondaCompleta": "¡Ronda completa! ¡Vamos con otras partes!",
+    "rondaRotulo": "Ronda {n} de {total}",
+    "final": "¡Jajaja! ¡Tus dedos son súper veloces! Encontraste muchas partes de mi cuerpo.",
+    "finalTitulo": "¡MUY BIEN!",
+    "finalSub": "Reconociste las partes de mi cuerpo.",
+    "cierre": "¡Muy bien! Reconociste las partes del cuerpo de Zoe.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola, amiguito! Soy Zoe. ¡Bienvenido a mi vestidor mágico!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Y yo soy Zeus! En este espejo, Zoe siente cosquillas cuando la tocas."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Vamos a jugar a las cosquillas mágicas! ¿Puedes encontrar las partes de mi cuerpo? ¡Toca donde te diga y veremos qué sucede!"
+      }
+    ],
+    "desfileAnuncio": "¡Miren! ¡Zoe sale del espejo para el gran desfile!"
+  },
+  "demo": [
+    {
+      "parte": "ojos",
+      "texto": "¿Dónde están los ojos de Zoe? ¡Aquí!"
+    },
+    {
+      "parte": "nariz",
+      "texto": "¡Ahora la nariz de Zoe!"
+    },
+    {
+      "parte": "boca",
+      "texto": "¡Ahora su boca!"
+    },
+    {
+      "parte": "manos",
+      "texto": "¡Y sus manos para aplaudir!"
+    }
+  ],
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Prejardín: partes del cuerpo"
+    }
+  ],
+  "banco": {
+    "ojos": [
+      {
+        "personaje": "zeus",
+        "texto": "¿Puedes tocar los ojos de Zoe para ver cómo parpadean?",
+        "ayuda": "¡Busca en la carita de Zoe! ¿Dónde están sus ojos?",
+        "acierto": "¡Jijí! ¡Me hiciste parpadear!"
+      },
+      {
+        "personaje": "zeus",
+        "texto": "¡Busca los ojos de Zoe!",
+        "ayuda": "Los ojos de Zoe están arriba de su nariz.",
+        "acierto": "¡Parpadeo, parpadeo! ¡Jijí!"
+      }
+    ],
+    "nariz": [
+      {
+        "personaje": "zeus",
+        "texto": "¡Ahora toca la nariz de Zoe!",
+        "ayuda": "La nariz de Zoe está en el centro de su carita.",
+        "acierto": "¡Bip bip! ¡Qué nariz tan cosquillosa!"
+      },
+      {
+        "personaje": "zeus",
+        "texto": "¿Dónde está la nariz de Zoe?",
+        "ayuda": "Busca en el centro de su carita, entre los ojos y la boca.",
+        "acierto": "¡Bip bip! ¡Cosquillas en mi nariz!"
+      }
+    ],
+    "boca": [
+      {
+        "personaje": "zeus",
+        "texto": "¡Ahora busca la boca de Zoe!",
+        "ayuda": "La boca de Zoe está debajo de su nariz.",
+        "acierto": "¡Jajajá! ¡Qué risa me da!"
+      },
+      {
+        "personaje": "zeus",
+        "texto": "¡Toca la boca de Zoe!",
+        "ayuda": "¿Dónde está su boca? ¡Está debajo de la nariz!",
+        "acierto": "¡Jajajá! ¡Mira mi sonrisa!"
+      }
+    ],
+    "manos": [
+      {
+        "personaje": "zeus",
+        "texto": "¡Busca las manos de Zoe para dar un aplauso!",
+        "ayuda": "Las manos de Zoe están al final de sus brazos.",
+        "acierto": "¡Clap, clap, clap! ¡Un aplauso para ti!"
+      },
+      {
+        "personaje": "zeus",
+        "texto": "¡Toca una mano de Zoe y verás un aplauso!",
+        "ayuda": "¡Toca una de las manos de Zoe!",
+        "acierto": "¡Bravo! ¡Qué buen aplauso!"
+      }
+    ],
+    "orejas": [
+      {
+        "personaje": "zeus",
+        "texto": "¡Toca las orejas de Zoe para que escuchen!",
+        "ayuda": "Las orejas de Zoe están a los lados de su cara.",
+        "acierto": "¡Jijí! ¡Mis orejas se mueven!"
+      },
+      {
+        "personaje": "zeus",
+        "texto": "¿Dónde están las orejas de Zoe?",
+        "ayuda": "Busca a los lados de su cara, junto a las coletas.",
+        "acierto": "¡Escucho, escucho! ¡Jijí!"
+      }
+    ],
+    "cabello": [
+      {
+        "personaje": "zeus",
+        "texto": "¡Toca el cabello de Zoe!",
+        "ayuda": "El cabello de Zoe está arriba de su cabeza, y también en sus coletas.",
+        "acierto": "¡Jijí! ¡Mira cómo bailan mis coletas!"
+      },
+      {
+        "personaje": "zeus",
+        "texto": "¡Busca el cabello de Zoe!",
+        "ayuda": "El cabello está en lo alto de la cabeza de Zoe.",
+        "acierto": "¡Qué peinado tan bailarín!"
+      }
+    ],
+    "barriga": [
+      {
+        "personaje": "zeus",
+        "texto": "¡Hazle cosquillas a Zoe en la barriga!",
+        "ayuda": "La barriga de Zoe está en el centro, donde está el corazón amarillo.",
+        "acierto": "¡Jajajá! ¡Qué cosquillas!"
+      },
+      {
+        "personaje": "zeus",
+        "texto": "¿Dónde está la barriga de Zoe?",
+        "ayuda": "Busca en el centro de su cuerpo, cerca del corazón.",
+        "acierto": "¡Jajajá! ¡Mi barriga se ríe!"
+      }
+    ],
+    "rodillas": [
+      {
+        "personaje": "zeus",
+        "texto": "¡Toca las rodillas de Zoe para que salte!",
+        "ayuda": "Las rodillas de Zoe están en la mitad de sus piernas.",
+        "acierto": "¡Boing, boing! ¡A saltar!"
+      },
+      {
+        "personaje": "zeus",
+        "texto": "¡Busca las rodillas de Zoe!",
+        "ayuda": "Mira sus piernas: las rodillas están en la mitad.",
+        "acierto": "¡Boing! ¡Qué buen salto!"
+      }
+    ],
+    "pies": [
+      {
+        "personaje": "zeus",
+        "texto": "¡Toca los pies de Zoe para que baile!",
+        "ayuda": "Los pies de Zoe están abajo, con los zapatos azules.",
+        "acierto": "¡Tap, tap, tap! ¡A bailar!"
+      },
+      {
+        "personaje": "zeus",
+        "texto": "¿Dónde están los pies de Zoe?",
+        "ayuda": "Busca abajo, donde están sus zapatos.",
+        "acierto": "¡Qué pasos tan bonitos!"
+      }
+    ]
+  }
+}

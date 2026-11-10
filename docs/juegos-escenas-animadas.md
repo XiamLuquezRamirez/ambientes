@@ -361,7 +361,7 @@ cada responsabilidad va en su archivo y expone un global.
   rápido"; los arrastres se simulan con `PointerEvent` (`pointerdown` en la ficha o en `.t-pieza` del taller,
   `pointermove`/`pointerup` en `window`). `Arrastre.activo().offset` dice dónde soltar para que el pivote caiga en
   `Arrastre.socketPantalla(socket)`.
-- Registro: fila en `database/ambientes.sql` y script idempotente `database/juego_espejo_de_las_posiciones.sql`
+- Registro: fila en `database/ambientes.sql`
   (ambiente 7, eje 11, temática 30 "Juegos de lateralidad", módulo 9, orden 9, imagen `espejo.png`).
 
 ### El Puzle de Siluetas en Acción (`Polimotor/PuzleDeSiluetasEnAccion/`)
@@ -408,8 +408,125 @@ Mismo patrón modular que el Espejo:
 - Probar: `node scripts/probar-puzle-siluetas.js`. En el navegador, los arrastres se simulan con `PointerEvent`
   (`pointerdown` en `.pz-toque` de la pieza, `pointermove`/`pointerup` en `window`); `Tablero.aPantalla` y
   `Tablero.figuraAEscenario(hueco.centro)` dan los puntos.
-- Registro: `database/insertar_puzle_siluetas_en_accion.sql` (solo la fila de `juegos`, sin actualizar nada;
-  ambiente 7, eje 11, temática 30 "Juegos de lateralidad", módulo 9, orden 10, imagen `siluetas.png`). No se agregó a `ambientes.sql`.
+- Registro: fila en `database/ambientes.sql`
+  (ambiente 7, eje 11, temática 30 "Juegos de lateralidad", módulo 9, orden 10, imagen `siluetas.png`).
+
+### El Toque Mágico de las Cosquillas (`Polimotor/ToqueMagicoCosquillas/`)
+
+Juego nuevo (noviembre de 2026), Prejardín 3-4 años, temática 29 "Reconocimiento de partes del cuerpo".
+En un **vestidor mágico**, Zoe aparece dentro de un espejo con bombillas y el niño toca directamente la parte
+que le piden: ojos, nariz, boca, manos, orejas, cabello (arriba o en las coletas), barriga, rodillas o pies. Zeus es la guía lateral (gif + globo de texto). Toda la escena del espejo es Phaser 4:
+
+| Archivo | Global | Qué hace |
+|---|---|---|
+| `retos.js` | `Retos` | Reglas puras (también `module.exports`): zona → parte, `esCorrecta`, `elegirZona` (gana la más cercana), `armarPartida`. |
+| `personaje.js` | `Personaje` | Zoe de frente en SVG por partes (cuerpo con rodillas, zapato, brazo, mano, pelo, coleta, oreja, cara, ojo, ceja, nariz, 3 bocas) y `GEOMETRIA` (pivotes y zonas). Lo que se anima solo va en pieza propia; el lado derecho es el izquierdo con escala −x. |
+| `phaser-juego.js` | `EspejoPhaser` | Marco, vidrio, bombillas y Zoe en contenedores; zonas `Phaser.GameObjects.Zone` elípticas dentro del contenedor de cada parte. |
+| `animaciones.js` | `ZoeAnim` | Reposo (respira, balancea, parpadea), reacción por parte, negar, cosquilla, saludo, alegría y boca que habla. |
+| `vestidor.js` | `Vestidor` | Fondo SVG: estantería con ropa, perchero que se mece, banderines, lámparas de estrella y estrellitas (CSS `.vf-*` en `style.css`). |
+| `guia-3d.js` | `Guia3D` | Módulo ES: Zeus 3D (`intro3d/models/nino.glb`, cargador y luces compartidos) en el panel guía; mira al espejo y hace gestos con los clips del GLB (Hablar, Saludar, Senalar, Celebrar/Aplaudir/Saltar, Pensar, Bailar). Sin WebGL o si el modelo falla, queda el GIF. |
+| `demo.js` | `CosquillasDemo` | Demo narrada por Zeus 3D (no usa `PedniaTutorial.correr` ni `tutorial-3d.js`: en este juego solo aparece Zeus); de PedniaTutorial solo usa la mano. Toca ojos, nariz, boca y manos sin contar aciertos. |
+| `script.js` | — | Flujo, rondas, ayuda progresiva, progreso, final y victoria. |
+
+- Unidades de diseño de Zoe: pies en (0,0), cabeza hasta y ≈ -880. "izq/der" son lados **de Zoe** (su mano izquierda
+  queda a la derecha de la pantalla). Las texturas se dibujan del SVG a un canvas a 2× (`RES`).
+- **Zonas**: `ojo_*`, `nariz`, `boca`, `mano_*`, `oreja_*`, `cabello` + `coleta_*`, `barriga`, `rodilla_*`, `pie_*` y
+  `cuerpo` (el resto de Zoe: solo un meneíto, ni acierto ni error). `input.topOnly = false`; entre zonas que se pisan gana la de menor distancia normalizada
+  al dibujo. En pantallas chicas el área táctil crece hasta 26 px (cara) o 36 px (manos) de radio, máximo 1,7×.
+  En las partes dobles vale cualquier lado, salvo que el reto traiga `"lado"`.
+- **Partida al azar** (`Retos.armarPartida`): `juego.rondas` (3) rondas de `juego.partesPorRonda` (4) partes distintas,
+  tomadas de `config.json → banco` (una lista de frases por parte: `texto`, `ayuda`, `acierto`, `personaje`). Prefiere las
+  partes que menos han salido (en 3 rondas salen las 9), no empieza una ronda con la parte con que terminó la anterior y
+  no repite frase mientras haya otra. Una parte nueva = dibujo + zona en `personaje.js`, entrada en `Retos.PARTES`/zonas,
+  reacción en `animaciones.js`, ícono en `script.js → ICONOS_PARTE` y frases en `banco`.
+- **Ayuda**: el pulso dorado sobre la zona sale **solo tras varios errores** en la misma parte
+  (`juego.erroresParaBrillo`, 2), no por tiempo (pedido del usuario). Sin tocar nada, a los 8 s Zeus dice la `ayuda`
+  y luego repite la instrucción cada 9 s. Error = Zoe mueve la cabeza, Zeus dice "¡Ups! ¡Esa no es!…" y `tic`.
+- **Reacciones nuevas**: orejas crecen y se menean; coletas bailan; barriga = risa con todo el cuerpo; rodillas =
+  se agacha y salta dos veces; pies = zapateo alternado (punta arriba desde el talón, `tic` en cada golpe).
+- **Sonidos** (tema `polimotor`): ojos, boca, cabello y pies `acierto`; nariz, barriga y rodillas `bote`; orejas `aparece`;
+  manos `correcto` (aplausos); fin de ronda `correcto`; victoria `victoria`. Risitas: no hay archivo; las dice la voz ("¡Jijí!", "¡Jajajá!").
+- **Final "Desfile en la alfombra"** (elegido por el usuario entre 4 ideas; no le gustó el primero porque el fondo no
+  participaba). `terminarJuego` (~15 s): Zeus anuncia "¡Miren! ¡Zoe sale del espejo…" → `Vestidor.desfile(true)` baja la
+  luz (`.vf-penumbra`), la alfombra se vuelve pasarela con bombillos en cadena y bajan dos haces de luz → el espejo destella
+  y se desvanece (`EspejoPhaser.salirDelEspejo`) y Zoe salta al cuarto al 80 % de tamaño (`ZoeAnim.salir`) → Zoe desfila
+  centro → derecha (brazos arriba) → izquierda (saluda) → centro (`ZoeAnim.desfilar`) mientras Zeus 3D camina hasta la
+  pasarela (`Guia3D.desfilar`: clip Caminar + translate del lienzo, `body.en-desfile` lo pone sobre el espejo); la ropa
+  del perchero vuela a la pasarela (`.vf-prenda`, capa intermedia porque un transform CSS pisaría el atributo), los
+  sombreros saltan (`.vf-salta`) y hay flashes de cámara (`#vf-flashes`) → cartel "¡MUY BIEN!" compacto arriba (`.arriba`,
+  sin tapar la cabeza), aplausos, confeti y la victoria compartida (que apaga el desfile).
+- Trampa: no poner la clase `final` a elementos del juego: `final/final.css` la usa para la victoria (fondo azul).
+  `gestoGuia` solo agrega clases de gestos con animación CSS.
+- Menús de accesibilidad abajo a la **derecha** (a la izquierda está la guía).
+- **Quién habla** (pedido del usuario): si se ve Zeus, habla en **tercera persona** ("¡Busca los ojos de Zoe!").
+  Zeus dice instrucciones, pistas, errores, demo, fin de ronda y cierre, en la nube lateral. Zoe solo dice sus propias
+  reacciones en primera persona (saludo, risas al acertar, final) en `#zoe-globo`, una nube rosada que `ubicarGloboZoe`
+  pone más allá de su coleta para no tapar partes que se tocan. Todo `banco[].personaje` es `"zeus"`; la prueba de node
+  falla si un texto de Zeus dice "mi/mis/me/yo".
+- **Guía 3D**: `script.js` llama `Guia3D.gesto()` desde `gestoGuia` (senala al dar una instrucción, celebra al acertar,
+  duda → Pensar al fallar, saluda en la presentación, final → Bailar) y `Guia3D.hablar()` mientras suena la voz de Zeus.
+  No se usó `intro3d/js/personajes-juego.js` porque solo alterna quieto/hablar y lo comparten muchos juegos. El lienzo
+  sobresale 25 % a cada lado del panel (sin eventos) para que el encuadre no lo limite el ancho; en pantallas angostas
+  el panel toma `height: 20vh` (15vh en celular) porque ya no depende del alto del GIF.
+- Probar: `node scripts/probar-toque-magico.js`. En el navegador, los toques se simulan con `MouseEvent`
+  (`mousedown` en el canvas, `mouseup` en `window`) en `EspejoPhaser.puntoDe(zona)`; también responde a `TouchEvent`.
+  Con el panel oculto Phaser no procesa toques: mostrar el panel antes. `EspejoPhaser.ultimoToque()` da los candidatos
+  y distancias del último toque.
+- **Trampa corregida**: Phaser guarda la posición del lienzo y solo la renueva si cambia de tamaño. Cuando la cabecera se
+  reacomodaba (fuente cargada, progreso visible) el lienzo se movía sin cambiar de tamaño y los toques se leían hasta
+  42 px corridos (ojo → boca). `vigilarPosicion` llama `scale.updateBounds()` en la fase de captura de cada toque y con un
+  `ResizeObserver`. Además se usa `pointer.x/y` (no `worldX`, que se actualiza un cuadro después).
+- **Pantalla de inicio**: cada juego debe traer en su `style.css` los estilos base de `.pantalla-inicio` (posición fija,
+  `z-index` 4000, mancha y animaciones); `comun/inicio-fondo.css` solo pone color y trazo. El ícono (`cosquillas.png`)
+  es un **glifo blanco sobre transparente**, como los demás: el catálogo y la portada lo pintan con el color del juego.
+- Registro: fila en `database/ambientes.sql`
+  (ambiente 7, eje 11, temática 29, módulo 9, orden 11, imagen `cosquillas.png`).
+
+### ¿Dónde se pone? (`Polimotor/DondeSePone/`)
+
+Juego nuevo (noviembre de 2026), Prejardín 3-4 años, temática 29 "Reconocimiento de partes del cuerpo".
+En el **baúl mágico de disfraces**, Zeus (de frente, en una tarima, con camiseta, pantaloneta y medias) pide sus
+accesorios y el niño los **arrastra** hasta la parte del cuerpo: gafas de sol → ojos, sombrero → cabeza,
+tenis → pies, bufanda → cuello. Zoe es la guía lateral (3D). Toda la escena central es Phaser 4:
+
+| Archivo | Global | Qué hace |
+|---|---|---|
+| `reglas.js` | `Reglas` | Puro (también `module.exports`): zona de cada accesorio (sale de `config.accesorios[].zona`), `esCorrecta`, `elegirZona` con tolerancia, `armarRondas`, `siguientePendiente`. |
+| `personaje.js` | `Personaje` | Zeus de frente en SVG por partes (cuerpo, pie con media, cara, pelo, ojo, ceja, nariz, 4 bocas, brazo + antebrazo con codo, mano) y `GEOMETRIA` con las 4 zonas de destino en coords de su contenedor. |
+| `accesorios.js` | `Accesorios` | SVG de gafas, sombrero, bufanda (vuelta + cola que ondea), tenis; versiones de bandeja `tenis_par` y `bufanda_icono`. Pivote = punto de encaje, en unidades de Zeus. |
+| `escenario-phaser.js` | `EscenarioPhaser` | Tarima, baúl (tapa que se abre), Zeus, zonas `Zone`, anillos de destino, halos, accesorios flotantes en burbujas, `encajar`, `quitarPuestos`, `llenarBandeja`. |
+| `arrastre.js` | `Arrastre` | Arrastre con el input de Phaser (`setDraggable`): destaca, sube de capa, resalta la zona tocada; **encaja solo** al entrar en su zona; al soltar en otra zona → error. |
+| `animaciones.js` | `ZeusAnim` | Reposo, aparecer, saludo, boca que habla, reacción por accesorio (`modelo`, `sombrero`, `baile`, `bufanda`), `sorpresa`, `alegria`, `desfile` (gira, manos en la cadera, pose, celebra). |
+| `vestidor.js` | `Vestidor` | Copia del fondo del Toque Mágico + guirnalda de luces de colores (`.vf-luz`). |
+| `guia-3d.js` | `Guia3D` | Copia del módulo del Toque Mágico con `nina.glb` (Zoe; mismos clips). GIF `zoe_normal.gif` de respaldo. |
+| `demo.js` | `DondeDemo` | La mano de PedniaTutorial lleva los 4 accesorios (gafas primero) sin contar aciertos; luego Zeus celebra, se desviste y sale "¡A jugar!". |
+| `script.js` | — | Flujo, rondas, microayuda, progreso (íconos de los accesorios), final y victoria. |
+
+- **Quién habla**: Zeus (centro) en **primera persona** en `#zeus-globo` (instrucciones, aciertos, error
+  "¡Ups! ¡Inténtalo en otro lugar!", final). Zoe (panel) da las **pistas** hablando de Zeus en tercera persona.
+  La prueba de node lo verifica.
+- **Rondas** (`juego.rondas` = 3): la 1.ª en el orden del enunciado (gafas, sombrero, tenis, bufanda) y con los
+  lugares `posicionInicial`; las demás en otro orden (no empieza con el último de la anterior) y con los
+  accesorios en otros lugares. Al terminar cada ronda Zeus desfila y todo vuelve al baúl.
+- Un accesorio fuera de orden pero en su zona correcta **se acepta** (sin negativos); la instrucción pasa al
+  siguiente pendiente. Soltar fuera de Zeus = vuelve flotando, sin error.
+- **Microayuda** a los `ayudaMs` (8 s) sin interacción: brilla la parte pedida, el accesorio se menea, salen chispas
+  del accesorio a la zona y Zoe dice la pista; luego Zeus repite cada 9 s. Tras 2 errores también brilla la zona.
+- **Diseño**: horizontal = accesorios en columnas a los lados (nunca tapan a Zeus), baúl abajo a la izquierda
+  (a la derecha están los menús). Vertical (`W/H < 0.75`) = Zeus abajo y más grande, accesorios con
+  `config.lugaresRetrato` y la nube de Zeus centrada arriba (`.zeus-globo.arriba`).
+- **Final**: baúl abierto del todo + chispas, `Vestidor.fiesta` + `desfile` (pasarela, focos, flashes), confeti,
+  `ZeusAnim.desfile`, cartel "¡QUÉ ESTILO!" y la victoria compartida.
+- Sonidos: `agarrar`, `soltar`, `encaje`, por accesorio (`acierto`, `aparece`, `bote`), error `regreso`,
+  fin de ronda `correcto`, victoria `victoria`.
+- **Trampa**: los tweens con Promise fijan los valores finales si Phaser no avanzó (panel oculto); sin eso los
+  accesorios quedaban dentro del baúl y la demo no los encontraba.
+- Probar: `node scripts/probar-donde-se-pone.js`. En el navegador, arrastrar con `MouseEvent`: `mousedown`,
+  `mousemove` y `mouseup` **en el canvas** (Phaser escucha `mousemove` en el canvas, no en `window`); con
+  `TouchEvent`, el `Touch` sintético necesita `pageX/pageY`. Puntos: `EscenarioPhaser.puntoDe("gafas")` (accesorio)
+  y `puntoDe("ojos")` (zona).
+- Registro: fila en `database/ambientes.sql`
+  (ambiente 7, eje 11, temática 29, módulo 9, orden 12, imagen `donde.png`).
 
 ## Trampas conocidas
 
@@ -462,6 +579,8 @@ Mismo patrón modular que el Espejo:
   - ReconocimientoDelCuerpo
   - JuegosDePrecision
   - EspejoDeLasPosiciones (juego nuevo)
+  - ToqueMagicoCosquillas (juego nuevo)
+  - DondeSePone (juego nuevo)
 - Rompecabezas: hecho "El cuerpo cobra vida". Se probó con la niña en 5 y 10 piezas; falta probar el niño y el
   nivel de 7 piezas.
 - Arrastrar y soltar: en pantallas altas queda piso vacío bajo las cajas; se ofreció agrandarlas o bajarlas.
