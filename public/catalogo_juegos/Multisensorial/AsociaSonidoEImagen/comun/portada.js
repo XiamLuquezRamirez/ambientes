@@ -23,13 +23,20 @@
     };
 
     /**
-     * Juegos que ya tienen las imágenes del diseño en img/diseno/<id>.svg (las de ¿Qué suena?).
+     * Juegos que ya tienen las imágenes del diseño en img/<id>.svg (las de ¿Qué suena?).
      * En esos, la portada muestra el diseño; si una falta, queda el dibujo.
      */
     var CON_DISENO = {
-        QueSuena: ['bicicleta', 'telefono', 'reloj', 'avion', 'tren', 'vaca', 'gallo'],
-        QueObjetoSuena: ['bicicleta', 'telefono', 'reloj', 'avion', 'tren', 'vaca', 'gallo', 'aspiradora'],
-        EscuchaYAsocia: ['bicicleta', 'telefono', 'reloj', 'avion', 'tren', 'vaca', 'gallo', 'ambulancia']
+        EscuchaYAsocia: ['ambulancia', 'avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca'],
+        LaGranAsociacion: ['aspiradora', 'avion', 'bicicleta', 'gallo', 'puerta', 'reloj', 'telefono', 'tren', 'vaca', 'ventilador'],
+        QueEscuchaste: ['ambulancia', 'avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca'],
+        QueObjetoSuena: ['aspiradora', 'avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca'],
+        QueSuena: ['avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca'],
+        SonidoDeTransporte: ['ambulancia', 'avion', 'camion', 'gallo', 'motocicleta', 'tren', 'vaca'],
+        SonidoDeUnaMaquina: ['aspiradora', 'gallo', 'lavadora', 'licuadora', 'secador', 'vaca', 'ventilador'],
+        SonidoDelAgua: ['lavadora'],
+        SonidoYObjeto: ['aspiradora', 'cajon', 'gallo', 'licuadora', 'puerta', 'reloj', 'telefono', 'vaca', 'ventana', 'ventilador'],
+        UnSonidoDeViaje: ['ambulancia', 'avion', 'bicicleta', 'camion', 'gallo', 'motocicleta', 'tren', 'vaca']
     };
 
     function dibujo(id) {
@@ -61,7 +68,7 @@
             var url = window.PedniaArte.dataURL(dibujo(id), 220);
             if (disenos.indexOf(id) >= 0) {
                 img.onerror = function () { img.onerror = null; if (url) img.src = url; };
-                img.src = 'img/diseno/' + id + '.svg';
+                img.src = 'img/' + id + '.svg';
                 return;
             }
             if (url) img.src = url;

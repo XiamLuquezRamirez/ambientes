@@ -2,7 +2,7 @@
   "nombre": "Recuerda Los Sonidos",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: escucha el sonido y luego toca lo que escuchaste.",
+    "demostracion": "¡Mira! Toca a los que escuchaste: corren al arca.",
     "demostracionAcierto": "¡Así se recuerda un sonido!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [

@@ -23,8 +23,8 @@
     var ROPA = [0xff8787, 0x74c0fc, 0xffd43b, 0x8ce99a, 0xb197fc];
     var A = global.PedniaArte;
 
-    /** Imágenes del diseño (img/diseno/): las de ¿Qué suena? + la ambulancia y el dormitorio. */
-    var DISENO = 'img/diseno/';
+    /** Imágenes del diseño (img/): las de ¿Qué suena? + la ambulancia y el dormitorio. */
+    var DISENO = 'img/';
     var PIELES = ['avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca', 'ambulancia'];
     /**
      * Muebles dentro de fondo.png (1281×721), medidos sobre la imagen. La cómoda no viene en el

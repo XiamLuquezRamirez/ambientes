@@ -1,0 +1,3069 @@
+{
+  "generado": "2026-11-11T22:16:15.646Z",
+  "fuentes": {
+    "QueSuena": {
+      "total": 26,
+      "objetos": [
+        "avion.svg",
+        "bicicleta.svg",
+        "gallo.svg",
+        "reloj.svg",
+        "telefono.svg",
+        "tren.svg",
+        "vaca.svg"
+      ],
+      "uiEscena": [
+        "carrito.svg",
+        "escuchar.svg",
+        "estrella.svg",
+        "fondo.png",
+        "fondo_frente.png",
+        "insignia_experto.svg",
+        "mariposa1.svg",
+        "mariposa2.svg",
+        "mariposa3.svg",
+        "mariposa4.svg",
+        "mariposa5.svg",
+        "nube1.png",
+        "nube2.png",
+        "nube3.png",
+        "nube4.png",
+        "nube5.png",
+        "nube6.png",
+        "sol.png",
+        "topo.svg"
+      ]
+    },
+    "QueObjetoSuena": {
+      "total": 18,
+      "objetos": [
+        "aspiradora.svg",
+        "avion.svg",
+        "bicicleta.svg",
+        "gallo.svg",
+        "reloj.svg",
+        "telefono.svg",
+        "tren.svg",
+        "vaca.svg"
+      ],
+      "uiEscena": [
+        "cofre.svg",
+        "escuchar.svg",
+        "estrella.svg",
+        "fondo.png",
+        "insignia_experto.svg",
+        "mariposa1.svg",
+        "mariposa2.svg",
+        "mariposa3.svg",
+        "mariposa4.svg",
+        "mariposa5.svg"
+      ]
+    },
+    "EscuchaYAsocia": {
+      "total": 13,
+      "objetos": [
+        "ambulancia.svg",
+        "avion.svg",
+        "bicicleta.svg",
+        "gallo.svg",
+        "reloj.svg",
+        "telefono.svg",
+        "tren.svg",
+        "vaca.svg"
+      ],
+      "uiEscena": [
+        "escuchar.svg",
+        "estrella.svg",
+        "fondo_sin_movil.png",
+        "insignia_experto.svg",
+        "movil.png"
+      ]
+    }
+  },
+  "catalogoObjetos": [
+    "ambulancia",
+    "aspiradora",
+    "avion",
+    "bicicleta",
+    "gallo",
+    "reloj",
+    "telefono",
+    "tren",
+    "vaca"
+  ],
+  "catalogoUi": [
+    "carrito",
+    "cofre",
+    "escuchar",
+    "estrella",
+    "fondo",
+    "fondo_frente",
+    "fondo_sin_movil",
+    "insignia_experto",
+    "mariposa1",
+    "mariposa2",
+    "mariposa3",
+    "mariposa4",
+    "mariposa5",
+    "movil",
+    "nube1",
+    "nube2",
+    "nube3",
+    "nube4",
+    "nube5",
+    "nube6",
+    "sol",
+    "topo"
+  ],
+  "porEje": {
+    "AsociaSonidoEImagen": [
+      {
+        "juego": "EscuchaYAsocia",
+        "ruta": "AsociaSonidoEImagen/EscuchaYAsocia",
+        "idsNecesarios": [
+          "ambulancia",
+          "avion",
+          "bicicleta",
+          "gallo",
+          "reloj",
+          "telefono",
+          "tren",
+          "vaca"
+        ],
+        "extra": [
+          "telefono",
+          "avion",
+          "vaca",
+          "gallo",
+          "ambulancia"
+        ],
+        "clasificacion": [
+          {
+            "id": "ambulancia",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/ambulancia.svg",
+            "fuentes": [
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "avion",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/avion.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "bicicleta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/bicicleta.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "reloj",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/reloj.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "telefono",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/telefono.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "tren",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/tren.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 8,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": [
+          "escuchar",
+          "estrella",
+          "fondo_sin_movil",
+          "movil"
+        ]
+      },
+      {
+        "juego": "LaGranAsociacion",
+        "ruta": "AsociaSonidoEImagen/LaGranAsociacion",
+        "idsNecesarios": [
+          "aspiradora",
+          "avion",
+          "bicicleta",
+          "gallo",
+          "puerta",
+          "reloj",
+          "telefono",
+          "tren",
+          "vaca",
+          "ventilador"
+        ],
+        "extra": [
+          "ventilador",
+          "tren",
+          "avion"
+        ],
+        "clasificacion": [
+          {
+            "id": "aspiradora",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/aspiradora.svg",
+            "fuentes": [
+              "QueObjetoSuena"
+            ]
+          },
+          {
+            "id": "avion",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/avion.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "bicicleta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/bicicleta.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "puerta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/puerta.svg",
+            "fuentes": []
+          },
+          {
+            "id": "reloj",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/reloj.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "telefono",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/telefono.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "tren",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/tren.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "ventilador",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/ventilador.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 10,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "QueEscuchaste",
+        "ruta": "AsociaSonidoEImagen/QueEscuchaste",
+        "idsNecesarios": [
+          "ambulancia",
+          "avion",
+          "bicicleta",
+          "gallo",
+          "reloj",
+          "telefono",
+          "tren",
+          "vaca"
+        ],
+        "extra": [
+          "bicicleta",
+          "avion",
+          "vaca",
+          "gallo",
+          "ambulancia"
+        ],
+        "clasificacion": [
+          {
+            "id": "ambulancia",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/ambulancia.svg",
+            "fuentes": [
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "avion",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/avion.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "bicicleta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/bicicleta.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "reloj",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/reloj.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "telefono",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/telefono.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "tren",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/tren.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 8,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "QueObjetoSuena",
+        "ruta": "AsociaSonidoEImagen/QueObjetoSuena",
+        "idsNecesarios": [
+          "aspiradora",
+          "avion",
+          "bicicleta",
+          "gallo",
+          "reloj",
+          "telefono",
+          "tren",
+          "vaca"
+        ],
+        "extra": [
+          "aspiradora",
+          "bicicleta",
+          "reloj",
+          "tren",
+          "vaca",
+          "gallo"
+        ],
+        "clasificacion": [
+          {
+            "id": "aspiradora",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/aspiradora.svg",
+            "fuentes": [
+              "QueObjetoSuena"
+            ]
+          },
+          {
+            "id": "avion",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/avion.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "bicicleta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/bicicleta.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "reloj",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/reloj.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "telefono",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/telefono.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "tren",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/tren.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 8,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": [
+          "cofre",
+          "escuchar",
+          "estrella",
+          "fondo",
+          "mariposa1",
+          "mariposa2",
+          "mariposa3",
+          "mariposa4",
+          "mariposa5"
+        ]
+      },
+      {
+        "juego": "QueSuena",
+        "ruta": "AsociaSonidoEImagen/QueSuena",
+        "idsNecesarios": [
+          "avion",
+          "bicicleta",
+          "gallo",
+          "reloj",
+          "telefono",
+          "tren",
+          "vaca"
+        ],
+        "extra": [
+          "tren",
+          "avion",
+          "vaca",
+          "gallo"
+        ],
+        "clasificacion": [
+          {
+            "id": "avion",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/avion.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "bicicleta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/bicicleta.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "reloj",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/reloj.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "telefono",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/telefono.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "tren",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/tren.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 7,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": [
+          "carrito",
+          "escuchar",
+          "estrella",
+          "fondo",
+          "fondo_frente",
+          "mariposa1",
+          "mariposa2",
+          "mariposa3",
+          "mariposa4",
+          "mariposa5",
+          "nube1",
+          "nube2",
+          "nube3",
+          "nube4",
+          "nube5",
+          "nube6",
+          "sol",
+          "topo"
+        ]
+      },
+      {
+        "juego": "SonidoDeTransporte",
+        "ruta": "AsociaSonidoEImagen/SonidoDeTransporte",
+        "idsNecesarios": [
+          "ambulancia",
+          "avion",
+          "camion",
+          "gallo",
+          "motocicleta",
+          "tren",
+          "vaca"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "ambulancia",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/ambulancia.svg",
+            "fuentes": [
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "avion",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/avion.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "camion",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/camion.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "motocicleta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/motocicleta.svg",
+            "fuentes": []
+          },
+          {
+            "id": "tren",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/tren.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 7,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SonidoDeUnaAccion",
+        "ruta": "AsociaSonidoEImagen/SonidoDeUnaAccion",
+        "idsNecesarios": [
+          "aplaudiendo",
+          "corriendo",
+          "durmiendo",
+          "gallo",
+          "saltando",
+          "vaca"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "aplaudiendo",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/aplaudiendo.svg",
+            "fuentes": []
+          },
+          {
+            "id": "corriendo",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/corriendo.svg",
+            "fuentes": []
+          },
+          {
+            "id": "durmiendo",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/durmiendo.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "saltando",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/saltando.svg",
+            "fuentes": []
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 2,
+          "replicar": 0,
+          "falta": 4
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SonidoDeUnaMaquina",
+        "ruta": "AsociaSonidoEImagen/SonidoDeUnaMaquina",
+        "idsNecesarios": [
+          "aspiradora",
+          "gallo",
+          "lavadora",
+          "licuadora",
+          "secador",
+          "vaca",
+          "ventilador"
+        ],
+        "extra": [
+          "lavadora"
+        ],
+        "clasificacion": [
+          {
+            "id": "aspiradora",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/aspiradora.svg",
+            "fuentes": [
+              "QueObjetoSuena"
+            ]
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "lavadora",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/lavadora.svg",
+            "fuentes": []
+          },
+          {
+            "id": "licuadora",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/licuadora.svg",
+            "fuentes": []
+          },
+          {
+            "id": "secador",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/secador.svg",
+            "fuentes": []
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "ventilador",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/ventilador.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 7,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SonidoDelAgua",
+        "ruta": "AsociaSonidoEImagen/SonidoDelAgua",
+        "idsNecesarios": [
+          "ducha",
+          "fuente",
+          "gallo",
+          "lavadora",
+          "pluma",
+          "regadera",
+          "vaca"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "ducha",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/ducha.svg",
+            "fuentes": []
+          },
+          {
+            "id": "fuente",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/fuente.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "lavadora",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/lavadora.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pluma",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/pluma.svg",
+            "fuentes": []
+          },
+          {
+            "id": "regadera",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/regadera.svg",
+            "fuentes": []
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 4
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SonidoYObjeto",
+        "ruta": "AsociaSonidoEImagen/SonidoYObjeto",
+        "idsNecesarios": [
+          "aspiradora",
+          "cajon",
+          "gallo",
+          "licuadora",
+          "puerta",
+          "reloj",
+          "telefono",
+          "vaca",
+          "ventana",
+          "ventilador"
+        ],
+        "extra": [
+          "reloj",
+          "ventilador",
+          "aspiradora",
+          "licuadora"
+        ],
+        "clasificacion": [
+          {
+            "id": "aspiradora",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/aspiradora.svg",
+            "fuentes": [
+              "QueObjetoSuena"
+            ]
+          },
+          {
+            "id": "cajon",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/cajon.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "licuadora",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/licuadora.svg",
+            "fuentes": []
+          },
+          {
+            "id": "puerta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/puerta.svg",
+            "fuentes": []
+          },
+          {
+            "id": "reloj",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/reloj.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "telefono",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/telefono.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "ventana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/ventana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "ventilador",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/ventilador.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 10,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "UnSonidoDeViaje",
+        "ruta": "AsociaSonidoEImagen/UnSonidoDeViaje",
+        "idsNecesarios": [
+          "ambulancia",
+          "avion",
+          "bicicleta",
+          "camion",
+          "gallo",
+          "motocicleta",
+          "tren",
+          "vaca"
+        ],
+        "extra": [
+          "camion",
+          "motocicleta",
+          "bicicleta"
+        ],
+        "clasificacion": [
+          {
+            "id": "ambulancia",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/ambulancia.svg",
+            "fuentes": [
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "avion",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/avion.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "bicicleta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/bicicleta.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "camion",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/camion.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "motocicleta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/motocicleta.svg",
+            "fuentes": []
+          },
+          {
+            "id": "tren",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/tren.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 8,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      }
+    ],
+    "MemoriaAuditiva": [
+      {
+        "juego": "ElGranDesafioDeMemoria",
+        "ruta": "MemoriaAuditiva/ElGranDesafioDeMemoria",
+        "idsNecesarios": [
+          "campana",
+          "gallo",
+          "gato",
+          "maracas",
+          "pajaro",
+          "pelota",
+          "perro",
+          "tambor"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "gato",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/gato.png",
+            "fuentes": []
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pelota",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pelota.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          },
+          {
+            "id": "tambor",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/tambor.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 8,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "ElSonidoRepetido",
+        "ruta": "MemoriaAuditiva/ElSonidoRepetido",
+        "idsNecesarios": [
+          "caballo",
+          "campana",
+          "gallo",
+          "leon",
+          "maracas",
+          "perro"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "caballo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/caballo.svg",
+            "fuentes": []
+          },
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "leon",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/leon.svg",
+            "fuentes": []
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 6,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "QueCambio",
+        "ruta": "MemoriaAuditiva/QueCambio",
+        "idsNecesarios": [
+          "campana",
+          "gaita",
+          "gallo",
+          "maracas",
+          "pajaro",
+          "tambor"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gaita",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/gaita.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "tambor",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/tambor.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 6,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "QueEscuchaste",
+        "ruta": "MemoriaAuditiva/QueEscuchaste",
+        "idsNecesarios": [
+          "gallo",
+          "manos",
+          "maracas",
+          "tren",
+          "trompeta"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "manos",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/manos.svg",
+            "fuentes": []
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "tren",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/tren.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "trompeta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/trompeta.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 4,
+          "replicar": 0,
+          "falta": 1
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "QueSonidoCambia",
+        "ruta": "MemoriaAuditiva/QueSonidoCambia",
+        "idsNecesarios": [
+          "campana",
+          "gallo",
+          "maracas",
+          "pajaro",
+          "perro",
+          "tambor"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          },
+          {
+            "id": "tambor",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/tambor.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 6,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "QueSonidoDesaparecio",
+        "ruta": "MemoriaAuditiva/QueSonidoDesaparecio",
+        "idsNecesarios": [
+          "caballo",
+          "gallo",
+          "maracas",
+          "pasos",
+          "reloj"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "caballo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/caballo.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pasos",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/pasos.svg",
+            "fuentes": []
+          },
+          {
+            "id": "reloj",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/reloj.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 4,
+          "replicar": 0,
+          "falta": 1
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "QueSonidoSeRepitio",
+        "ruta": "MemoriaAuditiva/QueSonidoSeRepitio",
+        "idsNecesarios": [
+          "campana",
+          "gallo",
+          "maracas",
+          "perro",
+          "pollito"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          },
+          {
+            "id": "pollito",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pollito.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 5,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "RecuerdaDosSonidos",
+        "ruta": "MemoriaAuditiva/RecuerdaDosSonidos",
+        "idsNecesarios": [
+          "botella",
+          "campana",
+          "gallo",
+          "maracas",
+          "pollito"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "botella",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/botella.svg",
+            "fuentes": []
+          },
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pollito",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pollito.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 5,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "RecuerdaElSonido",
+        "ruta": "MemoriaAuditiva/RecuerdaElSonido",
+        "idsNecesarios": [
+          "burro",
+          "elefante",
+          "gallo",
+          "maracas",
+          "vaca"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "burro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/burro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "elefante",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/elefante.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 5,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "RecuerdaLosSonidos",
+        "ruta": "MemoriaAuditiva/RecuerdaLosSonidos",
+        "idsNecesarios": [
+          "carro",
+          "gallo",
+          "leon",
+          "maracas",
+          "pato",
+          "perro",
+          "rana"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "carro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/carro.png",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "leon",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/leon.svg",
+            "fuentes": []
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pato",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pato.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          },
+          {
+            "id": "rana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/rana.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 7,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      }
+    ],
+    "EncuentraElSonido": [
+      {
+        "juego": "DondeEstaElPajaro",
+        "ruta": "EncuentraElSonido/DondeEstaElPajaro",
+        "idsNecesarios": [
+          "pajaro"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 1,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "DondeEstaElPerro",
+        "ruta": "EncuentraElSonido/DondeEstaElPerro",
+        "idsNecesarios": [
+          "perro"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 1,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "ElSonidoViajero",
+        "ruta": "EncuentraElSonido/ElSonidoViajero",
+        "idsNecesarios": [],
+        "extra": [],
+        "clasificacion": [],
+        "conteo": {
+          "ya": 0,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "EncuentraElSonido",
+        "ruta": "EncuentraElSonido/EncuentraElSonido",
+        "idsNecesarios": [],
+        "extra": [],
+        "clasificacion": [],
+        "conteo": {
+          "ya": 0,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "EncuentraElSonidoDeLaLluvia",
+        "ruta": "EncuentraElSonido/EncuentraElSonidoDeLaLluvia",
+        "idsNecesarios": [
+          "paraguas"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "paraguas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/paraguas.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 1,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "EncuentraElSonidoEntreDistractores",
+        "ruta": "EncuentraElSonido/EncuentraElSonidoEntreDistractores",
+        "idsNecesarios": [
+          "maracas"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 1,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "EncuentraLaTrompeta",
+        "ruta": "EncuentraElSonido/EncuentraLaTrompeta",
+        "idsNecesarios": [
+          "trompeta"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "trompeta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/trompeta.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 1,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "LocalizaElSonido",
+        "ruta": "EncuentraElSonido/LocalizaElSonido",
+        "idsNecesarios": [
+          "pandereta"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "pandereta",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pandereta.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 1,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "MisionFinalDondeEsta",
+        "ruta": "EncuentraElSonido/MisionFinalDondeEsta",
+        "idsNecesarios": [],
+        "extra": [],
+        "clasificacion": [],
+        "conteo": {
+          "ya": 0,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SonidosEnDiferentesLugares",
+        "ruta": "EncuentraElSonido/SonidosEnDiferentesLugares",
+        "idsNecesarios": [
+          "campana"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 1,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      }
+    ],
+    "QueSonidoEscuchas": [
+      {
+        "juego": "EscuchaYRecuerda",
+        "ruta": "QueSonidoEscuchas/EscuchaYRecuerda",
+        "idsNecesarios": [
+          "carro",
+          "gallo",
+          "pelota"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "carro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/carro.png",
+            "fuentes": []
+          },
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "pelota",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pelota.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "LaMisionFinal",
+        "ruta": "QueSonidoEscuchas/LaMisionFinal",
+        "idsNecesarios": [
+          "lluvia",
+          "mar",
+          "viento"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "lluvia",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/lluvia.svg",
+            "fuentes": []
+          },
+          {
+            "id": "mar",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/mar.svg",
+            "fuentes": []
+          },
+          {
+            "id": "viento",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/viento.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 0,
+          "replicar": 0,
+          "falta": 3
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "OtrosSonidosDeAnimales",
+        "ruta": "QueSonidoEscuchas/OtrosSonidosDeAnimales",
+        "idsNecesarios": [
+          "gallo",
+          "gato",
+          "vaca"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "gallo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/gallo.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          },
+          {
+            "id": "gato",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/gato.png",
+            "fuentes": []
+          },
+          {
+            "id": "vaca",
+            "estado": "ya_tiene_diseno",
+            "detalle": "copia idéntica a fuente",
+            "local": "img/vaca.svg",
+            "fuentes": [
+              "QueSuena",
+              "QueObjetoSuena",
+              "EscuchaYAsocia"
+            ]
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "OtrosSonidosDeLaNaturaleza",
+        "ruta": "QueSonidoEscuchas/OtrosSonidosDeLaNaturaleza",
+        "idsNecesarios": [
+          "lluvia",
+          "mar",
+          "viento"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "lluvia",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/lluvia.svg",
+            "fuentes": []
+          },
+          {
+            "id": "mar",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/mar.svg",
+            "fuentes": []
+          },
+          {
+            "id": "viento",
+            "estado": "falta_disenar",
+            "detalle": "solo arte plano/legacy o PedniaArte procedural",
+            "local": "img/viento.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 0,
+          "replicar": 0,
+          "falta": 3
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "QueSonidoEs",
+        "ruta": "QueSonidoEscuchas/QueSonidoEs",
+        "idsNecesarios": [
+          "gato",
+          "pajaro",
+          "perro"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "gato",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/gato.png",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "QueSonidoEscuchas",
+        "ruta": "QueSonidoEscuchas/QueSonidoEscuchas",
+        "idsNecesarios": [
+          "carro",
+          "pajaro",
+          "perro"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "carro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/carro.png",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "QueSonidoFalta",
+        "ruta": "QueSonidoEscuchas/QueSonidoFalta",
+        "idsNecesarios": [
+          "campana",
+          "carro",
+          "gato"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "carro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/carro.png",
+            "fuentes": []
+          },
+          {
+            "id": "gato",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/gato.png",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SonidosDeAnimales",
+        "ruta": "QueSonidoEscuchas/SonidosDeAnimales",
+        "idsNecesarios": [
+          "gato",
+          "pajaro",
+          "perro"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "gato",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/gato.png",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SonidosDeObjetos",
+        "ruta": "QueSonidoEscuchas/SonidosDeObjetos",
+        "idsNecesarios": [
+          "campana",
+          "carro",
+          "pelota"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "carro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/carro.png",
+            "fuentes": []
+          },
+          {
+            "id": "pelota",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pelota.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SonidosSimilares",
+        "ruta": "QueSonidoEscuchas/SonidosSimilares",
+        "idsNecesarios": [
+          "campana",
+          "tambor",
+          "triangulo"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "tambor",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/tambor.svg",
+            "fuentes": []
+          },
+          {
+            "id": "triangulo",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/triangulo.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      }
+    ],
+    "RepiteLaSecuencia": [
+      {
+        "juego": "DosInstrumentos",
+        "ruta": "RepiteLaSecuencia/DosInstrumentos",
+        "idsNecesarios": [
+          "campana",
+          "maracas",
+          "tambor"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "tambor",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/tambor.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "DosSonidos",
+        "ruta": "RepiteLaSecuencia/DosSonidos",
+        "idsNecesarios": [
+          "gato",
+          "perro"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "gato",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/gato.png",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 2,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "ElGranCodigoSecreto",
+        "ruta": "RepiteLaSecuencia/ElGranCodigoSecreto",
+        "idsNecesarios": [
+          "campana",
+          "gato",
+          "pajaro",
+          "pelota",
+          "perro",
+          "tambor"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gato",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/gato.png",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pelota",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pelota.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          },
+          {
+            "id": "tambor",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/tambor.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 6,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "GranSecuenciaFinal",
+        "ruta": "RepiteLaSecuencia/GranSecuenciaFinal",
+        "idsNecesarios": [
+          "campana",
+          "pajaro",
+          "tambor"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "tambor",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/tambor.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SecuenciaConCambio",
+        "ruta": "RepiteLaSecuencia/SecuenciaConCambio",
+        "idsNecesarios": [
+          "campana",
+          "pajaro",
+          "perro",
+          "tambor"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          },
+          {
+            "id": "tambor",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/tambor.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 4,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SecuenciaConDistractor",
+        "ruta": "RepiteLaSecuencia/SecuenciaConDistractor",
+        "idsNecesarios": [
+          "gato",
+          "pelota",
+          "perro"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "gato",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/gato.png",
+            "fuentes": []
+          },
+          {
+            "id": "pelota",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pelota.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SecuenciaDe3Sonidos",
+        "ruta": "RepiteLaSecuencia/SecuenciaDe3Sonidos",
+        "idsNecesarios": [
+          "campana",
+          "maracas",
+          "pajaro",
+          "tambor"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "tambor",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/tambor.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 4,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SecuenciaDe3SonidosDiferentes",
+        "ruta": "RepiteLaSecuencia/SecuenciaDe3SonidosDiferentes",
+        "idsNecesarios": [
+          "campana",
+          "carro",
+          "maracas",
+          "perro"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "carro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/carro.png",
+            "fuentes": []
+          },
+          {
+            "id": "maracas",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/maracas.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 4,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "SecuenciaDe4Sonidos",
+        "ruta": "RepiteLaSecuencia/SecuenciaDe4Sonidos",
+        "idsNecesarios": [
+          "campana",
+          "gato",
+          "pajaro",
+          "perro",
+          "tambor"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "gato",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/gato.png",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          },
+          {
+            "id": "tambor",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/tambor.svg",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 5,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      },
+      {
+        "juego": "TresSonidos",
+        "ruta": "RepiteLaSecuencia/TresSonidos",
+        "idsNecesarios": [
+          "campana",
+          "pajaro",
+          "perro"
+        ],
+        "extra": [],
+        "clasificacion": [
+          {
+            "id": "campana",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/campana.svg",
+            "fuentes": []
+          },
+          {
+            "id": "pajaro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "SVG de diseño local",
+            "local": "img/pajaro.svg",
+            "fuentes": []
+          },
+          {
+            "id": "perro",
+            "estado": "ya_tiene_diseno",
+            "detalle": "PNG local",
+            "local": "img/perro.png",
+            "fuentes": []
+          }
+        ],
+        "conteo": {
+          "ya": 3,
+          "replicar": 0,
+          "falta": 0
+        },
+        "uiMotor": []
+      }
+    ]
+  },
+  "resumenGlobal": {
+    "objetosEnCatalogoFuente": 9,
+    "uiEnCatalogoFuente": 22,
+    "idsUnicosNecesariosEnEje": 52,
+    "idsReplicablesDesdeFuentes": [],
+    "idsFaltaDisenar": [
+      "aplaudiendo",
+      "corriendo",
+      "ducha",
+      "durmiendo",
+      "fuente",
+      "lluvia",
+      "manos",
+      "mar",
+      "pasos",
+      "pluma",
+      "regadera",
+      "saltando",
+      "viento"
+    ],
+    "slotsYaConArte": 202
+  },
+  "matrizReplicacion": {},
+  "faltaDisenarDetalle": {
+    "aplaudiendo": [
+      "AsociaSonidoEImagen/SonidoDeUnaAccion"
+    ],
+    "corriendo": [
+      "AsociaSonidoEImagen/SonidoDeUnaAccion"
+    ],
+    "ducha": [
+      "AsociaSonidoEImagen/SonidoDelAgua"
+    ],
+    "durmiendo": [
+      "AsociaSonidoEImagen/SonidoDeUnaAccion"
+    ],
+    "fuente": [
+      "AsociaSonidoEImagen/SonidoDelAgua"
+    ],
+    "lluvia": [
+      "QueSonidoEscuchas/LaMisionFinal",
+      "QueSonidoEscuchas/OtrosSonidosDeLaNaturaleza"
+    ],
+    "manos": [
+      "MemoriaAuditiva/QueEscuchaste"
+    ],
+    "mar": [
+      "QueSonidoEscuchas/LaMisionFinal",
+      "QueSonidoEscuchas/OtrosSonidosDeLaNaturaleza"
+    ],
+    "pasos": [
+      "MemoriaAuditiva/QueSonidoDesaparecio"
+    ],
+    "pluma": [
+      "AsociaSonidoEImagen/SonidoDelAgua"
+    ],
+    "regadera": [
+      "AsociaSonidoEImagen/SonidoDelAgua"
+    ],
+    "saltando": [
+      "AsociaSonidoEImagen/SonidoDeUnaAccion"
+    ],
+    "viento": [
+      "QueSonidoEscuchas/LaMisionFinal",
+      "QueSonidoEscuchas/OtrosSonidosDeLaNaturaleza"
+    ]
+  }
+}

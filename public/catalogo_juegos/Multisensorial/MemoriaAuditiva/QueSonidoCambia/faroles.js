@@ -30,6 +30,7 @@
             L.guirnalda = Math.max(L.bocina.y + L.bocina.r + 46, H * 0.27);
             L.paso = L.calle - Math.min(80, H * 0.09);
             L.tam = Math.max(56, Math.min(110, (L.der - 30) / 5.6, H * 0.13));
+            L.bocina = { x: 48, y: L.guirnalda + 10, r: 24 };
             return L;
         },
 
@@ -56,6 +57,10 @@
                 for (var py = L.calle + 10; py < h; py += 22) for (var px = (py / 22 % 2) * 20; px < w; px += 40) { x.beginPath(); x.ellipse(px, py, 16, 8, 0, 0, Math.PI * 2); x.fill(); }
             });
             keep(this.add.image(0, 0, 'faroles_noche').setOrigin(0, 0).setDepth(0));
+            keep(this.add.circle(L.W * 0.84, 78, 32, 0xfff3bf).setDepth(1));
+            keep(this.add.circle(L.W * 0.84 + 12, 70, 26, 0x12244e).setDepth(1));
+            keep(K.nino(this, 70, L.calle + 4, 12, { ropa: 0xffd43b, pelo: 0x212529, esc: 1.75 }));
+            this.sembrarMotes(keep, 14, { x: 0, y: 10, w: L.W, h: L.guirnalda, depth: 4 }, 0xffe066);
             var V = this.montarVida(keep);
             if (V) V.estrellas({ x: 0, y: 0, w: L.W, h: L.guirnalda - 30, depth: 1 }, 18);
             // Cuerda de la guirnalda.
@@ -271,6 +276,14 @@
         },
 
         paso: function (time) {
+            (this.faroles || []).forEach(function (f, i) {
+                if (!f.cont || !f.cont.active || (this.arrastrando && this.arrastrando.f === f)) return;
+                f.cont.angle = Math.sin(time / 600 + i) * 4;
+            }, this);
+            (this.desfile || []).forEach(function (f, i) {
+                if (!f || !f.cont || !f.cont.active) return;
+                f.cont.angle = Math.sin(time / 400 + i) * 3;
+            });
             var r = this.arrastrando;
             if (!r || this.fase !== 'jugar') return;
             var k = Math.min(1, (time - r.t0) / MANTENER);

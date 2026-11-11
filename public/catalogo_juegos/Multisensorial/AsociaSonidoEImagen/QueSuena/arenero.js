@@ -225,8 +225,8 @@
 
     /* ══ Escena ══ */
 
-    /** Imágenes diseñadas por el equipo para este juego (img/diseno/). Si falta alguna, queda el dibujo. */
-    var DISENO = 'img/diseno/';
+    /** Imágenes diseñadas por el equipo para este juego (img/). Si falta alguna, queda el dibujo. */
+    var DISENO = 'img/';
     var PIELES = ['avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca'];
     // Hueco del cajón dentro de carrito.svg (medido sobre la imagen de 420×314).
     var CAJON = { x0: 29, x1: 350, y0: 82, y1: 157 };
@@ -404,7 +404,7 @@
         },
 
         /**
-         * Sol y nubes del fondo, recortados de la imagen del diseño (img/diseno/sol.png, nubeN.png)
+         * Sol y nubes del fondo, recortados de la imagen del diseño (img/sol.png, nubeN.png)
          * y puestos en el mismo lugar: el sol respira y se balancea, las nubes viajan despacio.
          * Al tocarlos responden (el sol gira y sonríe más grande, la nube se infla).
          */
