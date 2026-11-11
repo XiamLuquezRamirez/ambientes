@@ -13,8 +13,8 @@
  *   brazo       contenedor en el hombro; el antebrazo cuelga de un codo (contenedor) para poder doblarlo.
  * "izq"/"der" son los lados de Zeus: él mira al niño, así que su mano izquierda queda a la derecha de la pantalla.
  *
- * GEOMETRIA.zonas son las zonas de destino (cabeza, ojos, cuello, pies) en las coords del contenedor de
- * la parte: siguen a Zeus cuando se mueve o cuando cambia la pantalla.
+ * GEOMETRIA.zonas son las zonas de destino en las coords del contenedor de la parte. orejas, manos y
+ * muñecas tienen dos elipses (izquierda y derecha). Siguen a Zeus cuando se mueve o cambia la pantalla.
  */
 (function (global) {
     "use strict";
@@ -147,8 +147,8 @@
         '<rect x="2" y="6" width="9" height="86" rx="4.5" fill="' + PIEL_SOMBRA + '" opacity=".5"/>'
     );
 
-    SVG.mano = svg([-54, -50, 108, 100],
-        '<ellipse cx="-29" cy="-4" rx="12" ry="21" transform="rotate(-28 -29 -4)" fill="' + PIEL + '" stroke="' + PIEL_SOMBRA + '" stroke-width="3"/>' +
+    SVG.mano = svg([-66, -50, 120, 100],
+        '<ellipse cx="-38" cy="6" rx="16" ry="10" transform="rotate(16 -38 6)" fill="' + PIEL + '" stroke="' + PIEL_SOMBRA + '" stroke-width="3"/>' +
         '<ellipse cx="-19" cy="26" rx="9" ry="15" fill="' + PIEL + '" stroke="' + PIEL_SOMBRA + '" stroke-width="3"/>' +
         '<ellipse cx="-6" cy="32" rx="9" ry="16" fill="' + PIEL + '" stroke="' + PIEL_SOMBRA + '" stroke-width="3"/>' +
         '<ellipse cx="7" cy="32" rx="9" ry="16" fill="' + PIEL + '" stroke="' + PIEL_SOMBRA + '" stroke-width="3"/>' +
@@ -177,9 +177,23 @@
         talon: { x: 20, y: -4 },
         zonas: {
             cabeza: { contenedor: "cabeza", x: 0, y: -262, rx: 165, ry: 78 },
-            ojos: { contenedor: "cabeza", x: 0, y: -150, rx: 128, ry: 52 },
-            cuello: { contenedor: "zeus", x: 0, y: -548, rx: 96, ry: 40 },
-            pies: { contenedor: "zeus", x: 0, y: -36, rx: 150, ry: 58 }
+            ojos: { contenedor: "cabeza", x: 0, y: -150, rx: 110, ry: 46 },
+            orejas: { partes: [
+                { contenedor: "cabeza", x: -146, y: -140, rx: 48, ry: 48 },
+                { contenedor: "cabeza", x: 146, y: -140, rx: 48, ry: 48 }
+            ] },
+            cuello: { contenedor: "zeus", x: 0, y: -548, rx: 70, ry: 34 },
+            torso: { contenedor: "zeus", x: 0, y: -450, rx: 115, ry: 72 },
+            manos: { partes: [
+                { contenedor: "manoIzq", x: 0, y: 14, rx: 48, ry: 46 },
+                { contenedor: "manoDer", x: 0, y: 14, rx: 48, ry: 46 }
+            ] },
+            munecas: { partes: [
+                { contenedor: "manoIzq", x: 0, y: -34, rx: 22, ry: 16 },
+                { contenedor: "manoDer", x: 0, y: -34, rx: 22, ry: 16 }
+            ] },
+            piernas: { contenedor: "zeus", x: 0, y: -240, rx: 120, ry: 155 },
+            pies: { contenedor: "zeus", x: 0, y: -36, rx: 140, ry: 52 }
         }
     };
 

@@ -2,8 +2,9 @@
  * EscenarioPhaser — escena Phaser 4 del vestidor de "¿Dónde se pone?" (window.EscenarioPhaser).
  *
  * Dibuja en #escenario-phaser: la tarima, el baúl mágico (con tapa que se abre), a Zeus armado por partes
- * (personaje.js) y los accesorios flotantes (accesorios.js). Las zonas de destino (cabeza, ojos, cuello, pies)
- * son Phaser.GameObjects.Zone dentro del contenedor de su parte (personaje.js → GEOMETRIA.zonas), así siguen
+ * (personaje.js) y los accesorios flotantes (accesorios.js). Las zonas de destino (cabeza, ojos, orejas,
+ * cuello, torso, manos, muñecas, piernas, pies) son Phaser.GameObjects.Zone dentro del contenedor de su
+ * parte (personaje.js → GEOMETRIA.zonas); orejas, manos y muñecas tienen dos elipses. Así siguen
  * a Zeus aunque se mueva o cambie la pantalla. El arrastre lo maneja arrastre.js con los objetos de items().
  *
  * API:
@@ -212,11 +213,14 @@
             var sup = parte("brazo");
             var codo = sc.add.container(G.codo.x, G.codo.y);
             var ante = parte("antebrazo");
-            var mano = parte("mano", G.mano.x, G.mano.y);
+            // La mano es un contenedor: ahí van el dibujo, los guantes, el reloj y sus zonas.
+            var manoSprite = parte("mano");
+            var mano = sc.add.container(G.mano.x, G.mano.y);
+            mano.add(manoSprite);
             if (k < 0) {
                 sup.setFlipX(true);
                 ante.setFlipX(true);
-                mano.setFlipX(true);
+                manoSprite.setFlipX(true);
             }
             codo.add([ante, mano]);
             b.add([sup, codo]);
@@ -251,44 +255,66 @@
 
     function contenedorDe(nombre) {
         if (nombre === "cabeza") return obj.cabeza;
+        if (nombre === "manoIzq" && obj.brazoIzq) return obj.brazoIzq.mano;
+        if (nombre === "manoDer" && obj.brazoDer) return obj.brazoDer.mano;
         return obj.zeus;
+    }
+
+    function partesDe(id) {
+        var z = zonas[id];
+        if (!z) return [];
+        return z.partes || [z];
     }
 
     function crearZonas() {
         Object.keys(G.zonas).forEach(function (id) {
-            var z = G.zonas[id];
-            var c = contenedorDe(z.contenedor);
-            var zona = sc.add.zone(z.x, z.y, z.rx * 2, z.ry * 2);
-            zona.zonaId = id;
-            zona.def = z;
-            c.add(zona);
-            zonas[id] = zona;
+            var def = G.zonas[id];
+            var partesDef = (def.partes && def.partes.length) ? def.partes : [def];
+            var primera = null;
+            partesDef.forEach(function (z) {
+                var c = contenedorDe(z.contenedor);
+                var zona = sc.add.zone(z.x, z.y, z.rx * 2, z.ry * 2);
+                zona.zonaId = id;
+                zona.def = z;
+                c.add(zona);
 
-            // Anillo de destino (se ve solo mientras se arrastra) y halo dorado de ayuda.
-            var an = sc.add.ellipse(z.x, z.y, z.rx * 2, z.ry * 2);
-            an.setStrokeStyle(10, 0xffffff, 0.95);
-            an.setFillStyle(0xfff6c8, 0.18);
-            an.setAlpha(0);
-            c.add(an);
-            anillos[id] = an;
+                var an = sc.add.ellipse(z.x, z.y, z.rx * 2, z.ry * 2);
+                an.setStrokeStyle(10, 0xffffff, 0.95);
+                an.setFillStyle(0xfff6c8, 0.18);
+                an.setAlpha(0);
+                c.add(an);
+                zona.anillo = an;
 
-            var h = sc.add.image(z.x, z.y, "fx-halo");
-            h.setBlendMode(Phaser.BlendModes.ADD);
-            h.setAlpha(0);
-            h.setScale(z.rx * 2.6 / 128, z.ry * 2.6 / 128);
-            h.baseX = h.scaleX;
-            h.baseY = h.scaleY;
-            c.add(h);
-            halos[id] = h;
+                var h = sc.add.image(z.x, z.y, "fx-halo");
+                h.setBlendMode(Phaser.BlendModes.ADD);
+                h.setAlpha(0);
+                h.setScale(z.rx * 2.6 / 128, z.ry * 2.6 / 128);
+                h.baseX = h.scaleX;
+                h.baseY = h.scaleY;
+                c.add(h);
+                zona.halo = h;
+
+                if (!primera) {
+                    primera = zona;
+                    primera.partes = [];
+                    zonas[id] = primera;
+                    anillos[id] = an;
+                    halos[id] = h;
+                }
+                primera.partes.push(zona);
+            });
         });
     }
 
     /** Los anillos y halos van encima de los accesorios puestos. */
     function subirMarcas() {
-        Object.keys(G.zonas).forEach(function (id) {
-            var c = contenedorDe(G.zonas[id].contenedor);
-            c.bringToTop(anillos[id]);
-            c.bringToTop(halos[id]);
+        Object.keys(zonas).forEach(function (id) {
+            partesDe(id).forEach(function (z) {
+                var c = z.parentContainer;
+                if (!c) return;
+                if (z.anillo) c.bringToTop(z.anillo);
+                if (z.halo) c.bringToTop(z.halo);
+            });
         });
     }
 
@@ -486,7 +512,18 @@
     async function llenarBandeja(lugares, opts) {
         opts = opts || {};
         if (lugares) lugaresActuales = Object.assign({}, lugares);
-        var ids = (cfg.accesorios || []).map(function (a) { return a.id; }).filter(function (id) { return !puestos[id]; });
+        var idsRonda = Object.keys(lugaresActuales);
+        if (!idsRonda.length) idsRonda = (cfg.accesorios || []).map(function (a) { return a.id; });
+        Object.keys(itemsMap).forEach(function (id) {
+            if (idsRonda.indexOf(id) >= 0 || puestos[id]) return;
+            var oculto = itemsMap[id];
+            sc.tweens.killTweensOf(oculto);
+            oculto.setVisible(false);
+            oculto.setAlpha(1);
+            oculto.estado = "guardado";
+            if (oculto.input) oculto.input.enabled = false;
+        });
+        var ids = idsRonda.filter(function (id) { return !puestos[id]; });
         var desde = opts.desdeBaul !== false;
         if (desde) await baul("abierto");
         var vuelos = ids.map(function (id, i) {
@@ -592,15 +629,39 @@
         return { x: p.x, y: p.y };
     }
 
-    /** Zona de destino bajo un punto del mundo (el centro del accesorio). Se ignoran las zonas ya ocupadas. */
-    function zonaBajo(x, y) {
-        var candidatos = Object.keys(zonas).filter(function (id) { return !zonaOcupada(id); }).map(function (id) {
-            var z = zonas[id];
-            var p = localDe(z, x, y);
-            return { id: id, d: global.Reglas.distanciaNormalizada(p.x, p.y, { x: 0, y: 0, rx: z.def.rx, ry: z.def.ry }) };
+    /** La zona entra en juego solo si esta ronda tiene un accesorio suyo todavía sin poner. */
+    function zonaEnJuego(id) {
+        var ids = Object.keys(lugaresActuales);
+        if (!ids.length) return false;
+        return ids.some(function (accId) {
+            var d = defAcc(accId);
+            return d && d.zona === id && !puestos[accId];
         });
+    }
+
+    function distanciasEn(x, y) {
+        return Object.keys(zonas).filter(function (id) { return !zonaOcupada(id) && zonaEnJuego(id); }).map(function (id) {
+            var mejor = null;
+            partesDe(id).forEach(function (z) {
+                var p = localDe(z, x, y);
+                var d = global.Reglas.distanciaNormalizada(p.x, p.y, { x: 0, y: 0, rx: z.def.rx, ry: z.def.ry });
+                if (mejor == null || d < mejor) mejor = d;
+            });
+            return { id: id, d: mejor };
+        });
+    }
+
+    /**
+     * Zona bajo un punto del mundo. Primero el centro del accesorio.
+     * Si el centro no alcanza ninguna zona, se prueba el dedo (x2, y2): el niño a veces agarra el borde.
+     */
+    function zonaBajo(x, y, x2, y2) {
         var tol = Number(cfg.juego && cfg.juego.tolerancia) || 1.25;
-        return { id: global.Reglas.elegirZona(candidatos, tol), candidatos: candidatos };
+        var centro = distanciasEn(x, y);
+        var idCentro = global.Reglas.elegirZona(centro, tol);
+        if (idCentro || x2 == null) return { id: idCentro, candidatos: centro };
+        var dedo = distanciasEn(x2, y2);
+        return { id: global.Reglas.elegirZona(dedo, tol), candidatos: dedo };
     }
 
     function zonaOcupada(zonaId) {
@@ -609,9 +670,11 @@
 
     /** Anillos de destino: on mientras se arrastra; `sobre` es la zona que el accesorio está tocando. */
     function destinos(on, sobre) {
-        Object.keys(anillos).forEach(function (id) {
-            var an = anillos[id];
-            var ver = on && !zonaOcupada(id);
+        Object.keys(zonas).forEach(function (id) {
+            partesDe(id).forEach(function (parte) {
+            var an = parte.anillo;
+            if (!an) return;
+            var ver = on && !zonaOcupada(id) && zonaEnJuego(id);
             var resaltado = ver && id === sobre;
             if (an.estadoVisible === ver && an.resaltado === resaltado) return;
             an.estadoVisible = ver;
@@ -631,32 +694,65 @@
                 if (!reducido) sc.tweens.add({ targets: an, alpha: 0.8, duration: 700, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
                 else an.setAlpha(0.7);
             }
+            });
         });
     }
 
     // ------------------------------------------------------------------ encaje
 
+    function ponerPar(lados, clave, k, y, espejarDerecha) {
+        var lista = [];
+        lados.forEach(function (lado, i) {
+            if (!lado) return;
+            var t = acc(clave, 0, y || 0);
+            t.setScale(t.escalaBase * k);
+            t.escalaBase = t.escalaBase * k;
+            if (espejarDerecha && i === 1) t.setFlipX(true);
+            lado.add(t);
+            lista.push(t);
+        });
+        return lista;
+    }
+
+    function insertarBajo(ancla, im) {
+        var idx = ancla ? obj.zeus.getIndex(ancla) : -1;
+        if (idx < 0) obj.zeus.add(im);
+        else obj.zeus.addAt(im, idx);
+    }
+
+    /** Orejas, luego ojos, luego lo que va en la cabeza: el sombrero o la gorra queda encima. */
+    function ordenarCabeza() {
+        ["orejas", "ojos", "cabeza"].forEach(function (zona) {
+            Object.keys(puestos).forEach(function (id) {
+                var d = defAcc(id);
+                if (!d || d.zona !== zona) return;
+                (puestos[id] || []).forEach(function (p) {
+                    if (p.parentContainer) p.parentContainer.bringToTop(p);
+                });
+            });
+        });
+    }
+
     function piezaFinal(d) {
         var pf = d.posicionFinal || {};
         var k = Number(d.escalaFinal) || 1;
-        var lista = [];
-        if (pf.contenedor === "pies") {
-            [obj.pieIzq, obj.pieDer].forEach(function (pie) {
-                var t = acc("tenis", 0, 0);
-                t.setScale(t.escalaBase * k);
-                t.escalaBase = t.escalaBase * k;
-                pie.add(t);
-                lista.push(t);
-            });
-            return lista;
+        var puesta = d.puesta || (pf.contenedor === "pies" ? "parPies" : "");
+        if (puesta === "parPies") {
+            return ponerPar([obj.pieIzq, obj.pieDer], d.imagenPuesta || "tenis", k, 0, false);
         }
-        var c = contenedorDe(pf.contenedor);
-        var clave = d.imagen === "bufanda_icono" ? "bufanda" : d.imagen;
+        if (puesta === "parManos") {
+            return ponerPar([obj.brazoIzq.mano, obj.brazoDer.mano], d.imagenPuesta || d.imagen, k, pf.y || 0, true);
+        }
+        if (puesta === "parMunecas") {
+            return ponerPar([obj.brazoIzq.mano, obj.brazoDer.mano], d.imagenPuesta || d.imagen, k, pf.y != null ? pf.y : -32, true);
+        }
+        var lista = [];
+        var clave = d.imagen === "bufanda_icono" ? "bufanda" : (puesta === "torso" && d.imagenPuesta ? d.imagenPuesta : d.imagen);
         var im = acc(clave, pf.x || 0, pf.y || 0);
         im.setScale(im.escalaBase * k);
         im.escalaBase = im.escalaBase * k;
         if (clave === "bufanda") {
-            // la bufanda va entre el cuerpo y la cabeza; su cola cuelga del nudo
+            var c = obj.zeus;
             c.addAt(im, c.getIndex(obj.cabeza));
             var cola = acc("bufanda_cola", (pf.x || 0) + 52, (pf.y || 0) + 16);
             cola.setScale(cola.escalaBase * k);
@@ -665,11 +761,37 @@
             im.cola = cola;
             obj.bufandaCola = cola;
             lista.push(im, cola);
-        } else {
-            c.add(im);
+        } else if (puesta === "torso") {
+            insertarBajo(obj.brazoDer, im);
             lista.push(im);
-            // el sombrero siempre encima de las gafas
-            if (puestos.sombrero && clave === "gafas") puestos.sombrero.forEach(function (s) { c.bringToTop(s); });
+            if (d.imagenManga && obj.brazoIzq) {
+                [obj.brazoIzq, obj.brazoDer].forEach(function (b) {
+                    var m = acc(d.imagenManga, 0, 0);
+                    m.setScale(m.escalaBase * k);
+                    m.escalaBase = m.escalaBase * k;
+                    if (b.k < 0) m.setFlipX(true);
+                    b.addAt(m, 1);
+                    lista.push(m);
+                    if (d.imagenAntebrazo && b.codo) {
+                        var a = acc(d.imagenAntebrazo, 0, 0);
+                        a.setScale(a.escalaBase * k);
+                        a.escalaBase = a.escalaBase * k;
+                        if (b.k < 0) a.setFlipX(true);
+                        b.codo.addAt(a, 1);
+                        lista.push(a);
+                    }
+                });
+            }
+        } else if (puesta === "piernas") {
+            insertarBajo(obj.pieIzq, im);
+            lista.push(im);
+        } else if (puesta === "cuello") {
+            obj.zeus.addAt(im, obj.zeus.getIndex(obj.cabeza));
+            lista.push(im);
+        } else {
+            var c2 = contenedorDe(pf.contenedor);
+            c2.add(im);
+            lista.push(im);
         }
         return lista;
     }
@@ -677,14 +799,18 @@
     /** Punto del mundo donde termina el accesorio (centro de su lugar en Zeus). */
     function destinoMundo(d) {
         var pf = d.posicionFinal || {};
-        if (pf.contenedor === "pies") return mundoDe(obj.zeus, 0, -34);
+        if (d.puesta === "parPies" || pf.contenedor === "pies") return mundoDe(obj.zeus, 0, -34);
+        if (d.puesta === "parManos" && obj.brazoIzq) return mundoDe(obj.brazoIzq.mano, 0, pf.y || 0);
+        if (d.puesta === "parMunecas" && obj.brazoIzq) return mundoDe(obj.brazoIzq.mano, 0, pf.y != null ? pf.y : -32);
         if (d.imagen === "bufanda_icono") return mundoDe(obj.zeus, (pf.x || 0) + 10, (pf.y || 0) + 30);
         return mundoDe(contenedorDe(pf.contenedor), pf.x || 0, pf.y || 0);
     }
 
     /** Escala del dibujo de la bandeja cuando llega a Zeus (mismo tamaño que tendrá encajado). */
     function escalaLlegada(c, d) {
-        var ancho = (d.imagen === "tenis_par" ? 250 : c.dibujo.ancho) * (Number(d.escalaFinal) || 1) * obj.zeus.scaleX;
+        var ref = c.dibujo.ancho;
+        if (d.imagenPuesta && A.SVG[d.imagenPuesta]) ref = A.origen(A.SVG[d.imagenPuesta]).w;
+        var ancho = ref * (Number(d.escalaFinal) || 1) * obj.zeus.scaleX;
         return ancho / (c.dibujo.ancho * RES * c.dibujo.escalaBase);
     }
 
@@ -707,6 +833,7 @@
         c.estado = "colocado";
         var piezas = piezaFinal(d);
         puestos[id] = piezas;
+        ordenarCabeza();
         subirMarcas();
         await animarEncaje(d, piezas);
         estrellas(dest.x, dest.y, 18, null, 1);
@@ -741,13 +868,14 @@
                 });
             }));
         }
-        // deslizar (gafas): bajan un poquito y se ajustan con un rebote
-        var g = piezas[0];
-        var b0 = g.escalaBase;
-        var gy = g.y;
-        g.setScale(b0 * 1.18);
-        g.y = gy - 22;
-        return tw({ targets: g, scale: b0, y: gy, duration: 380, ease: "Back.easeOut" });
+        // deslizar (gafas, reloj, chaqueta…): bajan un poquito y se ajustan con un rebote
+        return Promise.all(piezas.map(function (g) {
+            var b0 = g.escalaBase;
+            var gy = g.y;
+            g.setScale(b0 * 1.18);
+            g.y = gy - 22;
+            return tw({ targets: g, scale: b0, y: gy, duration: 380, ease: "Back.easeOut" });
+        }));
     }
 
     function ondearBufanda(on) {
@@ -794,8 +922,13 @@
 
     function brillo(zonaId, opts) {
         opts = opts || {};
-        var h = halos[zonaId];
-        if (!h) return;
+        var lista = partesDe(zonaId).map(function (z) { return z.halo; }).filter(Boolean);
+        if (!lista.length && halos[zonaId]) lista = [halos[zonaId]];
+        if (!lista.length) return;
+        lista.forEach(function (h) { brilloUno(h, opts); });
+    }
+
+    function brilloUno(h, opts) {
         sc.tweens.killTweensOf(h);
         if (opts.on === false) {
             sc.tweens.add({ targets: h, alpha: 0, duration: 250 });

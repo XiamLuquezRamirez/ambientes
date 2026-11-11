@@ -18,29 +18,82 @@
   },
   "juego": {
     "rondas": 3,
-    "ordenInicial": ["gafas", "sombrero", "zapatos", "bufanda"],
+    "porRonda": 4,
+    "noJuntas": [
+      [
+        "manos",
+        "munecas"
+      ]
+    ],
     "tolerancia": 1.25,
     "ayudaMs": 8000,
     "ayudaRepetirMs": 9000,
     "erroresParaBrillo": 2
   },
   "zonas": {
-    "cabeza": { "nombre": "la cabeza" },
-    "ojos": { "nombre": "los ojos" },
-    "cuello": { "nombre": "el cuello" },
-    "pies": { "nombre": "los pies" }
+    "cabeza": {
+      "nombre": "la cabeza"
+    },
+    "ojos": {
+      "nombre": "los ojos"
+    },
+    "orejas": {
+      "nombre": "las orejas"
+    },
+    "cuello": {
+      "nombre": "el cuello"
+    },
+    "torso": {
+      "nombre": "el cuerpo"
+    },
+    "manos": {
+      "nombre": "las manos"
+    },
+    "munecas": {
+      "nombre": "las muñecas"
+    },
+    "piernas": {
+      "nombre": "las piernas"
+    },
+    "pies": {
+      "nombre": "los pies"
+    }
   },
   "lugares": [
-    { "x": 0.15, "y": 0.3 },
-    { "x": 0.85, "y": 0.4 },
-    { "x": 0.15, "y": 0.58 },
-    { "x": 0.85, "y": 0.7 }
+    {
+      "x": 0.15,
+      "y": 0.3
+    },
+    {
+      "x": 0.85,
+      "y": 0.4
+    },
+    {
+      "x": 0.15,
+      "y": 0.58
+    },
+    {
+      "x": 0.85,
+      "y": 0.7
+    }
   ],
   "lugaresRetrato": [
-    { "x": 0.15, "y": 0.1 },
-    { "x": 0.85, "y": 0.1 },
-    { "x": 0.13, "y": 0.43 },
-    { "x": 0.87, "y": 0.43 }
+    {
+      "x": 0.15,
+      "y": 0.1
+    },
+    {
+      "x": 0.85,
+      "y": 0.1
+    },
+    {
+      "x": 0.13,
+      "y": 0.43
+    },
+    {
+      "x": 0.87,
+      "y": 0.43
+    }
   ],
   "accesorios": [
     {
@@ -49,15 +102,22 @@
       "imagen": "gafas",
       "zona": "ojos",
       "posicionInicial": 0,
-      "posicionFinal": { "contenedor": "cabeza", "x": 0, "y": -150 },
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -150
+      },
       "escalaFinal": 1,
       "encaje": "deslizar",
       "animacionPersonaje": "modelo",
       "sonido": "acierto",
       "textos": {
-        "instruccion": ["¡Hora de disfrazarse! Ayúdame a ponerme cada cosa en su lugar. ¿Dónde van las gafas de sol?", "¿Dónde van mis gafas de sol?"],
+        "instruccion": [
+          "¡Mira las gafas de sol! ¿Dónde se pone Zeus las gafas de sol?",
+          "¿Dónde se pone Zeus las gafas de sol?"
+        ],
         "ayuda": "¡Las gafas sirven para ver! Mira la carita de Zeus: ¿dónde están sus ojos?",
-        "acierto": "¡Qué bien me quedan!"
+        "acierto": "¡Muy bien! Así se pone Zeus las gafas de sol."
       }
     },
     {
@@ -66,32 +126,48 @@
       "imagen": "sombrero",
       "zona": "cabeza",
       "posicionInicial": 1,
-      "posicionFinal": { "contenedor": "cabeza", "x": 0, "y": -238 },
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -238
+      },
       "escalaFinal": 1,
       "encaje": "caer",
       "animacionPersonaje": "sombrero",
       "sonido": "aparece",
       "textos": {
-        "instruccion": ["¡Ahora busca mi sombrero! ¿Dónde debo colocarlo?", "¿Dónde me pongo el sombrero?"],
+        "instruccion": [
+          "¡Mira el sombrero! ¿Dónde se pone Zeus el sombrero?",
+          "¿Dónde se pone Zeus el sombrero?"
+        ],
         "ayuda": "El sombrero va arriba, arriba, ¡en lo más alto de Zeus!",
-        "acierto": "¡Qué estilo! ¡Mi sombrero está perfecto!"
+        "acierto": "¡Muy bien! Así se pone Zeus el sombrero."
       }
     },
     {
       "id": "zapatos",
       "nombre": "los tenis",
       "imagen": "tenis_par",
+      "imagenPuesta": "tenis",
+      "puesta": "parPies",
       "zona": "pies",
       "posicionInicial": 2,
-      "posicionFinal": { "contenedor": "pies", "x": 0, "y": 0 },
+      "posicionFinal": {
+        "contenedor": "pies",
+        "x": 0,
+        "y": 0
+      },
       "escalaFinal": 1,
       "encaje": "calzar",
       "animacionPersonaje": "baile",
       "sonido": "bote",
       "textos": {
-        "instruccion": ["¡Necesito mis zapatos! ¿Dónde van mis tenis?", "¿Dónde me pongo los tenis?"],
+        "instruccion": [
+          "¡Mira los tenis! ¿Dónde se pone Zeus los tenis?",
+          "¿Dónde se pone Zeus los tenis?"
+        ],
         "ayuda": "Los tenis son para caminar. Mira abajo, ¿dónde están los pies de Zeus?",
-        "acierto": "¡Listos para correr y bailar!"
+        "acierto": "¡Muy bien! Así se pone Zeus los tenis."
       }
     },
     {
@@ -100,25 +176,841 @@
       "imagen": "bufanda_icono",
       "zona": "cuello",
       "posicionInicial": 3,
-      "posicionFinal": { "contenedor": "zeus", "x": 0, "y": -548 },
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -548
+      },
       "escalaFinal": 1,
       "encaje": "envolver",
       "animacionPersonaje": "bufanda",
       "sonido": "acierto",
       "textos": {
-        "instruccion": ["¡Me falta mi bufanda! ¿Dónde debo ponérmela?", "¿Dónde va mi bufanda?"],
+        "instruccion": [
+          "¡Mira la bufanda! ¿Dónde se pone Zeus la bufanda?",
+          "¿Dónde se pone Zeus la bufanda?"
+        ],
         "ayuda": "La bufanda abriga. Va entre la cabeza y la camiseta de Zeus: ¡en su cuello!",
-        "acierto": "¡Calientito y elegante! ¡Mi bufanda quedó perfecta!"
+        "acierto": "¡Muy bien! Así se pone Zeus la bufanda."
+      }
+    },
+    {
+      "id": "audifonos",
+      "nombre": "los audífonos",
+      "imagen": "audifonos",
+      "zona": "orejas",
+      "posicionInicial": 0,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -140
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira los audífonos! ¿Dónde se pone Zeus los audífonos?",
+          "¿Dónde se pone Zeus los audífonos?"
+        ],
+        "ayuda": "Los audífonos se escuchan con las orejas. Mira los lados de la cara de Zeus.",
+        "acierto": "¡Muy bien! Así se pone Zeus los audífonos."
+      }
+    },
+    {
+      "id": "collar",
+      "nombre": "el collar",
+      "imagen": "collar",
+      "zona": "cuello",
+      "posicionInicial": 1,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -548
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "puesta": "cuello",
+      "animacionPersonaje": "bufanda",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira el collar! ¿Dónde se pone Zeus el collar?",
+          "¿Dónde se pone Zeus el collar?"
+        ],
+        "ayuda": "El collar brilla en el cuello de Zeus, entre la cabeza y la camiseta.",
+        "acierto": "¡Muy bien! Así se pone Zeus el collar."
+      }
+    },
+    {
+      "id": "chaqueta",
+      "nombre": "la chaqueta",
+      "imagen": "chaqueta_icono",
+      "imagenPuesta": "chaqueta",
+      "imagenManga": "chaqueta_manga",
+      "imagenAntebrazo": "chaqueta_ante",
+      "zona": "torso",
+      "posicionInicial": 2,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -450
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "puesta": "torso",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira la chaqueta! ¿Dónde se pone Zeus la chaqueta?",
+          "¿Dónde se pone Zeus la chaqueta?"
+        ],
+        "ayuda": "La chaqueta abriga el cuerpo. Va sobre la camiseta de Zeus.",
+        "acierto": "¡Muy bien! Así se pone Zeus la chaqueta."
+      }
+    },
+    {
+      "id": "pantalones",
+      "nombre": "los pantalones",
+      "imagen": "pantalones",
+      "zona": "piernas",
+      "posicionInicial": 3,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -270
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "puesta": "piernas",
+      "animacionPersonaje": "baile",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira los pantalones! ¿Dónde se pone Zeus los pantalones?",
+          "¿Dónde se pone Zeus los pantalones?"
+        ],
+        "ayuda": "Los pantalones cubren las piernas de Zeus, debajo de la camiseta.",
+        "acierto": "¡Muy bien! Así se pone Zeus los pantalones."
+      }
+    },
+    {
+      "id": "guantes",
+      "nombre": "los guantes rojos",
+      "imagen": "guantes_par",
+      "imagenPuesta": "guante",
+      "puesta": "parManos",
+      "zona": "manos",
+      "posicionInicial": 0,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": 0
+      },
+      "escalaFinal": 1,
+      "encaje": "calzar",
+      "animacionPersonaje": "baile",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira los guantes rojos! ¿Dónde se pone Zeus los guantes rojos?",
+          "¿Dónde se pone Zeus los guantes rojos?"
+        ],
+        "ayuda": "Los guantes rojos cubren las manos de Zeus. Mira dónde terminan sus brazos.",
+        "acierto": "¡Muy bien! Así se pone Zeus los guantes rojos."
+      }
+    },
+    {
+      "id": "reloj",
+      "nombre": "el reloj",
+      "imagen": "reloj",
+      "imagenPuesta": "reloj",
+      "puesta": "parMunecas",
+      "zona": "munecas",
+      "posicionInicial": 1,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -32
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira el reloj! ¿Dónde se pone Zeus el reloj?",
+          "¿Dónde se pone Zeus el reloj?"
+        ],
+        "ayuda": "El reloj se abrocha en la muñeca de Zeus, justo antes de la mano.",
+        "acierto": "¡Muy bien! Así se pone Zeus el reloj."
+      }
+    },
+    {
+      "id": "manilla",
+      "nombre": "la manilla",
+      "imagen": "manilla",
+      "imagenPuesta": "manilla",
+      "puesta": "parMunecas",
+      "zona": "munecas",
+      "posicionInicial": 2,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -32
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira la manilla! ¿Dónde se pone Zeus la manilla?",
+          "¿Dónde se pone Zeus la manilla?"
+        ],
+        "ayuda": "La manilla se pone en la muñeca de Zeus, pegada a la mano.",
+        "acierto": "¡Muy bien! Así se pone Zeus la manilla."
+      }
+    },
+    {
+      "id": "chanclas",
+      "nombre": "las chanclas",
+      "imagen": "chanclas_par",
+      "imagenPuesta": "chancla",
+      "puesta": "parPies",
+      "zona": "pies",
+      "posicionInicial": 3,
+      "posicionFinal": {
+        "contenedor": "pies",
+        "x": 0,
+        "y": 0
+      },
+      "escalaFinal": 1,
+      "encaje": "calzar",
+      "animacionPersonaje": "baile",
+      "sonido": "bote",
+      "textos": {
+        "instruccion": [
+          "¡Mira las chanclas! ¿Dónde se pone Zeus las chanclas?",
+          "¿Dónde se pone Zeus las chanclas?"
+        ],
+        "ayuda": "Las chanclas son para los pies. Mira abajo, donde Zeus se para.",
+        "acierto": "¡Muy bien! Así se pone Zeus las chanclas."
+      }
+    },
+    {
+      "id": "botas",
+      "nombre": "las botas",
+      "imagen": "botas_par",
+      "imagenPuesta": "bota",
+      "puesta": "parPies",
+      "zona": "pies",
+      "posicionInicial": 0,
+      "posicionFinal": {
+        "contenedor": "pies",
+        "x": 0,
+        "y": 0
+      },
+      "escalaFinal": 1,
+      "encaje": "calzar",
+      "animacionPersonaje": "baile",
+      "sonido": "bote",
+      "textos": {
+        "instruccion": [
+          "¡Mira las botas! ¿Dónde se pone Zeus las botas?",
+          "¿Dónde se pone Zeus las botas?"
+        ],
+        "ayuda": "Las botas cubren los pies de Zeus y un poquito del tobillo.",
+        "acierto": "¡Muy bien! Así se pone Zeus las botas."
+      }
+    },
+    {
+      "id": "sandalias",
+      "nombre": "las sandalias",
+      "imagen": "sandalias_par",
+      "imagenPuesta": "sandalia",
+      "puesta": "parPies",
+      "zona": "pies",
+      "posicionInicial": 1,
+      "posicionFinal": {
+        "contenedor": "pies",
+        "x": 0,
+        "y": 0
+      },
+      "escalaFinal": 1,
+      "encaje": "calzar",
+      "animacionPersonaje": "baile",
+      "sonido": "bote",
+      "textos": {
+        "instruccion": [
+          "¡Mira las sandalias! ¿Dónde se pone Zeus las sandalias?",
+          "¿Dónde se pone Zeus las sandalias?"
+        ],
+        "ayuda": "Las sandalias se amarran en los pies de Zeus. Mira abajo.",
+        "acierto": "¡Muy bien! Así se pone Zeus las sandalias."
+      }
+    },
+    {
+      "id": "gorra",
+      "nombre": "la gorra",
+      "imagen": "gorra",
+      "zona": "cabeza",
+      "posicionInicial": 2,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -238
+      },
+      "escalaFinal": 1,
+      "encaje": "caer",
+      "animacionPersonaje": "sombrero",
+      "sonido": "aparece",
+      "textos": {
+        "instruccion": [
+          "¡Mira la gorra! ¿Dónde se pone Zeus la gorra?",
+          "¿Dónde se pone Zeus la gorra?"
+        ],
+        "ayuda": "La gorra va en la cabeza de Zeus, arriba de todo.",
+        "acierto": "¡Muy bien! Así se pone Zeus la gorra."
+      }
+    },
+    {
+      "id": "gorra_roja",
+      "nombre": "la gorra roja",
+      "imagen": "gorra_roja",
+      "zona": "cabeza",
+      "posicionInicial": 3,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -238
+      },
+      "escalaFinal": 1,
+      "encaje": "caer",
+      "animacionPersonaje": "sombrero",
+      "sonido": "aparece",
+      "textos": {
+        "instruccion": [
+          "¡Mira la gorra roja! ¿Dónde se pone Zeus la gorra roja?",
+          "¿Dónde se pone Zeus la gorra roja?"
+        ],
+        "ayuda": "La gorra roja también va en la cabeza de Zeus.",
+        "acierto": "¡Muy bien! Así se pone Zeus la gorra roja."
+      }
+    },
+    {
+      "id": "gorro",
+      "nombre": "el gorro",
+      "imagen": "gorro",
+      "zona": "cabeza",
+      "posicionInicial": 0,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -238
+      },
+      "escalaFinal": 1,
+      "encaje": "caer",
+      "animacionPersonaje": "sombrero",
+      "sonido": "aparece",
+      "textos": {
+        "instruccion": [
+          "¡Mira el gorro! ¿Dónde se pone Zeus el gorro?",
+          "¿Dónde se pone Zeus el gorro?"
+        ],
+        "ayuda": "El gorro abriga la cabeza de Zeus. Va arriba.",
+        "acierto": "¡Muy bien! Así se pone Zeus el gorro."
+      }
+    },
+    {
+      "id": "gorro_fiesta",
+      "nombre": "el gorro de fiesta",
+      "imagen": "gorro_fiesta",
+      "zona": "cabeza",
+      "posicionInicial": 1,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -238
+      },
+      "escalaFinal": 1,
+      "encaje": "caer",
+      "animacionPersonaje": "sombrero",
+      "sonido": "aparece",
+      "textos": {
+        "instruccion": [
+          "¡Mira el gorro de fiesta! ¿Dónde se pone Zeus el gorro de fiesta?",
+          "¿Dónde se pone Zeus el gorro de fiesta?"
+        ],
+        "ayuda": "El gorro de fiesta se pone en la cabeza de Zeus.",
+        "acierto": "¡Muy bien! Así se pone Zeus el gorro de fiesta."
+      }
+    },
+    {
+      "id": "sombrero_copa",
+      "nombre": "el sombrero de copa",
+      "imagen": "sombrero_copa",
+      "zona": "cabeza",
+      "posicionInicial": 2,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -238
+      },
+      "escalaFinal": 1,
+      "encaje": "caer",
+      "animacionPersonaje": "sombrero",
+      "sonido": "aparece",
+      "textos": {
+        "instruccion": [
+          "¡Mira el sombrero de copa! ¿Dónde se pone Zeus el sombrero de copa?",
+          "¿Dónde se pone Zeus el sombrero de copa?"
+        ],
+        "ayuda": "El sombrero de copa va en la cabeza de Zeus, bien arriba.",
+        "acierto": "¡Muy bien! Así se pone Zeus el sombrero de copa."
+      }
+    },
+    {
+      "id": "abrigo",
+      "nombre": "el abrigo",
+      "imagen": "abrigo_icono",
+      "imagenPuesta": "abrigo",
+      "imagenManga": "abrigo_manga",
+      "imagenAntebrazo": "abrigo_ante",
+      "zona": "torso",
+      "posicionInicial": 3,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -450
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "puesta": "torso",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira el abrigo! ¿Dónde se pone Zeus el abrigo?",
+          "¿Dónde se pone Zeus el abrigo?"
+        ],
+        "ayuda": "El abrigo cubre la camiseta de Zeus. Va en el cuerpo.",
+        "acierto": "¡Muy bien! Así se pone Zeus el abrigo."
+      }
+    },
+    {
+      "id": "chaleco",
+      "nombre": "el chaleco",
+      "imagen": "chaleco",
+      "zona": "torso",
+      "posicionInicial": 0,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -450
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "puesta": "torso",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira el chaleco! ¿Dónde se pone Zeus el chaleco?",
+          "¿Dónde se pone Zeus el chaleco?"
+        ],
+        "ayuda": "El chaleco va sobre la camiseta de Zeus. Los brazos quedan libres.",
+        "acierto": "¡Muy bien! Así se pone Zeus el chaleco."
+      }
+    },
+    {
+      "id": "jeans",
+      "nombre": "el pantalón azul",
+      "imagen": "jeans",
+      "zona": "piernas",
+      "posicionInicial": 1,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -270
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "puesta": "piernas",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira el pantalón azul! ¿Dónde se pone Zeus el pantalón azul?",
+          "¿Dónde se pone Zeus el pantalón azul?"
+        ],
+        "ayuda": "El pantalón azul cubre las piernas de Zeus.",
+        "acierto": "¡Muy bien! Así se pone Zeus el pantalón azul."
+      }
+    },
+    {
+      "id": "pantaloneta",
+      "nombre": "la pantaloneta",
+      "imagen": "pantaloneta",
+      "zona": "piernas",
+      "posicionInicial": 2,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -270
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "puesta": "piernas",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira la pantaloneta! ¿Dónde se pone Zeus la pantaloneta?",
+          "¿Dónde se pone Zeus la pantaloneta?"
+        ],
+        "ayuda": "La pantaloneta va en la cintura de Zeus. Las piernas quedan afuera.",
+        "acierto": "¡Muy bien! Así se pone Zeus la pantaloneta."
+      }
+    },
+    {
+      "id": "mocasines",
+      "nombre": "los zapatos café",
+      "imagen": "mocasines_par",
+      "imagenPuesta": "mocasin",
+      "puesta": "parPies",
+      "zona": "pies",
+      "posicionInicial": 3,
+      "posicionFinal": {
+        "contenedor": "pies",
+        "x": 0,
+        "y": 0
+      },
+      "escalaFinal": 1,
+      "encaje": "calzar",
+      "animacionPersonaje": "baile",
+      "sonido": "bote",
+      "textos": {
+        "instruccion": [
+          "¡Mira los zapatos café! ¿Dónde se pone Zeus los zapatos café?",
+          "¿Dónde se pone Zeus los zapatos café?"
+        ],
+        "ayuda": "Los zapatos café se calzan en los pies de Zeus. Mira abajo.",
+        "acierto": "¡Muy bien! Así se pone Zeus los zapatos café."
+      }
+    },
+    {
+      "id": "pantuflas",
+      "nombre": "las pantuflas",
+      "imagen": "pantuflas_par",
+      "imagenPuesta": "pantufla",
+      "puesta": "parPies",
+      "zona": "pies",
+      "posicionInicial": 0,
+      "posicionFinal": {
+        "contenedor": "pies",
+        "x": 0,
+        "y": 0
+      },
+      "escalaFinal": 1,
+      "encaje": "calzar",
+      "animacionPersonaje": "baile",
+      "sonido": "bote",
+      "textos": {
+        "instruccion": [
+          "¡Mira las pantuflas! ¿Dónde se pone Zeus las pantuflas?",
+          "¿Dónde se pone Zeus las pantuflas?"
+        ],
+        "ayuda": "Las pantuflas se ponen en los pies de Zeus.",
+        "acierto": "¡Muy bien! Así se pone Zeus las pantuflas."
+      }
+    },
+    {
+      "id": "visera",
+      "nombre": "la visera",
+      "imagen": "visera",
+      "zona": "cabeza",
+      "posicionInicial": 1,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -238
+      },
+      "escalaFinal": 1,
+      "encaje": "caer",
+      "animacionPersonaje": "sombrero",
+      "sonido": "aparece",
+      "textos": {
+        "instruccion": [
+          "¡Mira la visera! ¿Dónde se pone Zeus la visera?",
+          "¿Dónde se pone Zeus la visera?"
+        ],
+        "ayuda": "La visera va en la cabeza de Zeus, con el ala hacia el frente.",
+        "acierto": "¡Muy bien! Así se pone Zeus la visera."
+      }
+    },
+    {
+      "id": "antifaz",
+      "nombre": "el antifaz",
+      "imagen": "antifaz",
+      "zona": "ojos",
+      "posicionInicial": 2,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -150
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira el antifaz! ¿Dónde se pone Zeus el antifaz?",
+          "¿Dónde se pone Zeus el antifaz?"
+        ],
+        "ayuda": "El antifaz tapa los ojos de Zeus. Mira su carita.",
+        "acierto": "¡Muy bien! Así se pone Zeus el antifaz."
+      }
+    },
+    {
+      "id": "gafas_redondas",
+      "nombre": "las gafas redondas",
+      "imagen": "gafas_redondas",
+      "zona": "ojos",
+      "posicionInicial": 3,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -150
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira las gafas redondas! ¿Dónde se pone Zeus las gafas redondas?",
+          "¿Dónde se pone Zeus las gafas redondas?"
+        ],
+        "ayuda": "Las gafas redondas también van en los ojos de Zeus.",
+        "acierto": "¡Muy bien! Así se pone Zeus las gafas redondas."
+      }
+    },
+    {
+      "id": "orejeras",
+      "nombre": "las orejeras",
+      "imagen": "orejeras",
+      "zona": "orejas",
+      "posicionInicial": 0,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -140
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira las orejeras! ¿Dónde se pone Zeus las orejeras?",
+          "¿Dónde se pone Zeus las orejeras?"
+        ],
+        "ayuda": "Las orejeras abrigan las orejas de Zeus, a los lados de la cara.",
+        "acierto": "¡Muy bien! Así se pone Zeus las orejeras."
+      }
+    },
+    {
+      "id": "cascos",
+      "nombre": "los cascos",
+      "imagen": "cascos",
+      "zona": "orejas",
+      "posicionInicial": 1,
+      "posicionFinal": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -140
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira los cascos! ¿Dónde se pone Zeus los cascos?",
+          "¿Dónde se pone Zeus los cascos?"
+        ],
+        "ayuda": "Los cascos se escuchan con las orejas. Mira los lados de la cara de Zeus.",
+        "acierto": "¡Muy bien! Así se pone Zeus los cascos."
+      }
+    },
+    {
+      "id": "sudadera",
+      "nombre": "la sudadera",
+      "imagen": "sudadera_icono",
+      "imagenPuesta": "sudadera",
+      "imagenManga": "sudadera_manga",
+      "imagenAntebrazo": "sudadera_ante",
+      "zona": "torso",
+      "posicionInicial": 3,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -450
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "puesta": "torso",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira la sudadera! ¿Dónde se pone Zeus la sudadera?",
+          "¿Dónde se pone Zeus la sudadera?"
+        ],
+        "ayuda": "La sudadera cubre la camiseta de Zeus. Va en el cuerpo.",
+        "acierto": "¡Muy bien! Así se pone Zeus la sudadera."
+      }
+    },
+    {
+      "id": "guantes_azules",
+      "nombre": "los guantes azules",
+      "imagen": "guantes_azules_par",
+      "imagenPuesta": "guante_azul",
+      "puesta": "parManos",
+      "zona": "manos",
+      "posicionInicial": 1,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": 0
+      },
+      "escalaFinal": 1,
+      "encaje": "calzar",
+      "animacionPersonaje": "baile",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira los guantes azules! ¿Dónde se pone Zeus los guantes azules?",
+          "¿Dónde se pone Zeus los guantes azules?"
+        ],
+        "ayuda": "Los guantes azules cubren las manos de Zeus. Mira dónde terminan sus brazos.",
+        "acierto": "¡Muy bien! Así se pone Zeus los guantes azules."
+      }
+    },
+    {
+      "id": "guantes_verdes",
+      "nombre": "los guantes verdes",
+      "imagen": "guantes_verdes_par",
+      "imagenPuesta": "guante_verde",
+      "puesta": "parManos",
+      "zona": "manos",
+      "posicionInicial": 2,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": 0
+      },
+      "escalaFinal": 1,
+      "encaje": "calzar",
+      "animacionPersonaje": "baile",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira los guantes verdes! ¿Dónde se pone Zeus los guantes verdes?",
+          "¿Dónde se pone Zeus los guantes verdes?"
+        ],
+        "ayuda": "Los guantes verdes cubren las manos de Zeus. Mira dónde terminan sus brazos.",
+        "acierto": "¡Muy bien! Así se pone Zeus los guantes verdes."
+      }
+    },
+    {
+      "id": "pulsera",
+      "nombre": "la pulsera",
+      "imagen": "pulsera",
+      "puesta": "parMunecas",
+      "zona": "munecas",
+      "posicionInicial": 1,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -32
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira la pulsera! ¿Dónde se pone Zeus la pulsera?",
+          "¿Dónde se pone Zeus la pulsera?"
+        ],
+        "ayuda": "La pulsera es una banda en la muñeca de Zeus, pegada a la mano.",
+        "acierto": "¡Muy bien! Así se pone Zeus la pulsera."
+      }
+    },
+    {
+      "id": "bermuda",
+      "nombre": "la bermuda",
+      "imagen": "bermuda",
+      "zona": "piernas",
+      "posicionInicial": 2,
+      "posicionFinal": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -270
+      },
+      "escalaFinal": 1,
+      "encaje": "deslizar",
+      "puesta": "piernas",
+      "animacionPersonaje": "modelo",
+      "sonido": "acierto",
+      "textos": {
+        "instruccion": [
+          "¡Mira la bermuda! ¿Dónde se pone Zeus la bermuda?",
+          "¿Dónde se pone Zeus la bermuda?"
+        ],
+        "ayuda": "La bermuda cubre las piernas de Zeus y es más corta que el pantalón.",
+        "acierto": "¡Muy bien! Así se pone Zeus la bermuda."
+      }
+    },
+    {
+      "id": "botines",
+      "nombre": "los botines",
+      "imagen": "botines_par",
+      "imagenPuesta": "botin",
+      "puesta": "parPies",
+      "zona": "pies",
+      "posicionInicial": 3,
+      "posicionFinal": {
+        "contenedor": "pies",
+        "x": 0,
+        "y": 0
+      },
+      "escalaFinal": 1,
+      "encaje": "calzar",
+      "animacionPersonaje": "baile",
+      "sonido": "bote",
+      "textos": {
+        "instruccion": [
+          "¡Mira los botines! ¿Dónde se pone Zeus los botines?",
+          "¿Dónde se pone Zeus los botines?"
+        ],
+        "ayuda": "Los botines se calzan en los pies de Zeus y tapan el tobillo.",
+        "acierto": "¡Muy bien! Así se pone Zeus los botines."
       }
     }
   ],
   "textos": {
     "eligeNivel": "Elige tu edad",
     "nombreCorto": "¿Dónde se pone?",
-    "bienvenida": "¡Hola, amiguito! ¡Hora de disfrazarse! Ayúdame a colocar mis accesorios en el lugar correcto. ¡Vamos a descubrir dónde va cada cosa!",
-    "saludoCorto": "¡Hola, amiguito! ¡Hora de disfrazarse!",
-    "demostracion": "¡Mira cómo se juega! Lleva las gafas directamente a mis ojos para ver qué bien me quedan.",
-    "demostracionFin": "¡Ahora te toca a ti! Arrastra cada cosa hasta su lugar.",
+    "bienvenida": "¡Hola! Soy Zoe. Zeus quiere disfrazarse y no sabe dónde va cada cosa. ¡Ayúdalo a poner cada una en su lugar!",
+    "saludoCorto": "¡Hola! Soy Zoe. Vamos a vestir a Zeus.",
+    "demostracion": "¡Mira cómo se juega! Lleva las gafas a los ojos de Zeus.",
+    "demostracionFin": "¡Ahora te toca a ti! Arrastra cada cosa hasta su lugar en Zeus.",
     "botonComenzar": "¡A jugar!",
     "error": [
       "¡Ups! ¡Inténtalo en otro lugar!",
@@ -128,27 +1020,32 @@
     "orden": "¡Ese va ahí! ¡Qué bien!",
     "rondaCompleta": "¡Qué estilo! Ahora Zeus se quita todo y lo pide en otro orden.",
     "rondaRotulo": "Ronda {n} de {total}",
-    "otraVez": "¡Otra vez! ¿Me ayudas a vestirme de nuevo?",
-    "final": "¡SÚPER! Pusiste las gafas en los ojos, el sombrero en la cabeza y los zapatos en los pies. ¡Quedé listo para la fiesta! ¡Y mi bufanda quedó perfecta!",
+    "otraVez": "¡Otra vez! ¿Ayudas a Zeus a vestirse de nuevo?",
+    "final": "¡SÚPER! Cada cosa quedó en su parte del cuerpo. ¡Zeus está listo para la fiesta!",
     "finalTitulo": "¡QUÉ ESTILO!",
     "finalSub": "Ayudaste a Zeus a vestirse correctamente.",
-    "cierre": "¡Muy bien! Pusiste cada accesorio en su lugar.",
+    "cierre": "¡Muy bien! Vestiste a Zeus.",
     "conversacion": [
       {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. Zeus tiene un baúl mágico lleno de disfraces."
+      },
+      {
         "personaje": 0,
-        "texto": "¡Hola, amiguito! Soy Zeus. ¡Mira este baúl mágico lleno de disfraces!"
+        "texto": "¡Yo soy Zeus! Quiero ir a la fiesta, pero no sé dónde va cada cosa."
       },
       {
         "personaje": 1,
-        "texto": "¡Y yo soy Zoe! Zeus quiere ir a una fiesta, pero no sabe dónde va cada cosa."
-      },
-      {
-        "personaje": 0,
-        "texto": "¡Hora de disfrazarse! Ayúdame a colocar mis accesorios en el lugar correcto. ¡Vamos a descubrir dónde va cada cosa!"
+        "texto": "¡Ayúdalo! Hay que poner cada cosa en la parte del cuerpo de Zeus."
       }
     ]
   },
-  "demo": ["gafas", "sombrero", "zapatos", "bufanda"],
+  "demo": [
+    "gafas",
+    "sombrero",
+    "zapatos",
+    "bufanda"
+  ],
   "niveles": [
     {
       "id": "3",

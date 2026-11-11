@@ -3,8 +3,8 @@
  *
  * Flujo: pantalla de inicio → intro 3D (Zeus y Zoe) → PedniaEdad → presentación en el vestidor (Zeus aparece,
  * los accesorios salen del baúl y Zeus saluda) → demo automática con la mano (si "Mostrar intro") → ¡A jugar!
- * → rondas de 4 accesorios (la 1.ª en el orden gafas, sombrero, tenis, bufanda; las demás en otro orden y
- * con los accesorios en otros lugares) → final (baúl abierto, luces, desfile de Zeus) → victoria compartida.
+ * → rondas de 4 accesorios al azar, uno solo por parte del cuerpo, en distinto orden y lugar
+ * → final (baúl abierto, luces, desfile de Zeus) → victoria compartida.
  *
  * Módulos (cada uno en su archivo):
  *   Reglas (validación y rondas, puras) · Personaje (Zeus por partes) · Accesorios (dibujos)
@@ -210,19 +210,15 @@ function globo(texto, pj) {
 }
 
 function hablar(texto, pj, gesto) {
-    const quien = pj || "zeus";
+    // Zoe, el modelo 3D, dice todas las líneas. Zeus se viste y no narra.
+    const quien = "zoe";
     globo(texto, quien);
-    if (quien === "zoe") gestoGuia(gesto || "senala");
-    if (!texto || !feedbackActivo() || typeof TextoVoz === "undefined") {
-        if (quien === "zeus") callarGloboZeus(2600);
-        return Promise.resolve();
-    }
-    if (quien === "zeus" && anim()) anim().hablando(true);
-    if (quien === "zoe" && guia3d()) guia3d().hablar(true);
+    // Sin gesto, la boca (clip Hablar) arranca ya. Con gesto, al terminar vuelve a Hablar si la voz sigue.
+    if (gesto) gestoGuia(gesto);
+    if (!texto || !feedbackActivo() || typeof TextoVoz === "undefined") return Promise.resolve();
+    if (guia3d()) guia3d().hablar(true);
     return TextoVoz.hablar(texto, quien).then(function () {
-        if (quien === "zeus" && anim()) anim().hablando(false);
-        if (quien === "zeus") callarGloboZeus();
-        if (quien === "zoe" && guia3d()) guia3d().hablar(false);
+        if (guia3d()) guia3d().hablar(false);
     });
 }
 
@@ -622,6 +618,12 @@ function esperarBotonComenzar() {
     });
 }
 
+function lugaresDe(ids) {
+    const mapa = {};
+    (ids || []).forEach(function (id, i) { mapa[id] = i; });
+    return mapa;
+}
+
 /** Zeus aparece en la tarima, los accesorios salen del baúl y Zeus saluda. */
 async function presentar() {
     if (!escenario() || !anim()) return;
@@ -631,7 +633,9 @@ async function presentar() {
     const completa = introOmitida || !introDesdeEmpecemos;
     const voz = hablar(completa ? textos().bienvenida : textos().saludoCorto, "zeus");
     if (guia3d()) guia3d().gesto("saluda");
-    await Promise.all([escenario().llenarBandeja(rondas[0].lugares), anim().saludo()]);
+    const demoIds = (acc().mostrarIntro && gameConfig.demo) ? gameConfig.demo : null;
+    const bandeja = demoIds ? lugaresDe(demoIds) : rondas[0].lugares;
+    await Promise.all([escenario().llenarBandeja(bandeja), anim().saludo()]);
     await Promise.race([voz, sleep(completa ? 9000 : 4000)]);
 }
 
@@ -723,7 +727,7 @@ function encenderBrillo(zona) {
 
 /**
  * Sin interacción: a los ayudaMs la parte del cuerpo pedida brilla, el accesorio se menea y salen chispas
- * que van del accesorio a su zona; Zoe da la pista. Luego Zeus repite la instrucción de vez en cuando.
+ * que van del accesorio a su zona; Zoe da la pista y repite la instrucción.
  */
 function programarAyuda() {
     limpiarAyuda(false);
@@ -910,7 +914,7 @@ function mostrarVictoria() {
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
     }
     const cierre = textos().cierre || "";
-    if (feedbackActivo()) TextoVoz.hablar(cierre, "zeus");
+    if (feedbackActivo()) hablar(cierre);
     setTimeout(function () {
         const caja = document.getElementById("final");
         const texto = document.getElementById("texto_final");
@@ -979,7 +983,7 @@ function apiDemo() {
 let escenario_listo = Promise.resolve(false);
 
 $(document).ready(function () {
-    gameConfig = JSON.parse(readText("config.json?v=20261110b"));
+    gameConfig = JSON.parse(readText("config.json?v=20261111h"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = textos().conversacion || [];
     sincronizarDialogoIntro3d();

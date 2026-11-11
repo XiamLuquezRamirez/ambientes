@@ -5,13 +5,14 @@
  * un accesorio, arma las rondas (orden de las instrucciones y lugares de la bandeja) y elige el siguiente
  * accesorio pendiente. Lo usan script.js, escenario-phaser.js, arrastre.js y scripts/probar-donde-se-pone.js.
  *
- * Las asociaciones salen de config.json → accesorios[].zona, así que un accesorio nuevo no cambia esta mecánica:
- *   gafas → ojos · sombrero → cabeza · zapatos → pies · bufanda → cuello
+ * Las asociaciones salen de config.json → accesorios[].zona. Cada ronda elige juego.porRonda partes
+ * distintas y un solo accesorio de cada una (dos tenis no comparten ronda con las botas).
+ * juego.noJuntas evita pares de zonas que se pisan al soltar (manos y muñecas).
  */
 (function (global) {
     "use strict";
 
-    var ZONAS = ["cabeza", "ojos", "cuello", "pies"];
+    var ZONAS = ["cabeza", "ojos", "orejas", "cuello", "torso", "manos", "munecas", "piernas", "pies"];
 
     function lista(config) {
         return (config && Array.isArray(config.accesorios)) ? config.accesorios : [];
@@ -76,54 +77,104 @@
         return true;
     }
 
+    function gruposPorZona(config) {
+        var g = {};
+        lista(config).forEach(function (a) {
+            if (!a || !a.id || !a.zona) return;
+            if (!g[a.zona]) g[a.zona] = [];
+            g[a.zona].push(a.id);
+        });
+        return g;
+    }
+
+    function chocan(a, b, pares) {
+        for (var i = 0; i < (pares || []).length; i++) {
+            var p = pares[i];
+            if (!p || p.length < 2) continue;
+            if ((p[0] === a && p[1] === b) || (p[0] === b && p[1] === a)) return true;
+        }
+        return false;
+    }
+
+    /** Hasta n zonas, distintas, sin repetir las de la ronda anterior mientras haya otras, y sin pares noJuntas. */
+    function elegirZonas(zonas, n, rnd, anterior, pares) {
+        var usadas = anterior || [];
+        var frescas = zonas.filter(function (z) { return usadas.indexOf(z) < 0; });
+        var repetidas = zonas.filter(function (z) { return usadas.indexOf(z) >= 0; });
+        var bolsa = barajar(frescas, rnd).concat(barajar(repetidas, rnd));
+        var elegidas = [];
+        function tomar(listaZ) {
+            for (var i = 0; i < listaZ.length && elegidas.length < n; i++) {
+                var z = listaZ[i];
+                if (elegidas.indexOf(z) >= 0) continue;
+                if (elegidas.some(function (e) { return chocan(e, z, pares); })) continue;
+                elegidas.push(z);
+            }
+        }
+        tomar(bolsa);
+        if (elegidas.length < n) tomar(barajar(zonas, rnd));
+        return elegidas;
+    }
+
+    function zonaDeId(gruposMap, id) {
+        var zonas = Object.keys(gruposMap);
+        for (var i = 0; i < zonas.length; i++) if (gruposMap[zonas[i]].indexOf(id) >= 0) return zonas[i];
+        return null;
+    }
+
     /**
-     * Rondas de la partida. La primera usa juego.ordenInicial (gafas, sombrero, zapatos, bufanda) y los lugares
-     * de config; las siguientes cambian el orden de las instrucciones (distinto al anterior y sin empezar por el
-     * accesorio con que terminó la ronda anterior) y reparten los accesorios en otros lugares de la bandeja.
-     * Las asociaciones objeto → parte del cuerpo nunca cambian.
+     * Rondas de la partida. Cada una trae juego.porRonda accesorios (4) de partes distintas: un solo objeto
+     * por zona, así los tenis no salen con las botas ni la bufanda con el collar. El orden de las instrucciones
+     * y los lugares de la bandeja cambian en cada ronda, y no empieza por el accesorio con que terminó la anterior.
      *   → [{ numero, orden: [ids], lugares: { id: indiceDeLugar } }]
      */
     function armarRondas(config, rnd) {
         var r = typeof rnd === "function" ? rnd : Math.random;
-        var ids = lista(config).map(function (a) { return a.id; });
-        if (!ids.length) return [];
+        var gruposMap = gruposPorZona(config);
+        var zonas = Object.keys(gruposMap);
+        if (!zonas.length) return [];
         var juego = (config && config.juego) || {};
         var total = Math.max(1, Number(juego.rondas) || 3);
-        var inicial = (Array.isArray(juego.ordenInicial) ? juego.ordenInicial : []).filter(function (id) { return ids.indexOf(id) >= 0; });
-        ids.forEach(function (id) { if (inicial.indexOf(id) < 0) inicial.push(id); });
-        // lugar de la bandeja de cada accesorio en la 1.ª ronda: accesorios[].posicionInicial (o su índice)
-        var lugaresBase = lista(config).map(function (a, i) {
-            var n = Number(a.posicionInicial);
-            return isFinite(n) && n >= 0 ? n : i;
-        });
+        var porRonda = Math.max(1, Math.min(Number(juego.porRonda) || 4, zonas.length));
+        var pares = Array.isArray(juego.noJuntas) ? juego.noJuntas : [];
+        var cupos = [];
+        for (var c = 0; c < porRonda; c++) cupos.push(c);
 
         var rondas = [];
         var anterior = null;
-        var lugaresAnt = null;
+        var zonasAnt = null;
         for (var n = 0; n < total; n++) {
-            var orden;
-            var lugares;
-            if (n === 0) {
-                orden = inicial.slice();
-                lugares = lugaresBase.slice();
-            } else {
-                orden = barajar(inicial, r);
-                for (var k = 0; k < 12 && ids.length > 1 && (igual(orden, anterior) || orden[0] === anterior[anterior.length - 1]); k++) {
-                    orden = barajar(inicial, r);
+            var ids = null;
+            var zonasRonda = null;
+            for (var intento = 0; intento < 16; intento++) {
+                zonasRonda = elegirZonas(zonas, porRonda, r, zonasAnt, pares);
+                ids = zonasRonda.map(function (z) {
+                    var opciones = gruposMap[z];
+                    var previas = (anterior || []).filter(function (id) { return opciones.indexOf(id) >= 0; });
+                    var pool = opciones.filter(function (id) { return previas.indexOf(id) < 0; });
+                    if (!pool.length) pool = opciones;
+                    return pool[Math.floor(r() * pool.length)];
+                });
+                var firma = function (zs) { return (zs || []).slice().sort().join("|"); };
+                if (!anterior || firma(zonasRonda) !== firma(zonasAnt)) break;
+            }
+            var orden = barajar(ids, r);
+            if (anterior && orden.length > 1) {
+                for (var k = 0; k < 12 && (igual(orden, anterior) || orden[0] === anterior[anterior.length - 1]); k++) {
+                    orden = barajar(ids, r);
                 }
-                if (ids.length > 1 && orden[0] === anterior[anterior.length - 1]) {
+                if (orden[0] === anterior[anterior.length - 1]) {
                     var t = orden[0];
                     orden[0] = orden[1];
                     orden[1] = t;
                 }
-                lugares = barajar(lugaresBase, r);
-                for (var q = 0; q < 12 && ids.length > 1 && igual(lugares, lugaresAnt); q++) lugares = barajar(lugaresBase, r);
             }
+            var lugares = barajar(cupos, r);
             var mapa = {};
-            ids.forEach(function (id, i) { mapa[id] = lugares[i]; });
+            orden.forEach(function (id, i) { mapa[id] = lugares[i]; });
             rondas.push({ numero: n + 1, orden: orden, lugares: mapa });
             anterior = orden;
-            lugaresAnt = lugares;
+            zonasAnt = orden.map(function (id) { return zonaDeId(gruposMap, id); });
         }
         return rondas;
     }

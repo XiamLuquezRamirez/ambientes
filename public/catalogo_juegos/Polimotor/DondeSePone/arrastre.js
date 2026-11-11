@@ -60,7 +60,7 @@
     function alMoverse(pointer, c, dragX, dragY) {
         if (!c || c.ignorar || c !== actual || capturado) return;
         c.setPosition(dragX, dragY);
-        var zona = E().zonaBajo(c.x, c.y).id;
+        var zona = E().zonaBajo(c.x, c.y, pointer.worldX, pointer.worldY).id;
         E().destinos(true, zona);
         if (zona && typeof opts.alMover === "function" && opts.alMover(c.accId, zona) === true) {
             // encaje automático: el resto del arrastre se ignora
@@ -79,7 +79,7 @@
             capturado = false;
             return;
         }
-        var zona = E().zonaBajo(c.x, c.y).id;
+        var zona = E().zonaBajo(c.x, c.y, pointer.worldX, pointer.worldY).id;
         terminar(c);
         if (typeof opts.alSoltar === "function") opts.alSoltar(c.accId, zona);
     }

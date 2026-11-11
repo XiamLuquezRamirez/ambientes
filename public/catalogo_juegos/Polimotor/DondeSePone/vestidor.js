@@ -92,10 +92,10 @@
         var s = '<g transform="translate(' + x + ',260)"><g class="vf-prenda" style="--i:' + i + ';--dx:' + dx + 'px;--dy:330px"><g class="vf-colgado" style="--i:' + i + '">';
         s += '<path d="M0,-6 Q0,-22 12,-22 Q22,-22 22,-12" stroke="#9a7aa8" stroke-width="4" fill="none"/>';
         s += '<path d="M-38,22 L0,0 L38,22" stroke="#9a7aa8" stroke-width="5" fill="none" stroke-linecap="round"/>';
-        if (tipo === "vestido") {
-            s += '<path d="M-26,18 L26,18 L32,70 L70,220 Q0,240 -70,220 L-32,70 Z" fill="' + color + '"/>';
-            s += '<path d="M-60,214 Q0,232 60,214" stroke="#fff" stroke-width="5" stroke-dasharray="9 8" fill="none" opacity=".7"/>';
-            s += '<circle cx="0" cy="96" r="12" fill="#fff" opacity=".7"/>';
+        if (tipo === "chaqueta") {
+            s += '<path d="M-32,18 L32,18 L66,50 L48,74 L36,62 L36,200 L-36,200 L-36,62 L-48,74 L-66,50 Z" fill="' + color + '"/>';
+            s += '<path d="M-14,18 Q0,34 14,18" stroke="#fff" stroke-width="5" fill="none"/>';
+            s += '<path d="M0,40 V188" stroke="#ffd43b" stroke-width="6" stroke-linecap="round"/>';
         } else if (tipo === "camisa") {
             s += '<path d="M-30,18 L30,18 L62,48 L46,70 L34,60 L34,160 L-34,160 L-34,60 L-46,70 L-62,48 Z" fill="' + color + '"/>';
             s += '<path d="M-12,18 Q0,32 12,18" stroke="#fff" stroke-width="5" fill="none"/>';
@@ -113,9 +113,9 @@
         s += '<rect x="1218" y="236" width="14" height="480" rx="6" fill="#c9a7ff"/><rect x="1548" y="236" width="14" height="480" rx="6" fill="#c9a7ff"/>';
         s += '<rect x="1206" y="230" width="368" height="16" rx="8" fill="#b78ad6"/>';
         s += '<ellipse cx="1225" cy="718" rx="34" ry="8" fill="#b78ad6"/><ellipse cx="1555" cy="718" rx="34" ry="8" fill="#b78ad6"/>';
-        s += prenda(1280, "vestido", "#ff8fc7", 0);
-        s += prenda(1380, "camisa", "#7cd3f7", 1);
-        s += prenda(1480, "vestido", "#ffe066", 2);
+        s += prenda(1280, "chaqueta", "#ff6b6b", 0);
+        s += prenda(1380, "camisa", "#4dabf7", 1);
+        s += prenda(1480, "pantalon", "#1c4b82", 2);
         s += "</g>";
         // Planta y caja de juguetes
         s += '<g transform="translate(1110,700)"><path d="M-30,0 L-24,-60 L24,-60 L30,0 Z" fill="#ffb36b"/>' +
