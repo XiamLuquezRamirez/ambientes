@@ -26,6 +26,7 @@
             L.fila = L.mesa + (H - L.mesa) * 0.26;
             L.tacho = { x: L.der * 0.8, y: L.mesa + (H - L.mesa) * 0.72, r: Math.min(70, L.der * 0.12) };
             L.bandeja = { x: L.der * 0.36, y: L.tacho.y, w: Math.min(L.der * 0.58, 340), h: Math.min(110, (H - L.mesa) * 0.3) };
+            L.bocina = { x: 56, y: L.mesa - 36, r: 24 };
             return L;
         },
 
@@ -48,6 +49,13 @@
                 K.madera(x, 0, L.mesa, w, h - L.mesa, { r: 0, claro: '#9c6b30', medio: '#7a4f22', oscuro: '#5c3613' });
             });
             keep(this.add.image(0, 0, 'impostor_fondo').setOrigin(0, 0).setDepth(0));
+            this.lampara = keep(this.add.circle(L.der * 0.18, 36, 16, 0xffe066, 0.85).setDepth(4));
+            keep(this.add.rectangle(L.der * 0.18, 18, 8, 22, 0x495057).setDepth(4));
+            var cono = keep(this.add.graphics().setDepth(1));
+            cono.fillStyle(0xffe066, 0.14);
+            cono.fillTriangle(L.der * 0.18, 48, L.der * 0.05, L.mesa + 8, L.der * 0.42, L.mesa + 8);
+            keep(K.nino(this, L.der * 0.5, L.mesa + 2, 4, { ropa: 0x748ffc, esc: 1.65 }));
+            this.sembrarMotes(keep, 16, { x: L.der * 0.05, y: 40, w: L.der * 0.4, h: L.mesa - 50, depth: 5 }, 0xfff3bf);
             // Tacho de reciclaje y bandeja.
             var T = L.tacho, B = L.bandeja;
             var tg = keep(this.add.graphics().setDepth(8));
@@ -101,10 +109,12 @@
         alSegundaVuelta: async function () {
             var self = this;
             K.ruido({ f: 200, q: 0.6, dur: 0.5, vol: 0.06 });
+            this.apagado = true;
             await tw(this, { targets: this.oscuro, fillAlpha: 0.75, duration: 300 });
             this.sobres.forEach(function (s, k) { self.tweens.add({ targets: s.cont, angle: { from: -8, to: 8 }, duration: 70, yoyo: true, repeat: 4, delay: k * 40, onComplete: function () { s.cont.angle = 0; } }); });
             K.ruido({ f: 1800, q: 0.7, dur: 0.6, vol: 0.05 });
             await esperar(this, 700);
+            this.apagado = false;
             await tw(this, { targets: this.oscuro, fillAlpha: 0, duration: 300 });
         },
 
@@ -280,6 +290,10 @@
                     return s ? self.pasoArrastre(ori, { x: s.x, y: s.y - s.h * 0.4 }) : null;
                 }
             ];
+        },
+
+        paso: function (time) {
+            if (this.lampara) this.lampara.setAlpha(this.apagado ? 0.15 : 0.65 + Math.sin(time / 180) * 0.2);
         },
 
         estadoExtra: function () {

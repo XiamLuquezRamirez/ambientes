@@ -30,6 +30,7 @@
             L.dial = { x0: R.x - R.w * 0.42, x1: R.x + R.w * 0.42, y: R.y - R.h * 0.24, h: R.h * 0.3 };
             L.perilla = { x: R.x + R.w * 0.3, y: R.y + R.h * 0.22, r: Math.min(R.w, R.h) * 0.13 };
             L.parlante = { x: R.x - R.w * 0.2, y: R.y + R.h * 0.2, r: Math.min(R.w * 0.2, R.h * 0.26) };
+            L.bocina = { x: L.parlante.x, y: L.parlante.y - L.parlante.r - 36, r: 24 };
             return L;
         },
 
@@ -56,6 +57,15 @@
                 K.madera(x, 0, L.mesa, w, h - L.mesa, { r: 0, claro: '#9c6b30', medio: '#7a4f22', oscuro: '#5c3613' });
             });
             keep(this.add.image(0, 0, 'radio_archivo').setOrigin(0, 0).setDepth(0));
+            var foco = keep(this.add.graphics().setDepth(2));
+            foco.fillStyle(0xffe066, 0.16);
+            foco.fillTriangle(L.radio.x, 28, L.radio.x - L.radio.w * 0.7, L.radio.y - L.radio.h * 0.2, L.radio.x + L.radio.w * 0.7, L.radio.y - L.radio.h * 0.2);
+            foco.fillStyle(0xffe066, 1);
+            foco.fillCircle(L.radio.x, 26, 16);
+            foco.fillStyle(0x495057, 1);
+            foco.fillRect(L.radio.x - 3, 8, 6, 18);
+            keep(K.nino(this, Math.max(90, L.radio.x - L.radio.w * 0.5 - 70), L.mesa + 2, 11, { ropa: 0xfcc419, esc: 1.65 }));
+            this.sembrarMotes(keep, 20, { x: 0, y: 0, w: L.W, h: L.mesa, depth: 3 }, 0xfff3bf);
             this.montarRadio(keep);
             this.montarHud(keep);
             if (reubicar && this.nv) this.ponerEstaciones(this.nv.opciones, true);

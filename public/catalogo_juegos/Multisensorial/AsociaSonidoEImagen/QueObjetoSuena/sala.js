@@ -22,8 +22,8 @@
     var rnd = Ut.rnd;
     var EXTRA = ['aspiradora', 'bicicleta', 'reloj', 'tren', 'vaca', 'gallo'];
 
-    /** Imágenes diseñadas por el equipo (img/diseno/). Si falta alguna, queda el dibujo de antes. */
-    var DISENO = 'img/diseno/';
+    /** Imágenes diseñadas por el equipo (img/). Si falta alguna, queda el dibujo de antes. */
+    var DISENO = 'img/';
     // Las mismas imágenes de ¿Qué suena? (avión, bici, gallo, reloj, teléfono, tren, vaca) + la aspiradora.
     var PIELES = ['avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca', 'aspiradora'];
     /**

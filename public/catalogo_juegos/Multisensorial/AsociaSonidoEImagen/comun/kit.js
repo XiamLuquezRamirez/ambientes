@@ -756,6 +756,37 @@
         }
     };
 
+    /**
+     * Carga imágenes de diseño (config.elementos[].img) y las registra como pieles.
+     * Sin Act.piel(), Act.crear sigue dibujando PedniaArte aunque el SVG exista en disco.
+     */
+    function idsDesdeConfig(scene, extra) {
+        var ids = {};
+        (extra || []).forEach(function (id) { ids[id] = true; });
+        var els = (scene.config && scene.config.elementos) || {};
+        Object.keys(els).forEach(function (id) {
+            var src = els[id] && els[id].img;
+            if (src && /\.(svg|png|jpe?g|webp)$/i.test(src)) ids[id] = true;
+        });
+        return Object.keys(ids);
+    }
+    function cargarPieles(scene, prefijo, ids) {
+        var els = (scene.config && scene.config.elementos) || {};
+        (ids || []).forEach(function (id) {
+            var k = prefijo + id;
+            if (scene.textures.exists(k)) return;
+            var src = (els[id] && els[id].img) || ('img/' + id + '.svg');
+            // No añadir ?v= aquí: Phaser load.svg falla con query string y cae a PedniaArte.
+            if (/\.svg$/i.test(src)) scene.load.svg(k, src, { width: 420, height: 420 });
+            else scene.load.image(k, src);
+        });
+    }
+    function aplicarPieles(scene, prefijo, ids) {
+        (ids || []).forEach(function (id) {
+            if (scene.textures.exists(prefijo + id)) Act.piel(id, prefijo + id);
+        });
+    }
+
     function crear(def) {
         var esc = {};
         Object.keys(BASE).forEach(function (k) { esc[k] = BASE[k]; });
@@ -763,12 +794,26 @@
             if (k === 'create' || k === 'update') return;
             esc[k] = def.escena[k];
         });
-        if (def.escena.preload) esc.preload = def.escena.preload;
+        var pielesExtra = def.pieles || [];
+        var prefijo = (def.id || 'as') + '_';
+        var userPreload = def.escena.preload;
+        var userIniciar = esc.iniciar;
+        // Siempre: precargar SVG/PNG del config + registrar pieles (todos los motores K.crear).
+        esc.preload = function () {
+            cargarPieles(this, prefijo, idsDesdeConfig(this, pielesExtra));
+            if (userPreload) userPreload.call(this);
+        };
+        esc.iniciar = function () {
+            aplicarPieles(this, prefijo, idsDesdeConfig(this, pielesExtra));
+            if (userIniciar) userIniciar.call(this);
+        };
         return B.crearMotor({ id: def.id, fondo: def.fondo || '#a5d8ff', escena: esc });
     }
 
     global.AsociaKit = {
         crear: crear,
+        cargarPieles: cargarPieles,
+        aplicarPieles: aplicarPieles,
         ruido: ruido, tono: tono, actx: actx,
         textura: textura, rr: rr, grano: grano, madera: madera, pared: pared, piso: piso, ventana: ventana, sombra: sombra,
         efecto: efecto, ordenObjetivos: ordenObjetivos

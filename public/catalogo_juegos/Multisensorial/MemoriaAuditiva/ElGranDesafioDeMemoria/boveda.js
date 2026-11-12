@@ -1,10 +1,10 @@
 /**
  * «La bóveda del archivo» — motor propio de El gran desafío de memoria (5-6 años).
- * La rueda de la bóveda gira un clic con cada sonido (no se ve qué suena). Tres cerraduras:
- *   1) el niño ARRASTRA al buzón de la bóveda todos los que escuchó;
- *   2) pone el que sonó PRIMERO en la placa de la bandera verde;
- *   3) pone el que sonó AL FINAL en la placa de la bandera a cuadros.
- * Con las tres luces verdes la bóveda se abre.
+ * La rueda gira un clic con cada sonido (no se ve qué). Tres cerraduras:
+ *   1) TOCA los que escuchaste: vuelan al buzón;
+ *   2) TOCA el que sonó PRIMERO → placa bandera verde;
+ *   3) TOCA el que sonó AL FINAL → placa a cuadros.
+ * Con las tres luces verdes la bóveda se abre. No hay arrastre de fichas.
  */
 (function (global) {
     'use strict';
@@ -15,7 +15,15 @@
     var tw = Ut.tween;
 
     var escena = {
-        iniciar: function () { this.cosas = []; this.dentro = []; this.puestos = []; this.reunidos = []; this.giro = 0; },
+        iniciar: function () {
+            this.cosas = [];
+            this.dentro = [];
+            this.puestos = [];
+            this.reunidos = [];
+            this.giro = 0;
+            this.enviando = false;
+            this.apuntado = null;
+        },
 
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
@@ -31,6 +39,7 @@
             L.placaIni = { x: L.puerta.x - r * 1.55, y: L.puerta.y + r * 0.35, s: Math.min(r * 0.85, (L.der / 2 - r) * 0.9) };
             L.placaFin = { x: L.puerta.x + r * 1.55, y: L.puerta.y + r * 0.35, s: L.placaIni.s };
             L.tam = Math.max(54, Math.min(100, (L.der - 30) / 4.6, H * 0.12));
+            L.bocina = { x: 48, y: L.mesa * 0.28, r: 24 };
             return L;
         },
 
@@ -49,6 +58,18 @@
                 K.madera(x, 0, L.mesa, w, h - L.mesa, { r: 0, claro: '#9c6b30', medio: '#7a4f22', oscuro: '#5c3613' });
             });
             keep(this.add.image(0, 0, 'boveda_sala').setOrigin(0, 0).setDepth(0));
+            var foco = keep(this.add.graphics().setDepth(2));
+            foco.fillStyle(0xfff3bf, 0.13);
+            foco.fillTriangle(L.puerta.x, 16, L.puerta.x - L.puerta.r * 1.5, L.mesa, L.puerta.x + L.puerta.r * 1.5, L.mesa);
+            foco.fillStyle(0xffe066, 0.9);
+            foco.fillCircle(L.puerta.x, 18, 12);
+            var cebra = keep(this.add.graphics().setDepth(1));
+            for (var i = 0; i < 8; i++) {
+                cebra.fillStyle(i % 2 ? 0xf8f9fa : 0x212529, 1);
+                cebra.fillRect(L.puerta.x - 90 + i * 22, L.mesa - 16, 22, 16);
+            }
+            keep(K.nino(this, 64, L.mesa + 2, 4, { ropa: 0xced4da, pelo: 0x343a40, esc: 1.6 }));
+            this.sembrarMotes(keep, 18, { x: L.puerta.x - L.puerta.r, y: L.puerta.y - L.puerta.r, w: L.puerta.r * 2, h: L.puerta.r * 2, depth: 5 }, 0xfff3bf);
             this.montarPuerta(keep);
             this.montarHud(keep);
             if (reubicar) this.ubicarCosas();
@@ -136,6 +157,8 @@
 
         prepararNivel: async function () {
             var self = this;
+            this.enviando = false;
+            this.apuntado = null;
             await this.retirar(this.cosas.concat(this.dentro, this.puestos));
             this.cosas = []; this.dentro = []; this.puestos = [];
             [0, 1, 2].forEach(function (i) { self.luz(i, false); });
@@ -145,12 +168,32 @@
         },
 
         mostrarOpciones: async function (nv) {
+            var self = this;
             var n = nv.opciones.length;
-            this.cosas = await this.filaDeCosas(nv.opciones, this.lugares(n), this.tamDe(n), { depth: 30 });
+            var lug = this.lugares(n);
+            var tam = this.tamDe(n);
+            this.cosas = nv.opciones.map(function (id, i) {
+                var a = self.crearCosa(id, lug[i].x, lug[i].y - 24, tam, { depth: 30 });
+                a.casa = { x: lug[i].x, y: lug[i].y };
+                a.fase = Math.random() * 6;
+                a.vx = (Math.random() < 0.5 ? -1 : 1) * (25 + Math.random() * 35);
+                a.usada = false;
+                a.ocupada = false;
+                a.cont.setAlpha(0).setScale(0.4);
+                return a;
+            });
+            await Promise.all(this.cosas.map(function (a, i) {
+                return esperar(self, i * 80).then(function () {
+                    return tw(self, {
+                        targets: a.cont, alpha: 1, scale: 1, y: a.casa.y,
+                        duration: 300, ease: 'Back.easeOut'
+                    });
+                });
+            }));
             this.marcarDestino();
         },
 
-        /** Resalta dónde va lo que se arrastra en este paso. */
+        /** Resalta el destino activo de este paso. */
         marcarDestino: function () {
             var self = this;
             this.placas.forEach(function (p, i) {
@@ -167,30 +210,72 @@
             return { x: p.x, y: p.y, r: p.s * 0.9 };
         },
 
-        alTocar: function (p) {
-            if (this.fase !== 'jugar') return;
-            if (!this.tomar(p, this.cosas)) {
-                var b = this.cosaEn(this.cosas, p.x, p.y);
-                if (b && !this.sonando) this.sonar(b.id, { breve: true, bocina: false });
-            }
+        cosaEnPunto: function (x, y) {
+            var hit = null, best = 1e9;
+            this.cosas.forEach(function (a) {
+                if (a.usada || a.ocupada || !a.cont.active) return;
+                var d = Math.hypot(a.cont.x - x, a.cont.y - y);
+                if (d < a.tam * 0.7 && d < best) { best = d; hit = a; }
+            });
+            return hit;
         },
-        alMover: function (p) { this.llevar(p); },
 
-        alSoltar: async function () {
-            var a = this.soltar();
+        alTocar: function (p) {
+            if (this.fase !== 'jugar' || this.enviando) return;
+            var a = this.cosaEnPunto(p.x, p.y);
             if (!a) return;
-            var d = this.destino();
-            if (Math.hypot(a.cont.x - d.x, a.cont.y - d.y) > d.r || this.fase !== 'jugar') { this.aCasa(a); return; }
+            this.pista.reiniciar();
+            this.enviar(a);
+        },
+        alMover: function (p) {
+            if (this.fase !== 'jugar' || this.enviando) { this.apuntado = null; return; }
+            this.apuntado = this.cosaEnPunto(p.x, p.y);
+        },
+        alSoltar: function () {},
+
+        /** Tocar → vuela al destino activo (buzón o placa). */
+        enviar: async function (a) {
+            if (!a || a.usada || a.ocupada || this.enviando) return;
+            this.enviando = true;
+            a.ocupada = true;
             this.tocado = a;
+            var d = this.destino();
+            a.cont.setDepth(40);
+            K.tono({ f: 560, f2: 720, dur: 0.05, vol: 0.04 });
+            await tw(this, {
+                targets: a.cont, x: d.x, y: d.y, scale: 0.55,
+                duration: 320, ease: 'Quad.easeIn'
+            });
             if (this.paso === 0) {
                 var r = await this.marcar(a.id, d);
-                if (r === 'mal') this.aCasa(a, true);
-                else if (r === 'repetido') this.aCasa(a);
-                else if (r === 'bien') this.meter(a);
+                if (r === 'mal' || r === 'repetido') {
+                    await this.rechazar(a, r === 'mal');
+                    a.ocupada = false;
+                    this.enviando = false;
+                    return;
+                }
+                await this.meter(a);
+                this.enviando = false;
                 return;
             }
             var ok = await this.elegir(a.id, d);
-            if (ok === false) this.aCasa(a, true);
+            if (ok === false) {
+                await this.rechazar(a, true);
+                a.ocupada = false;
+            }
+            this.enviando = false;
+        },
+
+        rechazar: async function (a, conSacudir) {
+            var casa = a.casa || { x: 80, y: this.L.mesa + 40 };
+            this.cameras.main.shake(90, 0.004);
+            K.ruido({ f: 160, q: 1, dur: 0.15, vol: 0.08 });
+            await tw(this, {
+                targets: a.cont, x: casa.x, y: casa.y, scale: 1, alpha: 1,
+                duration: 400, ease: 'Back.easeOut'
+            });
+            a.cont.setDepth(30);
+            if (conSacudir) await a.sacudir();
         },
 
         /** Entra por el buzón de la bóveda. */
@@ -238,27 +323,49 @@
         /** Paso siguiente: vuelven a la mesa los que estaban en la bóveda (para elegir primero / último). */
         alPaso: async function (paso) {
             var self = this;
+            this.enviando = false;
+            this.apuntado = null;
             if (paso === 1) {
                 await this.retirar(this.cosas.filter(function (a) { return !a.usada; }));
                 this.dentro.forEach(function (a) { a.destruir(); });
                 this.dentro = [];
                 var ids = Ut.mezclar(this.nv.correctas.slice());
-                this.cosas = await this.filaDeCosas(ids, this.lugares(ids.length), this.tamDe(ids.length), { depth: 30 });
+                var lug = this.lugares(ids.length);
+                var tam = this.tamDe(ids.length);
+                this.cosas = ids.map(function (id, i) {
+                    var a = self.crearCosa(id, lug[i].x, lug[i].y, tam, { depth: 30 });
+                    a.casa = { x: lug[i].x, y: lug[i].y };
+                    a.fase = Math.random() * 6;
+                    a.vx = (Math.random() < 0.5 ? -1 : 1) * (25 + Math.random() * 35);
+                    a.usada = false;
+                    a.ocupada = false;
+                    return a;
+                });
             }
             this.marcarDestino();
         },
 
-        alFallar: async function () { if (this.tocado) await this.tocado.sacudir(); },
+        alFallar: async function () {},
 
         alTerminarNivel: async function () {
+            this.apuntado = null;
             await this.retirar(this.cosas.filter(function (a) { return !a.usada; }).concat(this.puestos));
             this.cosas = []; this.puestos = [];
             this.placas.forEach(function (p) { p.marca.setStrokeStyle(4, 0xffe066, 0); });
         },
 
         mostrarPista: function (cancelada) {
-            var d = this.destino();
-            return this.pistaArrastre(cancelada, this.cosas, d);
+            var self = this;
+            if (this.fase !== 'jugar' || this.sonando || this.enviando) return Promise.resolve();
+            var ok = this.cosas.filter(function (c) {
+                return !c.usada && self.respuestas().indexOf(c.id) >= 0;
+            })[0];
+            if (!ok) return Promise.resolve();
+            return this.ctx.mano({
+                punto: { x: ok.cont.x, y: ok.cont.y },
+                holdMs: 450,
+                cancelado: function () { return cancelada() || self.fase !== 'jugar'; }
+            });
         },
 
         /* ── Escena final: la bóveda se abre del todo ── */
@@ -289,9 +396,41 @@
             await esperar(this, 900);
         },
 
-        /** Demo: la mano mete por el buzón de la bóveda lo que sonó. */
+        /** Demo: la mano toca lo que sonó y vuela al destino. */
         demoPaso: function () {
-            return this.pasoArrastre(this.correctaDe(this.cosas), this.destino());
+            var self = this;
+            var ok = this.correctaDe(this.cosas);
+            if (!ok) return null;
+            return {
+                desde: { x: ok.cont.x, y: ok.cont.y - 16 },
+                mantener: 350,
+                hacer: function () { return self.enviar(ok); }
+            };
+        },
+
+        paso: function (time, delta) {
+            var dt = (delta || 16) / 1000;
+            var L = this.L;
+            if (this.interior && !this.tweens.isTweening(this.interior) && this.interior.fillAlpha < 0.2) {
+                this.interior.setFillStyle(0xffe066, 0.04 + Math.sin(time / 500) * 0.03);
+            }
+            if (this.fase !== 'jugar' || this.enviando) return;
+            var yMin = L.mesa + 18;
+            var yMax = L.H - 40;
+            this.cosas.forEach(function (a) {
+                if (a.usada || a.ocupada || !a.cont.active) return;
+                if (this.tweens.isTweening(a.cont)) return;
+                a.fase = (a.fase || 0) + dt * 2.2;
+                a.cont.x += a.vx * dt;
+                a.cont.y += Math.sin(a.fase) * 22 * dt;
+                if (a.cont.x < 40) { a.cont.x = 40; a.vx = Math.abs(a.vx); }
+                if (a.cont.x > L.der - 40) { a.cont.x = L.der - 40; a.vx = -Math.abs(a.vx); }
+                if (a.cont.y < yMin) a.cont.y = yMin;
+                if (a.cont.y > yMax) a.cont.y = yMax;
+                a.casa = { x: a.cont.x, y: a.cont.y };
+                if (this.apuntado === a) a.cont.setScale(1.08);
+                else if (Math.abs(a.cont.scale - 1) > 0.02) a.cont.setScale(1);
+            }, this);
         },
 
         estadoExtra: function () {

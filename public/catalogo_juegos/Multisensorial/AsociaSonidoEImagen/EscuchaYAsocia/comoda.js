@@ -23,8 +23,8 @@
     var ROPA = [0xff8787, 0x74c0fc, 0xffd43b, 0x8ce99a, 0xb197fc];
     var A = global.PedniaArte;
 
-    /** Imágenes del diseño (img/diseno/): las de ¿Qué suena? + la ambulancia y el dormitorio. */
-    var DISENO = 'img/diseno/';
+    /** Imágenes del diseño (img/): las de ¿Qué suena? + la ambulancia y el dormitorio. */
+    var DISENO = 'img/';
     var PIELES = ['avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca', 'ambulancia'];
     /**
      * Muebles dentro de fondo.png (1281×721), medidos sobre la imagen. La cómoda no viene en el
@@ -42,7 +42,10 @@
         preload: function () {
             var self = this;
             var svg = function (k, f, w, h) { if (!self.textures.exists(k)) self.load.svg(k, DISENO + f, { width: w, height: h }); };
-            if (!this.textures.exists('ea_fondo')) this.load.image('ea_fondo', DISENO + 'fondo.png');
+            // El dormitorio sin el móvil colgante (fondo_sin_movil.png) + el móvil aparte (movil.png),
+            // recortados del fondo.png del diseño, para que el móvil gire.
+            if (!this.textures.exists('ea_fondo')) this.load.image('ea_fondo', DISENO + 'fondo_sin_movil.png');
+            if (!this.textures.exists('ea_movil')) this.load.image('ea_movil', DISENO + 'movil.png');
             PIELES.forEach(function (id) { svg('ea_' + id, id + '.svg', 420, 420); });
             svg('ea_escuchar', 'escuchar.svg', 300, 300);
             [64, 128, 256].forEach(function (t) { svg('pa:estrella@' + t, 'estrella.svg', t, t); });
@@ -85,6 +88,43 @@
                 this.estrellas.push(e);
             }
             this.montarPresentador();
+        },
+
+        /**
+         * Móvil colgante del diseño: cuelga del gancho (325, 172 en la imagen) y gira despacio sobre
+         * su hilo; el ancho va y vuelve pasando de un lado a otro (como un objeto plano que da vueltas)
+         * y se mece un poco. Al tocarlo da una vuelta rápida.
+         */
+        montarMovil: function (keep) {
+            var L = this.L;
+            if (!this.textures.exists('ea_movil')) return;
+            var s = L.fondo.s;
+            var m = keep(this.add.image(L.fondo.x + 325 * s, L.fondo.y + 172 * s, 'ea_movil')
+                .setOrigin(47 / 96, 2 / 144).setScale(s).setDepth(-0.5));
+            this.movil = m;
+            var quieto = Ut.reducido && Ut.reducido();
+            var giro = { t: 0, vel: 1 };
+            m.giro = giro;
+            var ancho = function (t) {
+                var c = Math.cos(t);
+                // Nunca llega a cero (no desaparece de canto): pasa de un lado al otro.
+                return (c >= 0 ? 1 : -1) * (0.22 + 0.78 * Math.abs(c)) * s;
+            };
+            this.tweens.addCounter({
+                from: 0, to: 1, duration: 1000, repeat: -1,
+                onUpdate: function (tw) {
+                    if (!m.active) return;
+                    giro.t += (quieto ? 0.002 : 0.012) * giro.vel;
+                    m.scaleX = ancho(giro.t);
+                    m.angle = Math.sin(giro.t * 0.7) * (quieto ? 0.5 : 2.5);
+                }
+            });
+            // Toque: una vuelta rápida que se va frenando.
+            m.setInteractive({ useHandCursor: true });
+            m.on('pointerdown', function () {
+                giro.vel = 6;
+                this.tweens.add({ targets: giro, vel: 1, duration: 1800, ease: 'Quad.easeOut' });
+            }, this);
         },
 
         /**
@@ -154,6 +194,7 @@
                     keep(this.add.image(L.fondo.x, 0, 'ea_fondo', 'arriba').setOrigin(0, 0).setDisplaySize(CUARTO.fw * L.fondo.s, L.fondo.y + 2).setDepth(-1));
                 }
                 keep(this.add.image(L.fondo.x, L.fondo.y, 'ea_fondo', '__BASE').setOrigin(0, 0).setScale(L.fondo.s).setDepth(-1));
+                this.montarMovil(keep);
             }
             K.textura(this, 'cuarto_fondo', L.W, L.H, function (x, w, h) { self.pintarCuarto(x, w, h); });
             keep(this.add.image(0, 0, 'cuarto_fondo').setOrigin(0, 0).setDepth(0));

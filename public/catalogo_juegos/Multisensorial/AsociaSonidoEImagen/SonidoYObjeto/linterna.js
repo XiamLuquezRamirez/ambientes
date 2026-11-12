@@ -554,5 +554,10 @@
         }
     };
 
-    K.crear({ id: 'linterna', fondo: '#1b2440', escena: escena });
+    K.crear({
+        id: 'linterna',
+        fondo: '#1b2440',
+        pieles: ['aspiradora', 'cajon', 'gallo', 'licuadora', 'puerta', 'reloj', 'telefono', 'vaca', 'ventana', 'ventilador'],
+        escena: escena
+    });
 })(typeof window !== 'undefined' ? window : this);

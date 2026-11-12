@@ -457,5 +457,11 @@
         }
     };
 
-    K.crear({ id: 'camara', fondo: '#a5d8ff', escena: escena });
+    K.crear({
+        id: 'camara',
+        fondo: '#a5d8ff',
+        /* acciones siguen en 3D; solo distractores con SVG de diseño */
+        pieles: ['gallo', 'vaca'],
+        escena: escena
+    });
 })(typeof window !== 'undefined' ? window : this);

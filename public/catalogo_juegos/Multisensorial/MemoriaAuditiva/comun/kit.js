@@ -35,6 +35,43 @@
 
     function efecto(scene, n) { if (scene.ctx && scene.ctx.efecto) scene.ctx.efecto(n); }
 
+    /** Niño de pie, pies en y=0 del gráfico. o: ropa, piel, pelo. */
+    function pintarNino(g, s, o) {
+        o = o || {};
+        s = s || 1;
+        g.fillStyle(0x2b2b2b, 1);
+        g.fillRoundedRect(-15 * s, -7 * s, 13 * s, 7 * s, 2 * s);
+        g.fillRoundedRect(2 * s, -7 * s, 13 * s, 7 * s, 2 * s);
+        g.fillStyle(0x364fc7, 1);
+        g.fillRoundedRect(-13 * s, -22 * s, 11 * s, 16 * s, 4 * s);
+        g.fillRoundedRect(2 * s, -22 * s, 11 * s, 16 * s, 4 * s);
+        g.fillStyle(o.ropa || 0x4dabf7, 1);
+        g.fillRoundedRect(-17 * s, -50 * s, 34 * s, 30 * s, 9 * s);
+        g.fillStyle(o.piel || 0xffc078, 1);
+        g.fillCircle(-20 * s, -36 * s, 6 * s);
+        g.fillCircle(20 * s, -36 * s, 6 * s);
+        g.fillCircle(0, -64 * s, 15 * s);
+        g.fillStyle(o.pelo || 0x8d5524, 1);
+        g.fillEllipse(0, -74 * s, 28 * s, 16 * s);
+        g.fillRect(-14 * s, -70 * s, 28 * s, 8 * s);
+        g.fillStyle(0x2b2b2b, 1);
+        g.fillCircle(-5 * s, -64 * s, 2.1 * s);
+        g.fillCircle(6 * s, -64 * s, 2.1 * s);
+        g.lineStyle(2, 0xc45c26, 1);
+        g.beginPath();
+        g.arc(0, -58 * s, 6 * s, 0.25, Math.PI - 0.25);
+        g.strokePath();
+    }
+
+    function nino(scene, x, y, depth, o) {
+        o = o || {};
+        var c = scene.add.container(x, y).setDepth(depth || 20).setScale(o.esc || 1);
+        var g = scene.add.graphics();
+        pintarNino(g, 1, o);
+        c.add(g);
+        return c;
+    }
+
     var FRASES_ACIERTO = [
         { voz: 'zoe', texto: '¡Muy bien! Lo recordaste' },
         { voz: 'zeus', texto: '¡Qué buena memoria!' },
@@ -213,10 +250,14 @@
             b.halo = halo;
             this.bocina = b;
             this.ondasG = keep(this.add.graphics().setDepth(79));
+            // Marcador en la esquina: la bocina vive en el escenario, no en el cielo.
             this.estrellas = [];
-            var tam = Math.max(20, r * 0.6);
+            var tam = Math.max(18, Math.min(26, Math.round(L.H * 0.034)));
+            var x0 = L.W - 18 - 4 * tam - 3 * 8;
+            var anchoEst = 4 * tam + 3 * 8;
+            keep(this.add.rectangle(x0 + anchoEst / 2, 16 + tam / 2, anchoEst + 16, tam + 14, 0x12263f, 0.45).setDepth(79));
             for (var i = 0; i < 4; i++) {
-                var e = keep(this.add.image(L.bocina.x + r + 24 + i * (tam + 6), L.bocina.y, A.textura(this, 'estrella', 64)).setDisplaySize(tam, tam).setDepth(80));
+                var e = keep(this.add.image(x0 + i * (tam + 8) + tam / 2, 16 + tam / 2, A.textura(this, 'estrella', 64)).setDisplaySize(tam, tam).setDepth(80));
                 if (i >= this.nivelActual) e.setTint(0x8a8f98).setAlpha(0.55);
                 this.estrellas.push(e);
             }
@@ -749,6 +790,44 @@
             return this.ctx.mano({ punto: { x: ok.cont.x, y: ok.cont.y }, holdMs: 200, arrastre: { dx: destino.x - ok.cont.x, dy: destino.y - ok.cont.y, durMs: 900 }, cancelado: no });
         },
 
+        /**
+         * Polvo, polen o luciérnagas. zona {x,y,w,h,depth}. Se mueven solas en update.
+         * Cada armar() debe volver a sembrarlas: limpiarEscenario destruye el gráfico.
+         */
+        sembrarMotes: function (keep, n, zona, color) {
+            this.motes = [];
+            this.motesZona = zona;
+            this.motesColor = color == null ? 0xffffff : color;
+            this.motesG = keep(this.add.graphics().setDepth(zona.depth == null ? 7 : zona.depth));
+            for (var i = 0; i < n; i++) {
+                this.motes.push({
+                    x: zona.x + Math.random() * zona.w,
+                    y: zona.y + Math.random() * zona.h,
+                    r: 1.4 + Math.random() * 2.2,
+                    v: 6 + Math.random() * 18,
+                    fase: Math.random() * 6
+                });
+            }
+        },
+
+        moverMotes: function (time, delta) {
+            var g = this.motesG, z = this.motesZona;
+            if (!g || !z || !g.active) return;
+            g.clear();
+            var dt = (delta || 16) / 1000;
+            for (var i = 0; i < this.motes.length; i++) {
+                var m = this.motes[i];
+                m.fase += dt;
+                m.y -= m.v * dt;
+                m.x += Math.sin(time / 700 + m.fase) * 14 * dt;
+                if (m.y < z.y) { m.y = z.y + z.h; m.x = z.x + Math.random() * z.w; }
+                if (m.x < z.x) m.x = z.x + z.w;
+                if (m.x > z.x + z.w) m.x = z.x;
+                g.fillStyle(this.motesColor, 0.28 + 0.5 * (0.5 + 0.5 * Math.sin(m.fase * 3)));
+                g.fillCircle(m.x, m.y, m.r);
+            }
+        },
+
         /** Lleva un objeto en arco hasta (x, y); o.alto = cuánto sube, o.esc = escala final. */
         saltarA: function (obj, x, y, o) {
             o = o || {};
@@ -794,6 +873,7 @@
                 }
             }
             if (this.bocina && this.bocina.halo) this.bocina.halo.setScale(1 + Math.sin(time / 380) * 0.06);
+            if (this.motesG) this.moverMotes(time, delta);
             if (this.vidaAmb) this.vidaAmb.actualizar(time, delta);
             if (this.paso2) this.paso2(time, delta);
         }
@@ -807,7 +887,12 @@
             esc[k] = def.escena[k];
         });
         if (def.escena.paso) esc.paso2 = def.escena.paso;
-        var css = 'body.modo-' + def.id + ' #opciones,body.modo-' + def.id + ' .centro{display:none !important}';
+        var b = 'body.modo-' + def.id;
+        var css = b + ' #opciones,' + b + ' .centro{display:none !important}' +
+            b + ' .cabecera{position:fixed;top:10px;left:12px;width:min(420px,44vw);padding:0;z-index:8;pointer-events:none}' +
+            b + ' .dialogo{min-height:0;padding:4px 14px 4px 4px;border-width:3px}' +
+            b + ' .enunciado{font-size:clamp(16px,2.2vh,22px);line-height:1.25;margin:0}' +
+            b + ' .dialogo-avatar{width:46px;height:46px}';
         return B.crearMotor({ id: def.id, fondo: def.fondo || '#a5d8ff', css: css, escena: esc });
     }
 
@@ -819,6 +904,6 @@
         generar: generar, nivelOficial: nivelOficial,
         ruido: P.ruido, tono: P.tono, actx: P.actx,
         textura: P.textura, rr: P.rr, grano: P.grano, madera: P.madera, pared: P.pared, piso: P.piso, ventana: P.ventana, sombra: P.sombra,
-        efecto: efecto
+        efecto: efecto, nino: nino, pintarNino: pintarNino
     };
 })(typeof window !== 'undefined' ? window : this);

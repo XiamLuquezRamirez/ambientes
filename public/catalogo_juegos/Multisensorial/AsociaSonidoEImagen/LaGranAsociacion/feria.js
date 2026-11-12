@@ -572,5 +572,10 @@
         }
     };
 
-    K.crear({ id: 'feria', fondo: '#5f3dc4', escena: escena });
+    K.crear({
+        id: 'feria',
+        fondo: '#5f3dc4',
+        pieles: ['aspiradora', 'avion', 'bicicleta', 'gallo', 'puerta', 'reloj', 'telefono', 'tren', 'vaca', 'ventilador'],
+        escena: escena
+    });
 })(typeof window !== 'undefined' ? window : this);

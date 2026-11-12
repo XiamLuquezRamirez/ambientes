@@ -1,0 +1,1357 @@
+{
+  "generado": "2026-11-11T22:48:04.737Z",
+  "juegos": [
+    {
+      "ruta": "AsociaSonidoEImagen/EscuchaYAsocia",
+      "tipo": "asocia-K.crear+auto-pieles",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "ambulancia",
+        "avion",
+        "bicicleta",
+        "gallo",
+        "reloj",
+        "telefono",
+        "tren",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [
+        "despertador",
+        "mugido"
+      ],
+      "nDiseno": 8,
+      "nPlano": 0
+    },
+    {
+      "ruta": "AsociaSonidoEImagen/LaGranAsociacion",
+      "tipo": "asocia-K.crear+auto-pieles",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "aspiradora",
+        "avion",
+        "bicicleta",
+        "gallo",
+        "puerta",
+        "reloj",
+        "telefono",
+        "tren",
+        "vaca",
+        "ventilador"
+      ],
+      "plano": [],
+      "sinArchivo": [
+        "mugido",
+        "vibracion"
+      ],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "AsociaSonidoEImagen/QueEscuchaste",
+      "tipo": "asocia-K.crear+auto-pieles",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "ambulancia",
+        "avion",
+        "bicicleta",
+        "gallo",
+        "reloj",
+        "telefono",
+        "tren",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [
+        "mugido"
+      ],
+      "nDiseno": 8,
+      "nPlano": 0
+    },
+    {
+      "ruta": "AsociaSonidoEImagen/QueObjetoSuena",
+      "tipo": "asocia-K.crear+auto-pieles",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "aspiradora",
+        "avion",
+        "bicicleta",
+        "gallo",
+        "reloj",
+        "telefono",
+        "tren",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [
+        "mugido"
+      ],
+      "nDiseno": 8,
+      "nPlano": 0
+    },
+    {
+      "ruta": "AsociaSonidoEImagen/QueSuena",
+      "tipo": "asocia-B-crearMotor+pieles-manual",
+      "kitV": null,
+      "diseno": [
+        "avion",
+        "bicicleta",
+        "gallo",
+        "reloj",
+        "telefono",
+        "tren",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [
+        "mugido",
+        "timbre"
+      ],
+      "nDiseno": 7,
+      "nPlano": 0
+    },
+    {
+      "ruta": "AsociaSonidoEImagen/SonidoDeTransporte",
+      "tipo": "asocia-K.crear+auto-pieles",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "ambulancia",
+        "avion",
+        "camion",
+        "gallo",
+        "motocicleta",
+        "tren",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [
+        "mugido",
+        "sirena"
+      ],
+      "nDiseno": 7,
+      "nPlano": 0
+    },
+    {
+      "ruta": "AsociaSonidoEImagen/SonidoDeUnaAccion",
+      "tipo": "asocia-K.crear+auto-pieles",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "gallo",
+        "vaca"
+      ],
+      "plano": [
+        "aplaudiendo",
+        "corriendo",
+        "durmiendo",
+        "saltando"
+      ],
+      "sinArchivo": [
+        "aplausos",
+        "mugido"
+      ],
+      "nDiseno": 2,
+      "nPlano": 4
+    },
+    {
+      "ruta": "AsociaSonidoEImagen/SonidoDeUnaMaquina",
+      "tipo": "asocia-K.crear+auto-pieles",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "aspiradora",
+        "gallo",
+        "lavadora",
+        "licuadora",
+        "secador",
+        "vaca",
+        "ventilador"
+      ],
+      "plano": [],
+      "sinArchivo": [
+        "mugido"
+      ],
+      "nDiseno": 7,
+      "nPlano": 0
+    },
+    {
+      "ruta": "AsociaSonidoEImagen/SonidoDelAgua",
+      "tipo": "asocia-K.crear+auto-pieles",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "gallo",
+        "lavadora",
+        "vaca"
+      ],
+      "plano": [
+        "ducha",
+        "fuente",
+        "pluma",
+        "regadera"
+      ],
+      "sinArchivo": [
+        "grifo",
+        "mugido"
+      ],
+      "nDiseno": 3,
+      "nPlano": 4
+    },
+    {
+      "ruta": "AsociaSonidoEImagen/SonidoYObjeto",
+      "tipo": "asocia-K.crear+auto-pieles",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "aspiradora",
+        "cajon",
+        "gallo",
+        "licuadora",
+        "puerta",
+        "reloj",
+        "telefono",
+        "vaca",
+        "ventana",
+        "ventilador"
+      ],
+      "plano": [],
+      "sinArchivo": [
+        "mugido"
+      ],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "AsociaSonidoEImagen/UnSonidoDeViaje",
+      "tipo": "asocia-K.crear+auto-pieles",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "ambulancia",
+        "avion",
+        "bicicleta",
+        "camion",
+        "gallo",
+        "motocicleta",
+        "tren",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [
+        "mugido"
+      ],
+      "nDiseno": 8,
+      "nPlano": 0
+    },
+    {
+      "ruta": "MemoriaAuditiva/ElGranDesafioDeMemoria",
+      "tipo": "memoria-el_texturas",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "botella",
+        "burro",
+        "caballo",
+        "campana",
+        "carro",
+        "elefante",
+        "gaita",
+        "gallo",
+        "gato",
+        "leon",
+        "maracas",
+        "pajaro",
+        "pato",
+        "pelota",
+        "perro",
+        "pollito",
+        "rana",
+        "reloj",
+        "tambor",
+        "tren",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "manos",
+        "pasos"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 22,
+      "nPlano": 2
+    },
+    {
+      "ruta": "MemoriaAuditiva/ElSonidoRepetido",
+      "tipo": "memoria-el_texturas",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "botella",
+        "burro",
+        "caballo",
+        "campana",
+        "carro",
+        "elefante",
+        "gaita",
+        "gallo",
+        "gato",
+        "leon",
+        "maracas",
+        "pajaro",
+        "pato",
+        "pelota",
+        "perro",
+        "pollito",
+        "rana",
+        "reloj",
+        "tambor",
+        "tren",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "manos",
+        "pasos"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 22,
+      "nPlano": 2
+    },
+    {
+      "ruta": "MemoriaAuditiva/QueCambio",
+      "tipo": "memoria-el_texturas",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "botella",
+        "burro",
+        "caballo",
+        "campana",
+        "carro",
+        "elefante",
+        "gaita",
+        "gallo",
+        "gato",
+        "leon",
+        "maracas",
+        "pajaro",
+        "pato",
+        "pelota",
+        "perro",
+        "pollito",
+        "rana",
+        "reloj",
+        "tambor",
+        "tren",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "manos",
+        "pasos"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 22,
+      "nPlano": 2
+    },
+    {
+      "ruta": "MemoriaAuditiva/QueEscuchaste",
+      "tipo": "memoria-el_texturas",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "botella",
+        "burro",
+        "caballo",
+        "campana",
+        "carro",
+        "elefante",
+        "gaita",
+        "gallo",
+        "gato",
+        "leon",
+        "maracas",
+        "pajaro",
+        "pato",
+        "pelota",
+        "perro",
+        "pollito",
+        "rana",
+        "reloj",
+        "tambor",
+        "tren",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "manos",
+        "pasos"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 22,
+      "nPlano": 2
+    },
+    {
+      "ruta": "MemoriaAuditiva/QueSonidoCambia",
+      "tipo": "memoria-el_texturas",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "botella",
+        "burro",
+        "caballo",
+        "campana",
+        "carro",
+        "elefante",
+        "gaita",
+        "gallo",
+        "gato",
+        "leon",
+        "maracas",
+        "pajaro",
+        "pato",
+        "pelota",
+        "perro",
+        "pollito",
+        "rana",
+        "reloj",
+        "tambor",
+        "tren",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "manos",
+        "pasos"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 22,
+      "nPlano": 2
+    },
+    {
+      "ruta": "MemoriaAuditiva/QueSonidoDesaparecio",
+      "tipo": "memoria-el_texturas",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "botella",
+        "burro",
+        "caballo",
+        "campana",
+        "carro",
+        "elefante",
+        "gaita",
+        "gallo",
+        "gato",
+        "leon",
+        "maracas",
+        "pajaro",
+        "pato",
+        "pelota",
+        "perro",
+        "pollito",
+        "rana",
+        "reloj",
+        "tambor",
+        "tren",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "manos",
+        "pasos"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 22,
+      "nPlano": 2
+    },
+    {
+      "ruta": "MemoriaAuditiva/QueSonidoSeRepitio",
+      "tipo": "memoria-el_texturas",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "botella",
+        "burro",
+        "caballo",
+        "campana",
+        "carro",
+        "elefante",
+        "gaita",
+        "gallo",
+        "gato",
+        "leon",
+        "maracas",
+        "pajaro",
+        "pato",
+        "pelota",
+        "perro",
+        "pollito",
+        "rana",
+        "reloj",
+        "tambor",
+        "tren",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "manos",
+        "pasos"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 22,
+      "nPlano": 2
+    },
+    {
+      "ruta": "MemoriaAuditiva/RecuerdaDosSonidos",
+      "tipo": "memoria-el_texturas",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "botella",
+        "burro",
+        "caballo",
+        "campana",
+        "carro",
+        "elefante",
+        "gaita",
+        "gallo",
+        "gato",
+        "leon",
+        "maracas",
+        "pajaro",
+        "pato",
+        "pelota",
+        "perro",
+        "pollito",
+        "rana",
+        "reloj",
+        "tambor",
+        "tren",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "manos",
+        "pasos"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 22,
+      "nPlano": 2
+    },
+    {
+      "ruta": "MemoriaAuditiva/RecuerdaElSonido",
+      "tipo": "memoria-el_texturas",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "botella",
+        "burro",
+        "caballo",
+        "campana",
+        "carro",
+        "elefante",
+        "gaita",
+        "gallo",
+        "gato",
+        "leon",
+        "maracas",
+        "pajaro",
+        "pato",
+        "pelota",
+        "perro",
+        "pollito",
+        "rana",
+        "reloj",
+        "tambor",
+        "tren",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "manos",
+        "pasos"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 22,
+      "nPlano": 2
+    },
+    {
+      "ruta": "MemoriaAuditiva/RecuerdaLosSonidos",
+      "tipo": "memoria-el_texturas",
+      "kitV": "20261111piel2",
+      "diseno": [
+        "botella",
+        "burro",
+        "caballo",
+        "campana",
+        "carro",
+        "elefante",
+        "gaita",
+        "gallo",
+        "gato",
+        "leon",
+        "maracas",
+        "pajaro",
+        "pato",
+        "pelota",
+        "perro",
+        "pollito",
+        "rana",
+        "reloj",
+        "tambor",
+        "tren",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "manos",
+        "pasos"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 22,
+      "nPlano": 2
+    },
+    {
+      "ruta": "EncuentraElSonido/DondeEstaElPajaro",
+      "tipo": "encuentra-escondite",
+      "kitV": null,
+      "diseno": [
+        "bicicleta",
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pandereta",
+        "paraguas",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "arbol"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 15,
+      "nPlano": 1
+    },
+    {
+      "ruta": "EncuentraElSonido/DondeEstaElPerro",
+      "tipo": "encuentra-escondite",
+      "kitV": null,
+      "diseno": [
+        "bicicleta",
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pandereta",
+        "paraguas",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "arbol"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 15,
+      "nPlano": 1
+    },
+    {
+      "ruta": "EncuentraElSonido/ElSonidoViajero",
+      "tipo": "encuentra-escondite",
+      "kitV": null,
+      "diseno": [
+        "bicicleta",
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pandereta",
+        "paraguas",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "arbol"
+      ],
+      "sinArchivo": [
+        "azar"
+      ],
+      "nDiseno": 15,
+      "nPlano": 1
+    },
+    {
+      "ruta": "EncuentraElSonido/EncuentraElSonido",
+      "tipo": "encuentra-escondite",
+      "kitV": null,
+      "diseno": [
+        "bicicleta",
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pandereta",
+        "paraguas",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "arbol"
+      ],
+      "sinArchivo": [
+        "azar"
+      ],
+      "nDiseno": 15,
+      "nPlano": 1
+    },
+    {
+      "ruta": "EncuentraElSonido/EncuentraElSonidoDeLaLluvia",
+      "tipo": "encuentra-escondite",
+      "kitV": null,
+      "diseno": [
+        "bicicleta",
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pandereta",
+        "paraguas",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "arbol"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 15,
+      "nPlano": 1
+    },
+    {
+      "ruta": "EncuentraElSonido/EncuentraElSonidoEntreDistractores",
+      "tipo": "encuentra-escondite",
+      "kitV": null,
+      "diseno": [
+        "bicicleta",
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pandereta",
+        "paraguas",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "arbol"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 15,
+      "nPlano": 1
+    },
+    {
+      "ruta": "EncuentraElSonido/EncuentraLaTrompeta",
+      "tipo": "encuentra-escondite",
+      "kitV": null,
+      "diseno": [
+        "bicicleta",
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pandereta",
+        "paraguas",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "arbol"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 15,
+      "nPlano": 1
+    },
+    {
+      "ruta": "EncuentraElSonido/LocalizaElSonido",
+      "tipo": "encuentra-escondite",
+      "kitV": null,
+      "diseno": [
+        "bicicleta",
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pandereta",
+        "paraguas",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "arbol"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 15,
+      "nPlano": 1
+    },
+    {
+      "ruta": "EncuentraElSonido/MisionFinalDondeEsta",
+      "tipo": "encuentra-escondite",
+      "kitV": null,
+      "diseno": [
+        "bicicleta",
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pandereta",
+        "paraguas",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "arbol"
+      ],
+      "sinArchivo": [
+        "azar"
+      ],
+      "nDiseno": 15,
+      "nPlano": 1
+    },
+    {
+      "ruta": "EncuentraElSonido/SonidosEnDiferentesLugares",
+      "tipo": "encuentra-escondite",
+      "kitV": null,
+      "diseno": [
+        "bicicleta",
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pandereta",
+        "paraguas",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "trompeta",
+        "vaca"
+      ],
+      "plano": [
+        "arbol"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 15,
+      "nPlano": 1
+    },
+    {
+      "ruta": "QueSonidoEscuchas/EscuchaYRecuerda",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "vaca"
+      ],
+      "plano": [
+        "lluvia",
+        "mar",
+        "viento"
+      ],
+      "sinArchivo": [
+        "azar"
+      ],
+      "nDiseno": 10,
+      "nPlano": 3
+    },
+    {
+      "ruta": "QueSonidoEscuchas/LaMisionFinal",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "vaca"
+      ],
+      "plano": [
+        "lluvia",
+        "mar",
+        "viento"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 3
+    },
+    {
+      "ruta": "QueSonidoEscuchas/OtrosSonidosDeAnimales",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "vaca"
+      ],
+      "plano": [
+        "lluvia",
+        "mar",
+        "viento"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 3
+    },
+    {
+      "ruta": "QueSonidoEscuchas/OtrosSonidosDeLaNaturaleza",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "vaca"
+      ],
+      "plano": [
+        "lluvia",
+        "mar",
+        "viento"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 3
+    },
+    {
+      "ruta": "QueSonidoEscuchas/QueSonidoEs",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "vaca"
+      ],
+      "plano": [
+        "lluvia",
+        "mar",
+        "viento"
+      ],
+      "sinArchivo": [
+        "azar"
+      ],
+      "nDiseno": 10,
+      "nPlano": 3
+    },
+    {
+      "ruta": "QueSonidoEscuchas/QueSonidoEscuchas",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "vaca"
+      ],
+      "plano": [
+        "lluvia",
+        "mar",
+        "viento"
+      ],
+      "sinArchivo": [
+        "azar"
+      ],
+      "nDiseno": 10,
+      "nPlano": 3
+    },
+    {
+      "ruta": "QueSonidoEscuchas/QueSonidoFalta",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "vaca"
+      ],
+      "plano": [
+        "lluvia",
+        "mar",
+        "viento"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 3
+    },
+    {
+      "ruta": "QueSonidoEscuchas/SonidosDeAnimales",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "vaca"
+      ],
+      "plano": [
+        "lluvia",
+        "mar",
+        "viento"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 3
+    },
+    {
+      "ruta": "QueSonidoEscuchas/SonidosDeObjetos",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "vaca"
+      ],
+      "plano": [
+        "lluvia",
+        "mar",
+        "viento"
+      ],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 3
+    },
+    {
+      "ruta": "QueSonidoEscuchas/SonidosSimilares",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "triangulo",
+        "vaca"
+      ],
+      "plano": [
+        "lluvia",
+        "mar",
+        "viento"
+      ],
+      "sinArchivo": [
+        "azar"
+      ],
+      "nDiseno": 10,
+      "nPlano": 3
+    },
+    {
+      "ruta": "RepiteLaSecuencia/DosInstrumentos",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "RepiteLaSecuencia/DosSonidos",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "RepiteLaSecuencia/ElGranCodigoSecreto",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "RepiteLaSecuencia/GranSecuenciaFinal",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "RepiteLaSecuencia/SecuenciaConCambio",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "RepiteLaSecuencia/SecuenciaConDistractor",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "RepiteLaSecuencia/SecuenciaDe3Sonidos",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "RepiteLaSecuencia/SecuenciaDe3SonidosDiferentes",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "RepiteLaSecuencia/SecuenciaDe4Sonidos",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 0
+    },
+    {
+      "ruta": "RepiteLaSecuencia/TresSonidos",
+      "tipo": "dom-img-config",
+      "kitV": null,
+      "diseno": [
+        "campana",
+        "carro",
+        "gallo",
+        "gato",
+        "maracas",
+        "pajaro",
+        "pelota",
+        "perro",
+        "tambor",
+        "vaca"
+      ],
+      "plano": [],
+      "sinArchivo": [],
+      "nDiseno": 10,
+      "nPlano": 0
+    }
+  ],
+  "desalineados": []
+}

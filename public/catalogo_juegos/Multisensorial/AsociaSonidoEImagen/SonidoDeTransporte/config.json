@@ -37,28 +37,9 @@
     ]
   },
   "elementos": {
-    "bicicleta": {
-      "img": "img/bicicleta.svg",
-      "nombre": "Bicicleta"
-    },
-    "telefono": {
-      "img": "img/telefono.svg",
-      "nombre": "Teléfono"
-    },
-    "reloj": {
-      "img": "img/reloj.svg",
-      "nombre": "Reloj",
-      "fotogramas": [
-        "img/reloj_b.svg"
-      ]
-    },
     "avion": {
       "img": "img/avion.svg",
       "nombre": "Avión"
-    },
-    "aspiradora": {
-      "img": "img/aspiradora.svg",
-      "nombre": "Aspiradora"
     },
     "tren": {
       "img": "img/tren.svg",
@@ -66,38 +47,7 @@
     },
     "ambulancia": {
       "img": "img/ambulancia.svg",
-      "nombre": "Ambulancia",
-      "fotogramas": [
-        "img/ambulancia_b.svg"
-      ]
-    },
-    "puerta": {
-      "img": "img/puerta.svg",
-      "nombre": "Puerta",
-      "fotogramas": [
-        "img/puerta_abierta.svg"
-      ],
-      "quedaAbierta": true
-    },
-    "ventana": {
-      "img": "img/ventana.svg",
-      "nombre": "Ventana"
-    },
-    "cajon": {
-      "img": "img/cajon.svg",
-      "nombre": "Cajón"
-    },
-    "secador": {
-      "img": "img/secador.svg",
-      "nombre": "Secador de cabello"
-    },
-    "licuadora": {
-      "img": "img/licuadora.svg",
-      "nombre": "Licuadora"
-    },
-    "ventilador": {
-      "img": "img/ventilador.svg",
-      "nombre": "Ventilador"
+      "nombre": "Ambulancia"
     },
     "camion": {
       "img": "img/camion.svg",
@@ -106,49 +56,6 @@
     "motocicleta": {
       "img": "img/motocicleta.svg",
       "nombre": "Motocicleta"
-    },
-    "aplaudiendo": {
-      "img": "img/aplaudiendo.svg",
-      "nombre": "Personas aplaudiendo",
-      "fotogramas": [
-        "img/aplaudiendo_b.svg"
-      ]
-    },
-    "corriendo": {
-      "img": "img/corriendo.svg",
-      "nombre": "Persona corriendo"
-    },
-    "saltando": {
-      "img": "img/saltando.svg",
-      "nombre": "Persona saltando"
-    },
-    "durmiendo": {
-      "img": "img/durmiendo.svg",
-      "nombre": "Persona durmiendo"
-    },
-    "pluma": {
-      "img": "img/pluma.svg",
-      "nombre": "Pluma",
-      "fotogramas": [
-        "img/pluma_abierta.svg"
-      ],
-      "quedaAbierta": true
-    },
-    "ducha": {
-      "img": "img/ducha.svg",
-      "nombre": "Ducha"
-    },
-    "fuente": {
-      "img": "img/fuente.svg",
-      "nombre": "Fuente"
-    },
-    "lavadora": {
-      "img": "img/lavadora.svg",
-      "nombre": "Lavadora"
-    },
-    "regadera": {
-      "img": "img/regadera.svg",
-      "nombre": "Regadera"
     },
     "vaca": {
       "img": "img/vaca.svg",

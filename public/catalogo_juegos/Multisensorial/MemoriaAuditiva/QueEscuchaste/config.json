@@ -2,7 +2,7 @@
   "nombre": "¿Qué Escuchaste?",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: escucha el sonido y luego toca lo que escuchaste.",
+    "demostracion": "¡Mira! Usa el gancho para atrapar lo que escuchaste.",
     "demostracionAcierto": "¡Así se recuerda un sonido!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
@@ -23,6 +23,7 @@
     "mostrarIntro": true
   },
   "audios": {
+    "tema": "maquina",
     "cierre": "../../../sounds/victory.mp3",
     "fondo": "../../../sounds/fondo.mp3",
     "sonidos": {},
