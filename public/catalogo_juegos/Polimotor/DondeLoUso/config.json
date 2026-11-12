@@ -1,0 +1,327 @@
+{
+  "nombre": "¿Dónde lo uso?",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "radioCaptura": 2.8,
+    "ayudaMs": 11000,
+    "ayudaRepetirMs": 13000,
+    "erroresParaBrillo": 2,
+    "mezclarPartes": true
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "titulo": "RONDA 1",
+      "instruccion": "¡Mira los calcetines! ¿En qué parte del cuerpo te pones los calcetines? ¡Lleva la línea hasta allá!",
+      "destacar": "calcetines",
+      "objetos": [
+        {
+          "id": "gafas",
+          "nombre": "Gafas de sol",
+          "icono": "gafas",
+          "color": "#74c0fc",
+          "borde": "#1971c2",
+          "fila": 0,
+          "textos": {
+            "pista": "¡Mira las gafas de sol! ¿En qué parte del cuerpo te pones las gafas?",
+            "acierto": "Las gafas de sol se usan en los ojos."
+          }
+        },
+        {
+          "id": "nariz_payaso",
+          "nombre": "Nariz de payaso",
+          "icono": "nariz_payaso",
+          "color": "#ffe066",
+          "borde": "#e8a200",
+          "fila": 1,
+          "textos": {
+            "pista": "¡Mira la nariz de payaso! ¿Dónde debemos colocarla?",
+            "acierto": "La nariz de payaso va en la nariz."
+          }
+        },
+        {
+          "id": "calcetines",
+          "nombre": "Calcetines",
+          "icono": "calcetines",
+          "color": "#ffa8c5",
+          "borde": "#d6336c",
+          "fila": 2,
+          "textos": {
+            "pista": "¡Mira los calcetines! ¿En qué parte del cuerpo te pones los calcetines?",
+            "acierto": "Los calcetines se ponen en los pies."
+          }
+        },
+        {
+          "id": "guantes",
+          "nombre": "Guantes",
+          "icono": "guantes",
+          "color": "#d0bfff",
+          "borde": "#7048e8",
+          "fila": 3,
+          "textos": {
+            "pista": "¡Mira los guantes! ¿Dónde te pones los guantes cuando hace frío?",
+            "acierto": "Los guantes se ponen en las manos."
+          }
+        },
+        {
+          "id": "gorro",
+          "nombre": "Gorro",
+          "icono": "gorro",
+          "color": "#ffc078",
+          "borde": "#e8590c",
+          "fila": 4,
+          "textos": {
+            "pista": "¡Mira el gorro! ¿En qué parte del cuerpo se pone el gorro?",
+            "acierto": "El gorro se pone en la cabeza."
+          }
+        }
+      ],
+      "partes": [
+        {
+          "id": "nariz",
+          "nombre": "Nariz",
+          "icono": "nariz",
+          "color": "#e5dbff",
+          "borde": "#6741d9",
+          "fila": 0
+        },
+        {
+          "id": "manos",
+          "nombre": "Manos",
+          "icono": "manos",
+          "color": "#ffec99",
+          "borde": "#f08c00",
+          "fila": 1
+        },
+        {
+          "id": "cabeza",
+          "nombre": "Cabeza",
+          "icono": "cabeza",
+          "color": "#ffd8a8",
+          "borde": "#d9480f",
+          "fila": 2
+        },
+        {
+          "id": "ojos",
+          "nombre": "Ojos",
+          "icono": "ojos",
+          "color": "#fcc2d7",
+          "borde": "#c2255c",
+          "fila": 3
+        },
+        {
+          "id": "pies",
+          "nombre": "Pies",
+          "icono": "pies",
+          "color": "#a5d8ff",
+          "borde": "#1c7ed6",
+          "fila": 4
+        }
+      ],
+      "parejas": {
+        "gafas": "ojos",
+        "nariz_payaso": "nariz",
+        "calcetines": "pies",
+        "guantes": "manos",
+        "gorro": "cabeza"
+      }
+    },
+    {
+      "id": 2,
+      "titulo": "RONDA 2",
+      "instruccion": "¡Mira la bufanda! ¿En qué parte del cuerpo te pones la bufanda? ¡Lleva la línea hasta allá!",
+      "destacar": "bufanda",
+      "objetos": [
+        {
+          "id": "bufanda",
+          "nombre": "Bufanda",
+          "icono": "bufanda",
+          "color": "#99e9f2",
+          "borde": "#0c8599",
+          "fila": 0,
+          "textos": {
+            "pista": "¡Mira la bufanda! ¿En qué parte del cuerpo te pones la bufanda cuando hace frío?",
+            "acierto": "La bufanda se pone en el cuello."
+          }
+        },
+        {
+          "id": "audifonos",
+          "nombre": "Audífonos",
+          "icono": "audifonos",
+          "color": "#eebefa",
+          "borde": "#ae3ec9",
+          "fila": 1,
+          "textos": {
+            "pista": "¡Mira los audífonos! ¿Con qué parte del cuerpo escuchas la música?",
+            "acierto": "Los audífonos se ponen en las orejas."
+          }
+        },
+        {
+          "id": "cepillo_dientes",
+          "nombre": "Cepillo de dientes",
+          "icono": "cepillo_dientes",
+          "color": "#d8f5a2",
+          "borde": "#5c940d",
+          "fila": 2,
+          "textos": {
+            "pista": "¡Mira el cepillo de dientes! ¿Dónde lo usamos después de comer?",
+            "acierto": "El cepillo de dientes se usa en la boca."
+          }
+        },
+        {
+          "id": "reloj",
+          "nombre": "Reloj",
+          "icono": "reloj",
+          "color": "#ffd8a8",
+          "borde": "#e8590c",
+          "fila": 3,
+          "textos": {
+            "pista": "¡Mira el reloj! ¿En qué parte del brazo se pone el reloj?",
+            "acierto": "El reloj se pone en la muñeca."
+          }
+        },
+        {
+          "id": "mochila",
+          "nombre": "Mochila",
+          "icono": "mochila",
+          "color": "#a5d8ff",
+          "borde": "#1971c2",
+          "fila": 4,
+          "textos": {
+            "pista": "¡Mira la mochila! ¿En qué parte del cuerpo cargas la mochila para ir al colegio?",
+            "acierto": "La mochila se carga en la espalda."
+          }
+        }
+      ],
+      "partes": [
+        {
+          "id": "orejas",
+          "nombre": "Orejas",
+          "icono": "orejas",
+          "color": "#ffc9c9",
+          "borde": "#c92a2a",
+          "fila": 0
+        },
+        {
+          "id": "muneca",
+          "nombre": "Muñeca",
+          "icono": "muneca",
+          "color": "#d0bfff",
+          "borde": "#6741d9",
+          "fila": 1
+        },
+        {
+          "id": "espalda",
+          "nombre": "Espalda",
+          "icono": "espalda",
+          "color": "#c3fae8",
+          "borde": "#0ca678",
+          "fila": 2
+        },
+        {
+          "id": "cuello",
+          "nombre": "Cuello",
+          "icono": "cuello",
+          "color": "#fff3bf",
+          "borde": "#f08c00",
+          "fila": 3
+        },
+        {
+          "id": "boca",
+          "nombre": "Boca",
+          "icono": "boca",
+          "color": "#ffdeeb",
+          "borde": "#c2255c",
+          "fila": 4
+        }
+      ],
+      "parejas": {
+        "bufanda": "cuello",
+        "audifonos": "orejas",
+        "cepillo_dientes": "boca",
+        "reloj": "muneca",
+        "mochila": "espalda"
+      }
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "nombreCorto": "¿Dónde lo uso?",
+    "tituloIntro": "¡DÓNDE LO USO!",
+    "subtituloIntro": "Une cada objeto con su lugar correcto.",
+    "bienvenida": "¡Hola, amiguito! Hoy vamos a jugar a encontrar dónde se usa cada cosa. Tenemos gafas, calcetines, guantes y muchos accesorios divertidos. ¿Me ayudas a encontrar dónde van?",
+    "saludoCorto": "¡Hola, amiguito! ¿Me ayudas a encontrar dónde se usa cada cosa?",
+    "presentacionZeus": "¡Es muy fácil! Debes unir cada objeto con la parte del cuerpo donde lo utilizamos. ¡Traza una línea mágica y descubre las parejas!",
+    "demoFin": "¡Excelente! Cada objeto tiene un lugar especial en nuestro cuerpo.",
+    "demostracionBien": "¡Muy bien!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "instruccionZeus": "¡Traza una línea brillante para juntar cada objeto con su lugar correcto!",
+    "acierto": "¡Muy bien! ¡Encontraste su lugar!",
+    "errorZeus": [
+      "¡Uy! Ese no es su lugar. ¡Inténtalo otra vez!",
+      "¡Inténtalo otra vez! Busca dónde se utiliza ese objeto."
+    ],
+    "yaConectada": "¡Esa tarjeta ya encontró su pareja! Elige otra.",
+    "ocupado": "Esa parte del cuerpo ya tiene su objeto. ¡Busca otra!",
+    "mismoLado": "Lleva la línea hasta una parte del cuerpo, al otro lado del tablero.",
+    "progreso": "PAREJAS ENCONTRADAS",
+    "finalZoe": "¡SÚPER FANTÁSTICO! Encontraste el lugar exacto de los calcetines, guantes, gafas, gorro y la nariz de payaso, ¡y también de la bufanda, los audífonos, el cepillo, el reloj y la mochila!",
+    "finalZeus": "¡Conectaste todas las parejas a la perfección!",
+    "finalTitulo": "¡LO LOGRASTE!",
+    "finalSub": "¡Conectaste todos los objetos con su lugar correcto!",
+    "cierre": "¡Conectaste todos los objetos con su lugar correcto en las dos rondas!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. Estamos en el vestidor de PedNia, ¡lleno de accesorios divertidos!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Y yo soy Zeus! Gafas, gorro, guantes… ¿dónde se usa cada cosa?"
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Vamos a descubrirlo uniendo cada objeto con su parte del cuerpo!"
+      }
+    ],
+    "rondaLista": "¡Muy bien! ¡Terminaste la primera ronda! Ahora vienen más objetos. ¿Dónde se usará cada uno?",
+    "rondaListaTitulo": "¡RONDA 1 LISTA!",
+    "rondaSiguienteTitulo": "¡RONDA 2!",
+    "rondaSiguienteSub": "¡Más objetos para unir!",
+    "ronda": "RONDA"
+  },
+  "demo": {
+    "pasos": [
+      {
+        "objeto": "calcetines",
+        "texto": "¡Mira los calcetines! ¿En qué parte del cuerpo te pones los calcetines?"
+      },
+      {
+        "objeto": "nariz_payaso",
+        "texto": "¡Mira la nariz de payaso! ¿Dónde debemos colocarla?"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Transición: partes del cuerpo"
+    }
+  ]
+}

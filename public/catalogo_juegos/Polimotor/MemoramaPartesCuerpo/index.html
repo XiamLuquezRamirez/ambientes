@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>El Memorama de las Partes del Cuerpo</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" href="../../../assets/css/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../../assets/css/fontawesome/css/all.min.css">
+	<link rel="stylesheet" href="../../../assets/css/fonts.css">
+	<link rel="stylesheet" href="../../../assets/css/sweetalert2.min.css">
+	<script src="../../../assets/js/jquery-4.0.0.min.js"></script>
+	<script src="../../../assets/js/sweetalert.js"></script>
+	<link rel="stylesheet" href="style.css?v=20261112e">
+	<link rel="stylesheet" href="../comun/inicio-fondo.css?v=20261030d">
+	<link rel="stylesheet" href="../comun/interfaz.css?v=20261022o">
+	<script src="../comun/inicio-fondo.js?v=20261030d"></script>
+	<link rel="stylesheet" href="../../final/final.css">
+	<link rel="stylesheet" href="../../intro3d/css/intro.css">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261005a">
+</head>
+<body class="esperando-inicio">
+	<!-- Fondo: un cuarto de juegos mágico (pared lila y durazno, guirnalda de estrellas, huellitas de manos y
+	     pies pintadas por niños, tapete). Animaciones suaves y solo a los lados del tablero. -->
+	<div class="mem-fondo" aria-hidden="true">
+		<svg class="mem-cuarto" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+			<defs>
+				<linearGradient id="mem-pared" x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0" stop-color="#e5dbff"/>
+					<stop offset=".7" stop-color="#ffe3e3"/>
+					<stop offset="1" stop-color="#ffd8a8"/>
+				</linearGradient>
+				<radialGradient id="mem-luz" cx=".5" cy=".4" r=".55">
+					<stop offset="0" stop-color="#fffbe8" stop-opacity=".95"/>
+					<stop offset="1" stop-color="#fffbe8" stop-opacity="0"/>
+				</radialGradient>
+				<linearGradient id="mem-piso" x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0" stop-color="#b197fc"/>
+					<stop offset="1" stop-color="#9775fa"/>
+				</linearGradient>
+				<g id="mem-mano">
+					<rect x="-31" y="-50" width="12" height="42" rx="6" transform="rotate(-8 -25 -10)"/>
+					<rect x="-15" y="-60" width="13" height="50" rx="6.5"/>
+					<rect x="1" y="-56" width="12" height="46" rx="6" transform="rotate(6 7 -10)"/>
+					<rect x="15" y="-42" width="11" height="34" rx="5.5" transform="rotate(16 20 -8)"/>
+					<rect x="-46" y="-26" width="13" height="32" rx="6.5" transform="rotate(-42 -38 6)"/>
+					<path d="M-34,-14 Q-34,-20 -26,-20 H22 Q30,-20 30,-12 L28,12 Q24,32 -2,32 Q-30,32 -32,12 Z"/>
+				</g>
+				<g id="mem-pie">
+					<ellipse cx="0" cy="8" rx="22" ry="34"/>
+					<circle cx="-15" cy="-34" r="9"/>
+					<circle cx="0" cy="-41" r="6.5"/>
+					<circle cx="12" cy="-39" r="6"/>
+					<circle cx="21" cy="-32" r="5.5"/>
+					<circle cx="27" cy="-22" r="5"/>
+				</g>
+			</defs>
+			<rect width="1600" height="900" fill="url(#mem-pared)"/>
+			<ellipse cx="800" cy="380" rx="700" ry="420" fill="url(#mem-luz)"/>
+			<!-- franja de la pared y tapete -->
+			<rect y="768" width="1600" height="16" fill="#ffffff" opacity=".7"/>
+			<rect y="784" width="1600" height="116" fill="url(#mem-piso)"/>
+			<g opacity=".5">
+				<circle cx="140" cy="840" r="14" fill="#ffd43b"/>
+				<circle cx="420" cy="860" r="10" fill="#ffffff"/>
+				<circle cx="1180" cy="845" r="14" fill="#ffd43b"/>
+				<circle cx="1460" cy="865" r="10" fill="#ffffff"/>
+				<circle cx="800" cy="870" r="12" fill="#ff8cc6"/>
+			</g>
+
+			<!-- guirnalda de estrellas -->
+			<g class="mem-guirnalda">
+				<path d="M-10,36 Q400,110 800,54 Q1200,0 1610,64" fill="none" stroke="#7048e8" stroke-width="4" opacity=".55"/>
+				<path class="mem-colgante" style="--i:0" d="M90,58 l7,15 l16,2 l-12,10 l4,16 l-15,-8 l-14,8 l3,-16 l-12,-10 l16,-2 z" fill="#ffd43b"/>
+				<path class="mem-colgante" style="--i:1" d="M250,82 l7,15 l16,2 l-12,10 l4,16 l-15,-8 l-14,8 l3,-16 l-12,-10 l16,-2 z" fill="#ff8cc6"/>
+				<path class="mem-colgante" style="--i:2" d="M410,92 l7,15 l16,2 l-12,10 l4,16 l-15,-8 l-14,8 l3,-16 l-12,-10 l16,-2 z" fill="#74c0fc"/>
+				<path class="mem-colgante" style="--i:3" d="M570,86 l7,15 l16,2 l-12,10 l4,16 l-15,-8 l-14,8 l3,-16 l-12,-10 l16,-2 z" fill="#8ce99a"/>
+				<path class="mem-colgante" style="--i:4" d="M1030,30 l7,15 l16,2 l-12,10 l4,16 l-15,-8 l-14,8 l3,-16 l-12,-10 l16,-2 z" fill="#ffa94d"/>
+				<path class="mem-colgante" style="--i:5" d="M1190,24 l7,15 l16,2 l-12,10 l4,16 l-15,-8 l-14,8 l3,-16 l-12,-10 l16,-2 z" fill="#ffd43b"/>
+				<path class="mem-colgante" style="--i:6" d="M1350,34 l7,15 l16,2 l-12,10 l4,16 l-15,-8 l-14,8 l3,-16 l-12,-10 l16,-2 z" fill="#b197fc"/>
+				<path class="mem-colgante" style="--i:7" d="M1510,52 l7,15 l16,2 l-12,10 l4,16 l-15,-8 l-14,8 l3,-16 l-12,-10 l16,-2 z" fill="#ff8cc6"/>
+			</g>
+
+			<!-- huellitas de manos y pies pintadas en la pared (a los lados) -->
+			<g class="mem-pinturas">
+				<use href="#mem-mano" class="mem-huella" style="--i:0" transform="translate(110 300) rotate(-14)" fill="#ff8cc6"/>
+				<use href="#mem-pie" class="mem-huella" style="--i:1" transform="translate(220 460) rotate(10) scale(1.1)" fill="#74c0fc"/>
+				<use href="#mem-mano" class="mem-huella" style="--i:2" transform="translate(95 610) rotate(12) scale(.9)" fill="#ffd43b"/>
+				<use href="#mem-pie" class="mem-huella" style="--i:3" transform="translate(250 690) rotate(-8) scale(.85)" fill="#8ce99a"/>
+				<use href="#mem-pie" class="mem-huella" style="--i:4" transform="translate(1380 300) rotate(14)" fill="#ffa94d"/>
+				<use href="#mem-mano" class="mem-huella" style="--i:5" transform="translate(1500 450) rotate(-12) scale(1.05)" fill="#b197fc"/>
+				<use href="#mem-pie" class="mem-huella" style="--i:6" transform="translate(1505 650) rotate(-6) scale(.9)" fill="#ff8cc6"/>
+				<use href="#mem-mano" class="mem-huella" style="--i:7" transform="translate(1360 700) rotate(16) scale(.85)" fill="#74c0fc"/>
+			</g>
+
+			<!-- estrellitas que titilan -->
+			<path class="mem-estrella" style="--i:0" d="M330,220 l6,14 l15,1 l-12,9 l4,15 l-13,-8 l-13,8 l4,-15 l-12,-9 l15,-1 z" fill="#ffffff"/>
+			<path class="mem-estrella" style="--i:1" d="M1270,180 l5,11 l12,1 l-9,7 l3,12 l-11,-7 l-11,7 l3,-12 l-9,-7 l12,-1 z" fill="#ffe066"/>
+			<path class="mem-estrella" style="--i:2" d="M1250,560 l5,11 l12,1 l-9,7 l3,12 l-11,-7 l-11,7 l3,-12 l-9,-7 l12,-1 z" fill="#ffffff"/>
+			<path class="mem-estrella" style="--i:3" d="M360,560 l5,11 l12,1 l-9,7 l3,12 l-11,-7 l-11,7 l3,-12 l-9,-7 l12,-1 z" fill="#ffe066"/>
+			<path class="mem-estrella" style="--i:4" d="M60,160 l5,11 l12,1 l-9,7 l3,12 l-11,-7 l-11,7 l3,-12 l-9,-7 l12,-1 z" fill="#ffffff"/>
+			<path class="mem-estrella" style="--i:5" d="M1560,190 l5,11 l12,1 l-9,7 l3,12 l-11,-7 l-11,7 l3,-12 l-9,-7 l12,-1 z" fill="#ffffff"/>
+		</svg>
+	</div>
+
+	<div id="pantalla-inicio" class="pantalla-inicio">
+		<button type="button" id="btn-inicio-volver" class="inicio-volver" hidden>
+			<img src="../../../assets/images/selector-aula/volver.png" alt="Volver">
+		</button>
+		<div class="inicio-mancha" aria-hidden="true"></div>
+		<div class="inicio-contenido">
+			<img class="inicio-icono" src="memorama.png" alt="" aria-hidden="true">
+			<p class="inicio-kicker">El Memorama de las Partes del Cuerpo</p>
+			<button type="button" id="btn-empecemos" class="btn-empecemos">
+				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
+				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
+				<span class="btn-empecemos-texto">¡Empecemos!</span>
+			</button>
+		</div>
+	</div>
+
+	<div id="intro3d-root" hidden>
+		<div id="three-container"></div>
+		<div id="phaser-container"></div>
+		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;">
+			Omitir <i class="fa fa-forward" aria-hidden="true"></i>
+		</button>
+		<div id="intro3d-continuar" hidden>
+			<div class="intro3d-continuar-card">
+				<div class="intro3d-titulo-wrap">
+					<span class="intro3d-ray intro3d-ray-l1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l3" aria-hidden="true"></span>
+					<h2>¡Listo!</h2>
+					<span class="intro3d-ray intro3d-ray-r1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r3" aria-hidden="true"></span>
+				</div>
+				<p>Toca el botón para empezar el juego</p>
+				<div class="intro3d-btn-wrap">
+					<span class="intro3d-ray intro3d-ray-bl1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-bl2" aria-hidden="true"></span>
+					<button type="button" id="btn-continuar-intro3d">
+						<span class="intro3d-btn-shine" aria-hidden="true"></span>
+						<span class="intro3d-play" aria-hidden="true"></span>
+						<span>CONTINUAR</span>
+					</button>
+					<span class="intro3d-ray intro3d-ray-br1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-br2" aria-hidden="true"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div style="display: none; background-color: rgba(255, 255, 255, 0.664); width: 100%; height: 100%; position: fixed; z-index: 100;" id="fondo_blanco"></div>
+
+	<div id="final" class="final" hidden>
+		<div id="victoria">
+			<img src="../../img/fondo.png" class="fondo" alt="">
+			<div class="contenido">
+				<img src="../../img/excelente.png" class="excelente" alt="¡Excelente!">
+				<p class="texto-final" id="texto_final"></p>
+				<img src="../../img/trofeo.png" class="trofeo" alt="Trofeo">
+				<img src="../../img/zeus_normal.gif" class="personaje zeus" alt="Zeus">
+				<img src="../../img/zoe_normal.gif" class="personaje zoe" alt="Zoe">
+				<div class="destello destello-1"></div>
+				<div class="destello destello-2"></div>
+				<div class="destello destello-3"></div>
+			</div>
+			<img src="../../img/cortina_izq.png" class="cortina cortina-izq" alt="">
+			<img src="../../img/cortina_der.png" class="cortina cortina-der" alt="">
+			<div class="confeti" id="confeti"></div>
+		</div>
+		<div class="final-acciones" id="final-acciones">
+			<p class="final-pregunta">¿Quieres jugar nuevamente?</p>
+			<div class="final-botones">
+				<button type="button" class="btn btn-success" onclick="window.location.reload(1)"><i class="fa-solid fa-play"></i> Sí</button>
+				<button type="button" class="btn btn-danger" onclick="history.back()"><i class="fa-solid fa-home"></i> No</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="principal">
+		<!-- Zona superior: inicio, reiniciar, edad y título. -->
+		<header class="hud-top">
+			<div class="hud-nav">
+				<button type="button" onclick="history.back()" class="btn-inicio" title="Volver al inicio"><i class="fa-solid fa-house" aria-hidden="true"></i> Inicio</button>
+				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+				<span class="hud-edad"><strong>3-4</strong> años</span>
+			</div>
+			<div class="hud-titulo">
+				<h1 aria-label="El memorama del cuerpo"><span style="--c:#ff6b6b">E</span><span style="--c:#ff922b">L</span><span class="hud-espacio"> </span><span style="--c:#fab005">M</span><span style="--c:#40c057">E</span><span style="--c:#15aabf">M</span><span style="--c:#4c6ef5">O</span><span style="--c:#7950f2">R</span><span style="--c:#be4bdb">A</span><span style="--c:#f06595">M</span><span style="--c:#ff6b6b">A</span><span class="hud-espacio"> </span><span style="--c:#ff922b">D</span><span style="--c:#fab005">E</span><span style="--c:#40c057">L</span><span class="hud-espacio"> </span><span style="--c:#15aabf">C</span><span style="--c:#4c6ef5">U</span><span style="--c:#7950f2">E</span><span style="--c:#be4bdb">R</span><span style="--c:#f06595">P</span><span style="--c:#ff6b6b">O</span></h1>
+			</div>
+		</header>
+
+		<!-- Zona central: el tablero mágico de corcho (Phaser) con las cuatro tarjetas en 2 × 2. -->
+		<main class="escena">
+			<div id="escenario-zona" class="escenario-zona">
+				<div id="escenario-phaser" class="escenario-phaser" role="application" aria-label="Tablero con cuatro tarjetas boca abajo. Toca dos tarjetas para voltearlas y busca las que tienen la misma parte del cuerpo."></div>
+				<div id="escenario-cartel" class="escenario-cartel" hidden>
+					<strong id="escenario-cartel-titulo"></strong>
+					<span id="escenario-cartel-sub"></span>
+				</div>
+			</div>
+		</main>
+
+		<!-- Zona inferior: parejas encontradas (un espacio por pareja que se llena con su dibujo). -->
+		<footer class="barra-abajo">
+			<div id="progreso-box" class="progreso-box" aria-live="polite">
+				<span id="progreso-ronda" class="progreso-ronda">RONDA 1/3</span>
+				<p id="aviso-abajo" class="aviso-abajo" hidden></p>
+				<p class="progreso-texto"><span id="progreso-rotulo">PAREJAS ENCONTRADAS:</span> <strong id="progreso-num">0/2</strong></p>
+				<div id="progreso-ranuras" class="progreso-ranuras"></div>
+			</div>
+		</footer>
+	</div>
+
+	<!-- Zeus (3D): solo en la presentación y la demostración, de pie a la izquierda de las tarjetas; su nube va
+	     sobre su cabeza. Durante la partida no está en la escena. -->
+	<aside id="guia" class="guia" aria-live="polite">
+		<div class="guia-pj">
+			<img id="guia-img" src="../../img/zeus_normal.gif" alt="">
+			<div id="zeus-nube" class="zeus-nube" aria-live="polite" hidden><span id="zeus-nube-texto"></span></div>
+		</div>
+	</aside>
+
+	<!-- Felicitación del final: ¡LO LOGRASTE! con "Volver a jugar" y "Continuar". -->
+	<div id="felicitacion" class="felicitacion" hidden>
+		<div class="felicitacion-tarjeta" role="dialog" aria-labelledby="felicitacion-titulo">
+			<div class="felicitacion-estrellas" aria-hidden="true">
+				<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+			</div>
+			<h2 id="felicitacion-titulo">¡LO LOGRASTE!</h2>
+			<p id="felicitacion-sub">Encontraste todas las parejas del cuerpo.</p>
+			<div id="felicitacion-dibujos" class="felicitacion-dibujos" aria-hidden="true"></div>
+			<div class="felicitacion-botones">
+				<button type="button" id="btn-otra-vez" class="btn-final btn-final-otra"><i class="fa-solid fa-rotate-right"></i> <span>Volver a jugar</span></button>
+				<button type="button" id="btn-continuar" class="btn-final btn-final-seguir"><span>Continuar</span> <i class="fa-solid fa-arrow-right"></i></button>
+			</div>
+		</div>
+	</div>
+
+	<div id="comenzar-wrap" class="comenzar-wrap" hidden>
+		<button type="button" id="btn-comenzar" class="btn-comenzar"><i class="fa-solid fa-play"></i><span class="btn-comenzar-texto">¡A jugar!</span></button>
+	</div>
+
+	<div id="menu-acc" class="menu-acc">
+		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
+			<i class="fa-solid fa-universal-access"></i>
+		</button>
+		<div id="menu-acc-panel" class="menu-acc-panel" hidden>
+			<div class="menu-acc-cab">
+				<strong>Accesibilidad</strong>
+				<button type="button" id="btn-cerrar-acc" class="menu-acc-cerrar" aria-label="Cerrar">&times;</button>
+			</div>
+			<div id="menu-acc-ops" class="menu-acc-ops"></div>
+		</div>
+	</div>
+
+	<div id="menu-vol" class="menu-acc">
+		<button type="button" id="btn-menu-vol" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-vol-panel" title="Sonido">
+			<i class="fa-solid fa-volume-high"></i>
+		</button>
+		<div id="menu-vol-panel" class="menu-acc-panel" hidden>
+			<div class="menu-acc-cab">
+				<strong>Sonido</strong>
+				<button type="button" id="btn-cerrar-vol" class="menu-acc-cerrar" aria-label="Cerrar">×</button>
+			</div>
+			<label class="menu-acc-op">
+				<input type="checkbox" id="chk-voces" checked> Voces
+			</label>
+			<label class="menu-acc-op menu-acc-rango">
+				<span>Música de fondo <strong id="vol-val">20</strong></span>
+				<input type="range" id="rango-volumen" min="0" max="100" step="1" value="20">
+			</label>
+		</div>
+	</div>
+
+	<script src="../../texto_voz.js"></script>
+	<script src="../../shared/edad-nivel.js"></script>
+	<script src="../../../assets/vendor/phaser/phaser.min.js"></script>
+	<script src="../../intro3d/js/config.js?v=20261007a"></script>
+	<script src="../../intro3d/js/ambientes-tema.js?v=20261105a"></script>
+	<script type="importmap">
+	{
+	  "imports": {
+	    "three": "../../../assets/vendor/three/three.module.js",
+	    "three/addons/": "../../../assets/vendor/three/addons/"
+	  }
+	}
+	</script>
+	<script type="module" src="../../intro3d/js/three-scene.js?v=20261105a"></script>
+	<script type="module" src="../../intro3d/js/final-scene.js?v=20261105a"></script>
+	<script src="../../tutorial/tutorial.js?v=20261019c"></script>
+	<script src="../../intro3d/js/intro.js?v=20261028p4"></script>
+	<script src="../../final/final.js"></script>
+	<script src="../../shared/aplicar-perfil-juego.js?v=20261013a"></script>
+	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
+	<script src="../../../assets/vendor/gsap/gsap.min.js"></script>
+	<script src="../../../assets/vendor/howler/howler.core.min.js"></script>
+	<script src="../../shared/pednia-audio.js?v=20261028t"></script>
+	<script src="../../shared/pednia-fx.js?v=20261107d"></script>
+	<script src="reglas.js?v=20261112b"></script>
+	<script src="iconos.js?v=20261112r"></script>
+	<script src="sonidos.js?v=20261112a"></script>
+	<script src="escenario-phaser.js?v=20261112d"></script>
+	<script src="demo.js?v=20261112a"></script>
+	<script src="script.js?v=20261112d"></script>
+	<script type="module" src="guia-3d.js?v=20261112a"></script>
+</body>
+</html>

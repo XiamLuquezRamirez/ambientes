@@ -42,38 +42,6 @@
         '<rect x="42" y="98" width="40" height="16" rx="6" fill="' + CUELLO_CAMISA + '"/>'
     );
 
-    // Brazo doblado mostrando fuerza: manga verde, brazo, codo y puño arriba.
-    SVG.brazo = svg(
-        '<path d="M10,96 Q8,74 26,68 L54,62 Q62,61 66,68 L68,84 Q50,98 26,102 Q12,104 10,96 Z" fill="' + PIEL + '" ' + T + '/>' +
-        '<path d="M62,70 Q70,40 82,28 Q88,22 96,26 L98,46 Q86,56 80,74 Z" fill="' + PIEL + '" ' + T + '/>' +
-        '<ellipse cx="94" cy="24" rx="15" ry="13" fill="' + PIEL + '" ' + T + '/>' +
-        '<path d="M86,18 Q94,13 102,18 M85,25 Q94,21 103,26" stroke="' + LINEA + '" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
-        '<path d="M30,70 Q42,52 58,64" stroke="' + SOMBRA + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-        '<path d="M4,70 Q2,96 14,106 L32,104 Q24,84 30,64 Z" fill="' + CAMISA + '"/>' +
-        '<path d="M28,64 Q22,86 32,104" stroke="' + CUELLO_CAMISA + '" stroke-width="7" fill="none" stroke-linecap="round"/>'
-    );
-
-    // Pie de lado: talón, planta y cinco deditos.
-    SVG.pie = svg(
-        '<path d="M30,18 L52,18 L54,62 Q70,66 92,72 Q108,76 106,92 Q104,100 94,100 L28,100 Q14,100 14,84 Q14,68 28,60 Z" fill="' + PIEL + '" ' + T + '/>' +
-        '<circle cx="100" cy="82" r="7" fill="' + PIEL + '" ' + T + '/>' +
-        '<circle cx="90" cy="76" r="6" fill="' + PIEL + '" ' + T + '/>' +
-        '<circle cx="81" cy="72" r="5" fill="' + PIEL + '" ' + T + '/>' +
-        '<circle cx="73" cy="69" r="4.5" fill="' + PIEL + '" ' + T + '/>' +
-        '<circle cx="66" cy="67" r="4" fill="' + PIEL + '" ' + T + '/>' +
-        '<path d="M22,88 Q48,92 84,90" stroke="' + SOMBRA + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-        '<rect x="26" y="8" width="30" height="16" rx="5" fill="#ffffff" stroke="#d5dbe5" stroke-width="2"/>'
-    );
-
-    // Pierna completa: muslo con la pantaloneta, rodilla, canilla y pie con media.
-    SVG.pierna = svg(
-        '<path d="M40,4 L76,4 L78,34 L40,34 Z" fill="' + SHORT + '"/>' +
-        '<rect x="44" y="30" width="28" height="68" rx="13" fill="' + PIEL + '" ' + T + '/>' +
-        '<path d="M50,62 Q58,68 66,62" stroke="' + SOMBRA + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-        '<path d="M42,92 L74,92 L74,104 Q92,104 96,112 Q96,118 88,118 L46,118 Q40,118 42,108 Z" fill="#ffffff" stroke="#c9d0db" stroke-width="2.5" stroke-linejoin="round"/>' +
-        '<path d="M50,94 L50,104 M58,94 L58,104 M66,94 L66,104" stroke="#dfe3ea" stroke-width="2"/>'
-    );
-
     // Cabeza de frente con pelo, orejas y cara sonriente.
     SVG.cabeza = svg(
         '<ellipse cx="20" cy="66" rx="10" ry="13" fill="' + PIEL + '" ' + T + '/>' +
@@ -115,21 +83,107 @@
         '<path d="M18,44 Q38,34 60,42 Q82,34 102,44" stroke="' + LABIO_LINEA + '" stroke-width="5" fill="none" stroke-linecap="round"/>'
     );
 
-    // Oreja de lado, grande, con su interior rosado.
-    SVG.orejas = svg(
-        '<path d="M40,26 Q46,6 72,8 Q102,12 100,46 Q98,66 82,78 Q74,86 72,98 Q68,114 52,112 Q36,110 38,94" fill="' + PIEL + '" ' + T + '/>' +
-        '<path d="M52,34 Q58,20 74,22 Q90,26 88,46 Q86,60 74,68 Q66,74 64,86" stroke="' + OREJA + '" stroke-width="9" fill="none" stroke-linecap="round"/>' +
-        '<path d="M62,46 Q68,38 76,44 Q78,54 68,58" stroke="' + LINEA + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-        '<path d="M40,26 Q34,60 38,94" stroke="' + PIEL + '" stroke-width="2" fill="none"/>'
+    // ---------------------------------------------------------------- redibujados (2026-11-12)
+    // Brazo, pierna, pie, cuello y oreja nuevos (los anteriores no se reconocían bien). Contorno de "calcomanía":
+    // las formas se pintan primero gruesas en el color de la línea y luego encima en piel, así el borde rodea
+    // toda la silueta sin rayas por dentro. Misma paleta de Zeus (piel, camiseta verde, pantaloneta azul).
+    function silueta(formas, relleno, linea, grosor) {
+        return '<g fill="' + linea + '" stroke="' + linea + '" stroke-width="' + grosor + '" stroke-linejoin="round">' + formas + "</g>" +
+            '<g fill="' + relleno + '">' + formas + "</g>";
+    }
+
+    // Brazo mostrando fuerza: manga verde, brazo con bíceps, codo, antebrazo hacia arriba y puño.
+    SVG.brazo = svg(
+        silueta(
+            '<rect x="20" y="70" width="64" height="30" rx="15"/>' +
+            '<ellipse cx="50" cy="72" rx="22" ry="15"/>' +
+            '<circle cx="78" cy="86" r="15"/>' +
+            '<rect x="66" y="30" width="26" height="62" rx="13" transform="rotate(8 79 86)"/>' +
+            '<rect x="61" y="9" width="38" height="36" rx="18"/>',
+            PIEL, LINEA, 6) +
+        // dedos del puño y pulgar
+        '<path d="M67,21 Q75,18 83,21 M66,29 Q75,26 84,29 M67,37 Q74,34 82,37" stroke="' + LINEA + '" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+        '<path d="M86,18 Q96,22 92,34" stroke="' + LINEA + '" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+        // brillo del bíceps y pliegue del codo
+        '<path d="M38,66 Q50,58 62,66" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>' +
+        '<path d="M70,80 Q74,88 70,94" stroke="' + SOMBRA + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+        // manga de la camiseta
+        silueta('<path d="M4,62 L30,62 Q36,86 30,108 L4,108 Z"/>', CAMISA, "#1f6b54", 4) +
+        '<path d="M28,64 Q34,86 28,106" stroke="' + CUELLO_CAMISA + '" stroke-width="6" fill="none" stroke-linecap="round"/>'
     );
 
-    // Cuello: barbilla arriba, el cuello en el medio y los hombros con la camiseta abajo.
+    // Pierna entera de lado: pantaloneta, muslo, rodilla, canilla, media y tenis.
+    SVG.pierna = svg(
+        silueta(
+            // una sola silueta suave: muslo, rodilla apenas marcada y canilla
+            '<path d="M42,26 L76,26 Q78,52 74,66 Q71,76 72,88 L72,104 L46,104 L46,88 Q47,76 44,66 Q40,52 42,26 Z"/>',
+            PIEL, LINEA, 6) +
+        '<path d="M52,68 Q59,73 66,68" stroke="' + SOMBRA + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+        '<path d="M66,36 Q69,48 66,58 M64,78 Q66,86 65,94" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".6"/>' +
+        // media
+        silueta('<rect x="45" y="90" width="28" height="16" rx="4"/>', "#ffffff", "#c9d0db", 4) +
+        '<path d="M47,96 H71" stroke="#4dabf7" stroke-width="3"/>' +
+        // tenis rojo con suela blanca
+        silueta('<path d="M42,104 L74,104 Q90,104 102,110 Q108,114 106,118 L42,118 Q38,112 42,104 Z"/>', "#fa5252", "#a61e1e", 4) +
+        '<path d="M42,116 L106,116" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>' +
+        '<path d="M60,104 L64,110 M68,104 L72,110" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>' +
+        // pantaloneta
+        silueta('<path d="M36,4 L82,4 L84,34 Q60,40 38,34 Z"/>', SHORT, "#01384d", 4) +
+        '<path d="M40,30 Q60,35 82,30" stroke="#ffffff" stroke-width="3" fill="none" opacity=".5"/>'
+    );
+
+    // Pie de lado, descalzo: tobillo, talón redondo, planta y cinco deditos.
+    SVG.pie = svg(
+        silueta(
+            '<path d="M28,14 L52,14 L54,62 L24,62 Z"/>' +
+            '<path d="M22,58 Q18,100 36,104 L94,104 Q110,103 110,90 Q109,78 92,72 Q72,66 56,58 Z"/>' +
+            '<circle cx="101" cy="84" r="11"/>' +
+            '<circle cx="89" cy="74" r="8.5"/>' +
+            '<circle cx="79" cy="68" r="7.5"/>' +
+            '<circle cx="69" cy="64" r="6.5"/>' +
+            '<circle cx="60" cy="60" r="5.5"/>',
+            PIEL, LINEA, 6) +
+        // uñas
+        '<ellipse cx="104" cy="80" rx="5" ry="3.6" fill="#fff4ea"/>' +
+        '<ellipse cx="91" cy="70" rx="3.6" ry="2.8" fill="#fff4ea"/>' +
+        '<ellipse cx="81" cy="64.5" rx="3.2" ry="2.4" fill="#fff4ea"/>' +
+        // hueso del tobillo, arco y brillo
+        '<circle cx="44" cy="56" r="4" fill="' + SOMBRA + '"/>' +
+        '<path d="M44,92 Q66,86 88,92" stroke="' + SOMBRA + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+        '<path d="M32,26 V50" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity=".55"/>' +
+        // borde de la pantaloneta arriba
+        '<rect x="20" y="2" width="38" height="14" rx="5" fill="' + SHORT + '"/>'
+    );
+
+    // Cuello: la cara asoma arriba, el cuello en el medio (con brillos alrededor) y los hombros con la camiseta.
     SVG.cuello = svg(
-        '<path d="M6,118 Q8,88 34,82 L86,82 Q112,88 114,118 Z" fill="' + CAMISA + '"/>' +
-        '<rect x="40" y="26" width="40" height="66" rx="14" fill="' + PIEL + '" ' + T + '/>' +
-        '<path d="M42,84 Q60,104 78,84" stroke="' + CUELLO_CAMISA + '" stroke-width="9" fill="none" stroke-linecap="round"/>' +
-        '<path d="M22,6 Q24,36 60,40 Q96,36 98,6 Z" fill="' + PIEL + '" ' + T + '/>' +
-        '<path d="M48,58 Q60,64 72,58" stroke="' + SOMBRA + '" stroke-width="3" fill="none" stroke-linecap="round"/>'
+        // hombros y camiseta
+        silueta('<path d="M8,120 Q8,94 34,88 L86,88 Q112,94 112,120 Z"/>', CAMISA, "#1f6b54", 4) +
+        silueta('<rect x="42" y="40" width="36" height="58" rx="14"/>', PIEL, LINEA, 5) +
+        '<path d="M40,90 Q60,108 80,90" stroke="' + CUELLO_CAMISA + '" stroke-width="8" fill="none" stroke-linecap="round"/>' +
+        '<path d="M48,58 Q60,64 72,58" stroke="' + SOMBRA + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+        // cara (solo la parte de abajo) con pelo, ojos cerrados contentos y sonrisa
+        silueta('<path d="M24,10 Q24,48 60,50 Q96,48 96,10 Z"/>', PIEL, LINEA, 5) +
+        '<path d="M22,12 Q60,-6 98,12 L98,2 L22,2 Z" fill="' + PELO + '"/>' +
+        '<path d="M40,20 Q46,15 52,20 M68,20 Q74,15 80,20" stroke="#3b2016" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+        '<path d="M50,34 Q60,42 70,34" stroke="' + LABIO_LINEA + '" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
+        '<ellipse cx="34" cy="30" rx="6" ry="4" fill="#f29a98" opacity=".6"/><ellipse cx="86" cy="30" rx="6" ry="4" fill="#f29a98" opacity=".6"/>' +
+        // brillos que señalan el cuello
+        '<path d="M28,62 L36,66 M26,74 L36,74 M28,86 L36,82 M92,62 L84,66 M94,74 L84,74 M92,86 L84,82" stroke="#fab005" stroke-width="4" stroke-linecap="round"/>'
+    );
+
+    // Oreja de lado, grande: borde enrollado, interior rosado y lóbulo; un mechón de pelo arriba.
+    SVG.orejas = svg(
+        '<path d="M22,4 Q60,-4 74,16 L44,24 Q30,20 22,4 Z" fill="' + PELO + '"/>' +
+        silueta(
+            '<path d="M38,30 Q38,8 64,8 Q98,8 98,44 Q98,66 82,78 Q72,86 72,98 Q72,114 56,114 Q40,114 40,98 Q40,90 46,84 Q36,72 36,52 Z"/>',
+            PIEL, LINEA, 6) +
+        // interior de la oreja: la concha rosada y el borde enrollado (sin el gancho que parecía un "?")
+        '<path d="M50,38 Q52,22 66,22 Q86,22 86,46 Q86,62 76,70 Q68,76 66,86 Q56,84 54,72 Q52,62 58,56 Q50,50 50,38 Z" fill="' + OREJA + '" opacity=".75"/>' +
+        '<path d="M46,36 Q48,16 66,15 Q92,16 92,46 Q92,66 78,76" stroke="' + LINEA + '" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"/>' +
+        '<path d="M58,58 Q64,54 66,60 Q66,66 60,68" stroke="' + LINEA + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+        '<ellipse cx="56" cy="102" rx="8" ry="6" fill="#f29a98" opacity=".55"/>' +
+        '<path d="M44,40 Q42,56 46,70" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".55"/>'
     );
 
     function dataUrl(id) {
