@@ -190,5 +190,13 @@
         return SVG[id] ? "data:image/svg+xml;charset=utf-8," + encodeURIComponent(SVG[id]) : "";
     }
 
+    // Partes del cuerpo: los dibujos compartidos de Polimotor (comun/partes-cuerpo.js), más claros para
+    // niños, reemplazan a los de este archivo (los objetos y órganos propios del juego no se tocan).
+    if (global.PartesCuerpo) {
+        Object.keys(SVG).forEach(function (k) {
+            if (global.PartesCuerpo.SVG[k]) SVG[k] = global.PartesCuerpo.SVG[k];
+        });
+    }
+
     global.IconosCuerpo = { SVG: SVG, dataUrl: dataUrl };
 })(window);

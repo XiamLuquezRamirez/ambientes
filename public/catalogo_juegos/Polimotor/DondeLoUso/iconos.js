@@ -288,5 +288,13 @@
         '<path d="M44,16 Q52,10 60,14 M62,10 Q70,8 76,16 M50,38 Q60,44 70,38" fill="none" ' + trazo("#4a2512", 3) + '/>'
     );
 
+    // Partes del cuerpo: los dibujos compartidos de Polimotor (comun/partes-cuerpo.js), más claros para
+    // niños, reemplazan a los de este archivo (los objetos y órganos propios del juego no se tocan).
+    if (global.PartesCuerpo) {
+        Object.keys(SVG).forEach(function (k) {
+            if (global.PartesCuerpo.SVG[k]) SVG[k] = global.PartesCuerpo.SVG[k];
+        });
+    }
+
     global.IconosUso = { SVG: SVG };
 })(window);
