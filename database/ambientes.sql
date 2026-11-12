@@ -605,6 +605,7 @@ CREATE TABLE `docentes` (
   `fecha_ingreso` date DEFAULT NULL,
   `firma_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `foto_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `pin_accesibilidad` char(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `estado` enum('activo','inactivo','eliminado') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'activo',
   `bloqueado_en` timestamp NULL DEFAULT NULL,
@@ -617,10 +618,10 @@ CREATE TABLE `docentes` (
 
 /*Data for the table `docentes` */
 
-insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`foto_url`,`descripcion`,`estado`,`bloqueado_en`,`created_at`,`updated_at`) values 
-(1,2,'12345678925','direc','Educación Musical','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:50:15'),
-(2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:57:11'),
-(3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-23 14:23:57');
+insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`foto_url`,`pin_accesibilidad`,`descripcion`,`estado`,`bloqueado_en`,`created_at`,`updated_at`) values 
+(1,2,'12345678925','direc','Educación Musical','2026-06-23',NULL,NULL,'1234',NULL,'activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:50:15'),
+(2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'1234',NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:57:11'),
+(3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'1234',NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-23 14:23:57');
 
 /*Table structure for table `ejes` */
 
@@ -1346,6 +1347,7 @@ insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`r
 ('escucha-y-reconoce',8,19,38,3,'catalogo_juegos/Multisaberes/DescubreLasVocales/EscuchaYReconoce','Escucha Y Reconoce',NULL,NULL,'#6366f1',179,1,'2026-10-29 14:33:30','2026-10-29 15:39:20'),
 ('escucha-y-recuerda',9,13,14,10,'catalogo_juegos/Multisensorial/QueSonidoEscuchas/EscuchaYRecuerda','Escucha Y Recuerda',NULL,NULL,'#22c55e',277,1,'2026-10-29 14:42:01','2026-10-29 15:39:20'),
 ('frotado-artistico-de-la-naturaleza-buscar-corteza-de-arbol',9,14,19,10,'catalogo_juegos/Multisensorial/EncuentraLaTextura/FrotadoArtisticoDeLaNaturalezaBuscarCortezaDeArbol','¡Frotado Artístico de la Naturaleza! (buscar Corteza de Árbol)',NULL,NULL,'#14b8a6',326,1,'2026-10-29 14:42:01','2026-10-29 15:39:20'),
+('golpea-a-los-topos',7,11,29,9,'catalogo_juegos/Polimotor/GolpeaTopos','Golpea a los Topos','Transición (5 a 6 años). Reconocimiento de partes del cuerpo: en una colina del desierto los topos salen de sus agujeros con un globo ilustrado; hay que tocar rápido solo los que muestran una parte del cuerpo (nariz, ojos, boca, oreja, mano, pie, brazo, pierna, cabeza, corazón, cerebro, pulmones) y dejar los objetos (cepillo, peine, pelota, frutas, juguetes, utensilios) antes de que se acabe el tiempo.','topos.png','#e8590c',15,1,'2026-11-12 10:00:00','2026-11-12 10:00:00'),
 ('gran-secuencia-final',9,13,16,10,'catalogo_juegos/Multisensorial/RepiteLaSecuencia/GranSecuenciaFinal','Gran Secuencia Final',NULL,NULL,'#8b5cf6',294,1,'2026-10-29 14:42:01','2026-10-29 15:39:20'),
 ('haz-vibrar-las-cuerdas-de-la-guitarra',6,21,49,11,'catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/HazVibrarLasCuerdasDeLaGuitarra','Haz Vibrar las Cuerdas de la Guitarra',NULL,NULL,'#f97316',71,1,'2026-10-29 11:00:44','2026-10-29 15:39:20'),
 ('identificacion-de-la-textura-abrasiva-lija',9,14,22,10,'catalogo_juegos/Multisensorial/RelacionaIguales/IdentificacionDeLaTexturaAbrasivaLija','Identificación de la Textura Abrasiva (lija)',NULL,NULL,'#f97316',346,1,'2026-10-29 14:42:01','2026-10-29 15:39:20'),
@@ -1419,6 +1421,7 @@ insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`r
 ('las-uvas',8,19,39,3,'catalogo_juegos/Multisaberes/ConQueVocalComienza/LasUvas','Las Uvas',NULL,NULL,'#22c55e',187,1,'2026-10-29 14:33:30','2026-10-29 15:39:20'),
 ('las-vocales-cambian-de-lugar',8,19,38,3,'catalogo_juegos/Multisaberes/DescubreLasVocales/LasVocalesCambianDeLugar','Las Vocales Cambian De Lugar',NULL,NULL,'#8b5cf6',180,1,'2026-10-29 14:33:30','2026-10-29 15:39:20'),
 ('lateralidad',7,11,30,9,'catalogo_juegos/Polimotor/Lateralidad','Lateralidad','Discriminar derecha e izquierda tocando la parte del cuerpo indicada.','lateralidad.png','#a1b947',3,1,'2026-09-09 17:47:30','2026-10-15 16:23:37'),
+('linterna-reveladora-de-partes',7,11,29,9,'catalogo_juegos/Polimotor/LinternaReveladoraPartes','La Linterna Reveladora de Partes','Prejardín (3 a 4 años). Reconocimiento de partes del cuerpo: en el campamento nocturno de PedNia, mover una linterna para descubrir la barriga, las rodillas y las orejas de Zoe, y tocarlas solo cuando la luz ya las muestra.','linterna.png','#5b4fcf',13,1,'2026-11-11 09:50:00','2026-11-11 09:50:00'),
 ('localiza-el-sonido',9,13,15,10,'catalogo_juegos/Multisensorial/EncuentraElSonido/LocalizaElSonido','Localiza El Sonido',NULL,NULL,'#ef4444',285,1,'2026-10-29 14:42:01','2026-10-29 15:39:20'),
 ('los-circulos-bailarines-del-semaforo',6,22,56,11,'catalogo_juegos/ExpresionArtistica/ColoresYFormas/LosCirculosBailarinesDelSemaforo','Los Círculos Bailarines del Semáforo',NULL,NULL,'#22c55e',123,1,'2026-10-29 14:20:13','2026-10-29 15:39:20'),
 ('los-coloridos-petalos-de-la-margarita',6,22,54,11,'catalogo_juegos/ExpresionArtistica/CompletaElDibujo/LosColoridosPetalosDeLaMargarita','Los Coloridos Pétalos de la Margarita',NULL,NULL,'#f59e0b',109,1,'2026-10-29 14:20:13','2026-10-29 15:39:20'),
@@ -1499,6 +1502,7 @@ insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`r
 ('un-sonido-de-viaje',9,13,18,10,'catalogo_juegos/Multisensorial/AsociaSonidoEImagen/UnSonidoDeViaje','Un Sonido De Viaje',NULL,NULL,'#22c55e',313,1,'2026-10-29 14:42:01','2026-10-29 15:39:20'),
 ('una-nueva-pareja',8,19,41,3,'catalogo_juegos/Multisaberes/EncuentraLaPareja/UnaNuevaPareja','Una Nueva Pareja',NULL,NULL,'#ef4444',207,1,'2026-10-29 14:33:30','2026-10-29 15:39:20'),
 ('una-nueva-vocal',8,19,38,3,'catalogo_juegos/Multisaberes/DescubreLasVocales/UnaNuevaVocal','Una Nueva Vocal',NULL,NULL,'#3b82f6',178,1,'2026-10-29 14:33:30','2026-10-29 15:39:20'),
+('une-las-partes-del-cuerpo',7,11,29,9,'catalogo_juegos/Polimotor/UnePartesCuerpo','Une las Partes del Cuerpo','Transición (5 a 6 años). Reconocimiento de partes del cuerpo: unir con un hilo mágico cada tarjeta ilustrada (cabeza, ojos, orejas, nariz, boca, cuello, brazo, mano, pierna y pie) con su lugar en el cuerpo de Zeus, y enviar las respuestas al terminar.','une.png','#7950f2',14,1,'2026-11-11 18:00:00','2026-11-11 18:00:00'),
 ('une-los-puntos-de-la-constelacion',8,20,43,3,'catalogo_juegos/Multisaberes/CuentaLosObjetos/UneLosPuntosDeLaConstelacion','Une los Puntos de la Constelación',NULL,NULL,'#38bdf8',400,1,'2026-11-05 10:00:00','2026-11-05 10:00:00');
 
 /*Table structure for table `matriculas` */

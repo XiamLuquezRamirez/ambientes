@@ -1,0 +1,325 @@
+{
+  "nombre": "Une las Partes del Cuerpo",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "radioPunto": 15,
+    "radioCaptura": 2.6,
+    "ayudaMs": 11000,
+    "ayudaRepetirMs": 12000,
+    "erroresParaBrillo": 3
+  },
+  "tarjetas": [
+    {
+      "id": "cabeza",
+      "nombre": "Cabeza",
+      "icono": "cabeza",
+      "color": "#be4bdb",
+      "zona": "la cabeza",
+      "punto": "p-cabeza",
+      "tarjeta": {
+        "lado": "izq",
+        "fila": 1
+      },
+      "destino": {
+        "contenedor": "cabeza",
+        "x": -46,
+        "y": -300
+      },
+      "audio": {
+        "instruccion": null,
+        "acierto": null
+      },
+      "textos": {
+        "pista": "¿Dónde está la cabeza de Zeus? Busca arriba, donde está su pelo.",
+        "acierto": "¡Muy bien! Esa es la cabeza de Zeus."
+      }
+    },
+    {
+      "id": "ojos",
+      "nombre": "Ojos",
+      "icono": "ojos",
+      "color": "#1c7ed6",
+      "zona": "los ojos",
+      "punto": "p-ojos",
+      "tarjeta": {
+        "lado": "izq",
+        "fila": 0
+      },
+      "destino": {
+        "contenedor": "cabeza",
+        "x": -60,
+        "y": -150
+      },
+      "audio": {
+        "instruccion": null,
+        "acierto": null
+      },
+      "textos": {
+        "pista": "¿Puedes encontrar sus ojos? Con ellos Zeus te mira.",
+        "acierto": "¡Eso es! Esos son los ojos de Zeus."
+      }
+    },
+    {
+      "id": "orejas",
+      "nombre": "Orejas",
+      "icono": "orejas",
+      "color": "#e64980",
+      "zona": "las orejas",
+      "punto": "p-orejas",
+      "tarjeta": {
+        "lado": "izq",
+        "fila": 3
+      },
+      "destino": {
+        "contenedor": "cabeza",
+        "x": -173,
+        "y": -130
+      },
+      "audio": {
+        "instruccion": null,
+        "acierto": null
+      },
+      "textos": {
+        "pista": "¿Dónde están las orejas? Mira a los lados de la cara de Zeus.",
+        "acierto": "¡Súper! Con las orejas Zeus escucha."
+      }
+    },
+    {
+      "id": "brazo",
+      "nombre": "Brazo",
+      "icono": "brazo",
+      "color": "#f76707",
+      "zona": "el brazo",
+      "punto": "p-brazo",
+      "tarjeta": {
+        "lado": "izq",
+        "fila": 2
+      },
+      "destino": {
+        "contenedor": "brazoDer",
+        "x": 0,
+        "y": 66
+      },
+      "audio": {
+        "instruccion": null,
+        "acierto": null
+      },
+      "textos": {
+        "pista": "Busca su brazo: va desde el hombro hasta la mano.",
+        "acierto": "¡Muy bien! Ese es el brazo de Zeus."
+      }
+    },
+    {
+      "id": "pierna",
+      "nombre": "Pierna",
+      "icono": "pierna",
+      "color": "#364fc7",
+      "zona": "la pierna",
+      "punto": "p-pierna",
+      "tarjeta": {
+        "lado": "izq",
+        "fila": 4
+      },
+      "destino": {
+        "contenedor": "zeus",
+        "x": -58,
+        "y": -172
+      },
+      "audio": {
+        "instruccion": null,
+        "acierto": null
+      },
+      "textos": {
+        "pista": "¡Observa sus piernas! Con ellas Zeus camina y salta.",
+        "acierto": "¡Excelente! Esa es la pierna de Zeus."
+      }
+    },
+    {
+      "id": "nariz",
+      "nombre": "Nariz",
+      "icono": "nariz",
+      "color": "#7950f2",
+      "zona": "la nariz",
+      "punto": "p-nariz",
+      "tarjeta": {
+        "lado": "der",
+        "fila": 1
+      },
+      "destino": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -111
+      },
+      "audio": {
+        "instruccion": null,
+        "acierto": null
+      },
+      "textos": {
+        "pista": "¿Dónde está la nariz de Zeus? Está en el centro de su cara.",
+        "acierto": "¡Muy bien! Esa es la nariz de Zeus."
+      }
+    },
+    {
+      "id": "boca",
+      "nombre": "Boca",
+      "icono": "boca",
+      "color": "#f59f00",
+      "zona": "la boca",
+      "punto": "p-boca",
+      "tarjeta": {
+        "lado": "der",
+        "fila": 0
+      },
+      "destino": {
+        "contenedor": "cabeza",
+        "x": 0,
+        "y": -52
+      },
+      "audio": {
+        "instruccion": null,
+        "acierto": null
+      },
+      "textos": {
+        "pista": "¿Dónde está su boca? Con ella Zeus sonríe y habla.",
+        "acierto": "¡Eso es! Esa es la boca de Zeus."
+      }
+    },
+    {
+      "id": "cuello",
+      "nombre": "Cuello",
+      "icono": "cuello",
+      "color": "#1098ad",
+      "zona": "el cuello",
+      "punto": "p-cuello",
+      "tarjeta": {
+        "lado": "der",
+        "fila": 2
+      },
+      "destino": {
+        "contenedor": "zeus",
+        "x": 0,
+        "y": -620
+      },
+      "audio": {
+        "instruccion": null,
+        "acierto": null
+      },
+      "textos": {
+        "pista": "El cuello está debajo de la cabeza. ¡Búscalo!",
+        "acierto": "¡Muy bien! Ese es el cuello de Zeus."
+      }
+    },
+    {
+      "id": "pie",
+      "nombre": "Pie",
+      "icono": "pie",
+      "color": "#a0522d",
+      "zona": "el pie",
+      "punto": "p-pie",
+      "tarjeta": {
+        "lado": "der",
+        "fila": 4
+      },
+      "destino": {
+        "contenedor": "pieIzq",
+        "x": 52,
+        "y": -36
+      },
+      "audio": {
+        "instruccion": null,
+        "acierto": null
+      },
+      "textos": {
+        "pista": "¿Dónde está su pie? Mira abajo, abajo, donde Zeus pisa.",
+        "acierto": "¡Súper! Ese es el pie de Zeus."
+      }
+    },
+    {
+      "id": "mano",
+      "nombre": "Mano",
+      "icono": "mano",
+      "color": "#5c7cfa",
+      "zona": "la mano",
+      "punto": "p-mano",
+      "tarjeta": {
+        "lado": "der",
+        "fila": 3
+      },
+      "destino": {
+        "contenedor": "manoIzq",
+        "x": 11,
+        "y": 30
+      },
+      "audio": {
+        "instruccion": null,
+        "acierto": null
+      },
+      "textos": {
+        "pista": "Busca su mano. ¡Tiene cinco dedos!",
+        "acierto": "¡Muy bien! Esa es la mano de Zeus."
+      }
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "nombreCorto": "Une las Partes del Cuerpo",
+    "bienvenida": "¡Hola, amiguito! Hoy vamos a descubrir las partes del cuerpo de Zeus. Mira los dibujos y conecta cada uno con el lugar correcto. ¡Vamos a jugar!",
+    "saludoCorto": "¡Hola, amiguito! Vamos a conectar las partes del cuerpo de Zeus.",
+    "instruccion": "¡Mira el dibujo de la tarjeta, toca el punto y lleva la línea hasta esa parte en el cuerpo de Zeus!",
+    "demostracion": "¡Mira! Toca el puntito de la tarjeta y lleva la línea hasta la nariz de Zeus.",
+    "demostracionBien": "¡Muy bien!",
+    "demostracionFin": "¡Ahora te toca a ti! Une cada dibujo con su parte en el cuerpo de Zeus. Cuando unas todas, revisamos: verde está bien y rojo hay que arreglarlo.",
+    "botonComenzar": "¡A jugar!",
+    "yaConectada": "¡Esa tarjeta ya está conectada! Elige otra.",
+    "ocupado": "Ese punto ya tiene su línea. Busca otro lugar.",
+    "progreso": "PARTES CONECTADAS",
+    "revisando": "¡Uniste todas! Ahora vamos a revisar: verde está bien y rojo hay que arreglarlo.",
+    "final": "¡LO LOGRASTE! Uniste el dibujo de cada parte con su lugar en el cuerpo y todas quedaron en verde. ¡Tienes una súper precisión y conoces tu cuerpo a la perfección!",
+    "finalZeus": "¡Gracias, amiguito! ¡Ahora conoces todo mi cuerpo!",
+    "finalTitulo": "¡EXCELENTE TRABAJO!",
+    "finalSub": "¡Conectaste todas las partes del cuerpo!",
+    "cierre": "¡Excelente trabajo! Conectaste todas las partes del cuerpo.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. Hoy vamos a jugar con las partes del cuerpo."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Tengo cabeza, ojos, brazos, piernas… ¿me ayudas a encontrarlas?"
+      },
+      {
+        "personaje": 1,
+        "texto": "Hay que unir cada dibujo con su lugar en el cuerpo de Zeus. ¡Vamos!"
+      }
+    ],
+    "revisionMal": "¡Tienes {bien} en verde! Las rojas no van ahí. ¡Mira bien el dibujo y búscales su lugar otra vez!",
+    "revisionMalUna": "¡Casi! Solo una quedó en rojo. ¡Mira bien el dibujo y búscale su lugar otra vez!"
+  },
+  "demo": {
+    "tarjeta": "nariz",
+    "color": "#7950f2"
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Transición: partes del cuerpo"
+    }
+  ]
+}

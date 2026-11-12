@@ -1,0 +1,185 @@
+{
+  "nombre": "Golpea a los Topos",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "duracionSeg": 100,
+    "objetivo": 12,
+    "maxDistractoresSeguidos": 2,
+    "vozPausaMs": 2600,
+    "ayudaMs": 9000,
+    "ayudaRepetirMs": 16000,
+    "avisoTiempoSeg": 15
+  },
+  "agujeros": [
+    { "id": "a1", "x": 0.3, "y": 0.45 },
+    { "id": "a2", "x": 0.5, "y": 0.45 },
+    { "id": "a3", "x": 0.7, "y": 0.45 },
+    { "id": "b1", "x": 0.15, "y": 0.88 },
+    { "id": "b2", "x": 0.383, "y": 0.88 },
+    { "id": "b3", "x": 0.617, "y": 0.88 },
+    { "id": "b4", "x": 0.85, "y": 0.88 }
+  ],
+  "dificultad": [
+    {
+      "desde": 0,
+      "simultaneos": 1,
+      "visibleMs": 4600,
+      "intervaloMs": 1300,
+      "probDistractor": 0.35,
+      "partes": ["nariz", "ojos", "boca", "orejas", "mano", "pie"],
+      "distractores": ["pelota", "manzana", "cepillo"]
+    },
+    {
+      "desde": 3,
+      "simultaneos": 2,
+      "visibleMs": 4200,
+      "intervaloMs": 1200,
+      "probDistractor": 0.4,
+      "partes": ["nariz", "ojos", "boca", "orejas", "mano", "pie", "brazo", "pierna", "cabeza"],
+      "distractores": ["pelota", "manzana", "cepillo", "peine", "banano", "osito"]
+    },
+    {
+      "desde": 7,
+      "simultaneos": 2,
+      "visibleMs": 3800,
+      "intervaloMs": 1100,
+      "probDistractor": 0.45,
+      "partes": ["nariz", "ojos", "boca", "orejas", "mano", "pie", "brazo", "pierna", "cabeza", "corazon", "cerebro", "pulmones"],
+      "distractores": ["pelota", "manzana", "cepillo", "peine", "banano", "osito", "carro", "cuchara", "taza"]
+    },
+    {
+      "desde": 10,
+      "simultaneos": 3,
+      "visibleMs": 3600,
+      "intervaloMs": 1050,
+      "probDistractor": 0.45,
+      "partes": ["nariz", "ojos", "boca", "orejas", "mano", "pie", "brazo", "pierna", "cabeza", "corazon", "cerebro", "pulmones"],
+      "distractores": ["pelota", "manzana", "cepillo", "peine", "banano", "osito", "carro", "cuchara", "taza"]
+    }
+  ],
+  "imagenes": [
+    { "id": "nariz", "nombre": "la nariz", "icono": "nariz", "categoria": "parte_cuerpo" },
+    { "id": "ojos", "nombre": "los ojos", "icono": "ojos", "categoria": "parte_cuerpo" },
+    { "id": "boca", "nombre": "la boca", "icono": "boca", "categoria": "parte_cuerpo" },
+    { "id": "orejas", "nombre": "la oreja", "icono": "orejas", "categoria": "parte_cuerpo" },
+    { "id": "mano", "nombre": "la mano", "icono": "mano", "categoria": "parte_cuerpo" },
+    { "id": "pie", "nombre": "el pie", "icono": "pie", "categoria": "parte_cuerpo" },
+    { "id": "brazo", "nombre": "el brazo", "icono": "brazo", "categoria": "parte_cuerpo" },
+    { "id": "pierna", "nombre": "la pierna", "icono": "pierna", "categoria": "parte_cuerpo" },
+    { "id": "cabeza", "nombre": "la cabeza", "icono": "cabeza", "categoria": "parte_cuerpo" },
+    { "id": "corazon", "nombre": "el corazón", "icono": "corazon", "categoria": "parte_cuerpo" },
+    { "id": "cerebro", "nombre": "el cerebro", "icono": "cerebro", "categoria": "parte_cuerpo" },
+    { "id": "pulmones", "nombre": "los pulmones", "icono": "pulmones", "categoria": "parte_cuerpo" },
+    { "id": "cepillo", "nombre": "un cepillo de dientes", "icono": "cepillo", "categoria": "distractor" },
+    { "id": "peine", "nombre": "un peine", "icono": "peine", "categoria": "distractor" },
+    { "id": "pelota", "nombre": "una pelota", "icono": "pelota", "categoria": "distractor" },
+    { "id": "manzana", "nombre": "una manzana", "icono": "manzana", "categoria": "distractor" },
+    { "id": "banano", "nombre": "un banano", "icono": "banano", "categoria": "distractor" },
+    { "id": "osito", "nombre": "un osito de peluche", "icono": "osito", "categoria": "distractor" },
+    { "id": "carro", "nombre": "un carrito", "icono": "carro", "categoria": "distractor" },
+    { "id": "cuchara", "nombre": "una cuchara", "icono": "cuchara", "categoria": "distractor" },
+    { "id": "taza", "nombre": "una taza", "icono": "taza", "categoria": "distractor" }
+  ],
+  "presentacion": {
+    "agujeros": ["a1", "a2", "a3"],
+    "imagenes": ["ojos", "pelota", "boca"],
+    "destacarParte": "ojos",
+    "destacarDistractor": "pelota"
+  },
+  "demo": {
+    "pasos": [
+      { "agujero": "a1", "imagen": "nariz" },
+      { "agujero": "a2", "imagen": "cepillo" },
+      { "agujero": "a3", "imagen": "mano" }
+    ]
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "nombreCorto": "Golpea a los Topos",
+    "titulo": "¡GOLPEA A LOS TOPOS!",
+    "subtitulo": "Encuentra las partes del cuerpo.",
+    "bienvenida": "¡Hola, amiguito! Hoy vamos a jugar con unos topos muy traviesos. Algunos tienen dibujos de partes del cuerpo y otros tienen objetos diferentes. ¡Tienes que encontrar los correctos!",
+    "saludoCorto": "¡Hola, amiguito! Vamos a jugar con unos topos muy traviesos.",
+    "explicaReto": "¡Presta mucha atención! Cuando veas una parte del cuerpo en el globito, toca rápidamente al topo antes de que se esconda.",
+    "presentaParte": "¡Mira! Los ojos son una parte del cuerpo. ¡Ese topo sí se toca!",
+    "presentaDistractor": "La pelota es un objeto. ¡Ese topo no se toca!",
+    "demostracion": "¡Mira cómo se juega! Primero busco los dibujos de partes del cuerpo.",
+    "demoNariz": "¡La nariz es una parte del cuerpo! ¡Toc!",
+    "demoCepillo": "El cepillo es un objeto. ¡Ese no se toca!",
+    "demoMano": "¡Y la mano también es una parte del cuerpo!",
+    "demostracionBien": "¡CORRECTO!",
+    "demostracionNo": "¡ESE NO!",
+    "demostracionFin": "¡Muy bien! Recuerda: golpea solamente los topos que tengan partes del cuerpo.",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "instruccion": "¡Rápido! Toca los topos que tienen la parte del cuerpo.",
+    "instruccionZeus": "¡Fíjate bien en el dibujo del globito antes de que se escondan!",
+    "letrero": "¡Golpea los topos que son partes del cuerpo!",
+    "letreroCorrecto": "¡Correcto!",
+    "letreroError": "¡Ups! Ese es un objeto",
+    "aciertoVoz": [
+      "¡Correcto! ¡Encontraste una parte del cuerpo!",
+      "¡Correcto! ¡Es {nombre}!",
+      "¡Muy bien! ¡{Nombre} es una parte del cuerpo!",
+      "¡Eso es! ¡{Nombre}!"
+    ],
+    "errorVoz": [
+      "¡Ups! Ese tiene un objeto. ¡Busca otro!",
+      "¡Ese no! Busca los dibujos de las partes del cuerpo.",
+      "¡Ups! Es {nombre}. ¡Busca otro topo!"
+    ],
+    "ayuda": "¡Mira los globitos! Toca los topos que tienen una parte del cuerpo.",
+    "avisoTiempo": "¡Rápido, que queda poquito tiempo!",
+    "progreso": "PARTES",
+    "pausaTitulo": "Juego en pausa",
+    "pausaBoton": "¡Seguir jugando!",
+    "finalTitulo": "¡SÚPER VELOZ!",
+    "finalSub": "¡Encontraste todas las partes del cuerpo!",
+    "final": "¡SÚPER VELOZ! Tuviste los mejores reflejos, encontraste las partes del cuerpo y atrapaste a todos los topos. ¡Eres un campeón de la agilidad visual!",
+    "cierre": "¡Súper veloz! Encontraste todas las partes del cuerpo.",
+    "tiempoTitulo": "¡Buen trabajo!",
+    "tiempoSub": "Encontraste {n} partes del cuerpo.",
+    "tiempoSubUna": "Encontraste 1 parte del cuerpo.",
+    "tiempoSubCero": "¡Los topos fueron muy rápidos esta vez!",
+    "tiempoVoz": "¡Se terminó el tiempo! Encontraste {n} partes del cuerpo. ¡Lo hiciste muy bien! ¿Jugamos otra vez?",
+    "tiempoVozUna": "¡Se terminó el tiempo! Encontraste una parte del cuerpo. ¡Vamos a intentarlo otra vez!",
+    "tiempoVozCero": "¡Se terminó el tiempo! Los topos fueron muy rápidos. ¡Vamos a intentarlo otra vez!",
+    "botonOtraVez": "¡Jugar otra vez!",
+    "botonSalir": "Salir",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Hoy vamos al campamento de los topos!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Los topos salen de sus agujeros con dibujos en un globito."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Hay que tocar solo los topos que tienen partes del cuerpo! ¡Vamos!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Transición: partes del cuerpo"
+    }
+  ]
+}

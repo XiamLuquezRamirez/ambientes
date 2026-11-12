@@ -1,0 +1,154 @@
+{
+  "nombre": "La Linterna Reveladora de Partes",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "ayudaVozMs": 7000,
+    "ayudaRepetirMs": 9000,
+    "erroresParaPista": 2,
+    "visibilidad": 0.82,
+    "barrigaPrimero": true
+  },
+  "niveles": [
+    { "id": "3", "edad": "3-4 años", "titulo": "3 años" },
+    { "id": "4", "edad": "4 años", "titulo": "4 años" }
+  ],
+  "partes": {
+    "barriga": { "nombre": "la barriga", "sonido": "tambor", "animacion": "barriga" },
+    "manos": { "nombre": "las manos", "sonido": "acierto", "animacion": "manos" },
+    "pies": { "nombre": "los pies", "sonido": "aparece", "animacion": "pies" },
+    "rodillas": { "nombre": "las rodillas", "sonido": "acierto", "animacion": "rodillas" },
+    "hombros": { "nombre": "los hombros", "sonido": "bote", "animacion": "hombros" },
+    "orejas": { "nombre": "las orejas", "sonido": "aparece", "animacion": "orejas" },
+    "ojos": { "nombre": "los ojos", "sonido": "acierto", "animacion": "ojos" },
+    "boca": { "nombre": "la boca", "sonido": "aparece", "animacion": "boca" },
+    "cabello": { "nombre": "el cabello", "sonido": "bote", "animacion": "cabello" }
+  },
+  "retos": [
+    {
+      "id": "barriga", "ronda": 1, "parte": "barriga", "nombre": "la barriga",
+      "zonas": ["barriga"], "personaje": "zeus",
+      "texto": "¡Busca la barriga de Zoe! Mueve la luz al centro de su cuerpo y tócala cuando la veas.",
+      "ayuda": "La barriga está en el centro del cuerpo de Zoe.",
+      "confirma": "¡Ya se ve la barriga! Tócala otra vez.",
+      "acierto": "¡Encontraste la barriga de Zoe!",
+      "visibilidad": 0.82, "ayudaMs": 7000, "animacion": "barriga", "sonido": "tambor"
+    },
+    {
+      "id": "manos", "ronda": 1, "parte": "manos", "nombre": "las manos",
+      "zonas": ["mano_izq", "mano_der"], "personaje": "zeus",
+      "texto": "¡Ahora las manos de Zoe! Ilumina una mano y tócala.",
+      "ayuda": "Las manos están al final de los brazos de Zoe.",
+      "confirma": "¡Ya ves una mano! Tócala otra vez.",
+      "acierto": "¡Muy bien! Esa es una mano de Zoe.",
+      "visibilidad": 0.82, "ayudaMs": 7000, "animacion": "manos", "sonido": "acierto"
+    },
+    {
+      "id": "pies", "ronda": 1, "parte": "pies", "nombre": "los pies",
+      "zonas": ["pie_izq", "pie_der"], "personaje": "zeus",
+      "texto": "¡Vamos a los pies de Zoe! Baja la luz y toca un pie cuando brille.",
+      "ayuda": "Los pies de Zoe están abajo, en los zapatos.",
+      "confirma": "¡Ya se ve un pie! Tócalo otra vez.",
+      "acierto": "¡Encontraste un pie de Zoe!",
+      "visibilidad": 0.82, "ayudaMs": 7000, "animacion": "pies", "sonido": "aparece"
+    },
+    {
+      "id": "rodillas", "ronda": 2, "parte": "rodillas", "nombre": "las rodillas",
+      "zonas": ["rodilla_izq", "rodilla_der"], "personaje": "zeus",
+      "texto": "¡Ronda nueva! Busca las rodillas de Zoe, en la mitad de las piernas.",
+      "ayuda": "Las rodillas están entre la barriga y los pies.",
+      "confirma": "¡Ya se ven las rodillas! Toca una otra vez.",
+      "acierto": "¡Encontraste las rodillas de Zoe!",
+      "visibilidad": 0.82, "ayudaMs": 7000, "animacion": "rodillas", "sonido": "acierto"
+    },
+    {
+      "id": "hombros", "ronda": 2, "parte": "hombros", "nombre": "los hombros",
+      "zonas": ["hombro_izq", "hombro_der"], "personaje": "zeus",
+      "texto": "¡Busca los hombros de Zoe! Están donde empiezan los brazos.",
+      "ayuda": "Sube la luz a los lados del cuello. Ahí están los hombros.",
+      "confirma": "¡Ya se ve un hombro! Tócalo otra vez.",
+      "acierto": "¡Esos son los hombros de Zoe!",
+      "visibilidad": 0.82, "ayudaMs": 7000, "animacion": "hombros", "sonido": "bote"
+    },
+    {
+      "id": "orejas", "ronda": 2, "parte": "orejas", "nombre": "las orejas",
+      "zonas": ["oreja_izq", "oreja_der"], "personaje": "zeus",
+      "texto": "¡A los lados de la cabeza! Ilumina una oreja de Zoe y tócala.",
+      "ayuda": "Las orejas están a los dos lados de la cabeza de Zoe.",
+      "confirma": "¡Ya ves una oreja! Tócala otra vez.",
+      "acierto": "¡Encontraste las orejas de Zoe!",
+      "visibilidad": 0.82, "ayudaMs": 7000, "animacion": "orejas", "sonido": "aparece"
+    },
+    {
+      "id": "ojos", "ronda": 3, "parte": "ojos", "nombre": "los ojos",
+      "zonas": ["ojo_izq", "ojo_der"], "personaje": "zeus",
+      "texto": "¡Última ronda! Busca los ojos de Zoe y toca uno cuando la luz lo muestre.",
+      "ayuda": "Los ojos están en la cara de Zoe, arriba de la boca.",
+      "confirma": "¡Ya se ve un ojo! Tócalo otra vez.",
+      "acierto": "¡Encontraste los ojos de Zoe!",
+      "visibilidad": 0.78, "ayudaMs": 7000, "animacion": "ojos", "sonido": "acierto"
+    },
+    {
+      "id": "boca", "ronda": 3, "parte": "boca", "nombre": "la boca",
+      "zonas": ["boca"], "personaje": "zeus",
+      "texto": "¡Ahora la boca de Zoe! Baja un poco la luz en la cara y tócala.",
+      "ayuda": "La boca está debajo de los ojos, en la sonrisa de Zoe.",
+      "confirma": "¡Ya se ve la boca! Tócala otra vez.",
+      "acierto": "¡Encontraste la boca de Zoe!",
+      "visibilidad": 0.78, "ayudaMs": 7000, "animacion": "boca", "sonido": "aparece"
+    },
+    {
+      "id": "cabello", "ronda": 3, "parte": "cabello", "nombre": "el cabello",
+      "zonas": ["cabello", "coleta_izq", "coleta_der"], "personaje": "zeus",
+      "texto": "¡El cabello de Zoe! Sube la luz arriba de la cara y toca el pelo.",
+      "ayuda": "El cabello está arriba de la cabeza y en las coletas.",
+      "confirma": "¡Ya se ve el cabello! Tócalo otra vez.",
+      "acierto": "¡Encontraste el cabello de Zoe!",
+      "visibilidad": 0.82, "ayudaMs": 7000, "animacion": "cabello", "sonido": "bote"
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "nombreCorto": "La linterna reveladora",
+    "bienvenida": "¡Hola! Soy Zeus. Zoe está en el campamento. Con la linterna vamos a buscar las partes de su cuerpo. Primero mueve la luz y después toca.",
+    "saludoCorto": "¡La linterna mágica ya está aquí! Vamos a buscar las partes del cuerpo de Zoe.",
+    "demostracion": "¡Mira! Primero mueve la linterna hasta la barriga de Zoe y después tócala.",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "botonComenzar": "¡A jugar!",
+    "error": "¡Sigue buscando! ¡Tú puedes!",
+    "rondaRotulo": "Ronda",
+    "rondas": {
+      "2": "¡Ronda dos! El campamento enciende más luces. Ahora rodillas, hombros y orejas.",
+      "3": "¡Última ronda! Vamos a la cara y al cabello de Zoe."
+    },
+    "final": "¡Eres un superdetective de la luz! En tres rondas encontraste la barriga, las rodillas, las orejas y muchas partes más. ¡Conoces el cuerpo de arriba a abajo!",
+    "finalTitulo": "¡SUPERDETECTIVE DE PEDNIA!",
+    "finalSub": "¡Descubriste las partes del cuerpo en tres rondas!",
+    "cierre": "¡Eres un superdetective de la luz! ¡Conoces el cuerpo de arriba a abajo!",
+    "conversacion": [
+      { "personaje": 0, "texto": "¡Hola! Soy Zeus. Hoy estamos en el campamento de PedNia con Zoe." },
+      { "personaje": 0, "texto": "Con la linterna mágica vamos a buscar las partes del cuerpo de Zoe." },
+      { "personaje": 0, "texto": "Son tres rondas. Mueve la luz y toca la parte cuando ya esté iluminada." }
+    ]
+  },
+  "demo": [
+    {
+      "parte": "barriga",
+      "texto": "¡Mira! Primero mueve la linterna hasta la barriga de Zoe y después tócala."
+    }
+  ]
+}

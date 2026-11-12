@@ -530,6 +530,173 @@ ronda: la mano y la muñeca se pisan al soltar. Zoe es la guía lateral (3D). To
 - Registro: fila en `database/ambientes.sql`
   (ambiente 7, eje 11, temática 29, módulo 9, orden 12, imagen `donde.png`).
 
+### La Linterna Reveladora de Partes (`Polimotor/LinternaReveladoraPartes/`)
+
+Juego nuevo (noviembre de 2026), Prejardín 3-4 años, temática 29 "Reconocimiento de partes del cuerpo".
+Campamento nocturno de PedNia: el niño mueve una linterna y, cuando la parte ya está dentro del haz, la toca.
+Tres rondas de tres partes, en este orden: barriga, manos, pies; rodillas, hombros, orejas; ojos, boca, cabello.
+No entra la nariz: queda entre los ojos y la boca. El orden no se baraja (la demo enseña la barriga);
+lo que cambia en cada partida es la esquina donde aparece la linterna. El campamento ocupa toda la pantalla.
+Zeus queda en la esquina y es el único que habla, en tercera persona. Zoe es el modelo 3D
+(`intro3d/models/nina.glb`), centrada, con los pies sobre el pasto.
+La oscuridad no es negra: alfa 0.58 (0.36 en alto contraste) para que el campamento se siga leyendo.
+El haz se capa en 74 px; el aro dorado es un anillo fino, no un disco.
+
+| Archivo | Global | Qué hace |
+|---|---|---|
+| `retos.js` | `Retos` | Reglas puras: `evaluar` (acierto, oscura, error, cuerpo), `centroCubierto`, `tocar`, `armarPartida`. |
+| `personaje.js` | `Personaje` | Zoe en SVG. Solo se usa si el modelo 3D no carga. |
+| `campamento.js` | `Campamento` | Fondo en espejo: pinos y dos tiendas del mismo tamaño, suelo a la altura de los pies de Zoe, letrero a su derecha. `pulsoLuz`, `celebrar` y `ronda` no agregan objetos. |
+| `zoe-3d.js` | `Zoe3D` | Carga `nina.glb`, la encuadra de cuerpo entero y copia el WebGL a un canvas 2D. Las zonas salen de ese cuerpo opaco, no de los huesos. |
+| `linterna-phaser.js` | `LinternaPhaser` | Zoe, linterna, máscara y el toque. |
+| `animaciones.js` | `ZoeAnim` | Reposo y las reacciones. En 3D usa clips del modelo (reír, saltar, aplaudir, celebrar). |
+| `demo.js` | `LinternaDemo` | La mano desliza la linterna hasta la barriga y después la toca. No suma aciertos. |
+| `guia-3d.js` | `Guia3D` | Copia del Zeus 3D del Toque Mágico (`nino.glb`). |
+| `script.js` | — | Intro, demo, tres rondas, puente entre rondas, pistas, cartel y victoria compartida. |
+
+- **Luz**: Phaser 4 no trae `BitmapMask`. La oscuridad es un canvas a mitad de resolución: relleno azul y un círculo
+  `destination-out`. Se sube con `texture.source[0].update()` solo cuando el haz se mueve. El borde dorado es un sprite
+  ADD fijo. Las chispas salen de un pool de 22, no se crean al mover.
+- **Dos gestos**: al apoyar el dedo se guarda si la zona ya estaba iluminada. Un toque corto (≤ 32 px) confirma ese
+  estado. Un arrastre solo mueve la luz. Tocar la parte correcta todavía a oscuras no cuenta: la luz va hacia el dedo
+  y Zeus pide tocarla otra vez.
+- **Cuerpo de la linterna**: cuelga 70 px bajo el centro del haz para no tapar la barriga ni la oreja. `agarre()` da
+  el punto de la mano de la demo. Al ganar, la linterna baja a la esquina y el campamento queda a color.
+- **Zoe 3D**: Phaser no puede hacer `addCanvas` de un canvas WebGL (`getImageData` es null). Se dibuja el WebGL
+  (`preserveDrawingBuffer`) en un canvas 2D y ese es el que se publica. Las zonas se recalculan sobre el cuerpo
+  opaco: los pivotes del esqueleto no caen en la malla (los ojos quedaban en el vestido y los pies fuera de la pantalla).
+- **Quién habla**: Zeus dice la bienvenida, cada parte, la ayuda, el acierto y el cierre. Las frases son sobre Zoe,
+  no en primera persona. No hay muestra de tambor: la barriga usa el evento `bote`.
+- **Ayuda** a los 7 s: estrellas hacia la zona, huellas y un pulso. Si la parte ya está iluminada, la frase es la de
+  confirmar el toque. También tras 2 toques equivocados. Error = `tic` y "¡Sigue buscando! ¡Tú puedes!".
+- Sonidos: se rotan `bote`, `acierto` y `aparece`. Cierre de ronda `correcto`, victoria `victoria`.
+- Probar: `node scripts/probar-linterna-reveladora.js`. En el navegador, `mousedown` / `mousemove` / `mouseup` en el
+  canvas. `LinternaPhaser.puntoDe("barriga")` devuelve coordenadas de pantalla.
+- Registro: fila en `database/ambientes.sql` (ambiente 7, eje 11, temática 29, módulo 9, orden 13, imagen `linterna.png`).
+
+### Une las Partes del Cuerpo (`Polimotor/UnePartesCuerpo/`)
+
+Juego nuevo (noviembre de 2026), Transición 5-6 años, temática 29 "Reconocimiento de partes del cuerpo".
+Zeus de frente y de cuerpo entero en el centro, sobre una tarima en una sala azul clara. A cada lado, cinco
+tarjetas ilustradas (nombre en mayúsculas + dibujo + conector de color). El niño toca el conector (o la tarjeta),
+arrastra una línea y la suelta sobre un punto de Zeus. **Toda línea soltada en un punto libre queda pegada**, sin decir
+si está bien. **No hay botón de enviar**: al unir las 10, Zoe califica una por una (columna izquierda de arriba a abajo,
+luego la derecha). Verde con ✓ = bien (queda fija); rojo con ✗ = mal. Las rojas vuelven a su tarjeta para corregirlas
+y al completar otra vez se califican solo esas. Todas en verde → celebración.
+Zoe (3D, `nina.glb`) dice todo; Zeus solo agradece al final en su nube. En la presentación Zoe **entra caminando**
+desde la izquierda (clip `Caminar`, o `Caminar_y_hablar` si habla, mirando de perfil con `Guia3D.mirar`) y queda
+**grande** entre las tarjetas de la izquierda y Zeus (`zoeEntra()` pone la caja `.guia-pj` en `position: fixed` con
+medidas de `ubicarZoeGrande()`; en tableta vertical se para delante de la columna izquierda). Al terminar la demo
+**se va caminando** (`zoeSale()`) y queda pequeña en la barra de abajo mientras se juega. En el final vuelve a entrar.
+Mientras está grande, lo que dice sale en una nube sobre su cabeza (`#zoe-nube`, dentro de su caja: camina con ella);
+en la barra usa la nube de siempre. El paseo se hace con `setTimeout`, no con transición CSS: con el panel del
+navegador oculto las transiciones se congelan y Zoe aparecía de golpe.
+
+| Archivo | Global | Qué hace |
+|---|---|---|
+| `reglas.js` | `ReglasUne` | Puro (también `module.exports`): `esCorrecta` por **identidad** tarjeta ↔ punto, `puntoCercano`, `evaluar` (correcta, error, nada, repetida, ocupado), `calificar` (orden de revisión, verdes y rojas; `yaBien` salta las ya verdes), `progreso`, `siguientePendiente`. |
+| `personaje.js` | `Personaje` | Copia del Zeus de "¿Dónde se pone?" con la cabeza más arriba (`cabeza.y` -602, `escalaCabeza` 0.96) para que se vea el cuello, y los brazos más abiertos (`brazoReposo` 0.42). |
+| `iconos.js` | `IconosCuerpo` | Un SVG de 120 × 120 por tarjeta, con la piel, el pelo y la ropa de Zeus. |
+| `escenario-phaser.js` | `EscenarioUne` | Zeus por partes, anclas de los puntos, tarjetas (Phaser), líneas y puntos redibujados en cada cuadro, destellos y diseño. |
+| `conexiones.js` | `Conexiones` | Arrastre con el input de Phaser (ratón y dedo). Solo sigue al primer puntero. `pointerupoutside`, `blur` y `touchcancel` devuelven la línea. |
+| `animaciones.js` | `ZeusAnim` | Reposo (balanceo de brazos muy leve: hay puntos en el brazo y la mano), aparecer, saludo, contento, sorpresa, alegría, celebrar. |
+| `demo.js` | `UneDemo` | Mano de PedniaTutorial: toma el conector de NARIZ, arrastra la línea violeta hasta la nariz, destello, "¡Muy bien!". Luego `limpiarConexiones()`. |
+| `guia-3d.js` | `Guia3D` | Copia de la Zoe 3D de "¿Dónde se pone?"; el host sigue siendo `#guia .guia-pj`. |
+| `script.js` | — | Intro, presentación, demo, callbacks, ayudas, progreso, calificación verde/rojo, final y victoria. |
+
+- **Puntos que siguen a Zeus**: cada tarjeta de `config.json` trae `destino` `{ contenedor, x, y }` en las coordenadas
+  de una parte (`zeus`, `cabeza`, `brazoDer`, `manoIzq`, `pieIzq`…). Ahí se crea una `Zone` invisible y en cada cuadro
+  se lee su posición del mundo. No hay posiciones fijas en pantalla: los puntos y los hilos acompañan la respiración, los
+  saltos y los cambios de tamaño. Para las partes dobles el punto va en el lado de su columna de tarjetas
+  (ojos, orejas, brazo y pierna en el lado izquierdo de la pantalla; mano y pie en el derecho).
+- **Unir**: al soltar se elige el punto más cercano de **todos** dentro de `radioCaptura` (≥ 34 px), también los
+  ocupados. Si ya tiene línea → "ocupado" (la línea vuelve). Si está libre, la línea se pega (`fijarLinea`, tarjeta en
+  estado `unida`: tinte de su color, sin marca) aunque sea la parte equivocada. Soltar lejos de todo → vuelve sin error.
+  Una tarjeta unida no se puede volver a tomar hasta la revisión.
+- **Calificar** (`calificarTodo` en `script.js`, `calificarLinea` en la escena): "¡Uniste todas! Ahora vamos a
+  revisar…", luego cada línea se pinta de verde (aro y estrellas verdes, ✓, sonido `acierto`) o de rojo (aro rojo,
+  la tarjeta tiembla, ✗, sonido `regreso`) cada ~0,8 s. Con rojas: Zeus `sorpresa`, Zoe "¡Tienes N en verde! Las rojas
+  no van ahí…" y las rojas regresan a su tarjeta (`soltarLinea`). Las verdes quedan fijas (`enVerde`) y el puntito del
+  progreso se pone verde.
+- **Colores de tarjeta**: ninguno es verde ni rojo (lo comprueba la prueba de node), para no confundirse con la
+  calificación. Antes MANO era verde azulado y parecía "bien" sin estarlo.
+- Un unir **no bloquea** el arrastre: antes se perdía el siguiente toque si llegaba en los 130 ms del pegado.
+- **Ayudas**: a los `ayudaMs` (11 s) sin tocar nada, una tarjeta pendiente se menea y Zoe pregunta por esa parte
+  (rotan). No se ilumina el punto. Si una tarjeta sale en rojo `erroresParaBrillo` (3) veces, su punto brilla en dorado
+  hasta que el niño la vuelva a tomar.
+- **Demo**: la mano une la NARIZ y la línea se califica en verde ("¡Muy bien!"); luego se borra.
+- **Final**: hilos brillando (`celebrar(true)`), estrellas en cada punto, `ZeusAnim.celebrar`, confeti
+  (`PedniaFx.celebracion`), Zoe entra caminando y dice la felicitación larga en voz; su nube muestra solo
+  "¡EXCELENTE TRABAJO! ¡Conectaste todas las partes del cuerpo!" (4.º parámetro de `hablar`) y se cierra al terminar.
+  **Sin cartel**: el usuario pidió menos texto en pantalla (tapaba a Zeus). Luego la nube de Zeus y la victoria.
+- **Diseño**: tarjetas en modo `fila` (dibujo afuera, nombre al medio, conector hacia Zeus) o `columna` (dibujo arriba,
+  nombre abajo) cuando el ancho de tarjeta es < 186 px (tableta vertical). Barra de abajo: Zoe + nube, progreso
+  ("PARTES CONECTADAS: n / 10" + un puntito por color; verde al calificarse bien). En pantallas ≤ 1100 px los tres botones redondos
+  (pantalla completa, accesibilidad, volumen) suben arriba a la derecha; en vertical la barra pasa a dos filas.
+  Sin diseño para teléfonos (pedido explícito).
+- Sonidos: `agarrar`, `encaje` al unir, `acierto` (verde) y `regreso` (rojo) al calificar, `tic` (repetida/ocupado),
+  `aparece` (tarjetas y pistas), final `correcto` y `victoria`. Si una tarjeta trae `audio.instruccion` en
+  `config.json`, la pista usa ese archivo en lugar de la voz.
+- Probar: `node scripts/probar-une-partes-cuerpo.js`. En el navegador, `mousedown`/`mousemove`/`mouseup` en el canvas;
+  `EscenarioUne.puntoDe("nariz")` (conector de la tarjeta) y `puntoDe("p-nariz")` (punto en Zeus) dan coordenadas de
+  pantalla. El táctil solo se puede probar con emulación táctil (ancho < 768 en el panel): Phaser decide al arrancar si
+  activa el `TouchManager`.
+- Registro: fila en `database/ambientes.sql` (ambiente 7, eje 11, temática 29, módulo 9, orden 14, imagen `une.png`).
+
+### Golpea a los Topos (`Polimotor/GolpeaTopos/`)
+
+Juego nuevo (noviembre de 2026), Transición 5-6 años, temática 29. Colina desértica mágica de PedNia: cielo y sol
+en CSS (`.topos-cielo`); montañas (mesas), arena, la colina, siete agujeros en dos filas (3 atrás, 4 adelante),
+cactus y la carpa "PEDNIA" del campamento en Phaser. Los topos salen con un **globo ilustrado**: el niño toca solo
+los que muestran una parte del cuerpo. Cada toque hace aparecer un **mazo de juguete** (rojo con franjas amarillas)
+que cae sobre la cabeza del topo; la reacción empieza en el impacto (~0,2 s). Acierto: el topo queda mareado (ojos
+en espiral, tres estrellitas que dan vueltas sobre su cabeza), el globo estalla, "+1", letrero "¡Correcto!" y se
+hunde (sin pirueta: al usuario no le gustó). Objeto: se tapa los ojos, **la pantalla se sacude** (cámara de Phaser)
+y se esconde (sonido `bote`, sin castigo). El topo es **de cuerpo entero** (cabeza, barriga, brazos y patas;
+dibujo 200 × 300 con los pies en y = 292) y sale hasta quedar parado en el borde del agujero.
+Un topo que se va sin tocar tampoco castiga. Objetivo: 12 partes en 100 s (`config.juego`).
+
+Intro y demo siguen el modelo de "Une": intro 3D → `PedniaEdad` → presentación (título de madera que cae y sube al
+letrero, Zoe 3D entra caminando, salen tres topos: OJOS con aro verde ✓ y PELOTA tachada en rojo, Zoe explica el
+reto) → la demo arranca sola, con la mano de PedniaTutorial (nariz sí, cepillo tachado "¡ESE NO!", mano
+sí) → "¡Comenzar a jugar!". Zoe sale caminando y **no queda pequeña abajo** (distraía): durante la partida no
+hay Zoe ni nube abajo, solo se escuchan las voces. Su nube grande nunca sube por encima de la barra de arriba. **Zeus no sale en la escena** (pedido del usuario, 2026-11-12: Zeus
+y Zoe solo como personajes de la intro; Zoe 3D sigue en presentación, demo y final). Mientras se juega, la voz de
+Zeus va en la nube de la barra con la etiqueta "Zeus". **Sin botones de pausa ni de pantalla completa** (pedido del
+usuario): solo accesibilidad y sonido, **arriba a la derecha** junto al reloj, para que la colina use toda la altura.
+El **letrero tiene alto fijo** (hasta dos líneas): antes "¡Correcto!" con letra grande lo hacía crecer, la escena se
+reacomodaba y la pantalla "saltaba" en cada golpe.
+
+| Archivo | Global | Qué hace |
+|---|---|---|
+| `reglas.js` | `ReglasTopos` | Puro (también `module.exports`): `evaluarGolpe` por **categoría** de config (`parte_cuerpo`/`distractor`, nunca por el nombre del dibujo), `etapa` (dificultad por aciertos, valores que se acercan suave a la etapa siguiente), `elegirImagen` (no repite, máx. 2 objetos seguidos, nunca solo objetos en pantalla), `elegirAgujero`, `progreso`, `plantilla`, `formatoTiempo`, `revisarConfig`. |
+| `topos.js` | `Topos` | Caras del topo (SVG 200 × 240, borde del agujero en y = 216) y estados: oculto → apareciendo → visible → golpeado → celebrando → escondiéndose. Anima números del registro del agujero (`sube`, `salto`, `giro`, `kx`, `ky`, `globoK`). |
+| `escenario-phaser.js` | `EscenarioTopos` | Fondo, agujeros (labio de adelante que tapa el corte), dibuja cada cuadro topo + globo con `setCrop`, zona táctil por agujero (topo **y** globo), `mazo(hoyo)` (Promise que se resuelve en el impacto: con el mango horizontal la cabeza queda vertical y su punta toca la coronilla), efectos (`estallido`, `lluvia`, `iluminar`, `flotante`). |
+| `aparicion.js` | `Aparicion` | Saca topos con el reloj de la escena (`update`): intervalo, simultáneos, tiempo afuera; `golpe(hoyo)`. |
+| `temporizador.js` | `Temporizador` | Cuenta regresiva con el `update` de la escena. |
+| `iconos.js` | `IconosTopos` | Partes de "Une" + corazón, cerebro, pulmones + cepillo, peine, pelota, manzana, banano, osito, carro, cuchara, taza. |
+| `demo.js` | `ToposDemo` | Micro-tutorial (no suma, no corre el reloj). |
+| `guia-3d.js` | `Guia3D` | Copia de "Une" (Zoe 3D). |
+| `script.js` | — | Flujo, HUD (letrero de madera, reloj, barra de progreso), voces, ayuda, fin por tiempo y victoria. |
+
+- **Agregar una imagen**: dibujo en `iconos.js` + entrada en `config.imagenes` con su `categoria` + agregarla a las
+  etapas de `config.dificultad` que la usen. No hay que tocar la lógica.
+- **Zona útil**: la escena llega hasta abajo y la barra de Zoe flota sobre la arena; los agujeros usan `lay.Hu`
+  (alto del lienzo menos la barra), medido en `reacomodar()`.
+- Topos, apariciones y reloj corren con el tiempo de Phaser (no con `setTimeout`): si la pestaña se oculta, se
+  detienen solos.
+- **Voces en la partida**: `decirRapido` salta una frase si la anterior empezó hace menos de `vozPausaMs` (2,6 s).
+  Ayuda: a los 9 s sin tocar, Zoe recuerda mirar los globitos y el globo de una parte del cuerpo brilla en dorado;
+  luego cada 16 s.
+- **Final**: objetivo cumplido → topos celebran, lluvia de estrellas, luz cálida, Zoe entra,
+  cartel "¡SÚPER VELOZ!" (sí lleva cartel: lo pidió el enunciado) → victoria compartida. Tiempo agotado → tarjeta
+  "¡Buen trabajo!" con el número de partes y 0-3 estrellas, "¡Jugar otra vez!" (reinicia sin intro) y "Salir".
+- Probar: `node scripts/probar-golpea-a-los-topos.js`. En el navegador, `mousedown` en el canvas sobre
+  `EscenarioTopos.puntoTopo(hoyo)` o `puntoGlobo(hoyo)`. **Con el panel oculto Phaser no avanza** (ni topos ni
+  reloj): para probar así, mover el bucle a mano con
+  `setInterval(() => __escenarioTopos.loop.step(performance.now()), 16)`.
+- Registro: fila en `database/ambientes.sql` (orden 15, imagen `topos.png`, color `#e8590c`).
+
 ## Trampas conocidas
 
 - **Escala de Phaser**: `setScale(1.08)` es absoluto sobre el tamaño de la imagen original (un PNG de 1080 px).
@@ -583,6 +750,8 @@ ronda: la mano y la muñeca se pisan al soltar. Zoe es la guía lateral (3D). To
   - EspejoDeLasPosiciones (juego nuevo)
   - ToqueMagicoCosquillas (juego nuevo)
   - DondeSePone (juego nuevo)
+  - UnePartesCuerpo (juego nuevo)
+  - GolpeaTopos (juego nuevo)
 - Rompecabezas: hecho "El cuerpo cobra vida". Se probó con la niña en 5 y 10 piezas; falta probar el niño y el
   nivel de 7 piezas.
 - Arrastrar y soltar: en pantallas altas queda piso vacío bajo las cajas; se ofreció agrandarlas o bajarlas.
