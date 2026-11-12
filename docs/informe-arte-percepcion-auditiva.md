@@ -1,6 +1,6 @@
 # Informe de arte — Percepción auditiva (Multisensorial)
 
-Generado: 2026-11-11T22:16:15.646Z
+Generado: 2026-11-11T22:48:04.918Z
 
 Ámbito (temáticas de Percepción Auditiva): `AsociaSonidoEImagen`, `MemoriaAuditiva`, `EncuentraElSonido`, `QueSonidoEscuchas`, `RepiteLaSecuencia`.
 

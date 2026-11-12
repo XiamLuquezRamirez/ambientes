@@ -570,5 +570,10 @@
         }
     };
 
-    K.crear({ id: 'alfombra', fondo: '#a8794a', escena: escena });
+    K.crear({
+        id: 'alfombra',
+        fondo: '#a8794a',
+        pieles: ['ambulancia', 'avion', 'bicicleta', 'camion', 'gallo', 'motocicleta', 'tren', 'vaca'],
+        escena: escena
+    });
 })(typeof window !== 'undefined' ? window : this);

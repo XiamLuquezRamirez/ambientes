@@ -389,5 +389,10 @@
         }
     };
 
-    K.crear({ id: 'cruce', fondo: '#d0ebff', escena: escena });
+    K.crear({
+        id: 'cruce',
+        fondo: '#d0ebff',
+        pieles: ['ambulancia', 'avion', 'camion', 'gallo', 'motocicleta', 'tren', 'vaca'],
+        escena: escena
+    });
 })(typeof window !== 'undefined' ? window : this);

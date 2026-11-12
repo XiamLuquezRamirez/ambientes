@@ -47,10 +47,7 @@
     },
     "reloj": {
       "img": "img/reloj.svg",
-      "nombre": "Reloj",
-      "fotogramas": [
-        "img/reloj_b.svg"
-      ]
+      "nombre": "Reloj"
     },
     "avion": {
       "img": "img/avion.svg",
@@ -62,10 +59,7 @@
     },
     "ambulancia": {
       "img": "img/ambulancia.svg",
-      "nombre": "Ambulancia",
-      "fotogramas": [
-        "img/ambulancia_b.svg"
-      ]
+      "nombre": "Ambulancia"
     },
     "vaca": {
       "img": "img/vaca.svg",

@@ -423,5 +423,11 @@
         }
     };
 
-    K.crear({ id: 'enchufes', fondo: '#d0ebff', escena: escena });
+    K.crear({
+        id: 'enchufes',
+        fondo: '#d0ebff',
+        /* SVG en img/ — sin esto Act.crear sigue con PedniaArte */
+        pieles: ['aspiradora', 'secador', 'licuadora', 'ventilador', 'lavadora', 'gallo', 'vaca'],
+        escena: escena
+    });
 })(typeof window !== 'undefined' ? window : this);

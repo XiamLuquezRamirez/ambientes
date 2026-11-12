@@ -47,10 +47,7 @@
     },
     "ambulancia": {
       "img": "img/ambulancia.svg",
-      "nombre": "Ambulancia",
-      "fotogramas": [
-        "img/ambulancia_b.svg"
-      ]
+      "nombre": "Ambulancia"
     },
     "camion": {
       "img": "img/camion.svg",

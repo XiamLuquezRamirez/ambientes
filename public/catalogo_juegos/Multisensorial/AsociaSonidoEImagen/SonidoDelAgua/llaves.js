@@ -437,5 +437,10 @@
         }
     };
 
-    K.crear({ id: 'llaves', fondo: '#dee2e6', escena: escena });
+    K.crear({
+        id: 'llaves',
+        fondo: '#dee2e6',
+        pieles: ['gallo', 'lavadora', 'vaca'],
+        escena: escena
+    });
 })(typeof window !== 'undefined' ? window : this);

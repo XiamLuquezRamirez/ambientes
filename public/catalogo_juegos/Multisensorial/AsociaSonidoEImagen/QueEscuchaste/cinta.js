@@ -535,5 +535,10 @@
         }
     };
 
-    K.crear({ id: 'cinta', fondo: '#e6f4ea', escena: escena });
+    K.crear({
+        id: 'cinta',
+        fondo: '#e6f4ea',
+        pieles: ['ambulancia', 'avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca'],
+        escena: escena
+    });
 })(typeof window !== 'undefined' ? window : this);
