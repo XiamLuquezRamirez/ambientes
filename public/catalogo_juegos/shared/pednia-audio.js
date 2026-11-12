@@ -69,6 +69,49 @@
                 correcto: ['encaje', { e: 'aplausos', vol: 0.35, retraso: 0.15 }],
                 aparece: [{ e: 'bote', vol: 0.5 }]
             }
+        },
+        // Máquina de peluches del mall (Multisensorial/MemoriaAuditiva/QueEscuchaste): motor del
+        // gancho, pinzas, botón de arcade, premio que cae y brillos. Sintetizado con
+        // scripts/audio/sintetizar_maquina.py (sin tonos puros; medido con detectar_pitidos.py).
+        // Sin música propia: el juego conserva la de su config.
+        maquina: {
+            efectos: 'audio/maquina/efectos.wav?v=20261112a',
+            sprite: {
+                motor: [0, 420],
+                bajar: [870, 500],
+                subir: [1820, 600],
+                clac: [2870, 535],
+                abrir: [3855, 515],
+                boton: [4820, 160],
+                tic: [5430, 60],
+                aparece: [5940, 595],
+                cae: [6985, 1025],
+                brillo: [8460, 1075],
+                vuelo: [9985, 550],
+                vitrina: [10985, 675],
+                fallo: [12110, 775],
+                aplausos: [13335, 1875],
+                ovacion: [15660, 3575],
+                redoble: [19685, 2475]
+            },
+            eventos: {
+                // Los de la máquina se piden por su nombre.
+                motor: ['motor'], bajar: ['bajar'], subir: ['subir'], clac: ['clac'], abrir: ['abrir'],
+                boton: ['boton'], tic: ['tic'], aparece: ['aparece'], cae: ['cae'], brillo: ['brillo'],
+                vuelo: ['vuelo'], vitrina: ['vitrina'],
+                // Efectos que pide el kit de Memoria auditiva (antes eran notas puras = "pitidos").
+                recompensa: ['brillo', { e: 'aplausos', vol: 0.45, retraso: 0.1 }],
+                suave: ['fallo'],
+                error: ['fallo'],
+                pop: ['boton'],
+                magia: ['brillo'],
+                chispas: ['brillo'],
+                ding: ['brillo'],
+                celebracion: ['aplausos'],
+                aplausos: ['aplausos'],
+                aplausoBreve: [{ e: 'aplausos', vol: 0.75 }],
+                victoria: ['redoble', { e: 'ovacion', retraso: 0.9 }]
+            }
         }
     };
 

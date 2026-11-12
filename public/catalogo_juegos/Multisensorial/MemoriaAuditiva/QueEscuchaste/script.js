@@ -434,8 +434,15 @@
 
     /* ── Sonido y voz ─────────────────────────────────────────── */
 
+    /** Efectos del tema "maquina" (PedniaAudio + Howler). Devuelve true si el tema lo cubre. */
+    function efectoTema(nombre, opts) {
+        return !!(window.PedniaAudio && PedniaAudio.tieneTema() && PedniaAudio.evento(nombre, opts));
+    }
+    window.QueEscuchasteSfx = efectoTema;
+
     function efecto(nombre) {
         if (!nombre) return;
+        if (efectoTema(nombre)) return;
         const efectos = (gameConfig.audios && gameConfig.audios.efectos) || {};
         const ruta = efectos[nombre];
         if (ruta) {
@@ -1336,7 +1343,8 @@
         const texto = $id("texto_final");
         if (texto) texto.textContent = cierre.map(function (l) { return l.texto; }).join(" ");
         prepararInsignia();
-        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        // Victoria: redoble + ovación del tema (victory.mp3 es una fanfarria de tonos puros = "pitido").
+        if (!efectoTema("victoria")) reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
         hablarCierre(cierre);
         setTimeout(function () {
             const cajaFinal = $id("final");
@@ -1355,7 +1363,8 @@
     /* ── Boot ─────────────────────────────────────────────────── */
 
     $(document).ready(function () {
-        gameConfig = JSON.parse(readText("config.json"));
+        gameConfig = JSON.parse(readText("config.json?v=20261112a"));
+        if (window.PedniaAudio) PedniaAudio.usarTema((gameConfig.audios && gameConfig.audios.tema) || "maquina");
         introConfig = JSON.parse(readText("../../../intro.json"));
         introConfig.conversacion = conversacionInicial();
         aplicarLetterSpacing();

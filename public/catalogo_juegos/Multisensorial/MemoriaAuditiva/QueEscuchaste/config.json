@@ -23,6 +23,7 @@
     "mostrarIntro": true
   },
   "audios": {
+    "tema": "maquina",
     "cierre": "../../../sounds/victory.mp3",
     "fondo": "../../../sounds/fondo.mp3",
     "sonidos": {},

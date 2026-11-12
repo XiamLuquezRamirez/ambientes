@@ -518,8 +518,33 @@
         const bus = c.createGain();
         bus.gain.value = 1;
         bus.connect(c.destination);
+        bus.connect(analizadorDe(c));
         busEstimulo = bus;
         return fn(c, bus, c.currentTime + 0.03, o.lento ? 1.7 : 1, !!o.breve);
+    }
+
+    /* ── Medidor: qué tan fuerte suena el estímulo ahora (altavoz que vibra) ── */
+
+    let analizador = null;
+    let muestras = null;
+
+    function analizadorDe(c) {
+        if (!analizador) {
+            analizador = c.createAnalyser();
+            analizador.fftSize = 512;
+            analizador.smoothingTimeConstant = 0.6;
+            muestras = new Float32Array(analizador.fftSize);
+        }
+        return analizador;
+    }
+
+    /** Nivel actual del estímulo, 0..1 (RMS escalado). Sin sonido o sin Web Audio: 0. */
+    function nivel() {
+        if (!analizador || !busEstimulo) return 0;
+        analizador.getFloatTimeDomainData(muestras);
+        let suma = 0;
+        for (let i = 0; i < muestras.length; i++) suma += muestras[i] * muestras[i];
+        return Math.min(1, Math.sqrt(suma / muestras.length) * 4.5);
     }
 
     /* ── Efectos del juego ─────────────────────────────────────── */
@@ -587,6 +612,7 @@
     global.MemoriaAuditivaSfx = {
         reproducir: reproducir,
         detener: detener,
+        nivel: nivel,
         sonar: sonar,
         existe: existe,
         desbloquear: desbloquear,
