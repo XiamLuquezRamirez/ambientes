@@ -19,6 +19,7 @@
 (function (global) {
     "use strict";
 
+    // Respaldo si el config no trae acciones (el juego real define sus 16 en config.acciones).
     var ACCIONES = ["cabeza", "aplaudir", "zapatear", "saltar", "tocarPies", "abrirBrazos"];
     var DEMO = ["cabeza", "aplaudir"];
     var VISIBLES = 3;                       // botones a la vista en cada ítem (config.juego.visibles)
@@ -104,20 +105,37 @@
         return total;
     }
 
+    /**
+     * Los comandos del juego salen del config (`config.acciones[].id`), no de una constante: así un paquete
+     * puede tener seis movimientos y otro dieciséis sin tocar estas reglas.
+     */
+    function accionesDeConfig(cfg) {
+        var lista = (cfg && cfg.acciones) || [];
+        var ids = lista.map(function (a) { return a && a.id; }).filter(function (id) { return !!id; });
+        return ids.length ? ids : ACCIONES.slice();
+    }
+
+    /** La secuencia de la demostración (`config.demo.secuencia`). */
+    function demoDeConfig(cfg) {
+        var sec = cfg && cfg.demo && cfg.demo.secuencia;
+        return Array.isArray(sec) && sec.length ? sec.slice() : DEMO.slice();
+    }
+
     /** Cuántos botones se ven a la vez (config.juego.visibles; por defecto 3, nunca más que las acciones). */
     function visiblesDeConfig(cfg) {
         var n = Number(cfg && cfg.juego && cfg.juego.visibles);
         if (!isFinite(n) || n < 2) n = VISIBLES;
-        return Math.min(ACCIONES.length, Math.floor(n));
+        return Math.min(accionesDeConfig(cfg).length, Math.floor(n));
     }
 
     /** Los tres botones que se ven durante la demo (incluyen sí o sí los de la secuencia de demo). */
     function visiblesDemo(cfg) {
+        var todas = accionesDeConfig(cfg);
         var pedidos = (cfg && cfg.demo && cfg.demo.visibles) || VISIBLES_DEMO;
         var n = visiblesDeConfig(cfg);
-        var lista = pedidos.filter(function (a) { return ACCIONES.indexOf(a) >= 0; });
-        DEMO.forEach(function (a) { if (lista.indexOf(a) < 0) lista.unshift(a); });
-        ACCIONES.forEach(function (a) { if (lista.length < n && lista.indexOf(a) < 0) lista.push(a); });
+        var lista = pedidos.filter(function (a) { return todas.indexOf(a) >= 0; });
+        demoDeConfig(cfg).forEach(function (a) { if (lista.indexOf(a) < 0) lista.unshift(a); });
+        todas.forEach(function (a) { if (lista.length < n && lista.indexOf(a) < 0) lista.push(a); });
         return lista.slice(0, n);
     }
 
@@ -161,7 +179,7 @@
             for (var q = 0; q < itemsDeRonda(cfg, i); q++) {
                 var trio = null;
                 for (var t = 0; t < 200; t++) {
-                    trio = barajar(ACCIONES, r).slice(0, n);
+                    trio = barajar(accionesDeConfig(cfg), r).slice(0, n);
                     if (conjunto(trio) !== anterior) break;
                 }
                 anterior = conjunto(trio);
@@ -210,6 +228,7 @@
     /** Lista de reglas que no cumple un juego de secuencias (vacía = válido). */
     function problemasSecuencias(sec, cfg, visibles) {
         var p = [];
+        var todasLasAcciones = accionesDeConfig(cfg);
         var plano = [];
         (sec || []).forEach(function (r, ir) {
             var tres = [];
@@ -219,7 +238,7 @@
                 var vis = visibles && visibles[ir] ? visibles[ir][k] : null;
                 if (!s || s.length !== largo) {
                     p.push(nombre + ": no tiene " + largo + " movimientos");
-                } else if (s.some(function (a) { return ACCIONES.indexOf(a) < 0; })) {
+                } else if (s.some(function (a) { return todasLasAcciones.indexOf(a) < 0; })) {
                     p.push(nombre + ": acción desconocida");
                 } else {
                     if (vis && s.some(function (a) { return vis.indexOf(a) < 0; })) {
@@ -239,7 +258,7 @@
         plano.forEach(function (s, i) {
             if (i > 0 && iguales(s, plano[i - 1])) p.push("los ítems " + i + " y " + (i + 1) + " son iguales");
         });
-        if (plano.length && iguales(plano[0], DEMO)) p.push("el primer ítem repite la demo");
+        if (plano.length && iguales(plano[0], demoDeConfig(cfg))) p.push("el primer ítem repite la demo");
         return p;
     }
 
@@ -259,7 +278,7 @@
     function sortear(cfg, rnd, visibles) {
         var r = azar(rnd);
         var vis = visibles || sortearVisibles(cfg, rnd);
-        var anterior = DEMO;
+        var anterior = demoDeConfig(cfg);
         var resultado = [];
         rondas(cfg).forEach(function (rd, i) {
             var n = itemsDeRonda(cfg, i);
@@ -268,7 +287,7 @@
             var primeraDeTres = true;
             for (var q = 0; q < n; q++) {
                 var largo = largoDeItem(cfg, i, q);
-                var trio = (vis[i] && vis[i][q]) || ACCIONES;
+                var trio = (vis[i] && vis[i][q]) || accionesDeConfig(cfg);
                 // cada ítem se sortea hasta que cumple sus reglas, solo con sus movimientos visibles
                 var sec = null;
                 for (var t = 0; t < 300; t++) {
@@ -327,20 +346,22 @@
     }
 
     /** Los movimientos visibles del ítem actual (los tres botones de la botonera). */
-    function visiblesActuales(st) {
-        if (!st || !st.visibles) return ACCIONES.slice(0, VISIBLES);
+    function visiblesActuales(st, cfg) {
+        var todas = accionesDeConfig(cfg);
+        var cuantos = cfg ? visiblesDeConfig(cfg) : VISIBLES;
+        if (!st || !st.visibles) return todas.slice(0, cuantos);
         var r = st.visibles[st.ronda];
-        return (r && r[st.item]) || ACCIONES.slice(0, VISIBLES);
+        return (r && r[st.item]) || todas.slice(0, cuantos);
     }
 
     /**
      * El niño toca una acción. Solo vale en WAITING_INPUT, con una acción conocida y hasta tantas como
      * movimientos tenga la secuencia actual. Devuelve { ok, motivo?, accion, n (1…largo), completa, largo }.
      */
-    function tocar(st, id) {
+    function tocar(st, id, cfg) {
         if (!st || st.estado !== E.WAITING_INPUT) return { ok: false, motivo: "bloqueado" };
-        if (ACCIONES.indexOf(id) < 0) return { ok: false, motivo: "desconocida" };
-        if (visiblesActuales(st).indexOf(id) < 0) return { ok: false, motivo: "no visible" };
+        if (accionesDeConfig(cfg).indexOf(id) < 0) return { ok: false, motivo: "desconocida" };
+        if (visiblesActuales(st, cfg).indexOf(id) < 0) return { ok: false, motivo: "no visible" };
         var largo = (secuenciaActual(st) || []).length || LARGO;
         if (st.respuesta.length >= largo) return { ok: false, motivo: "completa" };
         st.respuesta.push(id);
@@ -434,7 +455,9 @@
     function revisarJuego(cfg) {
         var p = [];
         if (!cfg) return ["sin config"];
-        ACCIONES.forEach(function (id) {
+        var todas = accionesDeConfig(cfg);
+        if (todas.length < visiblesDeConfig(cfg)) p.push("hacen falta al menos " + visiblesDeConfig(cfg) + " acciones");
+        todas.forEach(function (id) {
             var a = accion(cfg, id);
             if (!a) p.push("falta la acción " + id);
             else if (!a.nombre || !a.voz) p.push("la acción " + id + " no tiene nombre o voz");
@@ -446,9 +469,10 @@
                 if (Number(m) < 2 || Number(m) > 4) p.push("la ronda " + (i + 1) + " debe tener de 2 a 4 movimientos por ítem");
             });
         });
-        if (!iguales((cfg.demo && cfg.demo.secuencia) || DEMO, DEMO)) p.push("la demo debe ser cabeza → aplaudir");
-        if (visiblesDeConfig(cfg) !== VISIBLES) p.push("deben verse " + VISIBLES + " movimientos a la vez");
-        DEMO.forEach(function (a) {
+        var demo = demoDeConfig(cfg);
+        if (!demo.length) p.push("la demo no tiene secuencia");
+        demo.forEach(function (a) {
+            if (todas.indexOf(a) < 0) p.push("la demo usa un movimiento que no existe: " + a);
             if (visiblesDemo(cfg).indexOf(a) < 0) p.push("la demo no muestra el botón " + a);
         });
         return p;
@@ -469,6 +493,8 @@
         totalItems: totalItems,
         accion: accion,
         combinaciones: combinaciones,
+        accionesDeConfig: accionesDeConfig,
+        demoDeConfig: demoDeConfig,
         visiblesDeConfig: visiblesDeConfig,
         visiblesDemo: visiblesDemo,
         sortearVisibles: sortearVisibles,

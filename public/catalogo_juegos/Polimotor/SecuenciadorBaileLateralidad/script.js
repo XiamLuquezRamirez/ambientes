@@ -731,7 +731,7 @@ function ponerBotones(ids, animar) {
 
 /** Deja en la botonera los tres movimientos visibles del ítem actual. */
 function botonesDelItem(animar) {
-    return ponerBotones(ReglasSimon.visiblesActuales(st), animar);
+    return ponerBotones(ReglasSimon.visiblesActuales(st, gameConfig), animar);
 }
 
 function armarBotones() {
@@ -1183,7 +1183,7 @@ async function jugarItem(reintento) {
     armarRanuras(sec.length);
     const t = textos();
     // los tres movimientos de este ítem entran en la botonera (los de antes salen con su animación)
-    const cambian = ReglasSimon.conjunto(visiblesEnPantalla()) !== ReglasSimon.conjunto(ReglasSimon.visiblesActuales(st));
+    const cambian = ReglasSimon.conjunto(visiblesEnPantalla()) !== ReglasSimon.conjunto(ReglasSimon.visiblesActuales(st, gameConfig));
     if (cambian && !reintento) nube("zeus", t.cambioOpciones || "", false);
     await botonesDelItem();
     if (!vigente(id)) return;
@@ -1226,7 +1226,7 @@ function alPulsar(idAccion) {
     const ahora = performance.now();
     if (ahora - ultimoToque < ms("debounceMs", 420)) return;
     ultimoToque = ahora;
-    const r = ReglasSimon.tocar(st, idAccion);
+    const r = ReglasSimon.tocar(st, idAccion, gameConfig);
     if (!r.ok) return;
     limpiarAyuda();
     const id = partidaId;

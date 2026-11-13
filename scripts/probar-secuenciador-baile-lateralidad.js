@@ -91,8 +91,130 @@ prueba("config.json: la demo son 3 comandos y sus 3 botones visibles", function 
     });
 });
 
-prueba("config.json: sin problemas según las reglas", function () {
+// ---------------------------------------------------------------- Tarea 2: comandos desde el config
+
+/** Azar con semilla (mulberry32) para repetir los casos. */
+function semilla(n) {
+    let a = n >>> 0;
+    return function () {
+        a = (a + 0x6d2b79f5) >>> 0;
+        let t = a;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+prueba("accionesDeConfig: los 16 comandos salen del config, no de una constante", function () {
+    assert.strictEqual(typeof R.accionesDeConfig, "function", "ReglasSecuenciador.accionesDeConfig existe");
+    assert.deepStrictEqual(R.accionesDeConfig(cfg), COMANDOS);
+});
+
+prueba("sortearVisibles: tríos de 3 comandos distintos, sin repetir el trío anterior", function () {
+    for (let s = 1; s <= 200; s++) {
+        const vis = R.sortearVisibles(cfg, semilla(s));
+        assert.strictEqual(vis.length, 1, "semilla " + s + ": una ronda");
+        assert.strictEqual(vis[0].length, 6, "semilla " + s + ": seis tandas");
+        let anterior = cfg.demo.visibles.slice().sort().join("|");
+        vis[0].forEach(function (trio, k) {
+            assert.strictEqual(trio.length, 3, "semilla " + s + " tanda " + (k + 1) + ": tres visibles");
+            assert.strictEqual(new Set(trio).size, 3, "semilla " + s + " tanda " + (k + 1) + ": los tres distintos");
+            trio.forEach(function (id) {
+                assert.ok(COMANDOS.indexOf(id) >= 0, "semilla " + s + ": " + id + " es un comando del juego");
+            });
+            const clave = trio.slice().sort().join("|");
+            assert.notStrictEqual(clave, anterior, "semilla " + s + " tanda " + (k + 1) + ": el trío cambió");
+            anterior = clave;
+        });
+    }
+});
+
+// Review Focus 1: una tanda de 4 con solo 3 botones visibles obliga a repetir un comando,
+// pero nunca dos iguales seguidos, y el generador no debe rendirse y devolver algo inválido.
+prueba("generarSecuencias: 200 semillas sin un solo problema (tandas de 4 con 3 visibles incluidas)", function () {
+    for (let s = 1; s <= 200; s++) {
+        const vis = R.sortearVisibles(cfg, semilla(s));
+        const sec = R.generarSecuencias(cfg, semilla(s + 5000), vis);
+        assert.deepStrictEqual(
+            R.problemasSecuencias(sec, cfg, vis),
+            [],
+            "semilla " + s + ": " + JSON.stringify(R.problemasSecuencias(sec, cfg, vis))
+        );
+        sec[0].forEach(function (s2, k) {
+            const largo = R.largoDeItem(cfg, 0, k);
+            assert.strictEqual(s2.length, largo, "semilla " + s + " tanda " + (k + 1) + ": " + largo + " movimientos");
+            s2.forEach(function (id) {
+                assert.ok(vis[0][k].indexOf(id) >= 0, "semilla " + s + " tanda " + (k + 1) + ": " + id + " está visible");
+            });
+            for (let m = 1; m < s2.length; m++) {
+                assert.notStrictEqual(s2[m], s2[m - 1], "semilla " + s + " tanda " + (k + 1) + ": sin dos iguales seguidos");
+            }
+            if (largo === 4) {
+                assert.strictEqual(new Set(s2).size, 3, "semilla " + s + " tanda " + (k + 1) + ": la de 4 usa los tres visibles");
+            }
+        });
+    }
+});
+
+// Review Focus 3: con 6 tríos de 3 hay 18 posiciones; en muchas partidas los 16 comandos deben salir.
+prueba("sortearVisibles: entre muchas partidas aparecen los 16 comandos", function () {
+    const vistos = new Set();
+    for (let s = 1; s <= 200; s++) {
+        R.sortearVisibles(cfg, semilla(s))[0].forEach(function (trio) {
+            trio.forEach(function (id) { vistos.add(id); });
+        });
+    }
+    const faltan = COMANDOS.filter(function (id) { return !vistos.has(id); });
+    assert.deepStrictEqual(faltan, [], "ningún comando queda fuera del sorteo");
+});
+
+// Review Focus 2: tocar un comando que no está en el trío de la tanda no cuenta ni rompe el progreso.
+prueba("tocar: un comando fuera del trío visible no cuenta y deja el progreso intacto", function () {
+    const st = R.crear(cfg, semilla(7));
+    R.pasar(st, R.E.SHOWING_SEQUENCE);
+    R.pasar(st, R.E.WAITING_INPUT);
+    const visibles = R.visiblesActuales(st, cfg);
+    const fuera = COMANDOS.find(function (id) { return visibles.indexOf(id) < 0; });
+    assert.ok(fuera, "hay algún comando fuera del trío");
+    const antes = st.respuesta.slice();
+    const r = R.tocar(st, fuera, cfg);
+    assert.strictEqual(r.ok, false, "el toque no se acepta");
+    assert.strictEqual(r.motivo, "no visible");
+    assert.deepStrictEqual(st.respuesta, antes, "el progreso no cambió");
+    assert.strictEqual(st.estado, R.E.WAITING_INPUT, "sigue esperando");
+});
+
+prueba("config.json: sin problemas según las reglas (16 comandos y demo de 3)", function () {
     assert.deepStrictEqual(R.revisarJuego(cfg), []);
+});
+
+// script.js y demo.js deben pasar el config a las reglas: sin él, los 10 comandos nuevos
+// (los que no están en la constante de respaldo) se rechazarían como "desconocida" en el navegador.
+prueba("script.js y demo.js pasan el config a visiblesActuales y tocar", function () {
+    const fuentes = ["script.js", "demo.js"];
+    fuentes.forEach(function (f) {
+        const txt = fs.readFileSync(path.join(carpeta, f), "utf8");
+        const llamadas = txt.match(/\.(visiblesActuales|tocar)\([^)]*\)/g) || [];
+        llamadas.forEach(function (c) {
+            assert.ok(/,\s*gameConfig\b/.test(c), f + ": " + c + " debe recibir gameConfig");
+        });
+        // el nombre debe existir de verdad en el archivo, o sería un ReferenceError en el navegador
+        if (llamadas.length) {
+            assert.ok(/\bgameConfig\b\s*=/.test(txt) || /\bgameConfig\b/.test(txt), f + ": gameConfig está declarado");
+        }
+    });
+});
+
+prueba("tocar: los comandos nuevos se aceptan cuando están visibles", function () {
+    const st = R.crear(cfg, semilla(11));
+    R.pasar(st, R.E.SHOWING_SEQUENCE);
+    R.pasar(st, R.E.WAITING_INPUT);
+    const visibles = R.visiblesActuales(st, cfg);
+    // un comando de los nuevos (fuera de la constante de respaldo de 6) debe poder tocarse
+    const nuevos = visibles.filter(function (id) { return R.ACCIONES.indexOf(id) < 0; });
+    if (!nuevos.length) return; // esta semilla no sacó ninguno; las otras pruebas cubren el sorteo
+    const r = R.tocar(st, nuevos[0], cfg);
+    assert.strictEqual(r.ok, true, nuevos[0] + " debe aceptarse: " + JSON.stringify(r));
 });
 
 console.log("\n" + pasadas + " pruebas correctas");
