@@ -191,7 +191,7 @@
         '<path d="M100,10 l4,9 l10,1 l-7,7 l2,10 l-9,-5 l-9,5 l2,-10 l-7,-7 l10,-1 z" fill="#ffe066" stroke="' + L + '" stroke-width="3.2" stroke-linejoin="round"/>' +
         '</svg>';
 
-    SVG.tocarPies =
+    SVG.pies =
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
         // piso
         '<path d="M12,186 Q100,178 188,186" fill="none" stroke="' + L + '" stroke-width="6" stroke-linecap="round" opacity=".55"/>' +
@@ -248,6 +248,274 @@
         '</g>' +
         // estrellita arriba
         '<path d="M100,14 l4,9 l10,1 l-7,7 l2,10 l-9,-5 l-9,5 l2,-10 l-7,-7 l10,-1 z" fill="#ffe066" stroke="' + L + '" stroke-width="3.2" stroke-linejoin="round"/>' +
+        '</svg>';
+
+
+    /* ---------------------------------------------------------------- comandos del Secuenciador
+     * Los diez movimientos que no tenía Simón Dice, con el mismo niño (piel, pelo y camiseta naranja) para que
+     * los dieciséis botones se lean como el mismo personaje. Los cuatro de lateralidad llevan además una
+     * flecha y la insignia del lado (D / I), porque el acierto depende de distinguir derecha de izquierda.
+     */
+
+    /** Piso de apoyo, igual en todos los dibujos. */
+    function piso() {
+        return '<path d="M12,186 Q100,178 188,186" fill="none" stroke="' + L + '" stroke-width="6" stroke-linecap="round" opacity=".55"/>';
+    }
+
+    /** Cuerpo con camiseta naranja y el cuello en V. */
+    function cuerpo(y) {
+        var t = y || 150;
+        return '<path d="M74,' + t + ' Q70,110 100,104 Q130,110 126,' + t + ' Z" fill="#ff922b" stroke="' + L + '" stroke-width="6" stroke-linejoin="round"/>' +
+            '<path d="M88,108 L100,122 L112,108" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>';
+    }
+
+    /** Mano (círculo de piel). */
+    function mano(cx, cy, r) {
+        return '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r || 13) + '" fill="' + PIEL + '" stroke="' + L + '" stroke-width="5.5"/>';
+    }
+
+    /** Zapato azul; `mirarDerecha` decide hacia qué lado apunta la punta. */
+    function zapato(cx, cy, mirarDerecha) {
+        var k = mirarDerecha ? 1 : -1;
+        var d = 'M' + cx + ',' + cy +
+            ' Q' + (cx + 20 * k) + ',' + (cy + 2) + ' ' + (cx + 24 * k) + ',' + (cy + 16) +
+            ' Q' + (cx + 24 * k) + ',' + (cy + 24) + ' ' + (cx + 14 * k) + ',' + (cy + 24) +
+            ' L' + (cx - 6 * k) + ',' + (cy + 24) +
+            ' Q' + (cx - 14 * k) + ',' + (cy + 24) + ' ' + (cx - 14 * k) + ',' + (cy + 16) +
+            ' L' + (cx - 12 * k) + ',' + (cy + 6) +
+            ' Q' + (cx - 8 * k) + ',' + cy + ' ' + cx + ',' + cy + ' Z';
+        return '<path d="' + d + '" fill="#4dabf7" stroke="' + L + '" stroke-width="6" stroke-linejoin="round"/>';
+    }
+
+    /** Insignia del lado: círculo con la letra D o I. */
+    function insigniaLado(cx, cy, letra, color) {
+        return '<circle cx="' + cx + '" cy="' + cy + '" r="21" fill="' + color + '" stroke="' + L + '" stroke-width="5"/>' +
+            '<text x="' + cx + '" y="' + (cy + 9) + '" text-anchor="middle" font-family="Verdana,DejaVu Sans,sans-serif" font-size="26" font-weight="bold" fill="#fff">' + letra + '</text>';
+    }
+
+    /** Flecha circular que indica el sentido del giro. */
+    function flechaGiro() {
+        return '<g fill="none" stroke="#ffd43b" stroke-width="8" stroke-linecap="round">' +
+            '<path d="M44,116 A58,58 0 1 1 156,116"/>' +
+            '</g>' +
+            '<path d="M156,96 L160,122 L136,114 Z" fill="#ffd43b" stroke="' + L + '" stroke-width="4" stroke-linejoin="round"/>';
+    }
+
+    // --- manos a la cintura: brazos en jarra, los codos bien separados del torso
+    SVG.cintura =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+        piso() +
+        miembro('M88,152 L86,168', 17) +
+        miembro('M112,152 L114,168', 17) +
+        zapato(80, 166, false) +
+        zapato(120, 166, true) +
+        cuerpo(154) +
+        // codos muy abiertos: del hombro hacia afuera y de vuelta a la cadera
+        miembro('M78,120 Q34,126 42,152 Q56,162 74,148') +
+        miembro('M122,120 Q166,126 158,152 Q144,162 126,148') +
+        mano(74, 146, 12) +
+        mano(126, 146, 12) +
+        carita(100, 68, 32) +
+        '</svg>';
+
+    // --- estirarse arriba: brazos rectos y juntos, de puntillas (se distingue del salto)
+    SVG.estirarse =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+        piso() +
+        miembro('M90,152 L88,170', 17) +
+        miembro('M110,152 L112,170', 17) +
+        zapato(84, 168, false) +
+        zapato(116, 168, true) +
+        cuerpo(154) +
+        // rectos y casi verticales, muy juntos arriba
+        miembro('M84,118 L90,34') +
+        miembro('M116,118 L110,34') +
+        mano(90, 26) +
+        mano(110, 26) +
+        carita(100, 78, 29) +
+        // flechas de estiramiento a los lados
+        '<g fill="none" stroke="#ffd43b" stroke-width="7" stroke-linecap="round">' +
+        '<path d="M40,96 L40,42"/><path d="M30,54 L40,40 L50,54"/>' +
+        '<path d="M160,96 L160,42"/><path d="M150,54 L160,40 L170,54"/>' +
+        '</g>' +
+        '</svg>';
+
+    // --- brazo DERECHO arriba (el derecho del niño cae a la izquierda de quien mira)
+    SVG.brazoDerecho =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+        piso() +
+        miembro('M88,152 L86,168', 17) +
+        miembro('M112,152 L114,168', 17) +
+        zapato(80, 166, false) +
+        zapato(120, 166, true) +
+        cuerpo(154) +
+        // brazo levantado bien separado del torso; el otro cuelga abierto
+        miembro('M78,118 L54,40') +
+        miembro('M122,120 Q144,142 146,162') +
+        mano(52, 32) +
+        mano(147, 166, 12) +
+        carita(100, 72, 31) +
+        '<g fill="none" stroke="#ffd43b" stroke-width="7" stroke-linecap="round">' +
+        '<path d="M26,92 L26,48"/><path d="M16,60 L26,46 L36,60"/>' +
+        '</g>' +
+        insigniaLado(168, 44, 'D', '#e8590c') +
+        '</svg>';
+
+    // --- brazo IZQUIERDO arriba
+    SVG.brazoIzquierdo =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+        piso() +
+        miembro('M88,152 L86,168', 17) +
+        miembro('M112,152 L114,168', 17) +
+        zapato(80, 166, false) +
+        zapato(120, 166, true) +
+        cuerpo(154) +
+        miembro('M122,118 L146,40') +
+        miembro('M78,120 Q56,142 54,162') +
+        mano(148, 32) +
+        mano(53, 166, 12) +
+        carita(100, 72, 31) +
+        '<g fill="none" stroke="#ffd43b" stroke-width="7" stroke-linecap="round">' +
+        '<path d="M174,92 L174,48"/><path d="M164,60 L174,46 L184,60"/>' +
+        '</g>' +
+        insigniaLado(32, 44, 'I', '#1c7ed6') +
+        '</svg>';
+
+    // --- pie DERECHO arriba: rodilla al frente bien marcada
+    SVG.pieDerecho =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+        piso() +
+        // pierna de apoyo, recta al piso
+        miembro('M112,152 L118,170', 17) +
+        zapato(124, 168, true) +
+        cuerpo(154) +
+        // pierna levantada: muslo al frente y pantorrilla colgando
+        miembro('M88,150 Q52,146 46,122', 18) +
+        zapato(42, 112, false) +
+        // brazos abiertos para el equilibrio
+        miembro('M78,120 Q50,138 46,160') +
+        miembro('M122,120 Q150,138 154,160') +
+        mano(45, 164, 12) +
+        mano(155, 164, 12) +
+        carita(100, 72, 31) +
+        '<g fill="none" stroke="#ffd43b" stroke-width="7" stroke-linecap="round">' +
+        '<path d="M22,156 L22,114"/><path d="M12,126 L22,112 L32,126"/>' +
+        '</g>' +
+        insigniaLado(170, 120, 'D', '#d6336c') +
+        '</svg>';
+
+    // --- pie IZQUIERDO arriba
+    SVG.pieIzquierdo =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+        piso() +
+        miembro('M88,152 L82,170', 17) +
+        zapato(76, 168, false) +
+        cuerpo(154) +
+        miembro('M112,150 Q148,146 154,122', 18) +
+        zapato(158, 112, true) +
+        miembro('M78,120 Q50,138 46,160') +
+        miembro('M122,120 Q150,138 154,160') +
+        mano(45, 164, 12) +
+        mano(155, 164, 12) +
+        carita(100, 72, 31) +
+        '<g fill="none" stroke="#ffd43b" stroke-width="7" stroke-linecap="round">' +
+        '<path d="M178,156 L178,114"/><path d="M168,126 L178,112 L188,126"/>' +
+        '</g>' +
+        insigniaLado(30, 120, 'I', '#0ca678') +
+        '</svg>';
+
+    // --- salto con un pie: en el aire, una pierna recogida y la otra estirada
+    SVG.saltarUnPie =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+        '<path d="M14,194 Q100,186 186,194" fill="none" stroke="' + L + '" stroke-width="6" stroke-linecap="round" opacity=".55"/>' +
+        '<g fill="#ffe066" stroke="' + L + '" stroke-width="3.5" stroke-linejoin="round">' +
+        '<ellipse cx="120" cy="190" rx="18" ry="7"/><ellipse cx="84" cy="194" rx="11" ry="5"/>' +
+        '</g>' +
+        cuerpo(144) +
+        // pierna estirada hacia abajo
+        miembro('M112,140 L122,168', 17) +
+        zapato(128, 164, true) +
+        // pierna recogida, rodilla al frente
+        miembro('M88,140 Q56,138 50,116', 18) +
+        zapato(46, 106, false) +
+        // brazos en alto, abiertos
+        miembro('M78,112 Q48,94 44,60') +
+        miembro('M122,112 Q152,98 156,70') +
+        mano(42, 52) +
+        mano(158, 62) +
+        carita(100, 64, 31) +
+        '<path d="M100,10 l4,9 l10,1 l-7,7 l2,10 l-9,-5 l-9,5 l2,-10 l-7,-7 l10,-1 z" fill="#ffe066" stroke="' + L + '" stroke-width="3.2" stroke-linejoin="round"/>' +
+        '</svg>';
+
+    // --- giro corporal: el niño de frente con la flecha circular girando a sus pies. Se dibuja de frente
+    // (misma carita que los demás) porque un perfil a esta escala se lee peor que la flecha del giro.
+    SVG.girar =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+        piso() +
+        // anillo del giro alrededor de los pies, abierto para que se vea el sentido
+        '<ellipse cx="100" cy="172" rx="76" ry="19" fill="none" stroke="#ffd43b" stroke-width="8" stroke-linecap="round" stroke-dasharray="112 54"/>' +
+        '<path d="M168,158 L184,172 L164,180 Z" fill="#ffd43b" stroke="' + L + '" stroke-width="4" stroke-linejoin="round"/>' +
+        // piernas juntas, como a mitad de giro
+        miembro('M92,152 L88,168', 17) +
+        miembro('M108,152 L114,168', 17) +
+        zapato(82, 166, false) +
+        zapato(118, 166, true) +
+        cuerpo(154) +
+        // brazos extendidos a los lados, acompañando el giro (sin cruzar la cara)
+        miembro('M78,122 Q46,128 36,142') +
+        miembro('M122,122 Q154,128 164,142') +
+        mano(33, 146) +
+        mano(167, 146) +
+        carita(100, 70, 31) +
+        // flechitas de rotación junto a la cabeza
+        '<g fill="none" stroke="#ffd43b" stroke-width="6" stroke-linecap="round">' +
+        '<path d="M46,54 Q62,32 88,28"/><path d="M80,20 L92,28 L82,38"/>' +
+        '<path d="M154,54 Q138,32 112,28"/><path d="M120,20 L108,28 L118,38"/>' +
+        '</g>' +
+        '</svg>';
+
+    // --- bailar: cadera al lado, una mano al cielo y una pierna cruzada
+    SVG.bailar =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+        piso() +
+        cuerpo(156) +
+        // una pierna apoyada y la otra cruzada al frente
+        miembro('M110,154 L118,170', 17) +
+        zapato(124, 168, true) +
+        miembro('M90,154 Q70,166 56,164', 17) +
+        zapato(50, 160, false) +
+        // un brazo al cielo, el otro en la cintura con el codo abierto
+        miembro('M122,118 L150,48') +
+        miembro('M78,120 Q38,128 46,152 Q60,162 76,148') +
+        mano(152, 40) +
+        mano(76, 146, 12) +
+        carita(100, 72, 31) +
+        '<g fill="#ffe066" stroke="' + L + '" stroke-width="3.4" stroke-linejoin="round">' +
+        '<circle cx="30" cy="52" r="9"/><path d="M39,52 L39,20 L54,24 L54,32 L39,28"/>' +
+        '<circle cx="32" cy="98" r="7"/><path d="M39,98 L39,74 L50,77 L50,83 L39,80"/>' +
+        '</g>' +
+        '</svg>';
+
+    // --- marchar en el sitio: rodilla alta al frente y brazos alternados
+    SVG.marchar =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+        piso() +
+        // pierna de apoyo
+        miembro('M112,152 L118,170', 17) +
+        zapato(124, 168, true) +
+        cuerpo(154) +
+        // rodilla levantada bien al frente
+        miembro('M88,150 Q54,144 50,120', 18) +
+        zapato(46, 110, false) +
+        // brazos alternados: uno adelante-arriba, el otro atrás-abajo
+        miembro('M78,118 Q50,104 46,78') +
+        miembro('M122,120 Q148,140 150,162') +
+        mano(44, 70) +
+        mano(151, 166, 12) +
+        carita(100, 72, 31) +
+        '<g fill="none" stroke="#ffd43b" stroke-width="6" stroke-linecap="round" opacity=".9">' +
+        '<path d="M172,136 L188,136"/><path d="M168,152 L184,152"/><path d="M176,120 L190,120"/>' +
+        '</g>' +
         '</svg>';
 
     var cache = {};

@@ -217,4 +217,36 @@ prueba("tocar: los comandos nuevos se aceptan cuando están visibles", function 
     assert.strictEqual(r.ok, true, nuevos[0] + " debe aceptarse: " + JSON.stringify(r));
 });
 
+// ---------------------------------------------------------------- Tarea 3: dibujos de los botones
+
+const I = require(path.join(carpeta, "iconos.js"));
+
+prueba("iconos: los 16 comandos tienen su dibujo propio", function () {
+    COMANDOS.forEach(function (id) {
+        const svg = I.svg(id);
+        assert.ok(svg && svg.indexOf("<svg") === 0, id + " tiene un SVG");
+        assert.ok(svg.length > 200, id + ": el dibujo no está vacío");
+        assert.ok(svg.indexOf("</svg>") > 0, id + ": el SVG está cerrado");
+    });
+    const distintos = new Set(COMANDOS.map(function (id) { return I.svg(id); }));
+    assert.strictEqual(distintos.size, 16, "los 16 dibujos son distintos entre sí");
+});
+
+// Review Focus 5: si el dibujo de derecha e izquierda fuera el mismo, el acierto sería ambiguo.
+prueba("iconos: los pares izquierda/derecha se distinguen a simple vista", function () {
+    [["brazoDerecho", "brazoIzquierdo"], ["pieDerecho", "pieIzquierdo"]].forEach(function (par) {
+        const a = I.svg(par[0]);
+        const b = I.svg(par[1]);
+        assert.notStrictEqual(a, b, par[0] + " y " + par[1] + " deben dibujarse distinto");
+        assert.ok(a.length > 200 && b.length > 200, par.join("/") + ": ambos dibujados");
+    });
+});
+
+prueba("iconos: dataUri sirve los 16 dibujos", function () {
+    COMANDOS.forEach(function (id) {
+        const uri = I.dataUri(id);
+        assert.ok(uri.indexOf("data:image/svg+xml") === 0, id + " tiene data URI");
+    });
+});
+
 console.log("\n" + pasadas + " pruebas correctas");
