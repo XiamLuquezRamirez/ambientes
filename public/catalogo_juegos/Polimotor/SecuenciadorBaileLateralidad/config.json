@@ -1,0 +1,280 @@
+{
+  "nombre": "¡EL SECUENCIADOR DE BAILE!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "msRespuesta": 1250,
+    "debounceMs": 420,
+    "pausaAntesDeComprobarMs": 550,
+    "ayudaMs": 12000,
+    "ayudaRepetirMs": 14000,
+    "ayudasMax": 3,
+    "repetirSecuenciaTrasError": true,
+    "pausaEntreItemsMs": 700,
+    "visibles": 3,
+    "msCambioOpciones": 620
+  },
+  "acciones": [
+    {
+      "id": "cabeza",
+      "nombre": "Mano a la Cabeza",
+      "voz": "¡Mano a la cabeza!",
+      "corto": "cabeza",
+      "color": "#fab005",
+      "nota": 523.25,
+      "clip": "Tocar_cabeza"
+    },
+    {
+      "id": "cintura",
+      "nombre": "Manos a la Cintura",
+      "voz": "¡Manos a la cintura!",
+      "corto": "cintura",
+      "color": "#f76707",
+      "nota": 554.37,
+      "clip": "Tocar_cintura"
+    },
+    {
+      "id": "pies",
+      "nombre": "Tocar los Pies",
+      "voz": "¡Tocar los pies!",
+      "corto": "pies",
+      "color": "#7950f2",
+      "nota": 587.33,
+      "clip": "Tocar_pies"
+    },
+    {
+      "id": "aplaudir",
+      "nombre": "Aplaudir",
+      "voz": "¡Aplaudir!",
+      "corto": "aplauso",
+      "color": "#228be6",
+      "nota": 659.25,
+      "clip": "Aplaudir"
+    },
+    {
+      "id": "abrirBrazos",
+      "nombre": "Abrir los Brazos",
+      "voz": "¡Abrir los brazos!",
+      "corto": "brazos",
+      "color": "#15aabf",
+      "nota": 698.46,
+      "clip": "Abrir_brazos"
+    },
+    {
+      "id": "estirarse",
+      "nombre": "Estirarse Arriba",
+      "voz": "¡Estirarse!",
+      "corto": "estirón",
+      "color": "#20c997",
+      "nota": 739.99,
+      "clip": "Estirarse"
+    },
+    {
+      "id": "brazoDerecho",
+      "nombre": "Brazo Derecho Arriba",
+      "voz": "¡Brazo derecho arriba!",
+      "corto": "brazo derecho",
+      "color": "#e8590c",
+      "nota": 783.99,
+      "clip": "Levantar_brazo_derecho",
+      "lado": "derecha"
+    },
+    {
+      "id": "brazoIzquierdo",
+      "nombre": "Brazo Izquierdo Arriba",
+      "voz": "¡Brazo izquierdo arriba!",
+      "corto": "brazo izquierdo",
+      "color": "#1c7ed6",
+      "nota": 830.61,
+      "clip": "Levantar_brazo_izquierdo",
+      "lado": "izquierda"
+    },
+    {
+      "id": "pieDerecho",
+      "nombre": "Pie Derecho Arriba",
+      "voz": "¡Pie derecho arriba!",
+      "corto": "pie derecho",
+      "color": "#d6336c",
+      "nota": 880.0,
+      "clip": "Levantar_pie_derecho",
+      "lado": "derecha"
+    },
+    {
+      "id": "pieIzquierdo",
+      "nombre": "Pie Izquierdo Arriba",
+      "voz": "¡Pie izquierdo arriba!",
+      "corto": "pie izquierdo",
+      "color": "#0ca678",
+      "nota": 932.33,
+      "clip": "Levantar_pie_izquierdo",
+      "lado": "izquierda"
+    },
+    {
+      "id": "zapatear",
+      "nombre": "Zapatear",
+      "voz": "¡Zapatear!",
+      "corto": "zapateo",
+      "color": "#40c057",
+      "nota": 987.77,
+      "clip": "Zapatear"
+    },
+    {
+      "id": "saltar",
+      "nombre": "Saltar",
+      "voz": "¡Saltar!",
+      "corto": "salto",
+      "color": "#e64980",
+      "nota": 1046.5,
+      "clip": "Saltar"
+    },
+    {
+      "id": "saltarUnPie",
+      "nombre": "Salto con un Pie",
+      "voz": "¡Salto con un pie!",
+      "corto": "salto en un pie",
+      "color": "#ae3ec9",
+      "nota": 1108.73,
+      "clip": "Saltar_en_un_pie"
+    },
+    {
+      "id": "girar",
+      "nombre": "Giro Corporal",
+      "voz": "¡Giro!",
+      "corto": "giro",
+      "color": "#12b886",
+      "nota": 1174.66,
+      "clip": "Girar"
+    },
+    {
+      "id": "bailar",
+      "nombre": "Bailar",
+      "voz": "¡A bailar!",
+      "corto": "baile",
+      "color": "#f06595",
+      "nota": 1244.51,
+      "clip": "Bailar"
+    },
+    {
+      "id": "marchar",
+      "nombre": "Marchar en el Sitio",
+      "voz": "¡Marchar!",
+      "corto": "marcha",
+      "color": "#4c6ef5",
+      "nota": 1318.51,
+      "clip": "Caminar"
+    }
+  ],
+  "rondas": [
+    {
+      "id": 1,
+      "titulo": "RONDA 1",
+      "nombre": "El secuenciador",
+      "items": 6,
+      "movimientos": [
+        3,
+        3,
+        3,
+        4,
+        4,
+        4
+      ],
+      "msMovimiento": 1900,
+      "pausaMs": 850,
+      "apoyo": "alto",
+      "nombrar": true,
+      "instruccion": "¡Mira la rutina de Zeus y repítela en el mismo orden!"
+    }
+  ],
+  "demo": {
+    "secuencia": [
+      "cabeza",
+      "saltarUnPie",
+      "girar"
+    ],
+    "msMovimiento": 2100,
+    "pausaMs": 900,
+    "visibles": [
+      "cabeza",
+      "saltarUnPie",
+      "girar"
+    ]
+  },
+  "textos": {
+    "tituloIntro": "¡EL SECUENCIADOR DE BAILE!",
+    "subtituloIntro": "Mira la rutina, recuérdala y baila",
+    "bienvenida": "¡Bienvenido al reto del Secuenciador! Observa la rutina de baile que haré con mi cuerpo. Memoriza cada movimiento y repítelo en el orden exacto.",
+    "saludoCorto": "¡Bienvenido al reto del Secuenciador!",
+    "pasoObserva": "1. OBSERVA",
+    "pasoRepite": "2. REPITE",
+    "presentaBotones": "Estos son mis movimientos de baile:",
+    "botonEmpezar": "¡COMENZAR!",
+    "demoInstruccion": "¡Observa con atención! Haré tres movimientos seguidos. ¡Recuerda el orden!",
+    "demoZoe": "¡Recuerda el orden! Primero la mano arriba, luego el salto en un pie y al final el giro.",
+    "tuTurno": "¡AHORA ES TU TURNO!",
+    "tuTurnoVoz": "¡Ahora es tu turno!",
+    "observa": "¡OBSERVA Y MEMORIZA! Mira bien el orden de los movimientos.",
+    "observaCorto": "¡Observa y memoriza!",
+    "faseObserva": "¡OBSERVA Y MEMORIZA!",
+    "faseRepite": "¡REPITE LA RUTINA!",
+    "aciertoZoe": "¡MUY BIEN!",
+    "aciertoZeus": "Recordaste los {cuantos} movimientos en el orden correcto. ¡Sigamos bailando!",
+    "errorZeus": "¡Casi! Recuerda el orden de los movimientos. ¡Vamos a intentarlo otra vez!",
+    "ayudaZoe": "¡Recuerda la rutina que bailó Zeus! ¡Intenta repetirla en el mismo orden!",
+    "rondaListaTitulo": "¡RONDA {n} COMPLETADA!",
+    "rondaLista": "¡Excelente! Completaste esta rutina. ¡Vamos por la siguiente!",
+    "ronda": "RONDA",
+    "item": "TANDA",
+    "de": "DE",
+    "finalTitulo": "¡ERES UN CAMPEÓN DE LA MEMORIA CORPORAL!",
+    "finalSub": "Completaste las 6 rutinas de baile de 3 y 4 movimientos.",
+    "finalZoe": "¡ESPECTACULAR! Completaste todas las rutinas de baile.",
+    "finalZeus": "¡Eres un campeón de la memoria corporal!",
+    "botonOtraVez": "VOLVER A JUGAR",
+    "botonContinuar": "CONTINUAR",
+    "otraVez": "¡Otra vez! Zeus tiene nuevas rutinas de baile para ti.",
+    "cierre": "¡Muy bien! Recordaste y repetiste la rutina de Zeus en el orden correcto.",
+    "eligeNivel": "Elige tu edad",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola! Soy Zeus. ¡Bienvenido a la pista de baile de PedNia!"
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Y yo soy Zoe! Hoy Zeus es el bailarín del Secuenciador."
+      },
+      {
+        "personaje": 0,
+        "texto": "Yo bailo una rutina y tú la repites en el mismo orden. ¡Vamos a bailar!"
+      }
+    ],
+    "cuantos": {
+      "2": "dos",
+      "3": "tres",
+      "4": "cuatro"
+    },
+    "cambioLargo": "¡Ahora son {cuantos} movimientos! ¡Mira con atención!",
+    "cambioOpciones": "¡Mira! Cambiaron los botones. Estos son los de ahora."
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Transición: memoria corporal y lateralidad"
+    }
+  ]
+}
