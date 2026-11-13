@@ -32,12 +32,69 @@
     var VAGONES = [0xe03131, 0x1c7ed6, 0x2f9e44, 0xf08c00, 0x7048e8];
     var MALETAS = [0x8d5524, 0xc2255c, 0x1971c2, 0x5c940d, 0xe67700];
     /** Paisaje de cada estación: cielo arriba/abajo, suelo, detalle. */
+    // Nombres iguales a los dibujos (fondo_1..4). "anden" = colores del andén que se pinta
+    // delante de la vía; la montaña ya trae su andén en el dibujo.
     var ESTACIONES = [
-        { nombre: 'campo', cielo: [0x4dabf7, 0xd0ebff], suelo: 0x69db7c },
-        { nombre: 'ciudad', cielo: [0x74c0fc, 0xe7f5ff], suelo: 0xadb5bd },
-        { nombre: 'playa', cielo: [0x3bc9db, 0xe3fafc], suelo: 0xffe066 },
-        { nombre: 'montana', cielo: [0x91a7ff, 0xedf2ff], suelo: 0xf8f9fa }
+        { nombre: 'campo', cielo: [0x4dabf7, 0xd0ebff], suelo: 0x69db7c, anden: { piso: 0xd9caa5, borde: 0xa8916a, junta: 0xc4b48d } },
+        { nombre: 'desierto', cielo: [0xffc078, 0xfff4e6], suelo: 0xf5c983, anden: { piso: 0xe8c48c, borde: 0xbf975a, junta: 0xd4ad72 } },
+        { nombre: 'playa', cielo: [0x3bc9db, 0xe3fafc], suelo: 0xffe066, anden: { piso: 0xd9a066, borde: 0xa8703d, junta: 0xbf8650, tablas: true } },
+        { nombre: 'montana', cielo: [0x91a7ff, 0xedf2ff], suelo: 0xf8f9fa, anden: null }
     ];
+    /** Vía de los fondos ilustrados (1280×720): rieles de y 411 a 458; las ruedas pisan y 443. */
+    var VIA_Y = 443;
+    /** El andén pintado empieza bajo los durmientes (terminan en y 480). */
+    var ANDEN_Y = 484;
+    /**
+     * Tren por piezas (docs/partir_tren.py): cuerpo sin ruedas (1214×380, las ruedas apoyan
+     * en y 375) y ruedas sueltas que giran. Medidas en unidades del dibujo.
+     */
+    var TREN = {
+        ancho: 1214, base: 375, alto: 226,
+        ruedas: [
+            { x: 946, y: 320, r: 53, grande: true }, { x: 1035, y: 333, r: 34 }, { x: 821, y: 335, r: 40 },
+            { x: 721, y: 335, r: 37 }, { x: 622, y: 335, r: 35 }, { x: 523, y: 335, r: 40 },
+            { x: 424, y: 335, r: 40 }, { x: 324, y: 335, r: 40 }, { x: 225, y: 335, r: 41 }, { x: 126, y: 335, r: 35 }
+        ],
+        // Vagones: centro x (el 0 es el que va pegado a la locomotora), borde de arriba y fondo.
+        vagones: [771, 572, 374, 175], vagonArriba: 243, vagonAbajo: 350, vagonAncho: 177,
+        chimenea: { x: 1050, y: 155 }
+    };
+    /** Arte de escena (staging EncuentraElSonido/img → img/). */
+    var ESCENA = {
+        fondos: ['img/fondo_1.svg', 'img/fondo_2.svg', 'img/fondo_3.svg', 'img/fondo_4.svg'],
+        maletas: ['img/maleta_1.svg', 'img/maleta_2.svg', 'img/maleta_3.svg', 'img/maleta_4.svg'],
+        tren: 'img/tren_escena.svg',
+        cuerpo: 'img/tren_cuerpo.svg',
+        rueda: 'img/rueda.svg',
+        ruedaGrande: 'img/rueda_grande.svg',
+        copo: 'img/copo.svg',
+        nubeNieve: 'img/nube_nieve.svg',
+        // Mariposas del diseño (copias de AsociaSonidoEImagen/QueSuena/img).
+        mariposas: ['img/mariposa1.svg', 'img/mariposa2.svg', 'img/mariposa3.svg']
+    };
+    function texEscena(parte) { return 'tren:escena:' + parte; }
+    var ESCENA_V = '?v=20261113piezas';
+    /** Todo el arte de escena. Los SVG de Illustrator sin ancho/alto van con load.svg y tamaño. */
+    function listaEscena() {
+        var l = [];
+        ESCENA.fondos.forEach(function (src, i) { l.push({ key: texEscena('fondo:' + i), src: src }); });
+        ESCENA.maletas.forEach(function (src, i) { l.push({ key: texEscena('maleta:' + i), src: src }); });
+        ['tren', 'cuerpo', 'rueda', 'ruedaGrande', 'copo', 'nubeNieve'].forEach(function (k) {
+            l.push({ key: texEscena(k), src: ESCENA[k] });
+        });
+        ESCENA.mariposas.forEach(function (src, i) {
+            l.push({ key: texEscena('mariposa:' + i), src: src, svg: { width: 160, height: 160 } });
+        });
+        return l;
+    }
+    function encolarEscena(load) {
+        listaEscena().forEach(function (t) {
+            var src = t.src;
+            if (src.indexOf('?') === -1) src += ESCENA_V;
+            if (t.svg) load.svg(t.key, src, t.svg);
+            else load.image(t.key, src);
+        });
+    }
 
     function elemento(id) {
         return (gameConfig && gameConfig.elementos && gameConfig.elementos[id]) || {};
@@ -139,10 +196,15 @@
             this.totalVagones = 4;
         },
 
+        preload: function () {
+            encolarEscena(this.load);
+        },
+
         create: function () {
             this.cielo = this.add.graphics().setDepth(-30);
             this.paisaje = this.add.container(0, 0).setDepth(-25);
             this.paisajeG = this.add.graphics();
+            this.paisajeImg = null;
             this.paisaje.add(this.paisajeG);
             this.via = this.add.graphics().setDepth(-12);
             this.anden = this.add.container(0, 0).setDepth(-8);
@@ -150,7 +212,9 @@
             this.anden.add(this.andenG);
             this.tren = this.add.container(0, 0).setDepth(-10);
             this.nieve = this.add.graphics().setDepth(14);
-            this.dibujarTodo();
+            this.coposImg = this.add.group();
+            this.nubeNieveImg = null;
+            // Escena solo tras cargarTexturas.
             var scene = this;
             this.scale.on('resize', function () { scene.dibujarTodo(); });
             sceneRef = this;
@@ -167,11 +231,38 @@
         },
 
         /** Medidas: la vía (detrás) y el piso del andén (delante, donde están los pasajeros). */
-        viaY: function () { return this.scale.height * 0.6; },
+        /** ¿Hay fondos y tren ilustrados? Entonces se usan sus medidas y no el dibujo procedural. */
+        ilustrado: function () {
+            return this.textures.exists(texEscena('fondo:0')) && this.textures.exists(texEscena('cuerpo')) &&
+                this.textures.exists(texEscena('rueda'));
+        },
+
+        /** Dónde cae el fondo (1280×720, centrado y cubriendo la pantalla). */
+        marcoFondo: function () {
+            var w = this.scale.width, h = this.scale.height;
+            var k = Math.max(w / 1280, h / 720);
+            var x0 = w / 2 - 640 * k, y0 = h / 2 - 360 * k;
+            return { k: k, ancho: 1280 * k, px: function (u) { return x0 + u * k; }, py: function (v) { return y0 + v * k; } };
+        },
+
+        viaY: function () {
+            if (this.ilustrado()) return this.marcoFondo().py(VIA_Y);
+            return this.scale.height * 0.6;
+        },
         pisoAnden: function () { return this.scale.height * 0.9; },
         tamPasajero: function () { return Math.min(this.scale.height * 0.24, this.scale.width * 0.15, 210); },
 
         dibujarTodo: function () {
+            if (this.ilustrado()) {
+                this.cielo.clear();
+                this.paisaje.setVisible(false);
+                this.anden.setVisible(false);
+                this.via.clear();
+                if (this.estCont) this.estCont.destroy();
+                this.estCont = this.armarEstacion(this.estacion);
+                this.armarTren();
+                return;
+            }
             this.dibujarCielo();
             this.dibujarPaisaje(this.estacion);
             this.dibujarVia();
@@ -185,6 +276,9 @@
             var e = ESTACIONES[this.estacion % ESTACIONES.length];
             var g = this.cielo;
             g.clear();
+            // Si hay fondo ilustrado, el cielo va en el arte: no pintar el procedural encima/detrás.
+            var keyFondo = texEscena('fondo:' + (this.estacion % ESCENA.fondos.length));
+            if (this.textures.exists(keyFondo)) return;
             for (var b = 0; b < 16; b++) {
                 g.fillStyle(mezclarColor(e.cielo[0], e.cielo[1], b / 15), 1);
                 g.fillRect(0, (this.viaY() / 16) * b - 1, w, this.viaY() / 16 + 2);
@@ -201,6 +295,22 @@
             var e = ESTACIONES[k % ESTACIONES.length];
             var g = this.paisajeG;
             g.clear();
+            var idx = k % ESCENA.fondos.length;
+            var keyFondo = texEscena('fondo:' + idx);
+            if (this.textures.exists(keyFondo)) {
+                if (!this.paisajeImg) {
+                    this.paisajeImg = this.add.image(0, 0, keyFondo).setOrigin(0.5, 0.5).setDepth(-26);
+                    this.paisaje.addAt(this.paisajeImg, 0);
+                } else if (this.paisajeImg.texture.key !== keyFondo) {
+                    this.paisajeImg.setTexture(keyFondo);
+                }
+                this.paisajeImg.setVisible(true);
+                // Cover a pantalla completa (el SVG ya trae cielo, colinas y vía).
+                var esc = Math.max(w / (this.paisajeImg.width || 1), h / (this.paisajeImg.height || 1));
+                this.paisajeImg.setScale(esc).setPosition(w / 2, h / 2);
+                return;
+            }
+            if (this.paisajeImg) this.paisajeImg.setVisible(false);
             if (e.nombre === 'campo') {
                 g.fillStyle(0x8ce99a, 1);
                 g.fillEllipse(w * 0.25, vy, w * 0.8, h * 0.3);
@@ -270,6 +380,8 @@
         },
 
         dibujarVia: function () {
+            // Con fondo ilustrado la vía viene en el dibujo.
+            if (this.ilustrado()) { this.via.clear(); return; }
             var w = this.scale.width;
             var h = this.scale.height;
             var vy = this.viaY();
@@ -287,6 +399,205 @@
             for (var x = -paso; x < w + paso; x += paso) g.fillRect(x - off, vy + 12, 14, 8);
             g.fillStyle(0x495057, 1);
             g.fillRect(0, vy + 10, w, 3);
+        },
+
+        /**
+         * Una estación ilustrada entera, en un contenedor que se desliza en el viaje: el fondo,
+         * el andén pintado delante de la vía (la montaña ya lo trae), el letrero y su vida.
+         */
+        armarEstacion: function (k) {
+            var w = this.scale.width, h = this.scale.height;
+            var F = this.marcoFondo();
+            var e = ESTACIONES[k % ESTACIONES.length];
+            var c = this.add.container(0, 0).setDepth(-25);
+            var img = this.add.image(w / 2, h / 2, texEscena('fondo:' + (k % ESCENA.fondos.length))).setScale(F.k);
+            c.add(img);
+            var g = this.add.graphics();
+            c.add(g);
+            if (e.anden) this.pintarAnden(g, e.anden, F);
+            this.pintarLetrero(c, e.nombre, F);
+            c.estacion = k;
+            c.vida = [];
+            this.armarVida(c, e.nombre, F);
+            return c;
+        },
+
+        /** Andén plano, del estilo del dibujo: borde oscuro, línea amarilla y juntas (o tablas). */
+        pintarAnden: function (g, a, F) {
+            var h = this.scale.height;
+            var x0 = F.px(-40), x1 = F.px(1320);
+            var y0 = F.py(ANDEN_Y);
+            g.fillStyle(a.piso, 1);
+            g.fillRect(x0, y0, x1 - x0, h - y0 + 2);
+            g.fillStyle(a.borde, 1);
+            g.fillRect(x0, y0, x1 - x0, 9 * F.k);
+            g.fillStyle(0xfcc419, 1);
+            g.fillRect(x0, y0 + 16 * F.k, x1 - x0, 6 * F.k);
+            g.fillStyle(a.junta, 1);
+            if (a.tablas) {
+                for (var y = y0 + 40 * F.k; y < h; y += 34 * F.k) g.fillRect(x0, y, x1 - x0, 3 * F.k);
+            } else {
+                for (var x = F.px(0); x < x1; x += 120 * F.k) g.fillRect(x, y0 + 28 * F.k, 3 * F.k, h - y0);
+                g.fillRect(x0, F.py(600), x1 - x0, 3 * F.k);
+            }
+        },
+
+        /** Letrero de la estación con su dibujo (sin letras), a la derecha del cruce del fondo. */
+        pintarLetrero: function (c, nombre, F) {
+            var w = this.scale.width;
+            var g = this.add.graphics();
+            var u = F.k;
+            var x = Math.max(F.px(255), w * 0.05);
+            var yPie = F.py(ANDEN_Y + 6);
+            var ancho = 74 * u, alto = 58 * u;
+            var yTab = F.py(VIA_Y) - 150 * u;
+            g.fillStyle(0x495057, 1);
+            g.fillRoundedRect(x - 4 * u, yTab + alto - 4 * u, 8 * u, yPie - yTab - alto + 4 * u, 3 * u);
+            g.fillStyle(0x0b4f8a, 1);
+            g.fillRoundedRect(x - ancho / 2, yTab + 3 * u, ancho, alto, 10 * u);
+            g.fillStyle(0x1c7ed6, 1);
+            g.fillRoundedRect(x - ancho / 2, yTab, ancho, alto, 10 * u);
+            g.lineStyle(3 * u, 0xffffff, 0.9);
+            g.strokeRoundedRect(x - ancho / 2 + 4 * u, yTab + 4 * u, ancho - 8 * u, alto - 8 * u, 7 * u);
+            var cx = x, cy = yTab + alto / 2;
+            g.fillStyle(0xffffff, 1);
+            if (nombre === 'campo') {
+                g.fillRect(cx - 3 * u, cy, 6 * u, 16 * u);
+                g.fillCircle(cx, cy - 4 * u, 13 * u);
+            } else if (nombre === 'desierto') {
+                g.fillRoundedRect(cx - 5 * u, cy - 17 * u, 10 * u, 34 * u, 5 * u);
+                g.fillRoundedRect(cx - 17 * u, cy - 6 * u, 7 * u, 14 * u, 3.5 * u);
+                g.fillRect(cx - 17 * u, cy + 4 * u, 14 * u, 5 * u);
+                g.fillRoundedRect(cx + 10 * u, cy - 12 * u, 7 * u, 14 * u, 3.5 * u);
+                g.fillRect(cx + 3 * u, cy - 2 * u, 14 * u, 5 * u);
+            } else if (nombre === 'playa') {
+                g.fillCircle(cx, cy - 2 * u, 11 * u);
+                g.fillStyle(0x1c7ed6, 1);
+                g.fillRect(cx - 20 * u, cy + 2 * u, 40 * u, 16 * u);
+                g.lineStyle(3 * u, 0xffffff, 1);
+                for (var i = 0; i < 2; i++) {
+                    g.beginPath();
+                    var yy = cy + (6 + i * 7) * u;
+                    g.moveTo(cx - 18 * u, yy);
+                    for (var t = 1; t <= 6; t++) g.lineTo(cx - 18 * u + t * 6 * u, yy + (t % 2 ? -3 : 0) * u);
+                    g.strokePath();
+                }
+            } else {
+                g.fillTriangle(cx - 22 * u, cy + 16 * u, cx, cy - 18 * u, cx + 22 * u, cy + 16 * u);
+                g.fillStyle(0x1c7ed6, 1);
+                g.fillTriangle(cx - 9 * u, cy + 2 * u, cx, cy - 8 * u, cx + 9 * u, cy + 2 * u);
+            }
+            c.add(g);
+            this.letreroX = x + ancho / 2;
+        },
+
+        /* ── Vida de cada estación (va dentro de su contenedor y se desliza con él) ── */
+
+        armarVida: function (c, nombre, F) {
+            var scene = this;
+            var w = this.scale.width;
+            if (reducido()) return;
+            if (nombre === 'campo') {
+                // Mariposas del diseño sobre las colinas y pájaros que cruzan el cielo.
+                ESCENA.mariposas.forEach(function (src, i) {
+                    var key = texEscena('mariposa:' + i);
+                    if (!scene.textures.exists(key)) return;
+                    var m = scene.add.image(rnd(0, w), F.py(rnd(170, 260)), key);
+                    c.add(m);
+                    c.vida.push({ tipo: 'mariposa', o: m, y0: m.y, fase: Math.random() * 6, base: Math.max(30, Math.min(52, w * 0.045)) / (m.width || 1) });
+                });
+                this.pajaros(c, 3, F.py(70), F.py(220), 0x495057);
+            } else if (nombre === 'desierto') {
+                c.vida.push({ tipo: 'rodadora', o: this.rodadora(c, F), espera: rnd(1, 3) });
+            } else if (nombre === 'playa') {
+                this.pajaros(c, 3, F.py(80), F.py(240), 0xffffff);
+                // Brillos del sol sobre el mar (el agua va de y 340 a 405 del dibujo).
+                for (var i = 0; i < 9; i++) {
+                    var b = this.add.ellipse(F.px(rnd(150, 1150)), F.py(rnd(350, 400)), rnd(14, 26) * F.k, 3 * F.k, 0xffffff, 0);
+                    c.add(b);
+                    c.vida.push({ tipo: 'brillo', o: b, fase: Math.random() * 6, vel: rnd(1.2, 2.4) });
+                }
+            } else {
+                // Montaña: copos sueltos que caen despacio aunque no nieve (en la nieve caen muchos más).
+                for (var k = 0; k < 14; k++) {
+                    var cp = this.add.circle(rnd(0, w), F.py(rnd(0, 400)), rnd(1.5, 3) * F.k, 0xffffff, 0.85);
+                    c.add(cp);
+                    c.vida.push({ tipo: 'copito', o: cp, vel: rnd(14, 28), fase: Math.random() * 6, alto: F.py(VIA_Y) });
+                }
+            }
+        },
+
+        /** Bandada de pájaros: una "v" que aletea y cruza el cielo. */
+        pajaros: function (c, n, yMin, yMax, color) {
+            var w = this.scale.width;
+            for (var i = 0; i < n; i++) {
+                var g = this.add.graphics();
+                g.x = rnd(-w * 0.3, w);
+                g.y = rnd(yMin, yMax);
+                c.add(g);
+                c.vida.push({ tipo: 'pajaro', o: g, vel: rnd(28, 55), fase: Math.random() * 6, color: color, tam: rnd(9, 14), y0: g.y });
+            }
+        },
+
+        /** Rodadora del desierto: una bola de ramitas secas que rueda por la arena. */
+        rodadora: function (c, F) {
+            var g = this.add.graphics();
+            var r = 22 * F.k;
+            g.lineStyle(2.4 * F.k, 0xa9773a, 1);
+            for (var i = 0; i < 9; i++) {
+                var a = (Math.PI * 2 / 9) * i;
+                g.beginPath();
+                g.arc(Math.cos(a) * r * 0.35, Math.sin(a) * r * 0.35, r * 0.65, a, a + Math.PI * 1.2);
+                g.strokePath();
+            }
+            g.lineStyle(1.6 * F.k, 0xc9955a, 1);
+            g.strokeCircle(0, 0, r * 0.9);
+            g.x = -r * 3;
+            g.y = F.py(392) - r;
+            g.r = r;
+            g.suelo = g.y;
+            c.add(g);
+            return g;
+        },
+
+        /** Mueve la vida de una estación (local a su contenedor). */
+        moverVida: function (c, time, dt) {
+            if (!c || !c.vida) return;
+            var w = this.scale.width;
+            c.vida.forEach(function (v) {
+                var o = v.o;
+                if (v.tipo === 'mariposa') {
+                    v.fase += dt;
+                    o.x += Math.sin(v.fase * 0.7) * 0.9 + 0.35;
+                    o.y = v.y0 + Math.sin(v.fase * 1.6) * 14;
+                    o.setScale(v.base * (0.35 + 0.65 * Math.abs(Math.sin(time / 70 + v.fase))), v.base);
+                    if (o.x > w + 30) o.x = -30;
+                } else if (v.tipo === 'pajaro') {
+                    o.x += v.vel * dt;
+                    if (o.x > w + 40) { o.x = -40 - Math.random() * w * 0.4; v.y0 = o.y; }
+                    o.y = v.y0 + Math.sin(time / 900 + v.fase) * 6;
+                    var ala = Math.sin(time / 120 + v.fase) * v.tam * 0.5;
+                    o.clear();
+                    o.lineStyle(2.2, v.color, 1);
+                    o.beginPath();
+                    o.moveTo(-v.tam, -ala);
+                    o.lineTo(0, 0);
+                    o.lineTo(v.tam, -ala);
+                    o.strokePath();
+                } else if (v.tipo === 'rodadora') {
+                    if (v.espera > 0) { v.espera -= dt; return; }
+                    o.x += 120 * dt;
+                    o.rotation += (120 * dt) / o.r;
+                    o.y = o.suelo - Math.abs(Math.sin(o.x / 60)) * o.r * 0.8;
+                    if (o.x > w + o.r * 3) { o.x = -o.r * 3; v.espera = rnd(4, 8); }
+                } else if (v.tipo === 'brillo') {
+                    o.fillAlpha = Math.max(0, Math.sin(time / 1000 * v.vel + v.fase)) * 0.85;
+                } else if (v.tipo === 'copito') {
+                    o.y += v.vel * dt;
+                    o.x += Math.sin(time / 900 + v.fase) * 0.3;
+                    if (o.y > v.alto) o.y = -10;
+                }
+            });
         },
 
         /** Andén con techo, banca, farol y letrero de la estación (un dibujo, sin letras). */
@@ -331,13 +642,47 @@
             this.tren.removeAll(true);
             this.vagones = [];
             this.ruedas = [];
+            this.trenPiezas = false;
             var vw = Math.min(w * 0.14, 190);
             var vh = h * 0.13;
             this.medidaVagon = { w: vw, h: vh };
             var x0 = w * 0.92;
-            // Locomotora.
-            var loco = this.add.graphics();
+            var keyTren = texEscena('tren');
+            var loco;
             var lw = vw * 1.15;
+            if (this.ilustrado()) {
+                this.armarTrenPiezas();
+                return;
+            }
+            if (this.textures.exists(keyTren)) {
+                // El tren ilustrado ya trae locomotora y 4 vagones: se dibuja entero y los
+                // vagones del juego son las zonas de sus coches (no se dibujan aparte).
+                var img = this.add.image(0, 0, keyTren).setOrigin(1, 1);
+                var anchoTren = Math.min(w * 0.9, (vw + 10) * (this.totalVagones + 1.4));
+                var escT = Math.min(anchoTren / (img.width || 1), (vh * 2.1) / (img.height || 1));
+                img.setScale(escT).setPosition(x0 + vw * 0.1, vy + 2);
+                this.tren.add(img);
+                var anchoReal = img.width * escT;
+                var altoReal = img.height * escT;
+                // Reparto medido sobre el dibujo: la locomotora ocupa el 24 % de la derecha.
+                var izq = img.x - anchoReal;
+                var zonaVag = anchoReal * 0.76;
+                var pasoV = zonaVag / this.totalVagones;
+                this.chimenea = { x: img.x - anchoReal * 0.12, y: vy - altoReal * 0.92 };
+                for (var q = 0; q < this.totalVagones; q++) {
+                    // Vagón 0 = el más cercano a la locomotora (derecha).
+                    var cxv = izq + zonaVag - (q + 0.5) * pasoV;
+                    var vq = { i: q, x: cxv, y: vy - altoReal * 0.42, ventana: altoReal * 0.42, pasajero: null };
+                    var prev = this.vagonesPrevios && this.vagonesPrevios[q];
+                    if (prev && prev.id) vq.pasajero = this.sentar(vq, prev.id);
+                    this.vagones.push(vq);
+                }
+                this.vagonesPrevios = this.vagones.map(function (v) { return { id: v.pasajero ? v.pasajero.id : null }; });
+                return;
+            }
+            {
+            // Locomotora.
+            loco = this.add.graphics();
             loco.fillStyle(0x343a40, 1);
             loco.fillRoundedRect(x0 - lw, vy - vh, lw * 0.62, vh, 8);
             loco.fillStyle(0xe03131, 1);
@@ -352,6 +697,7 @@
             loco.fillTriangle(x0, vy - vh * 0.1, x0, vy + 6, x0 + vw * 0.18, vy + 6);
             this.tren.add(loco);
             this.chimenea = { x: x0 - lw * 0.26, y: vy - vh * 1.15 };
+            }
             [x0 - lw * 0.8, x0 - lw * 0.45, x0 - lw * 0.15].forEach(function (rx) { scene.ruedas.push(scene.rueda(rx, vy - 2, vh * 0.2)); });
             // Vagones (uno por ronda); el pasajero que sube se sienta en la ventana.
             for (var i = 0; i < this.totalVagones; i++) {
@@ -376,6 +722,45 @@
             this.vagonesPrevios = this.vagones.map(function (v) { return { id: v.pasajero ? v.pasajero.id : null }; });
         },
 
+        /**
+         * Tren ilustrado por piezas, apoyado en la vía del dibujo: los pasajeros sentados van
+         * detrás del cuerpo (asoman por arriba del vagón) y las ruedas encima, sueltas, para girar.
+         */
+        armarTrenPiezas: function () {
+            var scene = this;
+            var w = this.scale.width, h = this.scale.height;
+            var F = this.marcoFondo();
+            var base = this.viaY();
+            var izqMin = Math.max(w * 0.03, (this.letreroX || F.px(300)) + 8);
+            var s = Math.min((w * 0.97 - izqMin) / TREN.ancho, (h * 0.3) / TREN.alto);
+            var izq = w * 0.97 - TREN.ancho * s;
+            this.escalaTren = s;
+            var cuerpo = this.add.image(izq, base, texEscena('cuerpo')).setOrigin(0, TREN.base / 380).setScale(s);
+            this.tren.add(cuerpo);
+            TREN.ruedas.forEach(function (r) {
+                var key = texEscena(r.grande ? 'ruedaGrande' : 'rueda');
+                var im = scene.add.image(izq + r.x * s, base - (TREN.base - r.y) * s, key);
+                im.setScale(s * (r.grande ? r.r / 53 : r.r / 40));
+                im.r = r.r * s;
+                scene.tren.add(im);
+                scene.ruedas.push(im);
+            });
+            var alto = (TREN.vagonAbajo - TREN.vagonArriba) * s;
+            for (var q = 0; q < this.totalVagones; q++) {
+                var vq = {
+                    i: q, x: izq + TREN.vagones[q] * s,
+                    y: base - (TREN.base - TREN.vagonArriba) * s + alto * 0.45,
+                    ventana: alto, anchoV: TREN.vagonAncho * s, pasajero: null
+                };
+                var prev = this.vagonesPrevios && this.vagonesPrevios[q];
+                if (prev && prev.id) vq.pasajero = this.sentar(vq, prev.id);
+                this.vagones.push(vq);
+            }
+            this.vagonesPrevios = this.vagones.map(function (v) { return { id: v.pasajero ? v.pasajero.id : null }; });
+            this.chimenea = { x: izq + TREN.chimenea.x * s, y: base - (TREN.base - TREN.chimenea.y) * s };
+            this.trenPiezas = true;
+        },
+
         rueda: function (x, y, r) {
             var c = this.add.graphics({ x: x, y: y });
             c.fillStyle(0x212529, 1);
@@ -392,10 +777,14 @@
         /** El pasajero queda sentado asomado por la ventana de su vagón. */
         sentar: function (v, id) {
             var im = this.add.image(v.x, v.y, tex(id)).setOrigin(0.5, 1);
-            var t = v.ventana * 1.25;
-            im.setScale(Math.min(t / (im.width || 1), t / (im.height || 1)));
+            // Con el tren por piezas el vagón es abierto: el pasajero asoma bien por arriba.
+            var t = v.ventana * (this.trenPiezas ? 1.6 : 1.25);
+            var esc = Math.min(t / (im.width || 1), t / (im.height || 1));
+            if (v.anchoV) esc = Math.min(esc, (v.anchoV * 0.8) / (im.width || 1));
+            im.setScale(esc);
             im.id = id;
-            this.tren.add(im);
+            if (this.trenPiezas) this.tren.addAt(im, 0);
+            else this.tren.add(im);
             return im;
         },
 
@@ -405,7 +794,8 @@
             var w = this.scale.width;
             // Un lugar de más y se quita el del centro: ahí abajo está el botón de escuchar.
             var out = [];
-            for (var i = 0; i <= n; i++) out.push(w * (0.12 + (0.76 / n) * i));
+            // De 12 % a 78 %: a la derecha abajo están los botones de accesibilidad y sonido.
+            for (var i = 0; i <= n; i++) out.push(w * (0.12 + (0.66 / n) * i));
             out.sort(function (a, b) { return Math.abs(a - w / 2) - Math.abs(b - w / 2); });
             out.shift();
             if (n === 1) out = [w * 0.3];
@@ -431,6 +821,16 @@
             var mw = Math.max(p.ancho, t * 0.8) + 20;
             var mh = p.size * 0.92;
             var c = this.add.container(p.x, this.pisoAnden()).setDepth(6);
+            var keyM = texEscena('maleta:' + (k % ESCENA.maletas.length));
+            if (this.textures.exists(keyM)) {
+                var im = this.add.image(0, 0, keyM).setOrigin(0.5, 1);
+                var esc = Math.min(mw / (im.width || 1), mh / (im.height || 1)) * 1.15;
+                im.setScale(esc);
+                c.add(im);
+                c.mw = Math.max(mw, (im.width || 1) * esc);
+                c.mh = Math.max(mh, (im.height || 1) * esc);
+                return c;
+            }
             var g = this.add.graphics();
             var col = MALETAS[k % MALETAS.length];
             g.fillStyle(col, 1);
@@ -471,6 +871,7 @@
             this.objetivo = o.objetivo;
             this.destruirPasajeros();
             var w = this.scale.width;
+            var h = this.scale.height;
             var lug = this.lugares(o.elementos.length);
             var entradas = o.elementos.map(function (id, i) {
                 var desdeIzq = lug[i] < w / 2;
@@ -486,7 +887,16 @@
                 }
                 return scene.caminarA(p, lug[i], reducido() ? 1 : 900 + i * 200);
             });
-            if (this.modo === 'nieve') this.nevando = true;
+            if (this.modo === 'nieve') {
+                this.nevando = true;
+                var keyNube = texEscena('nubeNieve');
+                if (this.textures.exists(keyNube)) {
+                    if (!this.nubeNieveImg) this.nubeNieveImg = this.add.image(0, 0, keyNube).setDepth(13).setAlpha(0);
+                    this.nubeNieveImg.setVisible(true).setPosition(w * 0.55, h * 0.14);
+                    this.nubeNieveImg.setScale(Math.min(w * 0.45 / (this.nubeNieveImg.width || 1), h * 0.22 / (this.nubeNieveImg.height || 1)));
+                    this.tweens.add({ targets: this.nubeNieveImg, alpha: 1, duration: 400 });
+                }
+            }
             return Promise.all(entradas).then(function () { return esperar(scene, 250); });
         },
 
@@ -549,27 +959,57 @@
             // Humo de la locomotora.
             if (this.chimenea && !reducido() && (!this.ultimoHumo || time - this.ultimoHumo > (this.viajando ? 140 : 700))) {
                 this.ultimoHumo = time;
-                var b = this.add.circle(this.chimenea.x, this.chimenea.y, rnd(8, 14), 0xf1f3f5, 0.9).setDepth(-9);
+                var u = this.escalaTren ? this.escalaTren / 0.7 : 1;
+                var b = this.add.circle(this.chimenea.x, this.chimenea.y, rnd(10, 16) * u, 0xffffff, 0.95).setDepth(-9);
+                b.setStrokeStyle(2, 0xdee2e6, 0.9);
                 this.tweens.add({
-                    targets: b, y: b.y - h * 0.15, x: b.x - (this.viajando ? w * 0.12 : rnd(-10, 20)), scale: 2.4, alpha: 0,
-                    duration: 1600, onComplete: function () { b.destroy(); }
+                    targets: b, y: b.y - h * (this.viajando ? 0.08 : 0.15), x: b.x - (this.viajando ? w * 0.3 : rnd(-10, 20)),
+                    scale: this.viajando ? 3 : 2.4, alpha: 0,
+                    duration: this.viajando ? 1300 : 1800, ease: 'Sine.easeOut', onComplete: function () { b.destroy(); }
                 });
             }
             if (this.viajando) {
-                this.ruedas.forEach(function (r) { r.rotation += dt * 12; });
-                this.dibujarVia();
+                if (this.trenPiezas) {
+                    // Las ruedas giran según su tamaño (como si avanzaran ~520 px/s) y el tren traquetea.
+                    this.ruedas.forEach(function (r) { r.rotation += dt * 520 / (r.r || 20); });
+                    this.tren.y = reducido() ? 0 : Math.abs(Math.sin(time / 110)) * -2;
+                } else {
+                    this.ruedas.forEach(function (r) { r.rotation += dt * 12; });
+                    this.dibujarVia();
+                }
+            } else if (this.tren.y) {
+                this.tren.y = 0;
             }
+            this.moverVida(this.estCont, time, dt);
+            this.moverVida(this.estVieja, time, dt);
             // Nieve.
             var g = this.nieve;
             g.clear();
+            var keyCopo = texEscena('copo');
+            var usaCopo = this.textures.exists(keyCopo);
             if (this.nevando && !reducido()) {
-                while (this.copos.length < 90) this.copos.push({ x: Math.random(), y: Math.random(), v: rnd(0.05, 0.12), f: Math.random() * 6 });
-                g.fillStyle(0xffffff, 0.9);
+                var maxCopos = usaCopo ? 36 : 90;
+                while (this.copos.length < maxCopos) {
+                    this.copos.push({ x: Math.random(), y: Math.random(), v: rnd(0.05, 0.12), f: Math.random() * 6, img: null });
+                }
+                if (!usaCopo) g.fillStyle(0xffffff, 0.9);
                 this.copos.forEach(function (c) {
                     c.y += c.v * dt;
                     if (c.y > 1) { c.y = 0; c.x = Math.random(); }
-                    g.fillCircle(c.x * w + Math.sin(time / 800 + c.f) * 12, c.y * h, 3);
+                    var cx = c.x * w + Math.sin(time / 800 + c.f) * 12;
+                    var cy = c.y * h;
+                    if (usaCopo) {
+                        if (!c.img) {
+                            c.img = scene.add.image(cx, cy, keyCopo).setDepth(14).setScale(0.045 + c.v * 0.2);
+                        } else {
+                            c.img.setPosition(cx, cy).setVisible(true);
+                        }
+                    } else {
+                        g.fillCircle(cx, cy, 3);
+                    }
                 });
+            } else {
+                this.copos.forEach(function (c) { if (c.img) c.img.setVisible(false); });
             }
         },
 
@@ -670,6 +1110,9 @@
             var scene = this;
             if (!p) return Promise.resolve();
             var v = this.vagones[Math.min(this.ronda, this.vagones.length - 1)];
+            var tVent = v.ventana * (this.trenPiezas ? 1.6 : 1.25);
+            var escFinal = Math.min(tVent / (p.img.width || 1), tVent / (p.img.height || 1));
+            if (v.anchoV) escFinal = Math.min(escFinal, (v.anchoV * 0.8) / (p.img.width || 1));
             return new Promise(function (resolve) {
                 var desde = { x: p.x, y: scene.pisoAnden() };
                 var t = { k: 0 };
@@ -679,7 +1122,7 @@
                     onUpdate: function () {
                         p.img.x = Phaser.Math.Linear(desde.x, v.x, t.k);
                         p.img.y = Phaser.Math.Linear(desde.y, v.y, t.k) - Math.sin(t.k * Math.PI) * scene.scale.height * 0.18;
-                        p.img.setScale(Phaser.Math.Linear(p.esc, p.esc * 0.55, t.k));
+                        p.img.setScale(Phaser.Math.Linear(p.esc, escFinal, t.k));
                     },
                     onComplete: function () {
                         p.img.setVisible(false);
@@ -704,9 +1147,31 @@
             var scene = this;
             var w = this.scale.width;
             this.nevando = false;
+            if (this.nubeNieveImg) this.nubeNieveImg.setVisible(false).setAlpha(0);
             this.viajando = true;
             sfx('magia');
             if (global.EncuentraSonidoSfx) global.EncuentraSonidoSfx.reproducir('trompeta', { breve: true, vol: 0.35 });
+            if (this.ilustrado() && this.estCont) {
+                var paso = this.marcoFondo().ancho;
+                var sig = (this.estacion + 1) % ESTACIONES.length;
+                var vieja = this.estCont;
+                var nueva = this.armarEstacion(sig);
+                nueva.x = paso;
+                this.estVieja = vieja;
+                this.estCont = nueva;
+                return new Promise(function (resolve) {
+                    scene.tweens.add({
+                        targets: [vieja, nueva], x: '-=' + paso, duration: reducido() ? 1 : 2800, ease: 'Sine.easeInOut',
+                        onComplete: function () {
+                            vieja.destroy();
+                            scene.estVieja = null;
+                            scene.estacion = sig;
+                            scene.viajando = false;
+                            resolve();
+                        }
+                    });
+                });
+            }
             var dur = reducido() ? 1 : 1300;
             var mover = { d: this.desfase };
             this.tweens.add({ targets: mover, d: this.desfase + w * 2, duration: dur * 2, onUpdate: function () { scene.desfase = mover.d; } });
@@ -735,6 +1200,7 @@
             var w = this.scale.width;
             this.jugando = false;
             this.nevando = false;
+            if (this.nubeNieveImg) this.nubeNieveImg.setVisible(false).setAlpha(0);
             this.viajando = true;
             if (global.EncuentraSonidoSfx) global.EncuentraSonidoSfx.reproducir('trompeta', { vol: 0.4 });
             this.confeti();
@@ -840,12 +1306,24 @@
         Object.keys(elems).forEach(function (id) {
             if (elems[id].img) lista.push({ key: tex(id), src: elems[id].img });
         });
+        lista = lista.concat(listaEscena());
         lista = lista.filter(function (t) { return !scene.textures.exists(t.key); });
         if (!lista.length) return Promise.resolve();
         return new Promise(function (resolve) {
+            // Fondos Illustrator con clipPath fallan en load.svg → se ve el procedural viejo.
+            // load.image deja que el navegador rasterice el SVG.
             lista.forEach(function (t) {
-                if (/\.svg(\?|$)/i.test(t.src)) scene.load.svg(t.key, t.src, { scale: 2 });
-                else scene.load.image(t.key, t.src);
+                var src = t.src;
+                var esEscena = t.key.indexOf(':escena:') !== -1;
+                if (esEscena) {
+                    if (src.indexOf('?') === -1) src += ESCENA_V;
+                    if (t.svg) scene.load.svg(t.key, src, t.svg);
+                    else scene.load.image(t.key, src);
+                } else if (/\.svg(\?|$)/i.test(src)) {
+                    scene.load.svg(t.key, src, { scale: 2 });
+                } else {
+                    scene.load.image(t.key, src);
+                }
             });
             scene.load.once('complete', resolve);
             scene.load.start();
@@ -870,6 +1348,7 @@
             doc.body.insertBefore(el, doc.body.firstChild);
         }
         doc.body.classList.add('modo-tren');
+        el.style.visibility = 'hidden';
         Host.destruirIntro();
         game = Host.crear({
             type: Phaser.AUTO,
@@ -886,7 +1365,11 @@
             return Promise.reject(new Error('No se pudo crear Phaser.Game'));
         }
         return esperarEscena().then(function (scene) {
-            return cargarTexturas(scene).then(function () { scene.armarTren(); return scene; });
+            return cargarTexturas(scene).then(function () {
+                scene.dibujarTodo();
+                el.style.visibility = '';
+                return scene;
+            });
         });
     }
 

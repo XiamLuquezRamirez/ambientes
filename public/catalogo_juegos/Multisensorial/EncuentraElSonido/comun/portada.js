@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Encuentra el Sonido — portada propia de cada juego.
  *
  * La tarjeta de inicio (.inicio-parque) era igual en los 10 juegos: un parque con perro,
@@ -55,7 +55,7 @@
                 '<g fill="#fff">' + [20, 140, 260, 380, 500, 620, 740].map(function (x) { return '<rect x="' + x + '" y="420" width="70" height="8"/>'; }).join('') + '</g>',
             items: [
                 { src: 'img/perro.png', x: 18.5, y: 24, w: 15, anim: 'pt-salta' },
-                { src: 'img/carro.png', x: 50, y: 6, w: 22, anim: 'pt-pasa' },
+                { src: 'img/carro.svg', x: 50, y: 6, w: 22, anim: 'pt-pasa' },
                 { src: 'img/pajaro.svg', x: 82, y: 30, w: 11, anim: 'pt-mece' }
             ]
         },
@@ -138,7 +138,7 @@
                 '<g fill="#f1f3f5"><circle class="pt-humo" cx="642" cy="160" r="14"/><circle class="pt-humo" style="animation-delay:-0.8s" cx="642" cy="160" r="14"/><circle class="pt-humo" style="animation-delay:-1.6s" cx="642" cy="160" r="14"/></g>',
             items: [
                 { src: 'img/gato.png', x: 24, y: 12, w: 14, anim: 'pt-salta' },
-                { src: 'img/carro.png', x: 76, y: 10, w: 18, anim: 'pt-flota' },
+                { src: 'img/carro.svg', x: 76, y: 10, w: 18, anim: 'pt-flota' },
                 { src: 'img/trompeta.svg', x: 52, y: 44, w: 13, anim: 'pt-mece' }
             ]
         },
@@ -236,7 +236,7 @@
                 { src: 'img/perro.png', x: 15, y: 16, w: 13, anim: 'pt-salta' },
                 { src: 'img/maracas.svg', x: 52, y: 40, w: 9, anim: 'pt-mece' },
                 { src: 'img/pajaro.svg', x: 84, y: 36, w: 10, anim: 'pt-mece' },
-                { src: 'img/carro.png', x: 66, y: 8, w: 14, anim: 'pt-pasa' }
+                { src: 'img/carro.svg', x: 66, y: 8, w: 14, anim: 'pt-pasa' }
             ]
         }
     };

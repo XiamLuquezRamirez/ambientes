@@ -801,15 +801,21 @@
 
             if (efecto === 'aletea' && this.textures.exists(tex(id, 'alas'))) {
                 var arriba = false;
+                // Swap de frame si hay arte distinto; el pulso de escala cubre cuando alas == base.
                 var ev = this.time.addEvent({
                     delay: 150, repeat: 10,
                     callback: function () {
                         arriba = !arriba;
                         img.setTexture(arriba ? tex(id, 'alas') : tex(id));
+                        if (!rm) img.setScale(el.escala * (arriba ? 1.08 : 0.94), el.escala * (arriba ? 0.92 : 1.06));
                     }
                 });
                 if (!rm) this.tweens.add({ targets: img, y: y - el.size * 0.35, duration: 450, yoyo: true, ease: 'Sine.easeInOut' });
-                this.time.delayedCall(1700, function () { ev.remove(); img.setTexture(tex(id)); });
+                this.time.delayedCall(1700, function () {
+                    ev.remove();
+                    img.setTexture(tex(id));
+                    img.setScale(el.escala);
+                });
                 this.notas(x, y - el.size * 0.4);
             } else if (efecto === 'paraguas') {
                 if (this.textures.exists(tex(id, 'abierto'))) img.setTexture(tex(id, 'abierto'));

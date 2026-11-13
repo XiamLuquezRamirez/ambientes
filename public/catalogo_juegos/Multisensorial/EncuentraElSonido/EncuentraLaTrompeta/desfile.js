@@ -34,6 +34,23 @@
     var FACHADAS = [0xffc9c9, 0xffe8cc, 0xd3f9d8, 0xd0ebff, 0xe5dbff, 0xfff3bf];
     var PIEL = [0xf1c27d, 0xe0ac69, 0xc68642, 0x8d5524, 0xffdbac];
     var SILUETA = 0x2b2140;
+    var ESCENA = {
+        fondo: 'img/fondo.svg',
+        carroza: 'img/carroza.svg',
+        tapadera: 'img/tapadera.svg'
+    };
+    function texEscena(parte) { return 'desfile:escena:' + parte; }
+    var ESCENA_V = '?v=20261112preload2';
+    function encolarEscena(load) {
+        function add(key, src) {
+            if (!src) return;
+            if (src.indexOf('?') === -1) src += ESCENA_V;
+            load.image(key, src);
+        }
+        add(texEscena('fondo'), ESCENA.fondo);
+        add(texEscena('carroza'), ESCENA.carroza);
+        add(texEscena('tapadera'), ESCENA.tapadera);
+    }
 
     function elemento(id) {
         return (gameConfig && gameConfig.elementos && gameConfig.elementos[id]) || {};
@@ -126,14 +143,19 @@
             this.demoObj = null;
         },
 
+        preload: function () {
+            encolarEscena(this.load);
+        },
+
         create: function () {
+            this.fondoImg = null;
             this.cielo = this.add.graphics().setDepth(-30);
             this.fondo = this.add.graphics().setDepth(-25);
             this.banderines = this.add.graphics().setDepth(-20);
             this.via = this.add.graphics().setDepth(-10);
             this.tarima = this.add.graphics().setDepth(-6);
             this.crearPublico();
-            this.dibujarFondo();
+            // Escena solo tras cargarTexturas.
             var scene = this;
             this.scale.on('resize', function () { scene.dibujarFondo(); });
             sceneRef = this;
@@ -168,67 +190,75 @@
         dibujarFondo: function () {
             var w = this.scale.width;
             var h = this.scale.height;
+            var keyFondo = texEscena('fondo');
             var g = this.cielo;
-            g.clear();
-            for (var b = 0; b < 16; b++) {
-                var c = Phaser.Display.Color.Interpolate.ColorWithColor(
-                    Phaser.Display.Color.ValueToColor(0x4dabf7),
-                    Phaser.Display.Color.ValueToColor(0xd0ebff), 100, Math.round(b / 15 * 100));
-                g.fillStyle(Phaser.Display.Color.GetColor(c.r, c.g, c.b), 1);
-                g.fillRect(0, (h * 0.5 / 16) * b - 1, w, h * 0.5 / 16 + 2);
-            }
-
-            // Fachadas de la plaza: casas de colores con ventanas y balcones.
             var f = this.fondo;
+            var bd = this.banderines;
+            g.clear();
             f.clear();
-            var acera = h * 0.56;
-            var n = Math.max(5, Math.round(w / 190));
-            var aw = w / n;
-            for (var i = 0; i < n; i++) {
-                var alto = h * (0.3 + ((i * 37) % 11) / 60);
-                var x = i * aw;
-                f.fillStyle(FACHADAS[i % FACHADAS.length], 1);
-                f.fillRect(x, acera - alto, aw + 1, alto);
-                f.fillStyle(0x000000, 0.06);
-                f.fillRect(x + aw - 6, acera - alto, 6, alto);
-                // Tejado plano con borde.
-                f.fillStyle(0xc0603a, 1);
-                f.fillRect(x - 2, acera - alto - 10, aw + 4, 12);
-                var filas = Math.max(1, Math.floor(alto / (h * 0.11)));
-                for (var r = 0; r < filas; r++) {
-                    for (var k = 0; k < 2; k++) {
-                        var vx = x + aw * (0.22 + k * 0.38);
-                        var vy = acera - alto + h * 0.04 + r * h * 0.1;
-                        if (vy > acera - h * 0.08) continue;
-                        f.fillStyle(0x74c0fc, 1);
-                        f.fillRoundedRect(vx, vy, aw * 0.2, h * 0.055, 4);
-                        f.fillStyle(0xffffff, 0.6);
-                        f.fillRect(vx + 3, vy + 3, aw * 0.07, h * 0.02);
-                        f.lineStyle(3, 0x495057, 1);
-                        f.lineBetween(vx - 3, vy + h * 0.06, vx + aw * 0.2 + 3, vy + h * 0.06);
+            bd.clear();
+            if (this.textures.exists(keyFondo)) {
+                if (!this.fondoImg) this.fondoImg = this.add.image(w / 2, h / 2, keyFondo).setDepth(-31);
+                this.fondoImg.setVisible(true).setPosition(w / 2, h / 2);
+                this.fondoImg.setScale(Math.max(w / (this.fondoImg.width || 1), h / (this.fondoImg.height || 1)));
+            } else {
+                if (this.fondoImg) this.fondoImg.setVisible(false);
+                for (var b = 0; b < 16; b++) {
+                    var c = Phaser.Display.Color.Interpolate.ColorWithColor(
+                        Phaser.Display.Color.ValueToColor(0x4dabf7),
+                        Phaser.Display.Color.ValueToColor(0xd0ebff), 100, Math.round(b / 15 * 100));
+                    g.fillStyle(Phaser.Display.Color.GetColor(c.r, c.g, c.b), 1);
+                    g.fillRect(0, (h * 0.5 / 16) * b - 1, w, h * 0.5 / 16 + 2);
+                }
+
+                // Fachadas de la plaza: casas de colores con ventanas y balcones.
+                var acera = h * 0.56;
+                var n = Math.max(5, Math.round(w / 190));
+                var aw = w / n;
+                for (var i = 0; i < n; i++) {
+                    var alto = h * (0.3 + ((i * 37) % 11) / 60);
+                    var x = i * aw;
+                    f.fillStyle(FACHADAS[i % FACHADAS.length], 1);
+                    f.fillRect(x, acera - alto, aw + 1, alto);
+                    f.fillStyle(0x000000, 0.06);
+                    f.fillRect(x + aw - 6, acera - alto, 6, alto);
+                    // Tejado plano con borde.
+                    f.fillStyle(0xc0603a, 1);
+                    f.fillRect(x - 2, acera - alto - 10, aw + 4, 12);
+                    var filas = Math.max(1, Math.floor(alto / (h * 0.11)));
+                    for (var r = 0; r < filas; r++) {
+                        for (var k = 0; k < 2; k++) {
+                            var vx = x + aw * (0.22 + k * 0.38);
+                            var vy = acera - alto + h * 0.04 + r * h * 0.1;
+                            if (vy > acera - h * 0.08) continue;
+                            f.fillStyle(0x74c0fc, 1);
+                            f.fillRoundedRect(vx, vy, aw * 0.2, h * 0.055, 4);
+                            f.fillStyle(0xffffff, 0.6);
+                            f.fillRect(vx + 3, vy + 3, aw * 0.07, h * 0.02);
+                            f.lineStyle(3, 0x495057, 1);
+                            f.lineBetween(vx - 3, vy + h * 0.06, vx + aw * 0.2 + 3, vy + h * 0.06);
+                        }
                     }
                 }
-            }
-            // Acera donde mira el público.
-            f.fillStyle(0xdee2e6, 1);
-            f.fillRect(0, acera, w, h * 0.04);
+                // Acera donde mira el público.
+                f.fillStyle(0xdee2e6, 1);
+                f.fillRect(0, acera, w, h * 0.04);
 
-            // Banderines de fiesta cruzando la plaza.
-            var bd = this.banderines;
-            bd.clear();
-            [0.14, 0.26].forEach(function (yy, j) {
-                var y0 = h * yy;
-                bd.lineStyle(2, 0x495057, 0.8);
-                var puntos = [];
-                for (var px = 0; px <= w; px += 8) puntos.push({ x: px, y: y0 + Math.sin((px / w) * Math.PI * 3 + j) * h * 0.025 });
-                bd.strokePoints(puntos);
-                for (var q = 0; q * 34 < w; q++) {
-                    var bx = q * 34 + 6 + j * 17;
-                    var by = y0 + Math.sin((bx / w) * Math.PI * 3 + j) * h * 0.025;
-                    bd.fillStyle(FIESTA[(q + j) % FIESTA.length], 1);
-                    bd.fillTriangle(bx, by, bx + 22, by, bx + 11, by + 24);
-                }
-            });
+                // Banderines de fiesta cruzando la plaza.
+                [0.14, 0.26].forEach(function (yy, j) {
+                    var y0 = h * yy;
+                    bd.lineStyle(2, 0x495057, 0.8);
+                    var puntos = [];
+                    for (var px = 0; px <= w; px += 8) puntos.push({ x: px, y: y0 + Math.sin((px / w) * Math.PI * 3 + j) * h * 0.025 });
+                    bd.strokePoints(puntos);
+                    for (var q = 0; q * 34 < w; q++) {
+                        var bx = q * 34 + 6 + j * 17;
+                        var by = y0 + Math.sin((bx / w) * Math.PI * 3 + j) * h * 0.025;
+                        bd.fillStyle(FIESTA[(q + j) % FIESTA.length], 1);
+                        bd.fillTriangle(bx, by, bx + 22, by, bx + 11, by + 24);
+                    }
+                });
+            }
 
             // Calle del desfile: dos carriles con línea punteada.
             var v = this.via;
@@ -290,8 +320,43 @@
             return { x: r.x + r.w * (0.14 + col * 0.24), y: r.y - fila * this.scale.height * 0.07 };
         },
 
+        /**
+         * El fondo ilustrado (img/fondo.svg) ya trae al público en la acera: la franja
+         * y 406-470 de la imagen. En vez de dibujar gente encima, esa franja se recorta en
+         * tiras verticales que se mecen y saltan como si fueran los espectadores.
+         */
+        PUBLICO_FONDO: { y0: 392, y1: 472, tiras: 22 },
+
+        publicoDelFondo: function () {
+            var keyFondo = texEscena('fondo');
+            if (!this.textures.exists(keyFondo)) return false;
+            var src = this.textures.get(keyFondo).getSourceImage();
+            var P = this.PUBLICO_FONDO;
+            var anchoTira = src.width / P.tiras;
+            // Cada tira se copia a su propia textura (recortar la del fondo no funciona:
+            // ya está en uso y Phaser sigue dibujándola entera).
+            for (var i = 0; i < P.tiras; i++) {
+                var clave = 'desfile:publico:' + i;
+                if (!this.textures.exists(clave)) {
+                    var x0 = Math.max(0, Math.round(i * anchoTira) - 1);
+                    var w0 = Math.min(src.width - x0, Math.round(anchoTira) + 2);
+                    var alto = P.y1 - P.y0;
+                    var cv = this.textures.createCanvas(clave, w0, alto);
+                    cv.getContext().drawImage(src, x0, P.y0, w0, alto, 0, 0, w0, alto);
+                    cv.refresh();
+                }
+                var im = this.add.image(0, 0, clave).setOrigin(0.5, 1).setDepth(-15);
+                im.fase = Math.random() * Math.PI * 2;
+                im.escala = 1;
+                im.tira = i;
+                this.publico.push(im);
+            }
+            return true;
+        },
+
         /** Público en la acera: se mece con la música y salta cuando se acierta. */
         crearPublico: function () {
+            if (this.publicoDelFondo()) return;
             for (var i = 0; i < 26; i++) {
                 var c = this.add.container(0, 0).setDepth(-15);
                 var color = FIESTA[(i * 5) % FIESTA.length];
@@ -311,6 +376,23 @@
             var h = this.scale.height;
             var n = this.publico.length;
             var limite = this.tarimaRect ? this.tarimaRect.x - 20 : w;
+            if (this.publico.length && this.publico[0].tira !== undefined) {
+                // Tiras del fondo: cada una va justo donde está en la imagen.
+                var img = this.fondoImg;
+                if (!img) return;
+                var k = img.scaleX;
+                var ix = img.x - img.width * k / 2;
+                var iy = img.y - img.height * k / 2;
+                var P = this.PUBLICO_FONDO;
+                var anchoTira = img.width / P.tiras;
+                this.publico.forEach(function (im, i) {
+                    im.setScale(k);
+                    im.setPosition(ix + (i + 0.5) * anchoTira * k, iy + P.y1 * k);
+                    im.base = im.y;
+                    im.baseX = im.x;
+                });
+                return;
+            }
             this.publico.forEach(function (c, i) {
                 c.x = (limite / n) * (i + 0.5) + ((i * 13) % 9) - 4;
                 c.y = h * 0.6 - ((i % 2) * 6);
@@ -326,54 +408,86 @@
             var r = W * 0.11;
             var Hf = W * 0.3;
             var cont = this.add.container(0, this.sueloCarril(carril));
-            // Bandera en un mástil.
-            var mastil = this.add.rectangle(-W * 0.42, -r - Hf, 4, W * 0.5, 0x495057).setOrigin(0.5, 1);
-            var bandera = this.add.triangle(-W * 0.42 + 2, -r - Hf - W * 0.5, 0, 0, W * 0.2, W * 0.07, 0, W * 0.14, FIESTA[(carril * 3 + Math.floor(Math.random() * 6)) % FIESTA.length]).setOrigin(0, 0);
-            // Plataforma con faldón de flecos.
-            var g = this.add.graphics();
-            g.fillStyle(color, 1);
-            g.fillRoundedRect(-W / 2, -r - Hf, W, Hf * 0.7, 10);
-            g.fillStyle(0xffffff, 0.25);
-            g.fillRect(-W / 2 + 8, -r - Hf + 6, W - 16, 6);
-            var flecos = 9;
-            for (var i = 0; i < flecos; i++) {
-                g.fillStyle(i % 2 ? 0xffd43b : 0xffffff, 1);
-                var fx = -W / 2 + (W / flecos) * i;
-                g.fillTriangle(fx, -r - Hf * 0.32, fx + W / flecos, -r - Hf * 0.32, fx + W / flecos / 2, -r + 2);
+            var keyCarroza = texEscena('carroza');
+            var mastil, bandera, g, ruedas, pisoArte = null;
+            if (this.textures.exists(keyCarroza)) {
+                mastil = this.add.rectangle(0, 0, 1, 1, 0x000000, 0).setVisible(false);
+                bandera = this.add.triangle(0, 0, 0, 0, 1, 0, 0, 1, 0xffffff).setVisible(false);
+                g = this.add.image(0, -r, keyCarroza).setOrigin(0.5, 1);
+                // Que ocupe el ancho del carril: la ilustración lleva encima al pasajero.
+                var escC = W / (g.width || 1);
+                g.setScale(escC);
+                // Piso de la carroza ilustrada: está al 54 % de su alto (medido sobre carroza.svg).
+                // Ahí se apoya lo que viaja encima, en vez de en la plataforma dibujada.
+                pisoArte = -r - g.displayHeight * (1 - 0.539);
+                ruedas = [this.add.graphics().setVisible(false), this.add.graphics().setVisible(false)];
+            } else {
+                // Bandera en un mástil.
+                mastil = this.add.rectangle(-W * 0.42, -r - Hf, 4, W * 0.5, 0x495057).setOrigin(0.5, 1);
+                bandera = this.add.triangle(-W * 0.42 + 2, -r - Hf - W * 0.5, 0, 0, W * 0.2, W * 0.07, 0, W * 0.14, FIESTA[(carril * 3 + Math.floor(Math.random() * 6)) % FIESTA.length]).setOrigin(0, 0);
+                // Plataforma con faldón de flecos.
+                g = this.add.graphics();
+                g.fillStyle(color, 1);
+                g.fillRoundedRect(-W / 2, -r - Hf, W, Hf * 0.7, 10);
+                g.fillStyle(0xffffff, 0.25);
+                g.fillRect(-W / 2 + 8, -r - Hf + 6, W - 16, 6);
+                var flecos = 9;
+                for (var i = 0; i < flecos; i++) {
+                    g.fillStyle(i % 2 ? 0xffd43b : 0xffffff, 1);
+                    var fx = -W / 2 + (W / flecos) * i;
+                    g.fillTriangle(fx, -r - Hf * 0.32, fx + W / flecos, -r - Hf * 0.32, fx + W / flecos / 2, -r + 2);
+                }
+                // Estrellas pintadas en el costado.
+                g.fillStyle(0xffffff, 0.9);
+                g.fillCircle(-W * 0.2, -r - Hf * 0.66, 4);
+                g.fillCircle(W * 0.2, -r - Hf * 0.66, 4);
+                g.fillCircle(0, -r - Hf * 0.66, 5);
+                ruedas = [-W * 0.3, W * 0.3].map(function (x) {
+                    var rg = this.add.graphics({ x: x, y: -r });
+                    rg.fillStyle(0x343a40, 1);
+                    rg.fillCircle(0, 0, r);
+                    rg.fillStyle(0xced4da, 1);
+                    rg.fillCircle(0, 0, r * 0.5);
+                    rg.lineStyle(3, 0x868e96, 1);
+                    rg.lineBetween(-r * 0.5, 0, r * 0.5, 0);
+                    rg.lineBetween(0, -r * 0.5, 0, r * 0.5);
+                    return rg;
+                }, this);
             }
-            // Estrellas pintadas en el costado.
-            g.fillStyle(0xffffff, 0.9);
-            g.fillCircle(-W * 0.2, -r - Hf * 0.66, 4);
-            g.fillCircle(W * 0.2, -r - Hf * 0.66, 4);
-            g.fillCircle(0, -r - Hf * 0.66, 5);
-            var ruedas = [-W * 0.3, W * 0.3].map(function (x) {
-                var rg = this.add.graphics({ x: x, y: -r });
-                rg.fillStyle(0x343a40, 1);
-                rg.fillCircle(0, 0, r);
-                rg.fillStyle(0xced4da, 1);
-                rg.fillCircle(0, 0, r * 0.5);
-                rg.lineStyle(3, 0x868e96, 1);
-                rg.lineBetween(-r * 0.5, 0, r * 0.5, 0);
-                rg.lineBetween(0, -r * 0.5, 0, r * 0.5);
-                return rg;
-            }, this);
-            var img = this.add.image(0, -r - Hf + 6, tex(id)).setOrigin(0.5, 1);
-            var caja = W * 0.78;
+            var baseY = pisoArte !== null ? pisoArte : (-r - Hf + 6);
+            var img = this.add.image(0, baseY, tex(id)).setOrigin(0.5, 1);
+            // Sobre la carroza ilustrada el pasajero va más pequeño, para que se vea encima de ella.
+            var caja = W * (pisoArte !== null ? 0.52 : 0.78);
             var esc = Math.min(caja / (img.width || 1), caja / (img.height || 1));
             img.setScale(esc);
-            // Sábana (ronda "sombras"): domo claro sobre la silueta.
-            var sabana = this.add.graphics();
-            sabana.fillStyle(0xfff9db, 0.78);
+            // Sábana / tapadera (ronda "sombras"): tapa la silueta.
             var sh = img.height * esc + 14;
-            var rad = Math.max(6, Math.min(caja / 2, sh - 10));
-            sabana.fillRoundedRect(-caja / 2 - 6, -r - Hf + 6 - sh, caja + 12, sh, { tl: rad, tr: rad, bl: 6, br: 6 });
-            sabana.lineStyle(3, 0xffffff, 0.9);
-            sabana.strokeRoundedRect(-caja / 2 - 6, -r - Hf + 6 - sh, caja + 12, sh, { tl: rad, tr: rad, bl: 6, br: 6 });
+            var sabana;
+            var keyTapa = texEscena('tapadera');
+            var sabanaBaseY = 0;
+            if (this.textures.exists(keyTapa)) {
+                sabanaBaseY = baseY - sh / 2;
+                sabana = this.add.image(0, sabanaBaseY, keyTapa).setOrigin(0.5, 0.5);
+                // En tapadera.svg la forma solo ocupa y 133-367 de 500 (46,8 % del alto) y
+                // x 54-446 (78,4 % del ancho): hay que escalar por eso, no por el lienzo,
+                // o la tapa sale corta y el objeto asoma por encima.
+                var usoX = 0.784, usoY = 0.468;
+                sabana.setScale(Math.max(
+                    (caja + 20) / ((sabana.width || 1) * usoX),
+                    (sh + 10) / ((sabana.height || 1) * usoY)));
+            } else {
+                sabana = this.add.graphics();
+                sabana.fillStyle(0xfff9db, 0.78);
+                var rad = Math.max(6, Math.min(caja / 2, sh - 10));
+                sabana.fillRoundedRect(-caja / 2 - 6, baseY - sh, caja + 12, sh, { tl: rad, tr: rad, bl: 6, br: 6 });
+                sabana.lineStyle(3, 0xffffff, 0.9);
+                sabana.strokeRoundedRect(-caja / 2 - 6, baseY - sh, caja + 12, sh, { tl: rad, tr: rad, bl: 6, br: 6 });
+            }
             sabana.setVisible(false);
             var brillo = this.add.ellipse(0, -r - Hf * 0.6, W * 1.2, Hf * 1.6, 0xffe066, 0).setVisible(true);
-            cont.add([brillo, mastil, bandera, g, ruedas[0], ruedas[1], img, sabana]);
+            cont.add([brillo, mastil, bandera, g, ruedas[0], ruedas[1], sabana, img]);
             var c = {
-                id: id, cont: cont, img: img, sabana: sabana, bandera: bandera, brillo: brillo, ruedas: ruedas,
+                id: id, cont: cont, img: img, sabana: sabana, sabanaBaseY: sabanaBaseY, bandera: bandera, brillo: brillo, ruedas: ruedas,
                 carril: carril, W: W, r: r, Hf: Hf, escImg: esc, tapada: false, resaltada: false,
                 altoImg: img.height * esc, salto: 0, fase: Math.random() * 6
             };
@@ -464,8 +578,8 @@
             var scene = this;
             sfx('zas');
             this.tweens.add({
-                targets: c.sabana, y: -c.altoImg * 0.8, alpha: 0, angle: 25, duration: reducido() ? 1 : 420, ease: 'Quad.easeOut',
-                onComplete: function () { c.sabana.setVisible(false); c.sabana.setAlpha(1); c.sabana.y = 0; c.sabana.angle = 0; if (!scene.carrozas.length) return; }
+                targets: c.sabana, y: (c.sabanaBaseY || 0) - c.altoImg * 0.8, alpha: 0, angle: 25, duration: reducido() ? 1 : 420, ease: 'Quad.easeOut',
+                onComplete: function () { c.sabana.setVisible(false); c.sabana.setAlpha(1); c.sabana.y = c.sabanaBaseY || 0; c.sabana.angle = 0; if (!scene.carrozas.length) return; }
             });
         },
 
@@ -483,8 +597,16 @@
             var scene = this;
             var musica = time / 260;
             this.publico.forEach(function (p) {
-                p.y = p.base - Math.abs(Math.sin(musica * 0.5 + p.fase)) * 3;
-                p.brazo.angle = Math.sin(musica + p.fase) * 25;
+                // Tiras del fondo: botan y se balancean un poco (no tienen brazo propio).
+                if (p.brazo) {
+                    p.y = p.base - Math.abs(Math.sin(musica * 0.5 + p.fase)) * 3;
+                    p.brazo.angle = Math.sin(musica + p.fase) * 25;
+                    return;
+                }
+                if (p.base === undefined) return;
+                p.y = p.base - Math.abs(Math.sin(musica * 0.5 + p.fase)) * 4;
+                p.x = p.baseX + Math.sin(musica * 0.5 + p.fase) * 2;
+                p.angle = Math.sin(musica * 0.5 + p.fase) * 1.2;
             });
             this.banda.forEach(function (m, i) {
                 m.y = m.base - Math.abs(Math.sin(musica + i)) * 6;
@@ -523,7 +645,7 @@
                 c.img.y = -c.r - c.Hf + 6 - brinco - c.salto;
                 c.bandera.scaleX = 0.8 + 0.2 * Math.sin(time / (c.resaltada ? 60 : 160) + c.fase);
                 c.brillo.fillAlpha = c.resaltada ? 0.25 + 0.2 * Math.sin(time / 140) : 0;
-                if (c.tapada) c.sabana.y = -brinco - c.salto;
+                if (c.tapada) c.sabana.y = (c.sabanaBaseY || 0) - brinco - c.salto;
             });
         },
 
@@ -791,12 +913,23 @@
         Object.keys(elems).forEach(function (id) {
             if (elems[id].img) lista.push({ key: tex(id), src: elems[id].img });
         });
+        Object.keys(ESCENA).forEach(function (parte) {
+            lista.push({ key: texEscena(parte), src: ESCENA[parte] });
+        });
         lista = lista.filter(function (t) { return !scene.textures.exists(t.key); });
         if (!lista.length) return Promise.resolve();
         return new Promise(function (resolve) {
             lista.forEach(function (t) {
-                if (/\.svg(\?|$)/i.test(t.src)) scene.load.svg(t.key, t.src, { scale: 2 });
-                else scene.load.image(t.key, t.src);
+                var src = t.src;
+                var esEscena = t.key.indexOf(':escena:') !== -1;
+                if (esEscena) {
+                    if (src.indexOf('?') === -1) src += ESCENA_V;
+                    scene.load.image(t.key, src);
+                } else if (/\.svg(\?|$)/i.test(src)) {
+                    scene.load.svg(t.key, src, { scale: 2 });
+                } else {
+                    scene.load.image(t.key, src);
+                }
             });
             scene.load.once('complete', resolve);
             scene.load.start();
@@ -821,6 +954,7 @@
             doc.body.insertBefore(el, doc.body.firstChild);
         }
         doc.body.classList.add('modo-desfile');
+        el.style.visibility = 'hidden';
         Host.destruirIntro();
         game = Host.crear({
             type: Phaser.AUTO,
@@ -837,7 +971,11 @@
             return Promise.reject(new Error('No se pudo crear Phaser.Game'));
         }
         return esperarEscena().then(function (scene) {
-            return cargarTexturas(scene).then(function () { return scene; });
+            return cargarTexturas(scene).then(function () {
+                scene.dibujarFondo();
+                el.style.visibility = '';
+                return scene;
+            });
         });
     }
 

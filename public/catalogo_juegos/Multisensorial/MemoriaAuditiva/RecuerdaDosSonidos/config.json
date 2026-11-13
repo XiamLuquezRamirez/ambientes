@@ -2,7 +2,7 @@
   "nombre": "Recuerda Dos Sonidos",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Mueve la canasta y atrapa lo que escuchaste.",
+    "demostracion": "¡Mira! Toca el disco que escuchaste y va a la bandeja.",
     "demostracionAcierto": "¡Así se recuerda un sonido!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
@@ -23,6 +23,7 @@
     "mostrarIntro": true
   },
   "audios": {
+    "tema": "cabina",
     "cierre": "../../../sounds/victory.mp3",
     "fondo": "../../../sounds/fondo.mp3",
     "sonidos": {},
@@ -118,7 +119,7 @@
       "sonido": "croar"
     },
     "carro": {
-      "img": "img/carro.png",
+      "img": "img/carro.svg",
       "nombre": "Carro",
       "sonido": "carro"
     },

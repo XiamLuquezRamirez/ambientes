@@ -30,6 +30,35 @@
     var COLORES_CASA = [0xffa8a8, 0xffd8a8, 0xa5d8ff, 0xb2f2bb, 0xd0bfff];
     var COLORES_TECHO = [0xc92a2a, 0xe8590c, 0x1971c2, 0x2b8a3e, 0x6741d9];
     var FIESTA = [0xff6b6b, 0xfcc419, 0x51cf66, 0x339af0, 0xcc5de8, 0xff922b];
+    var ESCENA = {
+        fondo: 'img/fondo.svg',
+        casas: ['img/casa_1.svg', 'img/casa_2.svg', 'img/casa_3.svg', 'img/casa_4.svg'],
+        caseta: 'img/caseta.svg',
+        hueso: 'img/hueso.svg',
+        // Las nubes van recortadas del propio fondo para poder moverlas.
+        nubes: ['img/nube_1.svg', 'img/nube_2.svg', 'img/nube_3.svg',
+                'img/nube_4.svg', 'img/nube_5.svg', 'img/nube_6.svg']
+    };
+    // Coordenadas del FONDO.svg (1280×720): acera y proporción de props.
+    var FONDO_W = 1280;
+    var FONDO_H = 720;
+    var FONDO_ACERA_Y = 555; // borde superior de la acera = pies de casas/caseta
+    var CASA_DISENO_W = 280; // ancho objetivo de cada casa en el lienzo 1280
+    var CASETA_DISENO_W = 100; // más chica que las casas (no al revés)
+    function texEscena(parte) { return 'calle:escena:' + parte; }
+    var ESCENA_V = "?v=20261113vida2";
+    function encolarEscena(load) {
+        function add(key, src) {
+            if (!src) return;
+            if (src.indexOf('?') === -1) src += ESCENA_V;
+            load.image(key, src);
+        }
+        add(texEscena('fondo'), ESCENA.fondo);
+        add(texEscena('caseta'), ESCENA.caseta);
+        add(texEscena('hueso'), ESCENA.hueso);
+        ESCENA.nubes.forEach(function (src, i) { add(texEscena('nube:' + i), src); });
+        ESCENA.casas.forEach(function (src, i) { add(texEscena('casa:' + i), src); });
+    }
 
     function elemento(id) {
         return (gameConfig && gameConfig.elementos && gameConfig.elementos[id]) || {};
@@ -154,9 +183,8 @@
             'body.modo-calle .escenario{grid-template-columns:minmax(0,1fr);grid-template-areas:"centro"}',
             'body.modo-calle .escena{border:0 !important;box-shadow:none !important;background:transparent !important}',
             'body.modo-calle .parque-fondo,body.modo-calle #zonas,body.modo-calle #elementos{display:none !important}',
-            'body.modo-calle .pj{position:fixed;bottom:0;z-index:2;pointer-events:none;--pj-alto:min(22vh,170px)}',
-            'body.modo-calle .pj-zoe{left:6px}',
-            'body.modo-calle .pj-zeus{right:6px}',
+            // Zoe/Zeus 3D no encajan con el arte plano de la calle: fuera del gameplay.
+            'body.modo-calle .pj{display:none !important}',
             'body.modo-calle .cabecera{padding-top:8px}'
         ].join('');
         doc.head.appendChild(css);
@@ -182,14 +210,19 @@
             this.pelota = null;
         },
 
+        preload: function () {
+            encolarEscena(this.load);
+        },
+
         create: function () {
+            this.fondoImg = null;
             this.cielo = this.add.graphics().setDepth(-30);
-            this.sol = this.add.circle(0, 0, 10, 0xffd43b, 1).setDepth(-29);
+            this.sol = this.add.circle(0, 0, 10, 0xffd43b, 1).setDepth(-29).setVisible(false);
             this.fondo = this.add.graphics().setDepth(-25);
             this.via = this.add.graphics().setDepth(-5);
             this.faroles = this.add.graphics().setDepth(1);
             for (var i = 0; i < 3; i++) {
-                var n = this.add.container(0, 0).setDepth(-28);
+                var n = this.add.container(0, 0).setDepth(-28).setVisible(false);
                 n.add(this.add.circle(-24, 6, 18, 0xffffff, 0.95));
                 n.add(this.add.circle(0, -5, 26, 0xffffff, 0.95));
                 n.add(this.add.circle(26, 6, 17, 0xffffff, 0.95));
@@ -198,15 +231,23 @@
                 n.alto = [0.16, 0.1, 0.2][i];
                 this.nubes.push(n);
             }
+            this.nubesArte = [];
+            this.pajaros = [];
+            this.mariposas = [];
             this.noche = this.add.rectangle(0, 0, 10, 10, 0x0b1d3a, 0).setOrigin(0).setDepth(6);
-            this.dibujarFondo();
-            this.crearCaseta();
+            // Escena solo tras cargarTexturas: evita flash del procedural viejo.
             sceneRef = this;
             if (readyResolve) {
                 readyResolve(this);
                 readyResolve = null;
             }
             this.input.on('pointerdown', this.alTocar, this);
+            var scene = this;
+            this.scale.on('resize', function () {
+                scene.dibujarFondo();
+                scene.crearCaseta();
+                scene.firma = '';
+            });
         },
 
         shutdown: function () {
@@ -214,8 +255,25 @@
             if (sceneRef === this) sceneRef = null;
         },
 
+        /** Mapa cover del FONDO.svg → pantalla. null si no hay textura. */
+        mapaFondo: function () {
+            if (!this.textures.exists(texEscena('fondo'))) return null;
+            var w = this.scale.width;
+            var h = this.scale.height;
+            var esc = Math.max(w / FONDO_W, h / FONDO_H);
+            var ox = (w - FONDO_W * esc) / 2;
+            var oy = (h - FONDO_H * esc) / 2;
+            return {
+                esc: esc, ox: ox, oy: oy,
+                sx: function (x) { return ox + x * esc; },
+                sy: function (y) { return oy + y * esc; },
+                suelo: function () { return oy + FONDO_ACERA_Y * esc; }
+            };
+        },
+
         suelo: function () {
-            return this.scale.height * 0.76;
+            var m = this.mapaFondo();
+            return m ? m.suelo() : this.scale.height * 0.76;
         },
 
         /* ── Escenario fijo: cielo, colinas, acera, calle, faroles ── */
@@ -225,7 +283,31 @@
             var h = this.scale.height;
             var s = this.suelo();
             var g = this.cielo;
+            var f = this.fondo;
+            var v = this.via;
             g.clear();
+            f.clear();
+            v.clear();
+            var keyFondo = texEscena('fondo');
+            var m = this.mapaFondo();
+            // El SVG de staging ya trae cielo, colinas, acera y calle: no pintar encima.
+            if (m) {
+                if (!this.fondoImg) this.fondoImg = this.add.image(0, 0, keyFondo).setOrigin(0).setDepth(-31);
+                this.fondoImg.setVisible(true).setPosition(m.ox, m.oy).setScale(m.esc);
+                this.sol.setVisible(false);
+                this.nubes.forEach(function (n) { n.setVisible(false); });
+                this.montarNubesArte(m);
+                this.montarPajaros(m);
+                this.montarMariposas(m);
+                this.noche.setSize(w, h);
+                return;
+            }
+            if (this.fondoImg) this.fondoImg.setVisible(false);
+            this.nubesArte.forEach(function (n) { n.setVisible(false); });
+            this.pajaros.forEach(function (p) { p.setVisible(false); });
+            this.mariposas.forEach(function (b) { b.setVisible(false); });
+            this.sol.setVisible(true);
+            this.nubes.forEach(function (n) { n.setVisible(true); });
             for (var b = 0; b < 20; b++) {
                 var c = Phaser.Display.Color.Interpolate.ColorWithColor(
                     Phaser.Display.Color.ValueToColor(0x74c0fc),
@@ -238,8 +320,6 @@
                 if (!n.listo) { n.x = w * n.base; n.listo = true; }
                 n.y = h * n.alto;
             });
-            var f = this.fondo;
-            f.clear();
             f.fillStyle(0x8ce99a, 1);
             f.fillEllipse(w * 0.25, s, w * 0.8, h * 0.34);
             f.fillEllipse(w * 0.8, s, w * 0.75, h * 0.28);
@@ -248,8 +328,6 @@
                 var tx = w * (0.05 + t * 0.15);
                 f.fillCircle(tx, s - h * 0.11, h * 0.05);
             }
-            var v = this.via;
-            v.clear();
             v.fillStyle(0xdee2e6, 1);
             v.fillRect(0, s, w, h * 0.06);
             v.fillStyle(0xadb5bd, 1);
@@ -261,20 +339,129 @@
             this.noche.setSize(w, h);
         },
 
+        /* ── Vida del escenario: nubes, pájaros y mariposas ──────── */
+
+        /**
+         * Las nubes salen del propio fondo (img/nube_N.svg, mismo lienzo 1280×720),
+         * así que basta con ponerlas donde va el fondo y moverlas en horizontal.
+         */
+        montarNubesArte: function (m) {
+            var w = this.scale.width;
+            var scene = this;
+            if (!this.nubesArte.length) {
+                ESCENA.nubes.forEach(function (src, i) {
+                    var clave = texEscena('nube:' + i);
+                    if (!scene.textures.exists(clave)) return;
+                    var im = scene.add.image(0, 0, clave).setOrigin(0).setDepth(-30.5);
+                    // Las de arriba van más rápido; las bajas, más lentas (profundidad).
+                    im.vel = 3.5 + (i % 3) * 2.2;
+                    im.dx = 0;
+                    scene.nubesArte.push(im);
+                });
+            }
+            this.nubesArte.forEach(function (im) {
+                im.setVisible(true).setScale(m.esc);
+                im.ox = m.ox;
+                im.oy = m.oy;
+                im.anchoTotal = FONDO_W * m.esc;
+                // Al reubicar (resize) se conserva lo que ya se había desplazado.
+                im.setPosition(m.ox + im.dx, m.oy);
+                im.limite = w + im.anchoTotal;
+            });
+        },
+
+        /** Pájaros que cruzan el cielo: dos alas en V que baten (se leen a 20 px). */
+        montarPajaros: function (m) {
+            var scene = this;
+            var h = this.scale.height;
+            if (!this.pajaros.length) {
+                for (var i = 0; i < 3; i++) {
+                    var c = this.add.container(0, 0).setDepth(-29.5);
+                    var g = this.add.graphics();
+                    c.add(g);
+                    c.dibujo = g;
+                    c.fase = Math.random() * Math.PI * 2;
+                    this.pajaros.push(c);
+                }
+            }
+            this.pajaros.forEach(function (c, i) {
+                c.setVisible(true);
+                c.alto = m.sy(80 + i * 48);
+                c.amplitud = Math.max(6, h * 0.012);
+                c.tam = Math.max(7, 11 * m.esc);
+                c.grosor = Math.max(2, 2.6 * m.esc);
+                if (!c.x) c.x = -150 - i * scene.scale.width * 0.4;
+                c.vel = 44 + i * 15;
+                c.y = c.alto;
+            });
+        },
+
+        /** Mariposas revoloteando sobre el pasto, delante de las casas. */
+        montarMariposas: function (m) {
+            var scene = this;
+            if (!this.mariposas.length) {
+                var tonos = [0xffd43b, 0xff8787, 0xffffff, 0xda77f2];
+                for (var i = 0; i < 4; i++) {
+                    var c = this.add.container(0, 0).setDepth(3.5);
+                    var col = tonos[i % tonos.length];
+                    // Cada lado son dos alas (grande arriba, chica abajo) que se pliegan.
+                    var izq = this.add.container(0, 0);
+                    izq.add(this.add.ellipse(-5, -3, 10, 8, col, 0.95));
+                    izq.add(this.add.ellipse(-4, 3, 7, 6, col, 0.8));
+                    var der = this.add.container(0, 0);
+                    der.add(this.add.ellipse(5, -3, 10, 8, col, 0.95));
+                    der.add(this.add.ellipse(4, 3, 7, 6, col, 0.8));
+                    c.add(izq); c.add(der);
+                    c.add(this.add.ellipse(0, 0, 2.5, 9, 0x495057, 1));
+                    c.alaI = izq; c.alaD = der;
+                    c.fase = Math.random() * Math.PI * 2;
+                    this.mariposas.push(c);
+                }
+            }
+            this.mariposas.forEach(function (c, i) {
+                // Sobre el pasto, repartidas entre la caseta y el borde derecho.
+                c.setVisible(true).setScale(Math.max(0.7, m.esc));
+                c.bx = scene.scale.width * (0.22 + i * 0.2);
+                c.by = m.sy(470 + (i % 2) * 40);
+                c.rx = scene.scale.width * 0.07;
+                c.ry = Math.max(14, 22 * m.esc);
+            });
+        },
+
         crearCaseta: function () {
             var w = this.scale.width;
             var s = this.suelo();
-            var R = Phaser.Math.Clamp(Math.min(w, this.scale.height) * 0.08, 40, 70);
-            var x = Math.max(w * 0.07, R * 1.1);
+            var m = this.mapaFondo();
+            var R;
+            var x;
+            if (m) {
+                // Caseta auxiliar: nunca más ancha que ~16% del viewport.
+                var targetW = Math.min(CASETA_DISENO_W * m.esc, w * 0.16);
+                R = targetW / 2;
+                x = Phaser.Math.Clamp(m.sx(110), R * 1.05, w * 0.18);
+            } else {
+                R = Phaser.Math.Clamp(Math.min(w, this.scale.height) * 0.08, 40, 70);
+                x = Math.max(w * 0.07, R * 1.1);
+            }
+            if (this.caseta && this.caseta.cont) this.caseta.cont.destroy();
             var c = this.add.container(x, s).setDepth(3);
-            var g = this.add.graphics();
-            g.fillStyle(0xc68642, 1);
-            g.fillRect(-R, -R * 1.1, R * 2, R * 1.1);
-            g.fillStyle(0xe03131, 1);
-            g.fillTriangle(-R * 1.25, -R * 1.05, R * 1.25, -R * 1.05, 0, -R * 1.9);
-            g.fillStyle(0x3b2a1a, 1);
-            g.fillRoundedRect(-R * 0.45, -R * 0.75, R * 0.9, R * 0.75, { tl: R * 0.45, tr: R * 0.45, bl: 0, br: 0 });
-            c.add(g);
+            var keyCaseta = texEscena('caseta');
+            if (this.textures.exists(keyCaseta)) {
+                var im = this.add.image(0, 0, keyCaseta).setOrigin(0.5, 1);
+                var tw = m ? CASETA_DISENO_W * m.esc : R * 2.4;
+                var th = m ? tw * 0.95 : R * 2.2;
+                im.setScale(Math.min(tw / (im.width || 1), th / (im.height || 1)));
+                c.add(im);
+            } else {
+                var g = this.add.graphics();
+                g.fillStyle(0xc68642, 1);
+                g.fillRect(-R, -R * 1.1, R * 2, R * 1.1);
+                g.fillStyle(0xe03131, 1);
+                g.fillTriangle(-R * 1.25, -R * 1.05, R * 1.25, -R * 1.05, 0, -R * 1.9);
+                g.fillStyle(0x3b2a1a, 1);
+                g.fillRoundedRect(-R * 0.45, -R * 0.75, R * 0.9, R * 0.75, { tl: R * 0.45, tr: R * 0.45, bl: 0, br: 0 });
+                c.add(g);
+            }
             this.caseta = { cont: c, x: x, y: s, R: R };
         },
 
@@ -289,69 +476,105 @@
             this.casas.forEach(function (c) { c.cont.destroy(); c.puerta.destroy(); c.ventana.destroy(); });
             this.casas = [];
             var s = this.suelo();
-            // Un poco de aire entre casas (los faroles van en ese espacio).
-            var W = Math.min((w * 0.74) / n * 0.86, (h * 0.46) / 1.15, 300);
-            var H = W * 1.15;
-            var x0 = w * 0.2;
-            var x1 = w * 0.94;
+            var m = this.mapaFondo();
+            var W;
+            var H;
+            var x0;
+            var x1;
+            if (m) {
+                // Ancho de diseño, pero sin salir del viewport (cover recorta lados en móvil).
+                // Priorizar casas grandes y legibles; caseta es secundaria.
+                x1 = w * 0.97;
+                var caseta = this.caseta;
+                var huecoCaseta = caseta ? (caseta.x + caseta.R * 1.2) : (w * 0.16);
+                x0 = Math.max(huecoCaseta + 8, w * 0.18);
+                W = Math.min(CASA_DISENO_W * m.esc, (x1 - x0) / Math.max(n, 1) * 0.92);
+                H = W * (394 / 430.82);
+            } else {
+                W = Math.min((w * 0.74) / n * 0.86, (h * 0.46) / 1.15, 300);
+                H = W * 1.15;
+                x0 = w * 0.2;
+                x1 = w * 0.94;
+            }
             var scene = this;
             for (var i = 0; i < n; i++) {
                 var x = x0 + (x1 - x0) * (i + 0.5) / n;
                 var cont = this.add.container(x, s).setDepth(2);
-                var g = this.add.graphics();
                 var cuerpoH = H * 0.74;
-                g.fillStyle(COLORES_CASA[i % COLORES_CASA.length], 1);
-                g.fillRect(-W / 2, -cuerpoH, W, cuerpoH);
-                g.fillStyle(COLORES_TECHO[i % COLORES_TECHO.length], 1);
-                g.fillTriangle(-W * 0.6, -cuerpoH + 2, W * 0.6, -cuerpoH + 2, 0, -H);
-                g.fillStyle(0x868e96, 1);
-                g.fillRect(W * 0.22, -H * 0.97, W * 0.12, H * 0.2);
-                // Hueco de la puerta, grande y corrido a la izquierda: el vecino debe
-                // verse bien dentro de él; a la derecha queda sitio para la ventana.
-                var pW = W * 0.44;
-                var pH = H * 0.6;
-                var dx = -W * 0.16;
-                g.fillStyle(0x3b2a1a, 1);
-                g.fillRect(dx - pW / 2, -pH, pW, pH);
-                g.fillStyle(0xffffff, 0.9);
-                g.fillRect(dx - pW / 2 - 4, -pH - 4, pW + 8, 4);
-                cont.add(g);
+                var keyCasa = texEscena('casa:' + (i % ESCENA.casas.length));
+                var conArte = this.textures.exists(keyCasa);
+                // Vano de la puerta medido sobre las casas ilustradas (img/casa_N.svg):
+                // centro a +0.105 del ancho, 0.316 de ancho, 0.453 de alto, base a 0.121 del suelo.
+                var pW = conArte ? W * 0.316 : W * 0.44;
+                var pH = conArte ? H * 0.453 : H * 0.6;
+                var dx = conArte ? W * 0.105 : -W * 0.16;
+                var puertaY = conArte ? (s - H * 0.121) : s;
+                if (conArte) {
+                    var him = this.add.image(0, 0, keyCasa).setOrigin(0.5, 1);
+                    him.setScale(Math.min(W / (him.width || 1), H / (him.height || 1)));
+                    cont.add(him);
+                } else {
+                    var g = this.add.graphics();
+                    g.fillStyle(COLORES_CASA[i % COLORES_CASA.length], 1);
+                    g.fillRect(-W / 2, -cuerpoH, W, cuerpoH);
+                    g.fillStyle(COLORES_TECHO[i % COLORES_TECHO.length], 1);
+                    g.fillTriangle(-W * 0.6, -cuerpoH + 2, W * 0.6, -cuerpoH + 2, 0, -H);
+                    g.fillStyle(0x868e96, 1);
+                    g.fillRect(W * 0.22, -H * 0.97, W * 0.12, H * 0.2);
+                    g.fillStyle(0x3b2a1a, 1);
+                    g.fillRect(dx - pW / 2, -pH, pW, pH);
+                    g.fillStyle(0xffffff, 0.9);
+                    g.fillRect(dx - pW / 2 - 4, -pH - 4, pW + 8, 4);
+                    cont.add(g);
+                }
 
-                // Puerta con bisagra a la izquierda: se abre hacia afuera.
-                var puerta = this.add.container(x + dx - pW / 2, s).setDepth(5);
-                var pg = this.add.graphics();
-                pg.fillStyle(0x8d5a2b, 1);
-                pg.fillRoundedRect(0, -pH, pW, pH, 6);
-                pg.lineStyle(3, 0x6b4220, 1);
-                pg.strokeRect(pW * 0.15, -pH * 0.85, pW * 0.7, pH * 0.32);
-                pg.strokeRect(pW * 0.15, -pH * 0.45, pW * 0.7, pH * 0.32);
-                pg.fillStyle(0xffd43b, 1);
-                pg.fillCircle(pW * 0.82, -pH * 0.48, pW * 0.06);
-                puerta.add(pg);
+                // Procedural: puerta dibujada. Arte: contenedor vacío (la puerta ya está en el SVG).
+                // dx ya es el centro del vano (medido sobre la ilustración).
+                var puerta = this.add.container(conArte ? (x + dx) : (x + dx - pW / 2), puertaY).setDepth(5);
+                if (!conArte) {
+                    var pg = this.add.graphics();
+                    pg.fillStyle(0x8d5a2b, 1);
+                    pg.fillRoundedRect(0, -pH, pW, pH, 6);
+                    pg.lineStyle(3, 0x6b4220, 1);
+                    pg.strokeRect(pW * 0.15, -pH * 0.85, pW * 0.7, pH * 0.32);
+                    pg.strokeRect(pW * 0.15, -pH * 0.45, pW * 0.7, pH * 0.32);
+                    pg.fillStyle(0xffd43b, 1);
+                    pg.fillCircle(pW * 0.82, -pH * 0.48, pW * 0.06);
+                    puerta.add(pg);
+                }
 
-                // Ventana a la derecha de la puerta, donde se asoman los vecinos.
-                var vs = W * 0.26;
-                var vx = x + W * 0.27;
-                var vy = s - H * 0.5;
+                // Vidrio medido sobre casa_N.svg (lienzo 500): x 117-211, y 238-330.
+                // Centro a -0.171 del ancho y a 0.432 del alto desde la base; lado 0.19.
+                var vs = conArte ? W * 0.19 : W * 0.26;
+                var vx = conArte ? (x - W * 0.171) : (x + W * 0.27);
+                var vy = conArte ? (s - H * 0.432) : (s - H * 0.5);
                 var ventana = this.add.container(vx, vy).setDepth(5);
                 var vg = this.add.graphics();
-                vg.fillStyle(0xe7f5ff, 1);
-                vg.fillRect(-vs / 2, -vs / 2, vs, vs);
-                vg.lineStyle(4, 0xffffff, 1);
-                vg.strokeRect(-vs / 2, -vs / 2, vs, vs);
+                // Con arte la ventana ya viene pintada: no taparla con un cuadrado blanco.
+                if (!conArte) {
+                    vg.fillStyle(0xe7f5ff, 1);
+                    vg.fillRect(-vs / 2, -vs / 2, vs, vs);
+                    vg.lineStyle(4, 0xffffff, 1);
+                    vg.strokeRect(-vs / 2, -vs / 2, vs, vs);
+                }
                 ventana.add(vg);
+                // Con arte la luz es un resplandor DETRAS del vidrio pintado, no un bloque
+                // opaco encima: si no, de noche tapa la ventana de la ilustracion.
                 var luz = this.add.rectangle(0, 0, vs - 6, vs - 6, 0xffe066, 0);
+                if (conArte) luz.setBlendMode(Phaser.BlendModes.ADD);
                 ventana.add(luz);
                 var marco = this.add.graphics();
-                marco.lineStyle(3, 0xffffff, 1);
-                marco.lineBetween(0, -vs / 2, 0, vs / 2);
-                marco.lineBetween(-vs / 2, 0, vs / 2, 0);
+                if (!conArte) {
+                    marco.lineStyle(3, 0xffffff, 1);
+                    marco.lineBetween(0, -vs / 2, 0, vs / 2);
+                    marco.lineBetween(-vs / 2, 0, vs / 2, 0);
+                }
                 ventana.add(marco);
 
                 scene.casas.push({
-                    i: i, x: x, px: x + dx, suelo: s, W: W, H: H, pW: pW, pH: pH, vs: vs, vx: vx, vy: vy,
+                    i: i, x: x, px: x + dx, suelo: s, umbral: puertaY, W: W, H: H, pW: pW, pH: pH, vs: vs, vx: vx, vy: vy,
                     cont: cont, puerta: puerta, ventana: ventana, luz: luz, marco: marco,
-                    ocupante: null, abierta: false, asomo: null
+                    ocupante: null, abierta: false, asomo: null, arte: conArte
                 });
             }
             this.dibujarFaroles();
@@ -361,6 +584,8 @@
         dibujarFaroles: function () {
             var f = this.faroles;
             f.clear();
+            // El fondo staging ya arma la calle: no clavar postes encima.
+            if (this.textures.exists(texEscena('fondo'))) return;
             var s = this.suelo();
             var h = this.scale.height;
             var scene = this;
@@ -600,8 +825,20 @@
          * carro son más anchos que altos y no deben salirse sobre la pared.
          */
         medir: function (v, casa) {
-            var anchoMax = casa ? casa.pW * 0.9 : this.scale.width * 0.14;
-            var altoMax = casa ? casa.pH * 0.88 : this.scale.height * 0.18;
+            var anchoMax;
+            var altoMax;
+            if (casa && casa.arte) {
+                // Dentro del vano de la puerta ilustrada, sin salirse sobre la pared.
+                anchoMax = casa.pW * 0.92;
+                altoMax = casa.pH * 0.9;
+            } else if (casa) {
+                anchoMax = casa.pW * 0.9;
+                altoMax = casa.pH * 0.88;
+            } else {
+                var m = this.mapaFondo();
+                anchoMax = m ? 90 * m.esc : this.scale.width * 0.14;
+                altoMax = m ? 110 * m.esc : this.scale.height * 0.18;
+            }
             var w = v.img.width || 1;
             var h = v.img.height || 1;
             v.escala = Math.min(anchoMax / w, altoMax / h);
@@ -660,7 +897,11 @@
             casa.abierta = true;
             sfx('puerta');
             var scene = this;
-            // Gira sobre la bisagra hacia afuera: queda pegada a la pared, sin tapar el umbral.
+            if (casa.arte) {
+                // Arte: la ilustración ya trae la puerta; solo marcamos abierta (el vecino sale al frente).
+                return Promise.resolve();
+            }
+            // Procedural: gira sobre la bisagra hacia afuera.
             return new Promise(function (resolve) {
                 scene.tweens.add({ targets: casa.puerta, scaleX: -0.32, duration: reducido() ? 1 : 260, ease: 'Quad.easeOut', onComplete: resolve });
             });
@@ -670,6 +911,7 @@
             if (!casa.abierta) return Promise.resolve();
             casa.abierta = false;
             var scene = this;
+            if (casa.arte) return Promise.resolve();
             return new Promise(function (resolve) {
                 scene.tweens.add({ targets: casa.puerta, scaleX: 1, duration: reducido() ? 1 : 240, ease: 'Quad.easeIn', onComplete: resolve });
             });
@@ -683,8 +925,8 @@
             v.pose = 'sentado';
             v.respira = true;
             this.medir(v, casa);
-            // Centrado en el umbral y apoyado en su piso.
-            v.img.setPosition(casa.px, casa.suelo - 2).setVisible(true).setAlpha(1);
+            // Centrado en el umbral (arte: puerta levantada; procedural: al ras del suelo).
+            v.img.setPosition(casa.px, (casa.umbral || casa.suelo) - 2).setVisible(true).setAlpha(1);
             v.img.angle = 0;
             v.img.setFlipX(false);
             v.img.setDepth(this.modo === 'noche' ? 7.5 : 4);
@@ -711,7 +953,11 @@
             // De noche la calle se oscurece antes de que entren (se ven en silueta).
             this.tweens.add({ targets: this.noche, fillAlpha: this.modo === 'noche' ? 0.62 : 0, duration: 900 });
             this.casas.forEach(function (c) {
-                c.luz.setFillStyle(0xffe066, scene.modo === 'noche' ? 0.9 : 0);
+                // Con arte la luz va DETRAS del vidrio pintado (resplandor); sin arte,
+                // la ventana dibujada sube por encima de la capa de noche.
+                // La luz va sobre el vidrio pintado, en mezcla aditiva: lo enciende
+                // sin taparlo (un rectangulo opaco borraba la ventana ilustrada).
+                c.luz.setFillStyle(0xffe066, scene.modo === 'noche' ? (c.arte ? 0.5 : 0.9) : 0);
                 c.ventana.setDepth(scene.modo === 'noche' ? 7 : 5);
                 c.resaltada = false;
             });
@@ -799,6 +1045,42 @@
                 if (n.x > w + 80) n.x = -80;
             });
             var scene = this;
+            if (!reducido()) {
+                // Nubes del arte: se arrastran y vuelven a entrar por la izquierda.
+                this.nubesArte.forEach(function (im) {
+                    if (!im.visible) return;
+                    im.dx += im.vel * dt;
+                    if (im.dx > im.limite) im.dx = -im.anchoTotal;
+                    im.x = im.ox + im.dx;
+                });
+                // Pájaros: cruzan ondulando y baten las alas (la V se abre y se cierra).
+                this.pajaros.forEach(function (c) {
+                    if (!c.visible) return;
+                    c.x += c.vel * dt;
+                    if (c.x > w + 140) c.x = -140;
+                    c.y = c.alto + Math.sin(time / 520 + c.fase) * c.amplitud;
+                    var bate = Math.sin(time / 130 + c.fase);
+                    var alto = c.tam * (0.25 + 0.75 * Math.abs(bate)) * (bate < 0 ? -0.45 : 1);
+                    var g = c.dibujo;
+                    g.clear();
+                    g.lineStyle(c.grosor, 0x4a5568, 0.9);
+                    g.beginPath();
+                    g.moveTo(-c.tam, 0);
+                    g.lineTo(0, -alto);
+                    g.lineTo(c.tam, 0);
+                    g.strokePath();
+                });
+                // Mariposas: dan vueltas lentas sobre el pasto y abren y cierran las alas.
+                this.mariposas.forEach(function (c) {
+                    if (!c.visible) return;
+                    var a = time / 1600 + c.fase;
+                    c.x = c.bx + Math.cos(a) * c.rx;
+                    c.y = c.by + Math.sin(a * 1.7) * c.ry;
+                    var abre = 0.35 + 0.65 * Math.abs(Math.sin(time / 90 + c.fase));
+                    c.alaI.scaleX = abre;
+                    c.alaD.scaleX = abre;
+                });
+            }
             this.casas.forEach(function (c) {
                 if (c.resaltada) c.cont.setAlpha(0.75 + 0.25 * Math.sin(time / 150));
                 else c.cont.setAlpha(1);
@@ -1073,15 +1355,22 @@
             var k = this.huesos.length;
             var c = this.caseta;
             var v = this.vecinos[this.objetivo];
-            var g = this.add.graphics().setDepth(9);
             var L = c.R * 0.55;
-            g.fillStyle(0xfff9db, 1);
-            g.lineStyle(2, 0xe9d8a6, 1);
-            g.fillRect(-L / 2, -L * 0.12, L, L * 0.24);
-            [[-L / 2, -L * 0.14], [-L / 2, L * 0.14], [L / 2, -L * 0.14], [L / 2, L * 0.14]].forEach(function (p) {
-                g.fillCircle(p[0], p[1], L * 0.16);
-                g.strokeCircle(p[0], p[1], L * 0.16);
-            });
+            var keyHueso = texEscena('hueso');
+            var g;
+            if (this.textures.exists(keyHueso)) {
+                g = this.add.image(0, 0, keyHueso).setDepth(9);
+                g.setScale(Math.min(L * 1.4 / (g.width || 1), L * 0.9 / (g.height || 1)));
+            } else {
+                g = this.add.graphics().setDepth(9);
+                g.fillStyle(0xfff9db, 1);
+                g.lineStyle(2, 0xe9d8a6, 1);
+                g.fillRect(-L / 2, -L * 0.12, L, L * 0.24);
+                [[-L / 2, -L * 0.14], [-L / 2, L * 0.14], [L / 2, -L * 0.14], [L / 2, L * 0.14]].forEach(function (p) {
+                    g.fillCircle(p[0], p[1], L * 0.16);
+                    g.strokeCircle(p[0], p[1], L * 0.16);
+                });
+            }
             var col = k % 3;
             var fila = Math.floor(k / 3);
             var dx = c.x + (col - 1) * L * 0.85;
@@ -1241,15 +1530,40 @@
                 rig[pose].piezas.concat(rig[pose].orejas || []).forEach(function (p) { lista.push({ key: base + p.n, src: rigSrc(id, pose, p.n) }); });
             });
         });
+        lista.push({ key: texEscena('fondo'), src: ESCENA.fondo });
+        lista.push({ key: texEscena('caseta'), src: ESCENA.caseta });
+        lista.push({ key: texEscena('hueso'), src: ESCENA.hueso });
+        ESCENA.casas.forEach(function (src, i) {
+            lista.push({ key: texEscena('casa:' + i), src: src });
+        });
         lista = lista.filter(function (t) { return !scene.textures.exists(t.key); });
         if (!lista.length) return Promise.resolve();
         return new Promise(function (resolve) {
             lista.forEach(function (t) {
-                if (/\.svg(\?|$)/i.test(t.src)) scene.load.svg(t.key, t.src, { scale: 2 });
-                else scene.load.image(t.key, t.src);
+                var src = t.src;
+                var esEscena = t.key.indexOf(':escena:') !== -1;
+                if (esEscena) {
+                    if (src.indexOf('?') === -1) src += ESCENA_V;
+                    scene.load.image(t.key, src);
+                } else if (/\.svg(\?|$)/i.test(src)) {
+                    scene.load.svg(t.key, src, { scale: 2 });
+                } else {
+                    scene.load.image(t.key, src);
+                }
             });
-            scene.load.once('complete', resolve);
+            var listo = false;
+            function fin() {
+                if (listo) return;
+                listo = true;
+                resolve();
+            }
+            scene.load.once('complete', fin);
+            scene.load.once('loaderror', function (file) {
+                try { console.warn('[calle] no cargó', file && (file.src || file.url || file.key)); } catch (e) { /* ignore */ }
+            });
             scene.load.start();
+            // Si el loader no dispara complete (p. ej. lista vacía tras error), no colgar.
+            setTimeout(fin, 8000);
         });
     }
 
@@ -1271,6 +1585,7 @@
             doc.body.insertBefore(el, doc.body.firstChild);
         }
         doc.body.classList.add('modo-calle');
+        el.style.visibility = 'hidden';
         Host.destruirIntro();
         game = Host.crear({
             type: Phaser.AUTO,
@@ -1284,10 +1599,20 @@
         });
         if (!game) {
             doc.body.classList.remove('modo-calle');
+            el.style.visibility = '';
             return Promise.reject(new Error('No se pudo crear Phaser.Game'));
         }
         return esperarEscena().then(function (scene) {
-            return cargarTexturas(scene).then(function () { return scene; });
+            return cargarTexturas(scene).then(function () {
+                scene.dibujarFondo();
+                scene.crearCaseta();
+                scene.firma = '';
+                el.style.visibility = '';
+                return scene;
+            });
+        }).catch(function (err) {
+            el.style.visibility = '';
+            throw err;
         });
     }
 
@@ -1321,6 +1646,8 @@
             sceneRef = null;
             game = null;
             global.document.body.classList.remove('modo-calle');
+            var el = global.document.getElementById('calle-canvas');
+            if (el) el.style.visibility = '';
             if (Host) Host.destruirJuego();
         }
     };

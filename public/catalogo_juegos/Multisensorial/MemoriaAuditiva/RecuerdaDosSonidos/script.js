@@ -434,8 +434,19 @@
 
     /* ── Sonido y voz ─────────────────────────────────────────── */
 
+    /** Efectos del tema «cabina» (PedniaAudio si existe; si no, síntesis en cabina-sfx.js). */
+    function efectoTema(nombre, opts) {
+        if (window.PedniaAudio && PedniaAudio.tieneTema && PedniaAudio.tieneTema() && PedniaAudio.evento(nombre, opts)) {
+            return true;
+        }
+        if (window.RecuerdaDosCabinaSfx && RecuerdaDosCabinaSfx(nombre, opts)) return true;
+        return false;
+    }
+    window.RecuerdaDosSfx = efectoTema;
+
     function efecto(nombre) {
         if (!nombre) return;
+        if (efectoTema(nombre)) return;
         const efectos = (gameConfig.audios && gameConfig.audios.efectos) || {};
         const ruta = efectos[nombre];
         if (ruta) {
@@ -1356,6 +1367,7 @@
 
     $(document).ready(function () {
         gameConfig = JSON.parse(readText("config.json"));
+        if (window.PedniaAudio) PedniaAudio.usarTema((gameConfig.audios && gameConfig.audios.tema) || "cabina");
         introConfig = JSON.parse(readText("../../../intro.json"));
         introConfig.conversacion = conversacionInicial();
         aplicarLetterSpacing();

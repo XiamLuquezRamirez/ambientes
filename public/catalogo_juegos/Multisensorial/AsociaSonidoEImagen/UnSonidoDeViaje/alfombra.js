@@ -51,7 +51,31 @@
         return { d: mejor, dist: Math.sqrt(dmin) };
     }
 
+    /**
+     * Escenario del diseño (img/fondo.svg, 1280×720): ciudad vista desde arriba con cielo,
+     * pista, vía, dos calles, avenida a la izquierda y estacionamiento de 5 bahías abajo.
+     * Medidas en unidades del SVG.
+     */
+    var FONDO = {
+        w: 1280, h: 720,
+        cielo: 194, cieloColor: 0x85cfe8, pastoColor: 0x6d9338,
+        recorte: 180,                       // a la izquierda solo hay casitas: se puede recortar hasta aquí
+        pista: 257.4, via: 352.7, calle: 448, salida: 543.4,
+        avenida: 223, ciudad: { x: 193, y: 218 }, fin: 1268,
+        bahias: [317, 470, 640, 808, 962], bahiaY: 655, bahiaAncho: 150,
+        lago: { x: 1150, y: 655 },
+        acera: 200,                         // franja gris entre el cielo y la ciudad
+        aceraCentro: 198,
+        faroles: [32, 240, 429, 786, 995, 1182], farolY: 72,
+        pistaBordes: [229, 283], pistaX0: 262, pistaX1: 1200,
+        cieloArriba: 14, cieloAbajo: 72
+    };
+
     var escena = {
+        preload: function () {
+            if (!this.textures.exists('vj_fondo')) this.load.svg('vj_fondo', 'img/fondo.svg', { width: 1920, height: 1080 });
+        },
+
         iniciar: function () { this.autos = []; },
 
         calcular: function () {
@@ -61,6 +85,7 @@
             L.bocina = { x: W / 2, y: Math.max(60, Math.min(100, 56 + hueco * 0.2)), r: Math.max(28, Math.min(40, hueco * 0.3)) };
             L.pres = W >= 760 ? { x: W - 70, piso: H - 104, alto: Math.min(160, H * 0.28) } : null;
             var der = L.pres ? W - 140 : W - 10;
+            if (this.textures.exists('vj_fondo')) return this.calcularConFondo(L, der);
             // La alfombra ocupa casi todo, con un borde de tela.
             L.alf = { x: 14, y: L.bocina.y + L.bocina.r + 14, w: der - 28, h: H - (L.bocina.y + L.bocina.r + 14) - 12 };
             var A0 = L.alf;
@@ -71,7 +96,7 @@
             L.est = { x: L.conn + L.tam * 0.6, y: A0.y + A0.h * 0.66, w: Math.min(A0.w * 0.6, L.tam * 1.25 * 5), h: A0.h * 0.3 };
             L.pasillo = L.est.y + L.est.h * 0.12;
             var yP = A0.y + A0.h * 0.16, yV = A0.y + A0.h * 0.36, yC = A0.y + A0.h * 0.54;
-            var xF = A0.x + A0.w - 10;
+            var xF = A0.x + A0.w - L.tam * 0.75;
             L.rutas = {
                 pista: { y: yP, fin: xF, color: 0x495057 },
                 via: { y: yV, fin: xF, color: 0x8d6e63 },
@@ -80,8 +105,58 @@
             return L;
         },
 
+        /**
+         * Con el escenario del diseño: la imagen cubre la pantalla (en vertical se recorta un poco de
+         * las casitas de la izquierda y el resto se completa con cielo arriba y pasto abajo) y los
+         * caminos se toman de sus medidas.
+         */
+        calcularConFondo: function (L, der) {
+            var W = L.W, H = L.H, F = FONDO;
+            var s = Math.max(W / F.w, Math.min(H / F.h, W * 1.35 / F.w));
+            var fw = F.w * s, fh = F.h * s;
+            var ix = Math.max((W - fw) / 2, -F.recorte * s), iy = (H - fh) * 0.7;
+            if (ix + fw < W) ix = W - fw;
+            var px = function (u) { return ix + u * s; };
+            var py = function (v) { return iy + v * s; };
+            L.fondo = { x: ix, y: iy, s: s, w: fw, h: fh };
+            // Que la bocina quede en el cielo.
+            L.bocina.y = Math.min(L.bocina.y, Math.max(40, py(F.cielo) - L.bocina.r - 10));
+            L.tam = Math.max(56, Math.min(118, F.bahiaAncho * s * 0.85));
+            // Los caminos terminan antes del presentador: el vehículo que llega se ve entero.
+            var xFin = Math.min(px(F.fin), der - L.tam * 0.75);
+            L.alf = { x: Math.max(0, px(F.ciudad.x)), y: py(F.ciudad.y) };
+            L.alf.w = xFin - L.alf.x;
+            L.alf.h = Math.min(H, py(F.h)) - L.alf.y;
+            L.conn = px(F.avenida);
+            L.pasillo = py(F.salida);
+            var b0 = F.bahias[0] - F.bahiaAncho / 2, b1 = F.bahias[F.bahias.length - 1] + F.bahiaAncho / 2;
+            L.est = { x: px(b0), y: py(583), w: (b1 - b0) * s, h: Math.min(H, py(F.h)) - py(583) };
+            L.bahiasX = F.bahias.map(px);
+            L.bahiaY = py(F.bahiaY) + L.tam * 0.3;
+            L.lago = { x: px(F.lago.x), y: py(F.lago.y), w: 200 * s };
+            L.acera = py(F.acera);
+            L.aceraCentro = py(F.aceraCentro);
+            L.faroles = F.faroles.map(function (u) { return { x: px(u), y: py(F.farolY) }; });
+            L.pistaBordes = F.pistaBordes.map(py);
+            L.pistaX0 = px(F.pistaX0);
+            L.pistaX1 = Math.min(px(F.pistaX1), xFin);
+            L.cielo = { y0: py(F.cieloArriba), y1: py(F.cieloAbajo) };
+            L.rutas = {
+                pista: { y: py(F.pista), fin: xFin, color: 0x495057 },
+                via: { y: py(F.via), fin: xFin, color: 0x8d6e63 },
+                calle: { y: py(F.calle), fin: xFin, color: 0x5c5f66 }
+            };
+            return L;
+        },
+
         bahia: function (k, n) {
-            var e = this.L.est;
+            var L = this.L;
+            if (L.bahiasX) {
+                // Bahías pintadas en el diseño; con menos vehículos se usan las del centro.
+                var off = Math.max(0, Math.floor((L.bahiasX.length - n) / 2));
+                return { x: L.bahiasX[Math.min(L.bahiasX.length - 1, k + off)], y: L.bahiaY };
+            }
+            var e = L.est;
             return { x: e.x + e.w * (k + 0.5) / n, y: e.y + e.h * 0.66 };
         },
 
@@ -128,22 +203,120 @@
             var self = this;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
-            K.textura(this, 'alfombra_fondo', L.W, L.H, function (x, w, h) { self.pintarAlfombra(x, w, h); });
-            keep(this.add.image(0, 0, 'alfombra_fondo').setOrigin(0, 0).setDepth(0));
+            if (L.fondo) {
+                // Escenario del diseño; si no llena la pantalla, cielo arriba y pasto abajo.
+                var Fd = L.fondo;
+                if (Fd.y > 0) keep(this.add.rectangle(0, 0, L.W, Fd.y + 1, FONDO.cieloColor).setOrigin(0, 0).setDepth(0));
+                if (Fd.y + Fd.h < L.H) keep(this.add.rectangle(0, Fd.y + Fd.h - 1, L.W, L.H - Fd.y - Fd.h + 2, FONDO.pastoColor).setOrigin(0, 0).setDepth(0));
+                keep(this.add.image(Fd.x, Fd.y, 'vj_fondo').setOrigin(0, 0).setDisplaySize(Fd.w, Fd.h).setDepth(0.1));
+            } else {
+                K.textura(this, 'alfombra_fondo', L.W, L.H, function (x, w, h) { self.pintarAlfombra(x, w, h); });
+                keep(this.add.image(0, 0, 'alfombra_fondo').setOrigin(0, 0).setDepth(0));
+            }
             this.rastroG = keep(this.add.graphics().setDepth(5));
+            this.armarPista(keep);
+            this.armarFaroles(keep);
             var V = this.montarVida(keep);
             var A0 = L.alf;
-            if (V) {
+            if (V && L.lago) {
+                V.pato(L.lago.x - L.lago.w * 0.25, L.lago.y + L.lago.w * 0.05, L.lago.w * 0.2, 0.9);
+                V.mariposas(3, { x: L.conn, y: Math.max(0, L.fondo.y + 90 * L.fondo.s), w: A0.w * 0.7, h: 70 * L.fondo.s, depth: 8 });
+                // Nubes que viajan por el cielo del dibujo y pájaros que lo cruzan.
+                if (L.cielo) {
+                    for (var nb = 0; nb < 3; nb++) V.nube(rnd(0, L.W), rnd(L.cielo.y0 + 10, L.cielo.y1 - 6), 0.5 * L.fondo.s / 0.86 + rnd(-0.06, 0.06));
+                    V.pajaros(2, L.cielo.y0 + 6, L.cielo.y1);
+                }
+            } else if (V) {
                 V.pato(A0.x + A0.w * 0.86, A0.y + A0.h * 0.82, A0.w * 0.04, 0.9);
                 V.mariposas(2, { x: L.est.x + L.est.w + 20, y: A0.y + A0.h * 0.62, w: A0.x + A0.w - L.est.x - L.est.w - 140, h: A0.h * 0.1, depth: 8 });
             }
             this.montarHud(keep);
+            // Los que ya viajaron siguen estacionados en la acera (también al cambiar el tamaño).
+            (this.coleccion || []).forEach(function (a, k) {
+                if (!a.cont || !a.cont.active) return;
+                var d = self.lugarRecuerdo(k);
+                a.cont.setPosition(d.x, d.y).setScale(d.rel * L.tam / a.tam).setAngle(0);
+            });
             var n = this.autos.length;
             this.autos.forEach(function (c) {
                 if (c.estado !== 'quieto') return;
                 var b = self.bahia(c.k, Math.max(n, c.n || n));
                 c.base = b;
                 c.actor.cont.setPosition(b.x, b.y - L.tam * 0.3).setScale(L.tam / c.actor.tam);
+            });
+        },
+
+        /**
+         * La franja del avión se reconoce como pista: marcas de cabecera al empezar y luces en los
+         * bordes que se encienden en cadena hacia donde despega.
+         */
+        armarPista: function (keep) {
+            var L = this.L;
+            this.lucesPista = [];
+            if (!L.pistaBordes) return;
+            var s = L.fondo.s;
+            var g = keep(this.add.graphics().setDepth(0.5));
+            var y0 = L.pistaBordes[0], y1 = L.pistaBordes[1];
+            // Cabecera: barras blancas a lo largo, como las de una pista de verdad.
+            g.fillStyle(0xffffff, 0.92);
+            for (var b = 0; b < 6; b++) {
+                var yb = y0 + (y1 - y0) * (0.12 + b * 0.152);
+                g.fillRect(L.pistaX0 + 8 * s, yb, 40 * s, 4 * s);
+            }
+            // Flecha de despegue pintada en el piso.
+            var xf = L.pistaX0 + 70 * s, yc = (y0 + y1) / 2;
+            g.fillTriangle(xf + 26 * s, yc, xf + 8 * s, yc - 9 * s, xf + 8 * s, yc + 9 * s);
+            g.fillRect(xf - 10 * s, yc - 3 * s, 20 * s, 6 * s);
+            var paso = 58 * s;
+            var k = 0;
+            for (var x = L.pistaX0 + 120 * s; x < L.pistaX1; x += paso, k++) {
+                [y0 + 3 * s, y1 - 3 * s].forEach(function (y) {
+                    var halo = keep(this.add.circle(x, y, 5.5 * s, 0xffd43b, 0.25).setDepth(0.6));
+                    var luz = keep(this.add.circle(x, y, 2.6 * s, 0xfff3bf, 1).setDepth(0.61));
+                    this.lucesPista.push({ halo: halo, luz: luz, k: k });
+                }, this);
+            }
+            this.nLuces = k;
+        },
+
+        /** Halos de los faroles del dibujo (se encienden en cadena cuando un vehículo viaja). */
+        armarFaroles: function (keep) {
+            var L = this.L;
+            this.faroles = [];
+            if (!L.faroles) return;
+            var s = L.fondo.s;
+            L.faroles.forEach(function (f) {
+                var h = keep(this.add.circle(f.x, f.y, 22 * s, 0xfff3bf, 0).setDepth(0.55));
+                var c = keep(this.add.circle(f.x, f.y, 8 * s, 0xffe066, 0).setDepth(0.56));
+                this.faroles.push({ halo: h, luz: c });
+            }, this);
+        },
+
+        encenderFaroles: function (quedan) {
+            var self = this;
+            (this.faroles || []).forEach(function (f, i) {
+                self.time.delayedCall(i * 140, function () {
+                    if (!f.halo.active) return;
+                    self.tweens.add({ targets: f.halo, fillAlpha: 0.55, duration: 220 });
+                    self.tweens.add({ targets: f.luz, fillAlpha: 0.95, duration: 220 });
+                    if (!quedan) {
+                        self.tweens.add({ targets: [f.halo, f.luz], fillAlpha: 0, duration: 600, delay: 2600 });
+                    }
+                });
+            });
+        },
+
+        /** Luces de la pista: una ola que corre hacia la derecha (más rápida mientras despega). */
+        paso: function (time) {
+            var n = this.nLuces || 0;
+            if (!n || !this.lucesPista) return;
+            var vel = this.despegando ? 45 : 140;
+            var ola = (time / vel) % (n + 6);
+            this.lucesPista.forEach(function (l) {
+                var d = ola - l.k;
+                var a = d >= 0 && d < 3 ? 1 - d / 3 : 0;
+                l.halo.fillAlpha = 0.12 + a * 0.6;
+                l.luz.fillAlpha = 0.45 + a * 0.55;
             });
         },
 
@@ -229,7 +402,8 @@
             var self = this;
             var L = this.L;
             var n = ids.length;
-            this.autos.forEach(function (c) { if (c.actor.cont.active) c.actor.destruir(); });
+            // Los que ya viajaron quedan como recuerdo en la acera: no se borran.
+            this.autos.forEach(function (c) { if (c.estado !== 'recuerdo' && c.actor.cont.active) c.actor.destruir(); });
             this.autos = [];
             this.vivos = this.coleccion.slice();
             var proms = ids.map(function (id, k) {
@@ -244,7 +418,13 @@
                 // Llegan rodando desde la izquierda a su bahía.
                 return esperar(self, k * 180).then(function () {
                     return tw(self, { targets: a.cont, x: b.x, duration: 700 + k * 60, ease: 'Cubic.easeOut' });
-                }).then(function () { c.estado = 'quieto'; });
+                }).then(function () {
+                    // Si la pantalla cambió de tamaño mientras llegaba, se acomoda en su bahía actual.
+                    var bb = self.bahia(c.k, n);
+                    c.base = bb;
+                    a.cont.setPosition(bb.x, bb.y - self.L.tam * 0.3).setScale(self.L.tam / a.tam);
+                    c.estado = 'quieto';
+                });
             });
             K.ruido({ f: 400, q: 0.6, dur: 0.6, vol: 0.06 });
             await Promise.all(proms);
@@ -359,25 +539,140 @@
             c.estado = 'viaje';
             this.rastroG.clear();
             this.fase = 'premio';
-            if (c.id === 'avion') {
-                // Despega: acelera, sube y se achica en el cielo.
-                this.tweens.add({ targets: a.cont, x: L.W - L.tam * 1.2, y: L.alf.y + L.tam * 0.2, angle: -16, duration: 700, ease: 'Quad.easeIn' });
-            } else if (c.id === 'tren') {
-                for (var k = 0; k < 4; k++) this.time.delayedCall(k * 160, function () { Ut.estallido(self, a.cont.x - L.tam * 0.3, a.cont.y - L.tam * 0.4, { n: 2, tex: 'humo', tam: 26, dist: 40, angulo: -Math.PI / 2, abanico: 0.6, depth: 45 }); });
-            }
-            await this.celebrar(a, { punto: { x: Math.min(a.cont.x, L.W - L.tam), y: a.cont.y - L.tam * 0.3 } });
-            // Se va de la alfombra; queda como «viaje hecho» en el borde de arriba.
-            var dest = this.lugarRecuerdo(this.coleccion.length);
+            a.cont.setAngle(0);
+            // Celebra al final de su camino (ahí se ve entero) y después hace su viaje de verdad.
+            await this.celebrar(a, { punto: { x: a.cont.x, y: a.cont.y - L.tam * 0.3 } });
+            if (!this.ctx.vivo()) return;
+            this.encenderFaroles(false);
+            await this.salirDeViaje(c);
+            if (!this.ctx.vivo()) return;
+            // Vuelve del viaje y se estaciona en la acera de arriba, donde se queda como recuerdo.
+            var k = this.coleccion.length;
+            var dest = this.lugarRecuerdo(k);
             this.coleccion.push(a);
-            await tw(this, { targets: a.cont, x: dest.x, y: dest.y, scaleX: dest.esc, scaleY: dest.esc, angle: 0, duration: 600, ease: 'Sine.easeInOut' });
+            c.estado = 'recuerdo';
+            var esc = dest.rel * L.tam / a.tam;
+            a.cont.setVisible(true).setAlpha(1).setAngle(0).setScale(esc).setDepth(30 + k * 0.01);
+            a.cont.setPosition(-L.tam, dest.y);
+            var o = { t: 0 };
+            var x0 = -L.tam;
+            await tw(this, {
+                targets: o, t: 1, duration: Ut.reducido() ? 1 : 900 + dest.x * 0.4, ease: 'Sine.easeOut',
+                onUpdate: function () {
+                    a.cont.x = x0 + (dest.x - x0) * o.t;
+                    a.cont.y = dest.y - Math.abs(Math.sin(o.t * Math.PI * 4)) * L.tam * 0.05 * (1 - o.t);
+                }
+            });
+            if (a.saltito) a.saltito(0.06, 1);
             await this.seguir();
+        },
+
+        /**
+         * El viaje: el avión acelera por la pista, despega y se pierde en el cielo; el tren pita y
+         * sale echando humo; la ambulancia sale con su luz y su sirena; los demás tocan bocina y se van.
+         */
+        salirDeViaje: async function (c) {
+            var self = this;
+            var L = this.L;
+            var a = c.actor;
+            var cont = a.cont;
+            var x0 = cont.x, y0 = cont.y;
+            var e0 = Math.abs(cont.scaleY);
+            cont.scaleX = e0;
+            if (Ut.reducido()) { cont.setVisible(false); return; }
+            if (c.id === 'avion') {
+                var sombra = this.add.ellipse(x0, y0 + L.tam * 0.25, L.tam * 0.8, L.tam * 0.2, 0x000000, 0.18).setDepth(cont.depth - 0.1);
+                var xFin = L.W + L.tam * 2;
+                var o = { t: 0 };
+                this.despegando = true;
+                K.ruido({ f: 700, q: 0.5, dur: 1.4, vol: 0.07 });
+                await tw(this, {
+                    targets: o, t: 1, duration: 2300, ease: 'Linear',
+                    onUpdate: function () {
+                        var t = o.t;
+                        var x = x0 + (xFin - x0) * t * t;
+                        var alto = Math.max(0, (t - 0.32) / 0.68);
+                        var sube = alto * alto;
+                        cont.x = x;
+                        cont.y = y0 - sube * (y0 + L.tam);
+                        cont.angle = -18 * Math.min(1, alto * 2.2);
+                        cont.setScale(e0 * (1 + sube * 0.45));
+                        sombra.setPosition(x - sube * L.tam * 0.6, y0 + L.tam * 0.25).setScale(1 - sube * 0.5).setAlpha(1 - alto);
+                    }
+                });
+                this.despegando = false;
+                sombra.destroy();
+                cont.setVisible(false);
+                return;
+            }
+            var dur = 1700;
+            var humo = null, sirena = null, luz = null;
+            if (c.id === 'tren') {
+                K.tono({ f: 880, f2: 840, dur: 0.35, vol: 0.07, tipo: 'triangle' });
+                this.time.delayedCall(420, function () { K.tono({ f: 880, f2: 820, dur: 0.6, vol: 0.07, tipo: 'triangle' }); });
+                humo = this.time.addEvent({
+                    delay: 150, loop: true, callback: function () {
+                        Ut.estallido(self, cont.x + L.tam * 0.25, cont.y - L.tam * 0.45, { n: 2, tex: 'humo', tam: 26, dist: 40, angulo: -Math.PI / 2 - 0.5, abanico: 0.5, depth: 45 });
+                    }
+                });
+            } else if (c.id === 'ambulancia') {
+                // Luz que destella arriba y sirena de dos tonos.
+                luz = this.add.circle(0, -a.tam * 0.42, a.tam * 0.07, 0xff3b3b, 1);
+                cont.add(luz);
+                var alterna = 0;
+                sirena = this.time.addEvent({
+                    delay: 260, loop: true, callback: function () {
+                        alterna = 1 - alterna;
+                        luz.fillColor = alterna ? 0x339af0 : 0xff3b3b;
+                        K.tono({ f: alterna ? 960 : 770, dur: 0.24, vol: 0.05, tipo: 'triangle' });
+                    }
+                });
+                dur = 2000;
+            } else {
+                K.tono({ f: 520, dur: 0.12, vol: 0.06, tipo: 'square' });
+                this.time.delayedCall(170, function () { K.tono({ f: 520, dur: 0.16, vol: 0.06, tipo: 'square' }); });
+            }
+            var p = { t: 0 };
+            var xF = L.W + L.tam * 2;
+            var ultMotor = 0;
+            await tw(this, {
+                targets: p, t: 1, duration: dur, ease: 'Quad.easeIn',
+                onUpdate: function () {
+                    cont.x = x0 + (xF - x0) * p.t;
+                    cont.y = y0 - Math.abs(Math.sin(p.t * 40)) * 1.5;
+                    if (self.time.now - ultMotor > 180) { ultMotor = self.time.now; K.ruido({ f: 240, q: 1.4, dur: 0.12, vol: 0.04 }); }
+                }
+            });
+            if (humo) humo.remove();
+            if (sirena) sirena.remove();
+            if (luz) luz.destroy();
+            cont.setVisible(false);
         },
 
         /** Los que ya viajaron quedan estacionados chiquitos junto al parque de la alfombra. */
         lugarRecuerdo: function (k) {
             var L = this.L, A0 = L.alf, e = L.est;
+            if (L.aceraCentro) {
+                // En la acera de arriba (bajo los faroles), en fila desde la avenida.
+                var rel = 0.62;
+                var x0a = L.conn + L.tam * 0.45;
+                var xMax = L.W - L.tam * 0.5;
+                var pasoA = Math.min(L.tam * 0.72, (xMax - x0a) / 9);
+                return { x: x0a + k * pasoA, y: L.aceraCentro - L.tam * 0.04, rel: rel, esc: rel };
+            }
             var esc = 0.5;
             var paso = L.tam * 0.5;
+            if (L.lago) {
+                // En el pasto junto al lago, a la derecha del estacionamiento.
+                var xa = e.x + e.w + paso * 0.7, xb = (L.pres ? L.W - 150 : L.W - 10) - paso * 0.5;
+                if (xb - xa < paso) {
+                    // Pantalla angosta: no hay pasto junto al lago; se quedan en la acera de arriba.
+                    var x0 = L.conn + paso, porFila = Math.max(1, Math.floor((L.W - 10 - x0) / paso) + 1);
+                    return { x: x0 + (k % porFila) * paso, y: L.acera - Math.floor(k / porFila) * paso * 0.8, esc: esc };
+                }
+                var cols = Math.max(1, Math.floor((xb - xa) / paso) + 1);
+                return { x: xa + (k % cols) * paso, y: e.y + paso * 0.6 + Math.floor(k / cols) * paso * 0.8, esc: esc };
+            }
             var x0 = e.x + e.w + paso * 0.8;
             var max = Math.max(1, Math.floor((A0.x + A0.w - 150 - x0) / paso));
             return { x: x0 + (k % max) * paso, y: e.y + e.h * 0.25 + Math.floor(k / max) * paso * 0.8, esc: esc };
@@ -413,6 +708,7 @@
         zonaFiesta: function () { var L = this.L; return { x: L.alf.x + 20, y: L.rutas.calle.y, w: L.alf.w * 0.8 }; },
 
         antesDeFiesta: async function () {
+            this.encenderFaroles(true);
             this.autos.forEach(function (c) { if (c.estado === 'quieto') c.actor.cont.setAlpha(0.3); });
         },
 
@@ -434,7 +730,7 @@
                 var nuevo = Act.crear(self, a.id, d.x, d.y, L.tam);
                 if (nuevo.animarIdle) nuevo.animarIdle(false);
                 nuevo.sonido = self.sonidoDe(a.id);
-                nuevo.cont.setScale(d.esc).setDepth(40);
+                nuevo.cont.setScale(d.rel ? d.rel * L.tam / nuevo.tam : d.esc).setDepth(40);
                 lista.push(nuevo);
             });
             this.coleccion.forEach(function (a) { if (lista.indexOf(a) < 0 && a.cont && a.cont.active) a.cont.setVisible(false); });

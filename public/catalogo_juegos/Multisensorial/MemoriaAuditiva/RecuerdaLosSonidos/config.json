@@ -118,7 +118,7 @@
       "sonido": "croar"
     },
     "carro": {
-      "img": "img/carro.png",
+      "img": "img/carro.svg",
       "nombre": "Carro",
       "sonido": "carro"
     },

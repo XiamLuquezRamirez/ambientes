@@ -757,8 +757,33 @@
      *   3 maletas → escondidos detrás de maletas
      *   4 nieve   → nieva y llega un pasajero más
      */
+    /** Pasajeros nuevos que llegan al andén: con dibujo, que no estén ni hayan subido y con otro sonido. */
+    function pasajerosNuevos(n, excluir) {
+        const demo = (gameConfig.demo || {}).elemento;
+        const sonidos = excluir.map(function (id) { return elemento(id).sonido; });
+        return L.mezclar(Object.keys(gameConfig.elementos || {}).filter(function (id) {
+            return excluir.indexOf(id) === -1 && id !== demo && elemento(id).img &&
+                sonidos.indexOf(elemento(id).sonido) === -1;
+        })).slice(0, n);
+    }
+
     function planRondas() {
         const r = nivelElegido.retos[0];
+        if (r.correcto === "azar") {
+            // Quien sube al tren ya no vuelve al andén: en su lugar llega un pasajero nuevo.
+            const modos = ["anden", "paseo", "maletas", "nieve"];
+            let anden = r.elementos.slice();
+            const subidos = [];
+            return modos.map(function (modo) {
+                const objetivoRonda = L.mezclar(anden)[0];
+                let elementos = anden.slice();
+                if (modo === "nieve") elementos = elementos.concat(pasajerosNuevos(1, elementos.concat(subidos)));
+                subidos.push(objetivoRonda);
+                anden = anden.filter(function (id) { return id !== objetivoRonda; })
+                    .concat(pasajerosNuevos(1, anden.concat(subidos)));
+                return { objetivo: objetivoRonda, modo: modo, elementos: elementos, intro: modo };
+            });
+        }
         let objs;
         if (r.correcto === "azar") {
             objs = L.mezclar(r.elementos).slice(0, 3);

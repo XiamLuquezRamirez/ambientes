@@ -32,12 +32,38 @@
     var FIESTA = [0xff6b6b, 0xfcc419, 0x51cf66, 0x339af0, 0xcc5de8, 0xff922b];
     var OSCURIDAD = 'linterna:oscuridad';
     var LIENZO = 1024;
+    var ESCENA = {
+        fondo: 'img/fondo.svg',
+        estrella: 'img/estrella_cielo.svg'
+    };
+    function texEscena(parte) { return 'linterna:escena:' + parte; }
+    var ESCENA_V = '?v=20261112preload2';
+    function encolarEscena(load) {
+        function add(key, src) {
+            if (!src) return;
+            if (src.indexOf('?') === -1) src += ESCENA_V;
+            load.image(key, src);
+        }
+        add(texEscena('fondo'), ESCENA.fondo);
+        add(texEscena('estrella'), ESCENA.estrella);
+    }
     /** Radio de luz (fracción del lado menor) y opacidad de la noche por ronda. */
     var RONDAS = {
         luna: { radio: 0.2, noche: 0.94 },
         mas: { radio: 0.17, noche: 0.97 },
         pasos: { radio: 0.17, noche: 0.97 },
         pila: { radio: 0.14, noche: 0.98 }
+    };
+    /**
+     * Medidas del fondo ilustrado (img/fondo.svg, 1280×720): pasto desde y 435, cerca desde
+     * y 271, granero a la izquierda, árbol a la derecha y la luna arriba a la derecha.
+     */
+    var JARDIN = {
+        pasto: 435, cielo: 262,
+        granero: { x0: 44, x1: 317 },
+        arbol: { x0: 978, x1: 1231, copaY: 200 },
+        luna: { x: 970, y: 118, r: 36 },
+        filaAtras: 528, filaAdelante: 640, atrasX0: 370, atrasX1: 940
     };
     /** Constelación final (forma de estrella grande), en fracciones del cielo. */
     var CONSTELACION = [[0.5, 0.06], [0.58, 0.18], [0.7, 0.2], [0.6, 0.28], [0.64, 0.4], [0.5, 0.33], [0.36, 0.4], [0.4, 0.28], [0.3, 0.2], [0.42, 0.18]];
@@ -133,7 +159,12 @@
             this.radioHecho = -1;
         },
 
+        preload: function () {
+            encolarEscena(this.load);
+        },
+
         create: function () {
+            this.fondoImg = null;
             this.fondo = this.add.graphics().setDepth(-30);
             this.titilan = [];
             for (var i = 0; i < 40; i++) {
@@ -145,9 +176,49 @@
             // Noche: imagen con un agujero de luz suave que sigue a la linterna.
             if (!this.textures.exists(OSCURIDAD)) this.textures.createCanvas(OSCURIDAD, LIENZO, LIENZO);
             this.oscuridad = this.add.image(0, 0, OSCURIDAD).setDepth(10);
-            this.haz = this.add.circle(0, 0, 10, 0xfff9db, 0.08).setDepth(10.5);
+            this.haz = this.add.circle(0, 0, 10, 0xffe8a3, 0.1).setDepth(10.5);
+            // Haz en cono desde la linterna hasta el círculo de luz.
+            this.cono = this.add.graphics().setDepth(10.4);
+            this.armarLinterna();
+            // Cielo que se ve aunque sea de noche: estrellas que titilan y la luna con su halo.
+            this.cieloNoche = this.add.container(0, 0).setDepth(10.8).setVisible(false);
+            this.chispitas = [];
+            for (var e = 0; e < 46; e++) {
+                var st = this.add.circle(0, 0, rnd(0.9, 2.2), 0xffffff, 1);
+                st.fase = Math.random() * 6;
+                st.vel = rnd(500, 1400);
+                st.u = Math.random();
+                st.v = Math.random();
+                this.cieloNoche.add(st);
+                this.chispitas.push(st);
+            }
+            this.lunaHalo = this.add.circle(0, 0, 10, 0xe7f5ff, 0.08);
+            this.lunaLuz = this.add.graphics();
+            this.cieloNoche.add([this.lunaHalo, this.lunaLuz]);
+            // Luciérnagas que se encienden y apagan sobre el pasto y los arbustos.
+            this.luciernagas = [];
+            for (var l = 0; l < 12; l++) {
+                var lu = this.add.container(0, 0).setDepth(10.7);
+                lu.add(this.add.circle(0, 0, 9, 0xd8f5a2, 0.25));
+                lu.add(this.add.circle(0, 0, 3, 0xf4fce3, 1));
+                lu.fase = Math.random() * 6;
+                lu.u = Math.random();
+                lu.v = Math.random();
+                lu.vel = rnd(0.6, 1.4);
+                this.luciernagas.push(lu);
+            }
+            // Ojos del búho en la copa del árbol: parpadean y se abren grandes si llega la luz.
+            this.buho = this.add.container(0, 0).setDepth(10.7).setVisible(false);
+            this.ojos = [-1, 1].map(function (lado) {
+                var o = this.add.container(lado * 11, 0);
+                o.add(this.add.circle(0, 0, 8, 0xffd43b, 1));
+                o.add(this.add.circle(0, 0, 3.6, 0x212529, 1));
+                this.buho.add(o);
+                return o;
+            }, this);
+            this.buho.proxParpadeo = 0;
             this.capaCielo = this.add.container(0, 0).setDepth(11);
-            this.dibujarFondo();
+            // Escena solo tras cargarTexturas.
             var scene = this;
             this.scale.on('resize', function () { scene.dibujarFondo(); scene.radioHecho = -1; });
             this.luz.x = this.scale.width * 0.5;
@@ -170,7 +241,38 @@
         },
 
         horizonte: function () {
+            var F = this.marcoFondo();
+            if (F) return F.py(JARDIN.pasto);
             return this.scale.height * 0.5;
+        },
+
+        /** Dónde cae el fondo ilustrado (1280×720, centrado y cubriendo). Sin fondo: null. */
+        marcoFondo: function () {
+            if (!this.textures.exists(texEscena('fondo'))) return null;
+            var w = this.scale.width, h = this.scale.height;
+            var k = Math.max(w / 1280, h / 720);
+            var x0 = w / 2 - 640 * k, y0 = h / 2 - 360 * k;
+            return { k: k, px: function (u) { return x0 + u * k; }, py: function (v) { return y0 + v * k; } };
+        },
+
+        /** Linterna (dibujada): cuerpo amarillo, aro y vidrio; se queda abajo a la izquierda. */
+        armarLinterna: function () {
+            var c = this.add.container(0, 0).setDepth(10.9);
+            var g = this.add.graphics();
+            // Mira hacia la derecha (ángulo 0): mango, aro y vidrio.
+            g.fillStyle(0x1864ab, 1);
+            g.fillRoundedRect(-62, -13, 58, 26, 8);
+            g.fillStyle(0x339af0, 1);
+            g.fillRoundedRect(-58, -13, 12, 26, 4);
+            g.fillRoundedRect(-38, -13, 12, 26, 4);
+            g.fillStyle(0xfcc419, 1);
+            g.fillRoundedRect(-8, -20, 28, 40, 8);
+            g.fillStyle(0xf59f00, 1);
+            g.fillRect(-8, -20, 6, 40);
+            c.add(g);
+            this.vidrio = this.add.ellipse(20, 0, 10, 34, 0xfff3bf, 1);
+            c.add(this.vidrio);
+            this.linterna = c;
         },
 
         dibujarFondo: function () {
@@ -179,46 +281,157 @@
             var hz = this.horizonte();
             var g = this.fondo;
             g.clear();
-            g.fillStyle(0x15224a, 1);
-            g.fillRect(0, 0, w, hz);
-            g.fillStyle(0x2b8a3e, 1);
-            g.fillRect(0, hz, w, h - hz);
-            // Cerca de madera.
-            g.fillStyle(0xd9a066, 1);
-            for (var x = 0; x < w; x += 46) {
-                g.fillRect(x + 4, hz - h * 0.1, 30, h * 0.12);
-                g.fillTriangle(x + 4, hz - h * 0.1, x + 34, hz - h * 0.1, x + 19, hz - h * 0.13);
+            var keyFondo = texEscena('fondo');
+            if (this.textures.exists(keyFondo)) {
+                if (!this.fondoImg) this.fondoImg = this.add.image(w / 2, h / 2, keyFondo).setDepth(-31);
+                this.fondoImg.setVisible(true).setPosition(w / 2, h / 2);
+                this.fondoImg.setScale(Math.max(w / (this.fondoImg.width || 1), h / (this.fondoImg.height || 1)));
+                this.titilan.forEach(function (s) { s.setVisible(false); });
+                this.luna.setVisible(false);
+            } else {
+                if (this.fondoImg) this.fondoImg.setVisible(false);
+                this.titilan.forEach(function (s) { s.setVisible(true); });
+                this.luna.setVisible(true);
+                g.fillStyle(0x15224a, 1);
+                g.fillRect(0, 0, w, hz);
+                g.fillStyle(0x2b8a3e, 1);
+                g.fillRect(0, hz, w, h - hz);
+                // Cerca de madera.
+                g.fillStyle(0xd9a066, 1);
+                for (var x = 0; x < w; x += 46) {
+                    g.fillRect(x + 4, hz - h * 0.1, 30, h * 0.12);
+                    g.fillTriangle(x + 4, hz - h * 0.1, x + 34, hz - h * 0.1, x + 19, hz - h * 0.13);
+                }
+                g.fillRect(0, hz - h * 0.07, w, 10);
+                // Casa a la izquierda con ventana encendida, macetas, caseta, árbol.
+                g.fillStyle(0xe8590c, 1);
+                g.fillRect(w * 0.02, hz - h * 0.28, w * 0.16, h * 0.3);
+                g.fillStyle(0xa61e4d, 1);
+                g.fillTriangle(0, hz - h * 0.28, w * 0.2, hz - h * 0.28, w * 0.1, hz - h * 0.4);
+                g.fillStyle(0xffe066, 1);
+                g.fillRect(w * 0.06, hz - h * 0.22, w * 0.05, h * 0.07);
+                g.fillStyle(0x8d5524, 1);
+                g.fillRect(w * 0.86, hz - h * 0.2, 16, h * 0.22);
+                g.fillStyle(0x2f9e44, 1);
+                g.fillCircle(w * 0.86 + 8, hz - h * 0.24, h * 0.09);
+                g.fillCircle(w * 0.83, hz - h * 0.18, h * 0.06);
+                g.fillCircle(w * 0.9, hz - h * 0.18, h * 0.06);
+                for (var f = 0; f < 18; f++) {
+                    var fx = ((f * 61) % 100) / 100 * w;
+                    var fy = hz + h * 0.05 + ((f * 37) % 100) / 100 * h * 0.42;
+                    g.fillStyle(FIESTA[f % FIESTA.length], 1);
+                    g.fillCircle(fx, fy, 5);
+                    g.fillStyle(0x40c057, 1);
+                    g.fillTriangle(fx - 7, fy + 12, fx + 7, fy + 12, fx, fy);
+                }
+                this.titilan.forEach(function (s, i) {
+                    s.setPosition(((i * 83) % 100) / 100 * w, ((i * 47) % 100) / 100 * hz * 0.85);
+                });
+                this.luna.setPosition(w * 0.12, h * 0.1).setScale(Math.max(0.8, h / 700));
             }
-            g.fillRect(0, hz - h * 0.07, w, 10);
-            // Casa a la izquierda con ventana encendida, macetas, caseta, árbol.
-            g.fillStyle(0xe8590c, 1);
-            g.fillRect(w * 0.02, hz - h * 0.28, w * 0.16, h * 0.3);
-            g.fillStyle(0xa61e4d, 1);
-            g.fillTriangle(0, hz - h * 0.28, w * 0.2, hz - h * 0.28, w * 0.1, hz - h * 0.4);
-            g.fillStyle(0xffe066, 1);
-            g.fillRect(w * 0.06, hz - h * 0.22, w * 0.05, h * 0.07);
-            g.fillStyle(0x8d5524, 1);
-            g.fillRect(w * 0.86, hz - h * 0.2, 16, h * 0.22);
-            g.fillStyle(0x2f9e44, 1);
-            g.fillCircle(w * 0.86 + 8, hz - h * 0.24, h * 0.09);
-            g.fillCircle(w * 0.83, hz - h * 0.18, h * 0.06);
-            g.fillCircle(w * 0.9, hz - h * 0.18, h * 0.06);
-            for (var f = 0; f < 18; f++) {
-                var fx = ((f * 61) % 100) / 100 * w;
-                var fy = hz + h * 0.05 + ((f * 37) % 100) / 100 * h * 0.42;
-                g.fillStyle(FIESTA[f % FIESTA.length], 1);
-                g.fillCircle(fx, fy, 5);
-                g.fillStyle(0x40c057, 1);
-                g.fillTriangle(fx - 7, fy + 12, fx + 7, fy + 12, fx, fy);
-            }
-            this.titilan.forEach(function (s, i) {
-                s.setPosition(((i * 83) % 100) / 100 * w, ((i * 47) % 100) / 100 * hz * 0.85);
-            });
-            this.luna.setPosition(w * 0.12, h * 0.1).setScale(Math.max(0.8, h / 700));
             var lado = Math.sqrt(w * w + h * h) * 2.2;
             this.oscuridad.setDisplaySize(lado, lado);
+            this.ubicarNoche();
             var scene = this;
             this.estrellasCielo.forEach(function (s, i) { var p = scene.puestoEstrella(i); s.setPosition(p.x, p.y); });
+        },
+
+        /** Coloca el cielo de noche, la luna, las luciérnagas, el búho y la linterna según el fondo. */
+        ubicarNoche: function () {
+            var w = this.scale.width, h = this.scale.height;
+            var F = this.marcoFondo();
+            var cieloAbajo = F ? F.py(JARDIN.cielo) : h * 0.4;
+            var hayFondo = !!F;
+            this.cieloNoche.setVisible(hayFondo);
+            if (hayFondo) {
+                this.chispitas.forEach(function (st) { st.setPosition(st.u * w, 8 + st.v * (cieloAbajo - 16)); });
+                var L = JARDIN.luna;
+                var lx = F.px(L.x), ly = F.py(L.y), lr = L.r * F.k;
+                this.lunaHalo.setPosition(lx, ly).setRadius(lr * 1.8);
+                this.pintarLuna(lx, ly, lr);
+                var A = JARDIN.arbol;
+                this.buho.setVisible(true).setPosition(F.px((A.x0 + A.x1) / 2 - 20), F.py(A.copaY)).setScale(F.k);
+            } else {
+                this.buho.setVisible(false);
+            }
+            var pasto = this.horizonte();
+            this.luciernagas.forEach(function (lu) {
+                lu.x0 = lu.u * w;
+                lu.y0 = pasto - h * 0.12 + lu.v * (h - pasto) * 0.8;
+            });
+            var esc = Math.max(0.7, Math.min(1.3, h / 650));
+            this.linterna.setScale(esc).setPosition(w * 0.07, h - 30 * esc);
+        },
+
+        /**
+         * Media luna como la del dibujo (iluminada a la derecha): el borde del círculo grande que
+         * queda fuera del círculo que la recorta, y de vuelta por el borde de ese recorte.
+         */
+        pintarLuna: function (x, y, r) {
+            var g = this.lunaLuz;
+            g.clear();
+            var cx2 = -r * 0.45, cy2 = -r * 0.2, r2 = r * 0.9;
+            var pts = [];
+            var fuera = function (px, py) { return Math.pow(px - cx2, 2) + Math.pow(py - cy2, 2) > r2 * r2; };
+            var dentro = function (px, py) { return px * px + py * py < r * r; };
+            // Arco exterior: empezar en un punto que quede dentro del recorte para no partir el trazo.
+            var inicio = 0;
+            for (var k = 0; k < 360; k++) {
+                var a = k * Math.PI / 180;
+                if (!fuera(Math.cos(a) * r, Math.sin(a) * r)) { inicio = k; break; }
+            }
+            for (var j = 0; j <= 360; j++) {
+                var b = (inicio + j) * Math.PI / 180;
+                var ox = Math.cos(b) * r, oy = Math.sin(b) * r;
+                if (fuera(ox, oy)) pts.push({ x: x + ox, y: y + oy });
+            }
+            // Arco interior (borde del recorte que cae dentro de la luna), en sentido contrario.
+            var interior = [];
+            for (var m = 0; m < 360; m++) {
+                var c = m * Math.PI / 180;
+                var ix = cx2 + Math.cos(c) * r2, iy = cy2 + Math.sin(c) * r2;
+                if (dentro(ix, iy)) interior.push({ x: x + ix, y: y + iy, a: Math.atan2(iy, ix) });
+            }
+            var ultimo = pts[pts.length - 1], primero = pts[0];
+            interior.sort(function (p1, p2) {
+                var d1 = Math.hypot(p1.x - ultimo.x, p1.y - ultimo.y), d2 = Math.hypot(p2.x - ultimo.x, p2.y - ultimo.y);
+                return d1 - d2;
+            });
+            // Recorrer el arco interior de vecino en vecino desde el final del exterior.
+            var orden = [], resto = interior.slice(), actual = ultimo;
+            while (resto.length) {
+                var mejor = 0, dm = Infinity;
+                for (var q = 0; q < resto.length; q++) {
+                    var dd = Math.hypot(resto[q].x - actual.x, resto[q].y - actual.y);
+                    if (dd < dm) { dm = dd; mejor = q; }
+                }
+                actual = resto.splice(mejor, 1)[0];
+                orden.push(actual);
+            }
+            g.fillStyle(0xe7f5ff, 1);
+            g.fillPoints(pts.concat(orden), true);
+        },
+
+        /** Tamaño de las estrellas del premio (en px), según la pantalla. */
+        tamEstrella: function () {
+            return Math.max(28, Math.min(48, this.scale.height * 0.06));
+        },
+
+        /** Estrella de premio: arte de escena o estrella Phaser. "base" guarda su escala real. */
+        crearEstrellaVisual: function (x, y) {
+            var key = texEscena('estrella');
+            var t = this.tamEstrella();
+            var im;
+            if (this.textures.exists(key)) {
+                im = this.add.image(x, y, key).setDepth(11);
+                im.base = Math.min(t / (im.width || 1), t / (im.height || 1));
+            } else {
+                im = this.add.star(x, y, 5, t * 0.2, t * 0.45, 0xffe066).setDepth(11);
+                im.base = 1;
+            }
+            im.crece = 1;
+            im.setScale(im.base);
+            return im;
         },
 
         /** Redibuja el agujero de luz cuando cambia el radio. */
@@ -251,10 +464,29 @@
             return Math.min(this.scale.height * 0.2, this.scale.width * 0.13, 170);
         },
 
-        /** Lugares repartidos en el pasto, lejos del botón de escuchar (abajo al centro). */
+        /**
+         * Lugares sobre el pasto del dibujo. Fila de atrás entre el granero y el árbol; fila de
+         * adelante a los lados, sin tapar el botón de escuchar (abajo al centro) ni los botones
+         * de abajo a la derecha.
+         */
         lugares: function (n) {
             var w = this.scale.width;
             var h = this.scale.height;
+            var F = this.marcoFondo();
+            if (F) {
+                var nAtras = Math.ceil(n / 2), nAdelante = n - nAtras;
+                var a0 = Math.max(w * 0.12, F.px(JARDIN.atrasX0)), a1 = Math.min(w * 0.88, F.px(JARDIN.atrasX1));
+                if (a1 - a0 < w * 0.3) { a0 = w * 0.18; a1 = w * 0.82; }
+                var yAtras = F.py(JARDIN.filaAtras);
+                var yAdelante = Math.min(F.py(JARDIN.filaAdelante), h * 0.9);
+                var adelanteX = { 0: [], 1: [0.24], 2: [0.2, 0.72], 3: [0.14, 0.3, 0.72] }[nAdelante] || [0.14, 0.3, 0.68, 0.8];
+                var res = [];
+                for (var a = 0; a < nAtras; a++) {
+                    res.push({ x: nAtras === 1 ? (a0 + a1) / 2 : a0 + ((a1 - a0) / (nAtras - 1)) * a, y: yAtras });
+                }
+                adelanteX.forEach(function (fx) { res.push({ x: w * fx, y: yAdelante }); });
+                return mezclar(res);
+            }
             var hz = this.horizonte();
             // Repartidas a lo ancho, en dos filas alternadas; cerca del centro, siempre arriba.
             var out = [];
@@ -280,7 +512,7 @@
         ponerEn: function (c, x, y) {
             c.x = x;
             c.y = y;
-            c.img.setPosition(x, y);
+            c.img.setPosition(x, y).setDepth(5 + y / 10000);
         },
 
         visibles: function () {
@@ -335,9 +567,22 @@
             sfx('crujido');
             vis.forEach(function (c, i) {
                 var d = lug[i];
+                var desde = { x: c.x, y: c.y };
+                var p = { t: 0 };
+                var rueda = c.id === 'bicicleta' || c.id === 'carro' || c.id === 'pelota';
+                var dist = Math.abs(d.x - desde.x) + Math.abs(d.y - desde.y);
+                var saltos = Math.max(2, Math.round(dist / 70));
+                c.img.setFlipX(d.x < desde.x && !rueda);
                 scene.tweens.add({
-                    targets: c, x: d.x, y: d.y, duration: reducido() ? 1 : 1200, ease: 'Sine.easeInOut',
-                    onUpdate: function () { c.img.setPosition(c.x, c.y); }
+                    targets: p, t: 1, duration: reducido() ? 1 : 1100 + dist * 1.2, delay: reducido() ? 0 : i * 260, ease: 'Sine.easeInOut',
+                    onUpdate: function () {
+                        c.x = Phaser.Math.Linear(desde.x, d.x, p.t);
+                        c.y = Phaser.Math.Linear(desde.y, d.y, p.t);
+                        var brinco = rueda ? 0 : Math.abs(Math.sin(p.t * Math.PI * saltos)) * c.size * 0.1;
+                        c.img.setPosition(c.x, c.y - brinco).setDepth(5 + c.y / 10000);
+                        c.img.angle = rueda ? (c.id === 'pelota' ? (d.x - desde.x) * p.t * 0.8 : Math.sin(p.t * Math.PI * saltos) * 2) : Math.sin(p.t * Math.PI * saltos) * 6;
+                    },
+                    onComplete: function () { c.img.angle = 0; c.img.setFlipX(false); scene.ponerEn(c, d.x, d.y); }
                 });
             });
         },
@@ -356,15 +601,85 @@
                 r *= f;
             }
             var alfa = this.final ? 0.35 : cfg.noche;
+            // Pila baja: a ratos la linterna se apaga casi del todo un instante.
+            var apagon = this.modo === 'pila' && this.jugando && !reducido() && Math.sin(time / 210) > 0.93 && Math.sin(time / 2300) > 0.3;
+            if (apagon) r *= 0.25;
             this.pintarOscuridad(r, alfa);
             this.oscuridad.setPosition(this.luz.x, this.luz.y);
             this.haz.setPosition(this.luz.x, this.luz.y).setRadius(r * 0.9);
+            this.dibujarCono(r, apagon, time);
+            this.moverNoche(time);
             this.titilan.forEach(function (s, i) { s.setAlpha(0.4 + 0.6 * Math.abs(Math.sin(time / (700 + i * 37) + i))); });
             this.visibles().forEach(function (c) {
                 if (c.resaltada) c.img.setAlpha(0.6 + 0.4 * Math.sin(time / 140));
                 else if (c.img.alpha < 1) c.img.setAlpha(1);
             });
-            this.estrellasCielo.forEach(function (s, i) { s.setScale(1 + 0.12 * Math.sin(time / 300 + i)); });
+            // Las estrellas del premio titilan sin perder su tamaño (base) ni su aparición (crece).
+            this.estrellasCielo.forEach(function (s, i) {
+                var b = s.base || 1;
+                s.setScale(b * (s.crece === undefined ? 1 : s.crece) * (1 + 0.12 * Math.sin(time / 300 + i)));
+            });
+        },
+
+        /** El haz: un cono cálido desde el vidrio de la linterna hasta el círculo de luz. */
+        dibujarCono: function (r, apagon, time) {
+            var g = this.cono;
+            g.clear();
+            var L = this.linterna;
+            var verLinterna = (this.jugando || this.demoObj) && !this.final;
+            L.setVisible(verLinterna);
+            if (!verLinterna) return;
+            var ang = Math.atan2(this.luz.y - L.y, this.luz.x - L.x);
+            L.rotation = ang;
+            var esc = L.scaleX;
+            var bx = L.x + Math.cos(ang) * 22 * esc, by = L.y + Math.sin(ang) * 22 * esc;
+            var px = -Math.sin(ang), py = Math.cos(ang);
+            var bajo = this.modo === 'pila';
+            var a = apagon ? 0.03 : (bajo ? 0.08 + 0.03 * Math.sin(time / 60) : 0.12);
+            g.fillStyle(0xffe8a3, a);
+            g.fillTriangle(bx + px * 14 * esc, by + py * 14 * esc, bx - px * 14 * esc, by - py * 14 * esc,
+                this.luz.x - px * r * 0.95, this.luz.y - py * r * 0.95);
+            g.fillTriangle(bx + px * 14 * esc, by + py * 14 * esc, this.luz.x + px * r * 0.95, this.luz.y + py * r * 0.95,
+                this.luz.x - px * r * 0.95, this.luz.y - py * r * 0.95);
+            this.vidrio.fillColor = apagon ? 0x868e96 : (bajo ? 0xffe066 : 0xfff3bf);
+            this.haz.fillAlpha = apagon ? 0.02 : 0.1;
+        },
+
+        /** Estrellas que titilan, luciérnagas que vuelan y se encienden, el búho que mira. */
+        moverNoche: function (time) {
+            var quieto = reducido();
+            if (this.cieloNoche.visible) {
+                this.chispitas.forEach(function (st) {
+                    st.alpha = quieto ? 0.8 : 0.35 + 0.65 * Math.abs(Math.sin(time / st.vel + st.fase));
+                });
+                this.lunaHalo.setScale(quieto ? 1 : 1 + 0.06 * Math.sin(time / 1400));
+            }
+            var w = this.scale.width;
+            this.luciernagas.forEach(function (lu) {
+                if (lu.x0 === undefined) return;
+                var t = time / 1000 * lu.vel + lu.fase;
+                lu.x = lu.x0 + (quieto ? 0 : Math.sin(t * 0.7) * 40 + Math.sin(t * 1.9) * 10);
+                lu.y = lu.y0 + (quieto ? 0 : Math.sin(t * 1.1) * 18);
+                lu.alpha = quieto ? 0.8 : Math.max(0, Math.sin(t * 1.6)) * 0.95;
+                if (lu.x > w + 20) lu.x0 -= w;
+            });
+            if (this.buho.visible) {
+                var dx = this.luz.x - this.buho.x, dy = this.luz.y - this.buho.y;
+                var cerca = Math.sqrt(dx * dx + dy * dy) < this.radioLuz() * 1.4;
+                var abierto = cerca ? 1.35 : 1;
+                if (!quieto && time > this.buho.proxParpadeo) {
+                    this.buho.parpadeo = time + 140;
+                    this.buho.proxParpadeo = time + rnd(2200, 4200);
+                }
+                var cerrado = this.buho.parpadeo && time < this.buho.parpadeo;
+                var mira = Math.atan2(dy, dx);
+                this.ojos.forEach(function (o) {
+                    o.scaleY = cerrado ? 0.12 : abierto;
+                    o.scaleX = abierto;
+                    // Las pupilas miran hacia la luz.
+                    o.list[1].setPosition(Math.cos(mira) * 3, Math.sin(mira) * 3);
+                });
+            }
         },
 
         /* ── Toques ───────────────────────────────────────────────── */
@@ -459,6 +774,9 @@
 
         puestoEstrella: function (i) {
             var p = CONSTELACION[i % CONSTELACION.length];
+            var F = this.marcoFondo();
+            // En el cielo del dibujo: entre la barra de progreso (arriba) y la cerca, lejos de la luna.
+            if (F) return { x: F.px(560 + (p[0] - 0.5) * 1100), y: F.py(122 + p[1] * 390) };
             return { x: this.scale.width * (0.25 + p[0] * 0.5), y: this.scale.height * (0.17 + p[1] * 0.55) };
         },
 
@@ -469,7 +787,7 @@
             var i = this.estrellasCielo.length;
             var p = this.puestoEstrella(i * 2);
             var desde = c ? { x: c.x, y: c.y - c.size / 2 } : { x: this.scale.width / 2, y: this.scale.height / 2 };
-            var s = this.add.star(desde.x, desde.y, 5, 7, 16, 0xffe066).setDepth(11);
+            var s = this.crearEstrellaVisual(desde.x, desde.y);
             return new Promise(function (resolve) {
                 sfx('zas');
                 scene.tweens.add({
@@ -490,7 +808,7 @@
             this.jugando = false;
             this.final = true;
             var lineas = this.add.graphics().setDepth(10.9).setAlpha(0);
-            lineas.lineStyle(3, 0xfff3bf, 0.8);
+            lineas.lineStyle(Math.max(2, this.tamEstrella() * 0.08), 0xfff3bf, 0.8);
             var puntos = CONSTELACION.map(function (q, k) { return scene.puestoEstrella(k); });
             for (var k = 0; k < puntos.length; k++) {
                 var a = puntos[k];
@@ -501,8 +819,9 @@
             var usados = this.estrellasCielo.map(function (s, k) { return (k * 2) % CONSTELACION.length; });
             for (var j = 0; j < CONSTELACION.length; j++) {
                 if (usados.indexOf(j) === -1) {
-                    var s = this.add.star(puntos[j].x, puntos[j].y, 5, 5, 12, 0xffe066).setDepth(11).setScale(0);
-                    this.tweens.add({ targets: s, scale: 1, duration: 300, delay: 200 + j * 120, ease: 'Back.easeOut' });
+                    var s = this.crearEstrellaVisual(puntos[j].x, puntos[j].y);
+                    s.crece = 0;
+                    this.tweens.add({ targets: s, crece: 1, duration: reducido() ? 1 : 300, delay: 200 + j * 120, ease: 'Back.easeOut' });
                     this.estrellasCielo.push(s);
                 }
             }
@@ -602,12 +921,23 @@
         Object.keys(elems).forEach(function (id) {
             if (elems[id].img) lista.push({ key: tex(id), src: elems[id].img });
         });
+        Object.keys(ESCENA).forEach(function (parte) {
+            lista.push({ key: texEscena(parte), src: ESCENA[parte] });
+        });
         lista = lista.filter(function (t) { return !scene.textures.exists(t.key); });
         if (!lista.length) return Promise.resolve();
         return new Promise(function (resolve) {
             lista.forEach(function (t) {
-                if (/\.svg(\?|$)/i.test(t.src)) scene.load.svg(t.key, t.src, { scale: 2 });
-                else scene.load.image(t.key, t.src);
+                var src = t.src;
+                var esEscena = t.key.indexOf(':escena:') !== -1;
+                if (esEscena) {
+                    if (src.indexOf('?') === -1) src += ESCENA_V;
+                    scene.load.image(t.key, src);
+                } else if (/\.svg(\?|$)/i.test(src)) {
+                    scene.load.svg(t.key, src, { scale: 2 });
+                } else {
+                    scene.load.image(t.key, src);
+                }
             });
             scene.load.once('complete', resolve);
             scene.load.start();
@@ -632,6 +962,7 @@
             doc.body.insertBefore(el, doc.body.firstChild);
         }
         doc.body.classList.add('modo-linterna');
+        el.style.visibility = 'hidden';
         Host.destruirIntro();
         game = Host.crear({
             type: Phaser.AUTO,
@@ -648,7 +979,11 @@
             return Promise.reject(new Error('No se pudo crear Phaser.Game'));
         }
         return esperarEscena().then(function (scene) {
-            return cargarTexturas(scene).then(function () { return scene; });
+            return cargarTexturas(scene).then(function () {
+                scene.dibujarFondo();
+                el.style.visibility = '';
+                return scene;
+            });
         });
     }
 

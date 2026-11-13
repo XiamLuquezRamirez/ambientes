@@ -15,6 +15,35 @@
 
     function rnd(a, b) { return a + Math.random() * (b - a); }
 
+    /**
+     * Mariposas del diseño (las de ¿Qué suena?), junto a este archivo en comun/img. La ruta se
+     * toma de dónde se cargó vida.js, así sirve igual desde Asocia y desde Memoria auditiva.
+     */
+    var BASE_VIDA = (function () {
+        var d = global.document;
+        var sc = d && (d.currentScript || Array.prototype.slice.call(d.getElementsByTagName('script')).filter(function (x) { return /comun\/vida\.js/.test(x.src); })[0]);
+        return sc && sc.src ? sc.src.replace(/vida\.js.*$/, '') : '';
+    })();
+    var MARIPOSAS_DISENO = 5;
+    function claveMariposa(k) { return 'vida_mariposa' + (k % MARIPOSAS_DISENO + 1); }
+    /** Carga (una vez por escena) los SVG; son de Illustrator sin ancho/alto: van con tamaño. */
+    function cargarMariposas(scene, listo) {
+        if (scene.textures.exists(claveMariposa(0))) { listo(); return; }
+        if (!BASE_VIDA || !scene.load) return;
+        var pend = scene.__vidaMariposasPend = scene.__vidaMariposasPend || [];
+        pend.push(listo);
+        if (pend.length > 1) return;
+        for (var i = 1; i <= MARIPOSAS_DISENO; i++) {
+            if (!scene.textures.exists('vida_mariposa' + i)) scene.load.svg('vida_mariposa' + i, BASE_VIDA + 'img/mariposa' + i + '.svg?v=20261113', { width: 160, height: 160 });
+        }
+        scene.load.once('complete', function () {
+            var fs = scene.__vidaMariposasPend || [];
+            scene.__vidaMariposasPend = [];
+            fs.forEach(function (f) { try { f(); } catch (e) { /* un adorno nunca rompe el juego */ } });
+        });
+        if (!scene.load.isLoading()) scene.load.start();
+    }
+
     /* ── Sonidos cortos del ambiente (sintetizados) ── */
     var ac = null;
     function ctx() {
@@ -230,15 +259,35 @@
 
         /* ── Mariposas: revolotean; al tocarlas escapan rápido ── */
 
+        /**
+         * Mariposas del diseño (mariposa1-5.svg). Mientras cargan no se ve nada; si no se pueden
+         * cargar, quedan unas dibujadas de respaldo.
+         */
         function mariposas(n, z) {
             var colores = [0xff922b, 0xcc5de8, 0x4dabf7, 0xfcc419];
+            var inicio = Math.floor(Math.random() * MARIPOSAS_DISENO);
             for (var i = 0; i < n; i++) {
-                (function (col) {
+                (function (col, k) {
                     var m = keep(scene.add.container(rnd(z.x, z.x + z.w), rnd(z.y, z.y + z.h)).setDepth(z.depth || 7));
                     var a1 = scene.add.ellipse(-6, 0, 12, 16, col).setOrigin(1, 0.5);
                     var a2 = scene.add.ellipse(6, 0, 12, 16, col).setOrigin(0, 0.5);
-                    m.add([a1, a2, scene.add.ellipse(0, 0, 3, 12, 0x343a40)]);
+                    var cuerpo = scene.add.ellipse(0, 0, 3, 12, 0x343a40);
+                    m.add([a1, a2, cuerpo]);
                     var b = item({ tipo: 'mariposa', c: m, fase: Math.random() * 6, y0: m.y, prisa: 0 });
+                    var hayArte = !!BASE_VIDA;
+                    if (hayArte) m.setVisible(false);
+                    var falla = scene.time.delayedCall(4000, function () { if (!b.img && m.active) m.setVisible(true); });
+                    cargarMariposas(scene, function () {
+                        if (!m.active || !scene.textures.exists(claveMariposa(k))) return;
+                        falla.remove();
+                        var tm = Math.max(30, Math.min(52, scene.scale.width * 0.045));
+                        b.img = scene.add.image(0, 0, claveMariposa(k));
+                        b.base = tm / (b.img.width || 1);
+                        b.img.setScale(b.base);
+                        a1.setVisible(false); a2.setVisible(false); cuerpo.setVisible(false);
+                        m.add(b.img);
+                        m.setVisible(true);
+                    });
                     b.paso = function (t, dt) {
                         b.fase += dt / 1000 * (b.prisa > 0 ? 3 : 1);
                         if (b.prisa > 0) { b.prisa -= dt; b.y0 -= dt * 0.05; }
@@ -246,12 +295,14 @@
                         m.x += Math.sin(b.fase * 0.7) * 0.9 + (b.prisa > 0 ? 3 : 0.3);
                         m.y = b.y0 + Math.sin(b.fase * 1.6) * 14;
                         var ab = Math.abs(Math.sin(t / (b.prisa > 0 ? 35 : 70) + b.fase));
-                        a1.scaleX = ab; a2.scaleX = ab;
+                        // La del diseño aletea encogiéndose de lado, como en ¿Qué suena?.
+                        if (b.img) b.img.scaleX = b.base * (0.35 + 0.65 * ab);
+                        else { a1.scaleX = ab; a2.scaleX = ab; }
                         if (m.x > z.x + z.w + 30) m.x = z.x - 30;
                     };
                     b.toca = function (p) { return Math.hypot(p.x - m.x, p.y - m.y) < 30; };
                     b.tocado = function () { b.prisa = 1500; SON.aleteo(); };
-                })(colores[i % colores.length]);
+                })(colores[i % colores.length], inicio + i);
             }
         }
 
