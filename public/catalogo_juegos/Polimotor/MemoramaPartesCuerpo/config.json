@@ -1,0 +1,115 @@
+{
+  "nombre": "El Memorama de las Partes del Cuerpo",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "previaMs": 3000,
+    "errorVisibleMs": 2000,
+    "ayudaPrimeraMs": 10000,
+    "ayudaSegundaMs": 7000,
+    "ayudaRepetirMs": 14000
+  },
+  "partes": [
+    { "id": "mano", "nombre": "Mano", "dibujo": "mano", "articulo": "la", "fondo": "#ffe3ec", "borde": "#f06595", "voz": "¡Mano!", "acierto": "¡Muy bien! ¡Encontraste las dos manos iguales!" },
+    { "id": "pie", "nombre": "Pie", "dibujo": "pie", "articulo": "el", "fondo": "#e3fafc", "borde": "#1c9fbf", "voz": "¡Pie!", "acierto": "¡Muy bien! ¡Encontraste los dos pies iguales!" },
+    { "id": "ojos", "nombre": "Ojos", "dibujo": "ojos", "articulo": "los", "fondo": "#e7f5ff", "borde": "#1c7ed6", "voz": "¡Ojos!", "acierto": "¡Muy bien! ¡Encontraste la pareja de los ojos!" },
+    { "id": "nariz", "nombre": "Nariz", "dibujo": "nariz", "articulo": "la", "fondo": "#fff4e6", "borde": "#f76707", "voz": "¡Nariz!", "acierto": "¡Muy bien! ¡Encontraste las dos narices iguales!" },
+    { "id": "boca", "nombre": "Boca", "dibujo": "boca", "articulo": "la", "fondo": "#fff0f6", "borde": "#c2255c", "voz": "¡Boca!", "acierto": "¡Muy bien! ¡Encontraste las dos bocas iguales!" },
+    { "id": "oreja", "nombre": "Oreja", "dibujo": "orejas", "articulo": "la", "fondo": "#fff5f5", "borde": "#e03131", "voz": "¡Oreja!", "acierto": "¡Muy bien! ¡Encontraste las dos orejas iguales!" },
+    { "id": "cabeza", "nombre": "Cabeza", "dibujo": "cabeza", "articulo": "la", "fondo": "#f3f0ff", "borde": "#7048e8", "voz": "¡Cabeza!", "acierto": "¡Muy bien! ¡Encontraste las dos cabezas iguales!" },
+    { "id": "brazo", "nombre": "Brazo", "dibujo": "brazo", "articulo": "el", "fondo": "#ebfbee", "borde": "#2f9e44", "voz": "¡Brazo!", "acierto": "¡Muy bien! ¡Encontraste los dos brazos iguales!" },
+    { "id": "pierna", "nombre": "Pierna", "dibujo": "pierna", "articulo": "la", "fondo": "#fff9db", "borde": "#e8a200", "voz": "¡Pierna!", "acierto": "¡Muy bien! ¡Encontraste las dos piernas iguales!" }
+  ],
+  "rondas": [
+    {
+      "id": 1,
+      "titulo": "RONDA 1",
+      "partes": ["mano", "pie"],
+      "previaMs": 3000,
+      "instruccion": "¡Busca las dos manos y los dos pies!"
+    },
+    {
+      "id": 2,
+      "titulo": "RONDA 2",
+      "partes": ["ojos", "nariz", "boca"],
+      "previaMs": 3000,
+      "instruccion": "¡Nuevas partes de la cara! Busca {lista}."
+    },
+    {
+      "id": 3,
+      "titulo": "RONDA 3",
+      "partes": ["oreja", "cabeza", "brazo", "pierna"],
+      "previaMs": 3000,
+      "instruccion": "¡La última ronda! Busca {lista}."
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡EL MEMORAMA DEL CUERPO!",
+    "subtituloIntro": "Busca las tarjetas iguales.",
+    "bienvenida": "¡Bienvenido al Memorama del Cuerpo! Toca dos tarjetas para voltearlas y buscar las que tienen la misma parte del cuerpo.",
+    "saludoCorto": "¡Toca dos tarjetas y busca las que son iguales!",
+    "presentacionZeus": "Debajo de cada tarjeta se esconde una parte del cuerpo. ¡Mira cómo se juega!",
+    "demoUno": "Toco una tarjeta… ¡Una mano!",
+    "demoDistinta": "Toco otra… ¡Un pie! La mano y el pie no son iguales: se vuelven a esconder.",
+    "demoOtraVez": "Yo recuerdo dónde estaba la mano. Busco la otra mano…",
+    "demoIgual": "¡Dos manos iguales! ¡Encontré una pareja!",
+    "demoFin": "¡Así se juega! Ahora te toca a ti.",
+    "demostracionBien": "¡Pareja!",
+    "botonComenzar": "¡A jugar!",
+    "previa": "¡Mira muy bien dónde está cada una!",
+    "previaCartel": "¡MIRA Y RECUERDA!",
+    "aJugar": "¡Ahora tú! Toca una tarjeta.",
+    "recordatorioZeus": "¡Recuerda dónde estaba {articulo} {parte} y busca su pareja idéntica!",
+    "ayudaPrimera": "¡Toca una tarjeta para voltearla!",
+    "ayudaSegunda": "¡Ahora toca otra tarjeta! ¿Dónde está la pareja?",
+    "yaEncontrada": "¡Esa ya tiene su pareja!",
+    "progreso": "PAREJAS ENCONTRADAS",
+    "ronda": "RONDA",
+    "rondaListaTitulo": "¡RONDA {n} LISTA!",
+    "rondaLista": "¡Muy bien! ¡Terminaste la ronda! Ahora vienen más tarjetas.",
+    "finalZoe": "¡SÚPER MEMORIA! Encontraste las dos manos y los dos pies, ¡y también {lista}!",
+    "finalZeus": "¡Tienes unos ojos de superdetective!",
+    "finalTitulo": "¡LO LOGRASTE!",
+    "finalSub": "Encontraste todas las parejas del cuerpo.",
+    "botonOtraVez": "Volver a jugar",
+    "botonContinuar": "Continuar",
+    "otraVez": "¡Vamos otra vez! Las tarjetas cambiaron de lugar.",
+    "cierre": "¡Encontraste todas las parejas del cuerpo en las tres rondas! ¡Tienes una súper memoria!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Mira este tablero mágico lleno de tarjetas!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Y yo soy Zeus! Debajo de cada tarjeta se esconde una parte del cuerpo."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Vamos a encontrar las tarjetas que son iguales!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Prejardín: memoria corporal"
+    }
+  ]
+}

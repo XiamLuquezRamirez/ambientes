@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>¿Dónde lo uso?</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" href="../../../assets/css/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../../assets/css/fontawesome/css/all.min.css">
+	<link rel="stylesheet" href="../../../assets/css/fonts.css">
+	<link rel="stylesheet" href="../../../assets/css/sweetalert2.min.css">
+	<script src="../../../assets/js/jquery-4.0.0.min.js"></script>
+	<script src="../../../assets/js/sweetalert.js"></script>
+	<link rel="stylesheet" href="style.css?v=20261112e">
+	<link rel="stylesheet" href="../comun/inicio-fondo.css?v=20261030d">
+	<link rel="stylesheet" href="../comun/interfaz.css?v=20261022o">
+	<script src="../comun/inicio-fondo.js?v=20261030d"></script>
+	<link rel="stylesheet" href="../../final/final.css">
+	<link rel="stylesheet" href="../../intro3d/css/intro.css">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261005a">
+</head>
+<body class="esperando-inicio">
+	<!-- Fondo: el vestidor infantil de PedNia (paredes cálidas, banderines, armario con ropa, estante de
+	     sombreros, espejo, piso de madera). Animaciones suaves y solo a los lados. -->
+	<div class="uso-fondo" aria-hidden="true">
+		<svg class="uso-vestidor" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+			<defs>
+				<linearGradient id="pared" x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0" stop-color="#ffe8c7"/>
+					<stop offset="1" stop-color="#ffcf9f"/>
+				</linearGradient>
+				<pattern id="papel" width="80" height="80" patternUnits="userSpaceOnUse">
+					<rect width="40" height="80" fill="#ffffff" opacity=".16"/>
+					<circle cx="60" cy="20" r="4" fill="#ffb4a2" opacity=".5"/>
+					<circle cx="60" cy="60" r="4" fill="#ffd43b" opacity=".45"/>
+				</pattern>
+				<linearGradient id="madera" x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0" stop-color="#e6a868"/>
+					<stop offset="1" stop-color="#c9864a"/>
+				</linearGradient>
+				<radialGradient id="luz" cx=".5" cy=".35" r=".6">
+					<stop offset="0" stop-color="#fffbe8" stop-opacity=".9"/>
+					<stop offset="1" stop-color="#fffbe8" stop-opacity="0"/>
+				</radialGradient>
+			</defs>
+			<rect width="1600" height="900" fill="url(#pared)"/>
+			<rect width="1600" height="770" fill="url(#papel)"/>
+			<ellipse cx="800" cy="330" rx="620" ry="380" fill="url(#luz)"/>
+			<!-- zócalo y piso de madera -->
+			<rect y="752" width="1600" height="22" fill="#ffffff" opacity=".75"/>
+			<rect y="774" width="1600" height="126" fill="url(#madera)"/>
+			<path d="M0,808 H1600 M0,846 H1600 M120,774 V808 M420,808 V846 M760,774 V808 M1080,808 V846 M1380,774 V808 M260,846 V900 M940,846 V900 M1500,846 V900" stroke="#b5733c" stroke-width="3" opacity=".5"/>
+
+			<!-- banderines -->
+			<g class="uso-banderines">
+				<path d="M-10,40 Q400,120 800,60 Q1200,0 1610,70" fill="none" stroke="#8a5a3c" stroke-width="4"/>
+				<g class="uso-bandera" style="--i:0"><path d="M60,52 L104,60 L76,104 Z" fill="#ff6b6b"/></g>
+				<g class="uso-bandera" style="--i:1"><path d="M170,72 L214,78 L188,122 Z" fill="#ffd43b"/></g>
+				<g class="uso-bandera" style="--i:2"><path d="M280,86 L324,90 L300,134 Z" fill="#4dabf7"/></g>
+				<g class="uso-bandera" style="--i:3"><path d="M390,94 L434,95 L412,140 Z" fill="#69db7c"/></g>
+				<g class="uso-bandera" style="--i:4"><path d="M500,94 L544,93 L522,138 Z" fill="#da77f2"/></g>
+				<g class="uso-bandera" style="--i:5"><path d="M610,86 L654,83 L632,128 Z" fill="#ff922b"/></g>
+				<g class="uso-bandera" style="--i:6"><path d="M720,72 L764,68 L742,112 Z" fill="#ff6b6b"/></g>
+				<g class="uso-bandera" style="--i:7"><path d="M830,58 L874,52 L852,96 Z" fill="#ffd43b"/></g>
+				<g class="uso-bandera" style="--i:8"><path d="M940,42 L984,36 L962,80 Z" fill="#4dabf7"/></g>
+				<g class="uso-bandera" style="--i:9"><path d="M1050,30 L1094,26 L1072,70 Z" fill="#69db7c"/></g>
+				<g class="uso-bandera" style="--i:10"><path d="M1160,24 L1204,24 L1182,68 Z" fill="#da77f2"/></g>
+				<g class="uso-bandera" style="--i:11"><path d="M1270,26 L1314,30 L1290,74 Z" fill="#ff922b"/></g>
+				<g class="uso-bandera" style="--i:12"><path d="M1380,36 L1424,42 L1398,86 Z" fill="#ff6b6b"/></g>
+				<g class="uso-bandera" style="--i:13"><path d="M1490,50 L1534,58 L1506,102 Z" fill="#ffd43b"/></g>
+			</g>
+
+			<!-- armario de la izquierda: ropa colgada, ropa doblada y zapatos -->
+			<g class="uso-armario">
+				<rect x="20" y="170" width="330" height="590" rx="18" fill="#c97b4a"/>
+				<rect x="40" y="190" width="290" height="550" rx="10" fill="#f6d8b8"/>
+				<rect x="40" y="190" width="290" height="90" fill="#efc79f"/>
+				<!-- ropa doblada arriba -->
+				<rect x="58" y="236" width="70" height="16" rx="5" fill="#4dabf7"/>
+				<rect x="58" y="252" width="70" height="16" rx="5" fill="#ffd43b"/>
+				<rect x="58" y="268" width="70" height="12" rx="5" fill="#ff8787"/>
+				<rect x="150" y="244" width="70" height="18" rx="5" fill="#b197fc"/>
+				<rect x="150" y="262" width="70" height="18" rx="5" fill="#63e6be"/>
+				<rect x="242" y="250" width="70" height="30" rx="6" fill="#ffa94d"/>
+				<rect x="40" y="280" width="290" height="10" fill="#b0683a"/>
+				<!-- barra y ganchos -->
+				<rect x="50" y="318" width="270" height="8" rx="4" fill="#8a5a3c"/>
+				<g class="uso-percha" style="--i:0">
+					<path d="M100,322 q0,-14 10,-10 M110,326 L74,352 H146 Z" fill="none" stroke="#5c3b1e" stroke-width="4"/>
+					<path d="M72,350 L148,350 L160,374 L146,382 L146,470 L74,470 L74,382 L60,374 Z" fill="#ff6b6b"/>
+					<circle cx="110" cy="400" r="12" fill="#ffd43b"/>
+				</g>
+				<g class="uso-percha" style="--i:1">
+					<path d="M196,322 q0,-14 10,-10 M206,326 L176,350 H236 Z" fill="none" stroke="#5c3b1e" stroke-width="4"/>
+					<path d="M180,350 L232,350 L236,400 L262,500 L150,500 L176,400 Z" fill="#da77f2"/>
+					<path d="M156,480 L256,480" stroke="#ffffff" stroke-width="6" opacity=".7"/>
+				</g>
+				<g class="uso-percha" style="--i:2">
+					<path d="M282,322 q0,-14 10,-10 M292,326 L262,350 H322 Z" fill="none" stroke="#5c3b1e" stroke-width="4"/>
+					<path d="M264,350 L320,350 L326,456 L258,456 Z" fill="#4dabf7"/>
+					<path d="M272,350 L272,456 M312,350 L312,456" stroke="#1c7ed6" stroke-width="5"/>
+				</g>
+				<!-- repisa y zapatos -->
+				<rect x="40" y="640" width="290" height="10" fill="#b0683a"/>
+				<path d="M64,640 Q62,612 84,610 L110,612 Q132,616 134,640 Z" fill="#e64980"/>
+				<path d="M140,640 Q138,612 160,610 L186,612 Q208,616 210,640 Z" fill="#e64980"/>
+				<path d="M234,640 L234,606 Q250,598 266,606 L290,624 Q308,630 306,640 Z" fill="#fab005"/>
+				<rect x="60" y="680" width="250" height="44" rx="10" fill="#ffffff" opacity=".55"/>
+			</g>
+
+			<!-- espejo y estante de sombreros a la derecha -->
+			<g class="uso-derecha">
+				<ellipse cx="1430" cy="250" rx="96" ry="124" fill="#ffd43b"/>
+				<ellipse cx="1430" cy="250" rx="80" ry="108" fill="#d0ebff"/>
+				<path d="M1386,190 L1420,160 M1392,226 L1450,176" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity=".8" class="uso-reflejo"/>
+				<rect x="1250" y="440" width="330" height="14" rx="6" fill="#b0683a"/>
+				<path d="M1280,440 Q1282,384 1324,382 Q1366,384 1368,440 Z" fill="#ff922b"/>
+				<circle cx="1324" cy="378" r="12" fill="#ffffff"/>
+				<rect x="1274" y="430" width="100" height="16" rx="7" fill="#4dabf7"/>
+				<path d="M1400,440 Q1402,396 1446,394 Q1490,396 1490,440 Z" fill="#20c997"/>
+				<path d="M1486,436 L1540,440" stroke="#20c997" stroke-width="10" stroke-linecap="round"/>
+				<rect x="1260" y="560" width="320" height="14" rx="6" fill="#b0683a"/>
+				<rect x="1290" y="508" width="80" height="52" rx="6" fill="#ffa8c5"/>
+				<rect x="1390" y="520" width="70" height="40" rx="6" fill="#a5d8ff"/>
+				<rect x="1476" y="500" width="70" height="60" rx="6" fill="#ffe066"/>
+			</g>
+
+			<!-- estrellitas que titilan -->
+			<path class="uso-estrella" style="--i:0" d="M470,230 l6,14 l15,1 l-12,9 l4,15 l-13,-8 l-13,8 l4,-15 l-12,-9 l15,-1 z" fill="#ffffff"/>
+			<path class="uso-estrella" style="--i:1" d="M1150,190 l5,11 l12,1 l-9,7 l3,12 l-11,-7 l-11,7 l3,-12 l-9,-7 l12,-1 z" fill="#ffe066"/>
+			<path class="uso-estrella" style="--i:2" d="M1220,640 l5,11 l12,1 l-9,7 l3,12 l-11,-7 l-11,7 l3,-12 l-9,-7 l12,-1 z" fill="#ffffff"/>
+			<path class="uso-estrella" style="--i:3" d="M390,600 l5,11 l12,1 l-9,7 l3,12 l-11,-7 l-11,7 l3,-12 l-9,-7 l12,-1 z" fill="#ffe066"/>
+		</svg>
+	</div>
+
+	<div id="pantalla-inicio" class="pantalla-inicio">
+		<button type="button" id="btn-inicio-volver" class="inicio-volver" hidden>
+			<img src="../../../assets/images/selector-aula/volver.png" alt="Volver">
+		</button>
+		<div class="inicio-mancha" aria-hidden="true"></div>
+		<div class="inicio-contenido">
+			<img class="inicio-icono" src="donde-lo-uso.png" alt="" aria-hidden="true">
+			<p class="inicio-kicker">¿Dónde lo uso?</p>
+			<button type="button" id="btn-empecemos" class="btn-empecemos">
+				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
+				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
+				<span class="btn-empecemos-texto">¡Empecemos!</span>
+			</button>
+		</div>
+	</div>
+
+	<div id="intro3d-root" hidden>
+		<div id="three-container"></div>
+		<div id="phaser-container"></div>
+		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;">
+			Omitir <i class="fa fa-forward" aria-hidden="true"></i>
+		</button>
+		<div id="intro3d-continuar" hidden>
+			<div class="intro3d-continuar-card">
+				<div class="intro3d-titulo-wrap">
+					<span class="intro3d-ray intro3d-ray-l1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l3" aria-hidden="true"></span>
+					<h2>¡Listo!</h2>
+					<span class="intro3d-ray intro3d-ray-r1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r3" aria-hidden="true"></span>
+				</div>
+				<p>Toca el botón para empezar el juego</p>
+				<div class="intro3d-btn-wrap">
+					<span class="intro3d-ray intro3d-ray-bl1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-bl2" aria-hidden="true"></span>
+					<button type="button" id="btn-continuar-intro3d">
+						<span class="intro3d-btn-shine" aria-hidden="true"></span>
+						<span class="intro3d-play" aria-hidden="true"></span>
+						<span>CONTINUAR</span>
+					</button>
+					<span class="intro3d-ray intro3d-ray-br1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-br2" aria-hidden="true"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div style="display: none; background-color: rgba(255, 255, 255, 0.664); width: 100%; height: 100%; position: fixed; z-index: 100;" id="fondo_blanco"></div>
+
+	<div id="final" class="final" hidden>
+		<div id="victoria">
+			<img src="../../img/fondo.png" class="fondo" alt="">
+			<div class="contenido">
+				<img src="../../img/excelente.png" class="excelente" alt="¡Excelente!">
+				<p class="texto-final" id="texto_final"></p>
+				<img src="../../img/trofeo.png" class="trofeo" alt="Trofeo">
+				<img src="../../img/zeus_normal.gif" class="personaje zeus" alt="Zeus">
+				<img src="../../img/zoe_normal.gif" class="personaje zoe" alt="Zoe">
+				<div class="destello destello-1"></div>
+				<div class="destello destello-2"></div>
+				<div class="destello destello-3"></div>
+			</div>
+			<img src="../../img/cortina_izq.png" class="cortina cortina-izq" alt="">
+			<img src="../../img/cortina_der.png" class="cortina cortina-der" alt="">
+			<div class="confeti" id="confeti"></div>
+		</div>
+		<div class="final-acciones" id="final-acciones">
+			<p class="final-pregunta">¿Quieres jugar nuevamente?</p>
+			<div class="final-botones">
+				<button type="button" class="btn btn-success" onclick="window.location.reload(1)"><i class="fa-solid fa-play"></i> Sí</button>
+				<button type="button" class="btn btn-danger" onclick="history.back()"><i class="fa-solid fa-home"></i> No</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="principal">
+		<!-- Zona superior: inicio, reiniciar, edad y título. -->
+		<header class="hud-top">
+			<div class="hud-nav">
+				<button type="button" onclick="history.back()" class="btn-inicio" title="Volver al inicio"><i class="fa-solid fa-house" aria-hidden="true"></i> Inicio</button>
+				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+				<span class="hud-edad"><strong>5-6</strong> años</span>
+			</div>
+			<div class="hud-titulo">
+				<h1 aria-label="¿Dónde lo uso?"><span style="--c:#ff6b6b">¿</span><span style="--c:#ff922b">D</span><span style="--c:#fab005">Ó</span><span style="--c:#40c057">N</span><span style="--c:#15aabf">D</span><span style="--c:#4c6ef5">E</span><span class="hud-espacio"> </span><span style="--c:#be4bdb">L</span><span style="--c:#f06595">O</span><span class="hud-espacio"> </span><span style="--c:#ff6b6b">U</span><span style="--c:#ff922b">S</span><span style="--c:#40c057">O</span><span style="--c:#4c6ef5">?</span></h1>
+			</div>
+		</header>
+
+		<!-- Zona central: el tablero (Phaser). Zoe 3D solo sale en la presentación y la demo. -->
+		<main class="escena">
+			<div id="escenario-zona" class="escenario-zona">
+				<div id="escenario-phaser" class="escenario-phaser" role="application" aria-label="Tablero: une cada objeto de la izquierda con la parte del cuerpo donde se usa, a la derecha. Toca el círculo de la tarjeta, mantén presionado y lleva la línea hasta su pareja."></div>
+				<div id="escenario-cartel" class="escenario-cartel" hidden>
+					<strong id="escenario-cartel-titulo"></strong>
+					<span id="escenario-cartel-sub"></span>
+				</div>
+			</div>
+		</main>
+
+		<!-- Zona inferior: progreso. -->
+		<footer class="barra-abajo">
+			<div id="progreso-box" class="progreso-box" aria-live="polite">
+				<span id="progreso-ronda" class="progreso-ronda">RONDA 1/2</span>
+				<p class="progreso-texto"><span id="progreso-rotulo">PAREJAS ENCONTRADAS:</span> <strong id="progreso-num">0/5</strong></p>
+				<div id="progreso-barra" class="progreso-barra" role="progressbar" aria-valuemin="0" aria-valuenow="0" aria-valuemax="5">
+					<div id="progreso-relleno" class="progreso-relleno"></div>
+				</div>
+			</div>
+		</footer>
+	</div>
+
+	<!-- Zoe (3D): solo en la presentación y la demo, de pie a la izquierda del tablero; su nube va sobre su cabeza. -->
+	<aside id="guia" class="guia" aria-live="polite">
+		<div class="guia-pj">
+			<img id="guia-img" src="../../img/zoe_normal.gif" alt="">
+			<div id="zoe-nube" class="zoe-nube" aria-live="polite" hidden><span id="zoe-nube-texto"></span></div>
+		</div>
+	</aside>
+
+	<div id="comenzar-wrap" class="comenzar-wrap" hidden>
+		<button type="button" id="btn-comenzar" class="btn-comenzar"><i class="fa-solid fa-play"></i><span class="btn-comenzar-texto">¡A jugar!</span></button>
+	</div>
+
+	<div id="menu-pantalla" class="menu-acc">
+		<button type="button" id="btn-pantalla" class="menu-acc-fab" title="Pantalla completa">
+			<i class="fa-solid fa-expand"></i>
+		</button>
+	</div>
+
+	<div id="menu-acc" class="menu-acc">
+		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
+			<i class="fa-solid fa-universal-access"></i>
+		</button>
+		<div id="menu-acc-panel" class="menu-acc-panel" hidden>
+			<div class="menu-acc-cab">
+				<strong>Accesibilidad</strong>
+				<button type="button" id="btn-cerrar-acc" class="menu-acc-cerrar" aria-label="Cerrar">&times;</button>
+			</div>
+			<div id="menu-acc-ops" class="menu-acc-ops"></div>
+		</div>
+	</div>
+
+	<div id="menu-vol" class="menu-acc">
+		<button type="button" id="btn-menu-vol" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-vol-panel" title="Volumen de fondo">
+			<i class="fa-solid fa-volume-high"></i>
+		</button>
+		<div id="menu-vol-panel" class="menu-acc-panel" hidden>
+			<div class="menu-acc-cab">
+				<strong>Volumen de fondo</strong>
+				<button type="button" id="btn-cerrar-vol" class="menu-acc-cerrar" aria-label="Cerrar">×</button>
+			</div>
+			<label class="menu-acc-op menu-acc-rango">
+				<span>Volumen <strong id="vol-val">20</strong></span>
+				<input type="range" id="rango-volumen" min="0" max="100" step="1" value="20">
+			</label>
+		</div>
+	</div>
+
+	<script src="../../texto_voz.js"></script>
+	<script src="../../shared/edad-nivel.js"></script>
+	<script src="../../../assets/vendor/phaser/phaser.min.js"></script>
+	<script src="../../intro3d/js/config.js?v=20261007a"></script>
+	<script src="../../intro3d/js/ambientes-tema.js?v=20261105a"></script>
+	<script type="importmap">
+	{
+	  "imports": {
+	    "three": "../../../assets/vendor/three/three.module.js",
+	    "three/addons/": "../../../assets/vendor/three/addons/"
+	  }
+	}
+	</script>
+	<script type="module" src="../../intro3d/js/three-scene.js?v=20261105a"></script>
+	<script type="module" src="../../intro3d/js/final-scene.js?v=20261105a"></script>
+	<script src="../../tutorial/tutorial.js?v=20261019c"></script>
+	<script src="../../intro3d/js/intro.js?v=20261028p4"></script>
+	<script src="../../final/final.js"></script>
+	<script src="../../shared/aplicar-perfil-juego.js?v=20261013a"></script>
+	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
+	<script src="../../../assets/vendor/gsap/gsap.min.js"></script>
+	<script src="../../../assets/vendor/howler/howler.core.min.js"></script>
+	<script src="../../shared/pednia-audio.js?v=20261028t"></script>
+	<script src="../../shared/pednia-fx.js?v=20261107d"></script>
+	<script src="reglas.js?v=20261112e"></script>
+	<script src="../comun/partes-cuerpo.js?v=20261112d"></script>
+	<script src="iconos.js?v=20261112s"></script>
+	<script src="escenario-phaser.js?v=20261112e"></script>
+	<script src="conexiones.js?v=20261112a"></script>
+	<script src="demo.js?v=20261112a"></script>
+	<script src="script.js?v=20261112f"></script>
+	<script type="module" src="guia-3d.js?v=20261112a"></script>
+</body>
+</html>
