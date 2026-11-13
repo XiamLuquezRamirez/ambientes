@@ -44,6 +44,37 @@ function clipsDelGlb() {
     return json.animations.map(function (a) { return a.name; });
 }
 
+/** Duración real de cada clip del GLB (segundos), leída de los accesores del archivo. */
+function duracionesDelGlb() {
+    const glb = path.join(raiz, "public", "catalogo_juegos", "Polimotor", "SimonDiceCorporal", "zeus_animado_suave.glb");
+    const b = fs.readFileSync(glb);
+    const jlen = b.readUInt32LE(12);
+    const json = JSON.parse(b.slice(20, 20 + jlen).toString("utf8"));
+    const off = 20 + jlen;
+    const bin = b.slice(off + 8, off + 8 + b.readUInt32LE(off));
+    const dur = {};
+    json.animations.forEach(function (a) {
+        let d = 0;
+        a.samplers.forEach(function (sp) {
+            const acc = json.accessors[sp.input];
+            let t = 0;
+            if (acc.max) {
+                t = acc.max[0];
+            } else {
+                const bv = json.bufferViews[acc.bufferView];
+                const start = (bv.byteOffset || 0) + (acc.byteOffset || 0);
+                for (let i = 0; i < acc.count; i++) {
+                    const v = bin.readFloatLE(start + i * 4);
+                    if (v > t) t = v;
+                }
+            }
+            if (t > d) d = t;
+        });
+        dur[a.name] = d;
+    });
+    return dur;
+}
+
 console.log("El Secuenciador de Baile y Lateralidad");
 
 // ---------------------------------------------------------------- Tarea 1: config
@@ -246,6 +277,96 @@ prueba("iconos: dataUri sirve los 16 dibujos", function () {
     COMANDOS.forEach(function (id) {
         const uri = I.dataUri(id);
         assert.ok(uri.indexOf("data:image/svg+xml") === 0, id + " tiene data URI");
+    });
+});
+
+// ---------------------------------------------------------------- Tarea 4: Zeus y los clips del GLB
+
+/** Lee MOVIMIENTOS, DURACION_CLIP y URL_MODELO de zeus-3d.js (es un módulo ESM, se analiza como texto). */
+function zeus3d() {
+    const txt = fs.readFileSync(path.join(carpeta, "zeus-3d.js"), "utf8");
+    const movs = {};
+    const bloque = txt.slice(txt.indexOf("const MOVIMIENTOS = {"), txt.indexOf("const DURACION_CLIP"));
+    const re = /(\w+):\s*\{\s*clip:\s*"([^"]+)"[^}]*contactos:\s*\[([^\]]*)\]/g;
+    let m;
+    while ((m = re.exec(bloque)) !== null) {
+        movs[m[1]] = { clip: m[2], contactos: m[3].split(",").map(Number).filter(function (n) { return !isNaN(n); }) };
+    }
+    const dur = {};
+    const bd = txt.slice(txt.indexOf("const DURACION_CLIP = {"), txt.indexOf("// Lo que dura cada movimiento"));
+    const rd = /(\w+):\s*([\d.]+)/g;
+    while ((m = rd.exec(bd)) !== null) dur[m[1]] = Number(m[2]);
+    const url = (txt.match(/new URL\("([^"]+)"/) || [])[1] || "";
+    return { movs: movs, dur: dur, url: url, txt: txt };
+}
+
+prueba("zeus-3d.js: los 16 comandos tienen su clip real del GLB", function () {
+    const z = zeus3d();
+    const clips = clipsDelGlb();
+    const porId = {};
+    cfg.acciones.forEach(function (a) { porId[a.id] = a.clip; });
+    COMANDOS.forEach(function (id) {
+        const mv = z.movs[id];
+        assert.ok(mv, id + " está en MOVIMIENTOS");
+        assert.ok(clips.indexOf(mv.clip) >= 0, id + ": el clip " + mv.clip + " existe en el GLB");
+        assert.strictEqual(mv.clip, porId[id], id + ": el clip coincide con el del config");
+        assert.ok(mv.contactos.length >= 1, id + " tiene al menos un contacto");
+        mv.contactos.forEach(function (t) {
+            assert.ok(t > 0 && t < 1, id + ": el contacto " + t + " está entre 0 y 1");
+        });
+    });
+});
+
+prueba("zeus-3d.js: reutiliza el GLB de SimonDiceCorporal, sin copiarlo", function () {
+    const z = zeus3d();
+    assert.ok(/SimonDiceCorporal\/zeus_animado_suave\.glb$/.test(z.url), "apunta al GLB vecino: " + z.url);
+    assert.ok(
+        !fs.existsSync(path.join(carpeta, "zeus_animado_suave.glb")),
+        "no hay una copia de 17 MB en la carpeta del juego"
+    );
+});
+
+prueba("zeus-3d.js: DURACION_CLIP trae la duración medida de cada clip usado", function () {
+    const z = zeus3d();
+    const medidas = duracionesDelGlb();
+    COMANDOS.forEach(function (id) {
+        const clip = z.movs[id].clip;
+        assert.ok(z.dur[clip] != null, clip + " tiene duración declarada");
+        assert.ok(
+            Math.abs(z.dur[clip] - medidas[clip]) < 0.1,
+            clip + ": declarada " + z.dur[clip] + "s, medida " + medidas[clip].toFixed(2) + "s"
+        );
+    });
+});
+
+// Review Focus 4: el clip se acelera con timeScale para caber en el tiempo de la tanda; si la ronda pide
+// menos ms que la duración natural, el clip debe acelerarse, no solaparse con el movimiento siguiente.
+prueba("ritmo: los clips largos caben en el tiempo de su tanda", function () {
+    const z = zeus3d();
+    const ms = cfg.rondas[0].msMovimiento;
+    const pausa = cfg.rondas[0].pausaMs;
+    COMANDOS.forEach(function (id) {
+        const clip = z.movs[id].clip;
+        const natural = z.dur[clip] * 1000;
+        const escala = natural / ms;
+        assert.ok(escala > 0, clip + ": la escala de tiempo es positiva");
+        // el clip se adapta al ritmo: no puede quedar tan acelerado que no se vea (más de 4x)
+        assert.ok(escala <= 4, clip + ": " + natural + "ms en " + ms + "ms sería " + escala.toFixed(1) + "x, demasiado rápido");
+    });
+    assert.ok(ms + pausa > 0, "la tanda deja tiempo entre movimientos");
+});
+
+prueba("script.js: cada comando tiene color de luz y efecto, y no quedan ids viejos", function () {
+    const txt = fs.readFileSync(path.join(carpeta, "script.js"), "utf8");
+    assert.ok(txt.indexOf("tocarPies") < 0, "no quedan referencias al id viejo tocarPies");
+    const luces = txt.slice(txt.indexOf("const COLORES_LUZ = {"), txt.indexOf("function luz("));
+    COMANDOS.forEach(function (id) {
+        assert.ok(new RegExp("\\b" + id + ":").test(luces), id + " tiene color de luz");
+    });
+    // el efecto de cada comando se resuelve en la tabla EFECTOS, justo antes de golpe()
+    const golpe = txt.slice(txt.indexOf("const EFECTOS = {"), txt.indexOf("let turnoLuz"));
+    COMANDOS.forEach(function (id) {
+        assert.ok(golpe.indexOf(id) >= 0, id + " tiene efecto en golpe()");
     });
 });
 

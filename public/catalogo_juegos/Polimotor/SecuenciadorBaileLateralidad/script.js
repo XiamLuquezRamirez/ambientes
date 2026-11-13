@@ -773,11 +773,21 @@ function centroBoton(id) {
 
 const COLORES_LUZ = {
     cabeza: "#ffe066",
+    cintura: "#ffc078",
+    pies: "#d0bfff",
     aplaudir: "#74c0fc",
+    abrirBrazos: "#99e9f2",
+    estirarse: "#96f2d7",
+    brazoDerecho: "#ffc9a0",
+    brazoIzquierdo: "#a5d8ff",
+    pieDerecho: "#ffc9de",
+    pieIzquierdo: "#96f2d7",
     zapatear: "#8ce99a",
     saltar: "#ffa8c5",
-    tocarPies: "#d0bfff",
-    abrirBrazos: "#99e9f2"
+    saltarUnPie: "#eebefa",
+    girar: "#63e6be",
+    bailar: "#fcc2d7",
+    marchar: "#bac8ff"
 };
 
 function luz(id) {
@@ -808,41 +818,65 @@ function puntoZeus(parte) {
  * Efecto y sonido de cada contacto de un movimiento. `n` es el número de contacto (1, 2, …): el salto
  * suena distinto al despegar (1) que al caer (2), que es cuando retumba la tarima.
  */
+/*
+ * Qué se ve y se oye en cada contacto de un movimiento. Una entrada por comando:
+ *   parte   dónde cae el efecto (Zeus3D.punto); "manos", "pies", "cabeza", "pieDerecho"…
+ *   efecto  "estrellas" | "destello" | "ondas" | "notas" (lo dibuja la capa Phaser)
+ *   sonido  "brillo" | "aplauso" | "zapateo" | "nota" (nota usa la del propio comando)
+ *   tarima  true si además vibra el piso de la pista
+ *   porGolpe opcional: distinto efecto en el 1.er y 2.º contacto (salto: despegue y caída)
+ */
+const EFECTOS = {
+    cabeza: { parte: "cabeza", efecto: "estrellas", sonido: "brillo" },
+    cintura: { parte: "centro", efecto: "destello", sonido: "nota" },
+    pies: { parte: "pies", efecto: "destello", sonido: "nota" },
+    aplaudir: { parte: "manos", efecto: "destello", sonido: "aplauso" },
+    abrirBrazos: { parte: "manos", efecto: "destello", sonido: "brillo" },
+    estirarse: { parte: "manos", efecto: "estrellas", sonido: "brillo" },
+    brazoDerecho: { parte: "manos", efecto: "destello", sonido: "nota" },
+    brazoIzquierdo: { parte: "manos", efecto: "destello", sonido: "nota" },
+    pieDerecho: { parte: "pieDerecho", efecto: "notas", sonido: "nota" },
+    pieIzquierdo: { parte: "pieIzquierdo", efecto: "notas", sonido: "nota" },
+    zapatear: { parte: "pieDerecho", efecto: "ondas", sonido: "zapateo", tarima: true },
+    saltar: {
+        parte: "pies",
+        porGolpe: [
+            { efecto: "estrellas", sonido: "brillo", dy: -30 },
+            { efecto: "ondas", sonido: "zapateo", tarima: true, dy: 6 }
+        ]
+    },
+    saltarUnPie: {
+        parte: "pies",
+        porGolpe: [
+            { efecto: "estrellas", sonido: "brillo", dy: -26 },
+            { efecto: "ondas", sonido: "zapateo", tarima: true, dy: 6 }
+        ]
+    },
+    girar: { parte: "centro", efecto: "notas", sonido: "brillo" },
+    bailar: { parte: "manos", efecto: "notas", sonido: "nota" },
+    marchar: { parte: "pies", efecto: "ondas", sonido: "zapateo", tarima: true }
+};
+
 function golpe(id, n) {
-    const e = fx();
-    if (id === "cabeza") {
-        sfx("brillo");
-        const p = puntoZeus("cabeza");
-        if (e && p) e.estrellas(p.x, p.y - 20);
-    } else if (id === "aplaudir") {
-        sfx("aplauso");
-        const p = puntoZeus("manos");
-        if (e && p) e.destello(p.x, p.y, accionCfg("aplaudir").color);
-    } else if (id === "zapatear") {
-        sfx("zapateo");
-        vibrarTarima();
-        const p = puntoZeus("pieDerecho") || puntoZeus("pies");
-        if (e && p) e.ondas(p.x, p.y + 6);
-    } else if (id === "saltar") {
-        // 1 = despegue (brillo y estrellitas hacia arriba), 2 = caída (golpe en la tarima)
-        const p = puntoZeus("pies");
-        if (n === 1) {
-            sfx("brillo");
-            if (e && p) e.estrellas(p.x, p.y - 30);
-        } else {
-            sfx("zapateo");
-            vibrarTarima();
-            if (e && p) e.ondas(p.x, p.y + 6);
-        }
-    } else if (id === "tocarPies") {
-        sfx("nota", accionCfg("tocarPies").nota);
-        const p = puntoZeus("pies");
-        if (e && p) e.destello(p.x, p.y, accionCfg("tocarPies").color);
-    } else if (id === "abrirBrazos") {
-        sfx("brillo");
-        const p = puntoZeus("manos");
-        if (e && p) e.destello(p.x, p.y, accionCfg("abrirBrazos").color);
-    }
+    const e = escena();
+    const base = EFECTOS[id];
+    if (!base) return;
+    // los movimientos con dos fases (saltos) traen su propia receta por contacto
+    const paso = base.porGolpe ? (base.porGolpe[Math.min(n, base.porGolpe.length) - 1] || base.porGolpe[0]) : base;
+    const cfgAccion = accionCfg(id);
+
+    if (paso.sonido === "nota") sfx("nota", cfgAccion.nota);
+    else if (paso.sonido) sfx(paso.sonido);
+
+    if (paso.tarima) vibrarTarima();
+
+    const p = puntoZeus(base.parte) || puntoZeus("centro");
+    if (!e || !p) return;
+    const y = p.y + (paso.dy || 0);
+    if (paso.efecto === "estrellas") e.estrellas(p.x, y);
+    else if (paso.efecto === "ondas") e.ondas(p.x, y + 6);
+    else if (paso.efecto === "notas") e.notas(p.x, y, cfgAccion.color);
+    else if (paso.efecto === "destello") e.destello(p.x, y, cfgAccion.color);
 }
 
 /**

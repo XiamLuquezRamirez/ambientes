@@ -1,5 +1,5 @@
 /**
- * Zeus3D — Zeus en 3D en el centro de la tarima de "¡Simón Dice Corporal!" (window.Zeus3D).
+ * Zeus3D — Zeus en 3D en el centro de la pista de "El Secuenciador de Baile y Lateralidad" (window.Zeus3D).
  *
  * Usa el modelo propio del juego `zeus_animado_suave.glb`, que **ya trae un clip por cada movimiento**
  * (Saltar, Tocar_cabeza, Aplaudir, Zapatear, Tocar_pies, Abrir_brazos) además de los de siempre (Quieto,
@@ -10,8 +10,8 @@
  *
  * API (script.js la usa solo si existe y está lista):
  *   Zeus3D.listo()                         true cuando el modelo ya se ve.
- *   Zeus3D.hacer(id, {ms, alGolpe})        "cabeza" | "aplaudir" | "zapatear" | "saltar" | "tocarPies" |
- *                                          "abrirBrazos" | "brazos" (celebrar) → Promise al terminar;
+ *   Zeus3D.hacer(id, {ms, alGolpe})        uno de los 16 comandos del juego (ver MOVIMIENTOS) o "brazos"
+ *                                          (celebrar) → Promise al terminar;
  *                                          alGolpe(n) en cada contacto (ver CONTACTOS).
  *   Zeus3D.gesto(nombre)                   "saluda" | "celebra" | "baila" | "amistoso" | "senala" (clips del GLB).
  *   Zeus3D.hablar(on)                      clip de hablar mientras suena su voz.
@@ -24,8 +24,9 @@ import * as THREE from "three";
 import { crearCargadorGltf } from "../../intro3d/js/cargador-gltf.js";
 import { agregarLucesModelo } from "../../intro3d/js/luces-modelo.js";
 
-// Modelo propio de este juego: trae un clip por cada movimiento (el esqueleto es el mismo de nino.glb).
-const URL_MODELO = new URL("./zeus_animado_suave.glb", import.meta.url).href;
+// El modelo vive en SimonDiceCorporal y se reutiliza desde aquí: es el mismo GLB de 17 MB, no se duplica.
+// Trae 33 clips; este juego usa los 16 corporales (los de estado de ánimo quedan como gestos o fuera).
+const URL_MODELO = new URL("../SimonDiceCorporal/zeus_animado_suave.glb", import.meta.url).href;
 const ESCALA = 1.12;
 const YAW = 0; // de frente al niño, en el centro de la tarima
 const FOV = 26;
@@ -50,14 +51,29 @@ const GESTOS = {
  *             esto es solo el golpecito extra del zapateo
  */
 const MOVIMIENTOS = {
+    // --- tocar partes del cuerpo
     cabeza: { clip: "Tocar_cabeza", contactos: [0.42, 0.66] },
+    cintura: { clip: "Tocar_cintura", contactos: [0.44] },
+    pies: { clip: "Tocar_pies", contactos: [0.46] },
+    // --- brazos
     aplaudir: { clip: "Aplaudir", contactos: [0.3, 0.52, 0.74] },
+    abrirBrazos: { clip: "Abrir_brazos", contactos: [0.42] },
+    estirarse: { clip: "Estirarse", contactos: [0.4] },
+    // --- lateralidad: el propio modelo distingue derecha e izquierda, no se espeja por código
+    brazoDerecho: { clip: "Levantar_brazo_derecho", contactos: [0.42] },
+    brazoIzquierdo: { clip: "Levantar_brazo_izquierdo", contactos: [0.42] },
+    pieDerecho: { clip: "Levantar_pie_derecho", contactos: [0.44] },
+    pieIzquierdo: { clip: "Levantar_pie_izquierdo", contactos: [0.44] },
+    // --- piernas y desplazamiento
     zapatear: { clip: "Zapatear", contactos: [0.3, 0.75], baja: 1.2 },
     // el clip Saltar flexiona pero NO desplaza la raíz: el vuelo entre el despegue y la caída se agrega
     // por código (campo `vuelo`), para que Zeus se vea de verdad en el aire
     saltar: { clip: "Saltar", contactos: [0.3, 0.68], vuelo: [0.3, 0.68, 1.1] },
-    tocarPies: { clip: "Tocar_pies", contactos: [0.46] },
-    abrirBrazos: { clip: "Abrir_brazos", contactos: [0.42] },
+    saltarUnPie: { clip: "Saltar_en_un_pie", contactos: [0.32, 0.62], vuelo: [0.32, 0.62, 0.7] },
+    girar: { clip: "Girar", contactos: [0.5] },
+    bailar: { clip: "Bailar", contactos: [0.3, 0.7] },
+    marchar: { clip: "Caminar", contactos: [0.25, 0.75], baja: 0.6 },
+    // --- celebración (no es un botón)
     brazos: { clip: "Celebrar", contactos: [0.25] }
 };
 
@@ -67,18 +83,32 @@ const MOVIMIENTOS = {
  */
 const DURACION_CLIP = {
     Tocar_cabeza: 3.4,
+    Tocar_cintura: 3.4,
+    Tocar_pies: 4.0,
     Aplaudir: 2.1,
+    Abrir_brazos: 3.2,
+    Estirarse: 4.2,
+    Levantar_brazo_derecho: 3.2,
+    Levantar_brazo_izquierdo: 3.2,
+    Levantar_pie_derecho: 3.0,
+    Levantar_pie_izquierdo: 3.0,
     Zapatear: 1.0,
     Saltar: 2.33,
-    Tocar_pies: 4.0,
-    Abrir_brazos: 3.2,
+    Saltar_en_un_pie: 5.6,
+    Girar: 3.6,
+    Bailar: 2.23,
+    Caminar: 2.1,
     Celebrar: 2.3
 };
 
 // Lo que dura cada movimiento si la ronda no pide otra cosa (ms).
 const DURACION = {
-    cabeza: 1800, aplaudir: 1700, zapatear: 1400,
-    saltar: 1800, tocarPies: 1900, abrirBrazos: 1800,
+    cabeza: 1800, cintura: 1800, pies: 1900,
+    aplaudir: 1700, abrirBrazos: 1800, estirarse: 2000,
+    brazoDerecho: 1800, brazoIzquierdo: 1800,
+    pieDerecho: 1800, pieIzquierdo: 1800,
+    zapatear: 1400, saltar: 1800, saltarUnPie: 2100,
+    girar: 1900, bailar: 1800, marchar: 1700,
     brazos: 1600
 };
 
