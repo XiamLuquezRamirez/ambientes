@@ -57,29 +57,32 @@
         '<path d="M170,26 l3,7 l8,1 l-6,5 l2,8 l-7,-4 l-7,4 l2,-8 l-6,-5 l8,-1 z" fill="#fff" stroke="' + L + '" stroke-width="3" stroke-linejoin="round"/>' +
         '</svg>';
 
-    function mano(espejo) {
-        // mano abierta de perfil (palma hacia la otra mano), dedos hacia arriba
-        var t = espejo ? ' transform="translate(200 0) scale(-1 1)"' : "";
-        return '<g' + t + '>' +
-            '<path d="M96,176 L70,176 Q60,150 62,118 L60,70 Q60,58 70,58 Q80,58 80,70 L80,104 L82,54 Q82,42 93,42 Q104,42 104,54 L102,104 L104,62 Q104,52 113,52 Q122,52 122,62 L118,118 Q124,106 134,104 Q146,104 144,118 Q132,140 116,160 Q106,172 96,176 Z" ' +
-            'fill="' + PIEL + '" stroke="' + L + '" stroke-width="6" stroke-linejoin="round"/>' +
-            '<path d="M70,100 L70,82 M92,96 L92,72 M112,100 L112,80" stroke="' + PIEL_SOMBRA + '" stroke-width="4" stroke-linecap="round"/>' +
-            '<rect x="64" y="168" width="40" height="22" rx="7" fill="#4dabf7" stroke="' + L + '" stroke-width="6"/>' +
-            "</g>";
-    }
 
     SVG.aplaudir =
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
-        // estallido detrás de las manos
-        '<path d="M100,26 L112,52 L140,40 L132,68 L162,74 L138,92 L160,112 L130,112 L136,142 L112,126 L100,152 L88,126 L64,142 L70,112 L40,112 L62,92 L38,74 L68,68 L60,40 L88,52 Z" fill="#fff3bf" stroke="#ffd43b" stroke-width="4" stroke-linejoin="round"/>' +
-        '<g transform="translate(-14 0) rotate(-12 100 120)">' + mano(false) + "</g>" +
-        '<g transform="translate(14 0) rotate(12 100 120)">' + mano(true) + "</g>" +
-        // rayitas de palmada
-        '<g stroke="' + L + '" stroke-width="6" stroke-linecap="round">' +
-        '<path d="M100,10 L100,26"/><path d="M62,18 L72,32"/><path d="M138,18 L128,32"/>' +
-        '<path d="M30,60 L46,66"/><path d="M170,60 L154,66"/>' +
-        "</g>" +
-        "</svg>";
+        piso() +
+        // piernas firmes
+        miembro('M88,152 L86,168', 17) +
+        miembro('M112,152 L114,168', 17) +
+        zapato(80, 166, false) +
+        zapato(120, 166, true) +
+        cuerpo(154) +
+        // destello de la palmada, delante del cuerpo y detrás de las manos
+        '<path d="M100,76 L108,96 L128,88 L120,108 L142,114 L122,126 L138,142 L116,140 L118,160 L100,148 L82,160 L84,140 L62,142 L78,126 L58,114 L80,108 L72,88 L92,96 Z" fill="#fff3bf" stroke="#ffd43b" stroke-width="4" stroke-linejoin="round"/>' +
+        // brazos que se juntan al frente, a la altura del pecho
+        miembro('M78,120 Q62,134 86,128') +
+        miembro('M122,120 Q138,134 114,128') +
+        // las dos manos chocando en el centro
+        mano(90, 126, 13) +
+        mano(110, 126, 13) +
+        carita(100, 70, 31) +
+        // rayitas de la palmada
+        '<g stroke="#ffd43b" stroke-width="6" stroke-linecap="round">' +
+        '<path d="M40,104 L24,100"/><path d="M160,104 L176,100"/>' +
+        '<path d="M46,80 L32,70"/><path d="M154,80 L168,70"/>' +
+        '<path d="M48,140 L34,148"/><path d="M152,140 L166,148"/>' +
+        '</g>' +
+        '</svg>';
 
     function pierna(x, y, rot, colorZapato) {
         return '<g transform="translate(' + x + " " + y + ") rotate(" + rot + ')">' +

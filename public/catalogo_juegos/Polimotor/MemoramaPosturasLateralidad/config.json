@@ -1,0 +1,648 @@
+{
+  "nombre": "Memorama de Posturas Asimétricas y Lateralidad",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "previaMs": 3500,
+    "errorVisibleMs": 2000,
+    "ayudaPrimeraMs": 8000,
+    "ayudaSegundaMs": 8000,
+    "ayudaRepetirMs": 14000
+  },
+  "_posturas": "Cada postura es un identificador propio. Las parejas comparten id (dibujo idéntico). Las posturas que son reflejo horizontal una de otra tienen ids DISTINTOS y conviven en la misma ronda: ese es el reto de lateralidad. Los ángulos son los del muñeco articulado (Postura/Muneco de El Espejo de las Posiciones): a = abducción del hombro/cadera (0 pegado al cuerpo, 90 horizontal, 180 arriba), b = flexión del codo/rodilla. El lado es anatómico: el personaje mira al niño, así que su izquierda se ve a la derecha de la pantalla.",
+  "posturas": [
+    {
+      "id": "mano-der-cabeza",
+      "nombre": "Mano derecha en la cabeza",
+      "corto": "Mano derecha arriba",
+      "lado": "der",
+      "fondo": "#fff4e6",
+      "borde": "#f76707",
+      "destello": [
+        "brazo_der"
+      ],
+      "voz": "¡Mano derecha sobre la cabeza!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": -175,
+          "b": 30
+        },
+        "brazo_izq": {
+          "a": 100,
+          "b": 0
+        },
+        "pierna_der": {
+          "a": 16,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 16,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "mano-izq-cabeza",
+      "nombre": "Mano izquierda en la cabeza",
+      "corto": "Mano izquierda arriba",
+      "lado": "izq",
+      "fondo": "#e6fcf5",
+      "borde": "#0ca678",
+      "destello": [
+        "brazo_izq"
+      ],
+      "voz": "¡Mano izquierda sobre la cabeza!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 100,
+          "b": 0
+        },
+        "brazo_izq": {
+          "a": -175,
+          "b": 30
+        },
+        "pierna_der": {
+          "a": 16,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 16,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "mano-der-cintura",
+      "nombre": "Mano derecha en la cintura",
+      "corto": "Mano derecha a la cintura",
+      "lado": "der",
+      "fondo": "#fff0f6",
+      "borde": "#e64980",
+      "destello": [
+        "brazo_der"
+      ],
+      "voz": "¡Mano derecha en la cintura!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 35,
+          "b": -60
+        },
+        "brazo_izq": {
+          "a": 100,
+          "b": 0
+        },
+        "pierna_der": {
+          "a": 16,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 16,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "mano-izq-cintura",
+      "nombre": "Mano izquierda en la cintura",
+      "corto": "Mano izquierda a la cintura",
+      "lado": "izq",
+      "fondo": "#e7f5ff",
+      "borde": "#1c7ed6",
+      "destello": [
+        "brazo_izq"
+      ],
+      "voz": "¡Mano izquierda en la cintura!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 100,
+          "b": 0
+        },
+        "brazo_izq": {
+          "a": 35,
+          "b": -60
+        },
+        "pierna_der": {
+          "a": 16,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 16,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "brazo-der-arriba-cintura",
+      "nombre": "Brazo derecho arriba, izquierdo en la cintura",
+      "corto": "Brazo derecho arriba",
+      "lado": "der",
+      "fondo": "#ebfbee",
+      "borde": "#2f9e44",
+      "destello": [
+        "brazo_der",
+        "brazo_izq"
+      ],
+      "voz": "¡Brazo derecho levantado y mano izquierda en la cintura!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 175,
+          "b": 0
+        },
+        "brazo_izq": {
+          "a": 35,
+          "b": -60
+        },
+        "pierna_der": {
+          "a": 16,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 16,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "brazo-izq-arriba-cintura",
+      "nombre": "Brazo izquierdo arriba, derecho en la cintura",
+      "corto": "Brazo izquierdo arriba",
+      "lado": "izq",
+      "fondo": "#fff5f5",
+      "borde": "#e03131",
+      "destello": [
+        "brazo_izq",
+        "brazo_der"
+      ],
+      "voz": "¡Brazo izquierdo levantado y mano derecha en la cintura!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 35,
+          "b": -60
+        },
+        "brazo_izq": {
+          "a": 175,
+          "b": 0
+        },
+        "pierna_der": {
+          "a": 16,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 16,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "mano-der-hombro-izq",
+      "nombre": "Mano derecha en el hombro izquierdo",
+      "corto": "Mano derecha cruzada",
+      "lado": "der",
+      "fondo": "#f3f0ff",
+      "borde": "#7048e8",
+      "destello": [
+        "brazo_der"
+      ],
+      "voz": "¡Mano derecha sobre el hombro izquierdo!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": -50,
+          "b": -110
+        },
+        "brazo_izq": {
+          "a": 110,
+          "b": 0
+        },
+        "pierna_der": {
+          "a": 16,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 16,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "mano-izq-hombro-der",
+      "nombre": "Mano izquierda en el hombro derecho",
+      "corto": "Mano izquierda cruzada",
+      "lado": "izq",
+      "fondo": "#fff9db",
+      "borde": "#e8a200",
+      "destello": [
+        "brazo_izq"
+      ],
+      "voz": "¡Mano izquierda sobre el hombro derecho!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 110,
+          "b": 0
+        },
+        "brazo_izq": {
+          "a": -50,
+          "b": -110
+        },
+        "pierna_der": {
+          "a": 16,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 16,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "rodilla-der-arriba",
+      "nombre": "Rodilla derecha arriba",
+      "corto": "Rodilla derecha",
+      "lado": "der",
+      "fondo": "#e3fafc",
+      "borde": "#1098ad",
+      "destello": [
+        "pierna_der",
+        "brazo_izq"
+      ],
+      "voz": "¡Rodilla derecha arriba y brazo izquierdo al lado!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 35,
+          "b": 0
+        },
+        "brazo_izq": {
+          "a": 115,
+          "b": 0
+        },
+        "pierna_der": {
+          "a": 55,
+          "b": -105
+        },
+        "pierna_izq": {
+          "a": 0,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "rodilla-izq-arriba",
+      "nombre": "Rodilla izquierda arriba",
+      "corto": "Rodilla izquierda",
+      "lado": "izq",
+      "fondo": "#f8f0fc",
+      "borde": "#ae3ec9",
+      "destello": [
+        "pierna_izq",
+        "brazo_der"
+      ],
+      "voz": "¡Rodilla izquierda arriba y brazo derecho al lado!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 115,
+          "b": 0
+        },
+        "brazo_izq": {
+          "a": 35,
+          "b": 0
+        },
+        "pierna_der": {
+          "a": 0,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 55,
+          "b": -105
+        }
+      }
+    },
+    {
+      "id": "codo-der-doblado",
+      "nombre": "Codo derecho doblado arriba",
+      "corto": "Codo derecho",
+      "lado": "der",
+      "fondo": "#fff0f6",
+      "borde": "#c2255c",
+      "destello": [
+        "brazo_der"
+      ],
+      "voz": "¡Codo derecho doblado hacia arriba!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 95,
+          "b": 95
+        },
+        "brazo_izq": {
+          "a": 25,
+          "b": 0
+        },
+        "pierna_der": {
+          "a": 22,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 22,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "codo-izq-doblado",
+      "nombre": "Codo izquierdo doblado arriba",
+      "corto": "Codo izquierdo",
+      "lado": "izq",
+      "fondo": "#edf2ff",
+      "borde": "#4263eb",
+      "destello": [
+        "brazo_izq"
+      ],
+      "voz": "¡Codo izquierdo doblado hacia arriba!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 25,
+          "b": 0
+        },
+        "brazo_izq": {
+          "a": 95,
+          "b": 95
+        },
+        "pierna_der": {
+          "a": 22,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 22,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "gimnasta-der",
+      "nombre": "Brazo derecho arriba y rodilla izquierda",
+      "corto": "Gimnasta derecha",
+      "lado": "der",
+      "fondo": "#f3f0ff",
+      "borde": "#5f3dc4",
+      "destello": [
+        "brazo_der",
+        "pierna_izq"
+      ],
+      "voz": "¡Brazo derecho arriba y rodilla izquierda levantada!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 170,
+          "b": 0
+        },
+        "brazo_izq": {
+          "a": 35,
+          "b": -60
+        },
+        "pierna_der": {
+          "a": 0,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 55,
+          "b": -105
+        }
+      }
+    },
+    {
+      "id": "gimnasta-izq",
+      "nombre": "Brazo izquierdo arriba y rodilla derecha",
+      "corto": "Gimnasta izquierda",
+      "lado": "izq",
+      "fondo": "#fff9db",
+      "borde": "#f08c00",
+      "destello": [
+        "brazo_izq",
+        "pierna_der"
+      ],
+      "voz": "¡Brazo izquierdo arriba y rodilla derecha levantada!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 35,
+          "b": -60
+        },
+        "brazo_izq": {
+          "a": 170,
+          "b": 0
+        },
+        "pierna_der": {
+          "a": 55,
+          "b": -105
+        },
+        "pierna_izq": {
+          "a": 0,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "patinadora-der",
+      "nombre": "Patinadora con la derecha arriba",
+      "corto": "Patina a la derecha",
+      "lado": "der",
+      "fondo": "#fff4e6",
+      "borde": "#d9480f",
+      "destello": [
+        "brazo_der",
+        "pierna_der"
+      ],
+      "voz": "¡Brazo derecho arriba y rodilla derecha levantada!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 150,
+          "b": 35
+        },
+        "brazo_izq": {
+          "a": 60,
+          "b": -110
+        },
+        "pierna_der": {
+          "a": 55,
+          "b": -105
+        },
+        "pierna_izq": {
+          "a": 0,
+          "b": 0
+        }
+      }
+    },
+    {
+      "id": "patinadora-izq",
+      "nombre": "Patinadora con la izquierda arriba",
+      "corto": "Patina a la izquierda",
+      "lado": "izq",
+      "fondo": "#e6fcf5",
+      "borde": "#087f5b",
+      "destello": [
+        "brazo_izq",
+        "pierna_izq"
+      ],
+      "voz": "¡Brazo izquierdo arriba y rodilla izquierda levantada!",
+      "acierto": "¡Muy bien! ¡Encontraste las dos posturas iguales!",
+      "partes": {
+        "brazo_der": {
+          "a": 60,
+          "b": -110
+        },
+        "brazo_izq": {
+          "a": 150,
+          "b": 35
+        },
+        "pierna_der": {
+          "a": 0,
+          "b": 0
+        },
+        "pierna_izq": {
+          "a": 55,
+          "b": -105
+        }
+      }
+    }
+  ],
+  "rondas": [
+    {
+      "id": 1,
+      "titulo": "RONDA 1",
+      "subtitulo": "Mano derecha, mano izquierda",
+      "posturas": [
+        "mano-der-cabeza",
+        "mano-izq-cabeza",
+        "mano-der-cintura",
+        "mano-izq-cintura"
+      ],
+      "previaMs": 4000,
+      "instruccion": "¡Comencemos! Observa las posturas y encuentra las imágenes que son exactamente iguales."
+    },
+    {
+      "id": 2,
+      "titulo": "RONDA 2",
+      "subtitulo": "Memoria y orientación",
+      "posturas": [
+        "brazo-der-arriba-cintura",
+        "brazo-izq-arriba-cintura",
+        "mano-der-hombro-izq",
+        "mano-izq-hombro-der"
+      ],
+      "previaMs": 3500,
+      "instruccion": "¡Muy bien! Ahora tenemos nuevas posturas. ¡Fíjate bien en qué lado se mueve cada mano!"
+    },
+    {
+      "id": 3,
+      "titulo": "RONDA 3",
+      "subtitulo": "Rodillas y codos",
+      "posturas": [
+        "rodilla-der-arriba",
+        "rodilla-izq-arriba",
+        "codo-der-doblado",
+        "codo-izq-doblado"
+      ],
+      "previaMs": 3500,
+      "instruccion": "¡Ahora las rodillas y los codos! Mira muy bien cuál lado se dobla en cada foto."
+    },
+    {
+      "id": 4,
+      "titulo": "RONDA 4",
+      "subtitulo": "El gran reto de lateralidad",
+      "posturas": [
+        "gimnasta-der",
+        "gimnasta-izq",
+        "patinadora-der",
+        "patinadora-izq"
+      ],
+      "previaMs": 3500,
+      "instruccion": "¡Llegó el gran desafío! Observa con mucha atención y encuentra las cuatro parejas sin confundirte de lado."
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡MEMORAMA DE POSTURAS!",
+    "subtituloIntro": "Encuentra las posturas exactamente iguales.",
+    "bienvenida": "¡Desafío de memoria y lateralidad! Encuentra las parejas de fotos que muestran exactamente la misma postura corporal y del mismo lado.",
+    "saludoCorto": "¡Encuentra las parejas de fotos con la misma postura y del mismo lado!",
+    "presentacionZeus": "Toca una tarjeta, observa la postura, toca otra tarjeta y encuentra las dos posturas iguales.",
+    "pasos": [
+      "Toca una tarjeta.",
+      "Observa la postura.",
+      "Toca otra tarjeta.",
+      "Encuentra las dos posturas iguales."
+    ],
+    "demoUno": "Toco una tarjeta… ¡Mano derecha a rodilla izquierda!",
+    "demoDistinta": "Toco otra… ¡Mano izquierda a rodilla derecha! ¡Ojo con el lado! Busca la foto que tenga la misma mano en la misma rodilla.",
+    "demoOtraVez": "No son iguales porque cambia el lado. Ahora busco la que sí tiene la misma mano y la misma rodilla…",
+    "demoIgual": "¡Las dos posturas iguales! ¡Encontré una pareja!",
+    "demoFin": "¡Ahora es tu turno! ¡Encuentra todas las parejas!",
+    "demostracionBien": "¡Pareja!",
+    "botonComenzar": "¡COMENZAR!",
+    "previa": "¡Mira muy bien dónde está cada postura!",
+    "previaCartel": "¡MIRA Y RECUERDA!",
+    "aJugar": "¡Ahora tú! Toca una tarjeta.",
+    "recordatorioZeus": "¡Observa bien! ¿Están usando la misma mano y la misma rodilla?",
+    "ayudaPrimera": "¡Toca una tarjeta para voltearla!",
+    "ayudaSegunda": "¡Ahora toca otra tarjeta! ¿Dónde está la misma postura?",
+    "yaEncontrada": "¡Esa ya tiene su pareja!",
+    "progreso": "PAREJAS ENCONTRADAS",
+    "ronda": "RONDA",
+    "rondaListaTitulo": "¡RONDA {n} LISTA!",
+    "rondaLista": "¡Excelente memoria! ¡Reconociste las posturas y sus lados!",
+    "finalZoe": "¡Memoria espacial de nivel maestro! Identificaste cada postura y su lateralidad sin confundirte.",
+    "finalZeus": "¡Reconociste la derecha y la izquierda en todas las posturas!",
+    "finalTitulo": "¡RETO COMPLETADO!",
+    "finalSub": "Encontraste todas las parejas de posturas.",
+    "botonOtraVez": "Volver a jugar",
+    "botonContinuar": "Continuar",
+    "otraVez": "¡Vamos otra vez! Las tarjetas cambiaron de lugar.",
+    "cierre": "¡Memoria espacial de nivel maestro! Identificaste cada postura y su lateralidad sin confundirte.",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola! Soy Zeus. ¡Bienvenido al gimnasio de las posturas!"
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Y yo soy Zoe! En el mural hay fotos de posturas escondidas."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Ojo con el lado! Busca la foto que tenga la misma mano en la misma rodilla."
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Transición: memoria corporal y lateralidad"
+    }
+  ]
+}

@@ -284,12 +284,25 @@ body.fiesta .sd-cono { animation-duration: 0.45s; }
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 160px 0 16px;
+  /* A los lados se reserva el ancho de los puntos (izquierda) y de Inicio + recargar (derecha),
+     que van en absoluto, para que el título centrado no quede por debajo de ellos. */
+  padding: 10px 200px 0 260px;
   flex: 0 0 auto;
   min-height: 70px;
 }
 
-.hud-nav { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; z-index: 2; }
+/* Inicio y recargar van pegados al borde derecho. Van en posición absoluta porque el título
+   (también absoluto y centrado) es muy ancho y, en el flujo normal, los empujaba hacia el centro. */
+.hud-nav {
+  position: absolute;
+  right: 16px;
+  top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  z-index: 4;
+}
 
 .btn-inicio {
   display: inline-flex;
@@ -348,7 +361,7 @@ body.fiesta .sd-cono { animation-duration: 0.45s; }
 
 .hud-titulo h1 {
   margin: 0;
-  font-size: clamp(30px, 3.9vw, 56px);
+  font-size: clamp(38px, 5vw, 76px);
   font-weight: 700;
   line-height: 1.05;
   white-space: nowrap;
@@ -374,20 +387,24 @@ body.fiesta .sd-cono { animation-duration: 0.45s; }
 
 /* ---------------------------------------------------------------- progreso (debajo del título) */
 
+/* Solo los puntos de las tandas, arriba a la izquierda. El nombre de la tanda y el contador
+   siguen en el HTML (script.js los actualiza por id), pero no se muestran. */
 .progreso-box {
-  flex: 0 0 auto;
-  align-self: center;
+  position: absolute;
+  left: 16px;
+  top: 12px;
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 4px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(27, 10, 61, 0.72);
-  border: 3px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-  z-index: 3;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  z-index: 4;
 }
+
+.progreso-pill,
+.progreso-barra { display: none; }
 
 .progreso-box[hidden] { display: none; }
 .progreso-box.sube { animation: progresoSube 0.5s ease; }
@@ -415,8 +432,8 @@ body.fiesta .sd-cono { animation-duration: 0.45s; }
 .grupo {
   display: flex;
   align-items: center;
-  gap: 3px;
-  padding: 3px 5px;
+  gap: 6px;
+  padding: 6px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.12);
 }
@@ -438,18 +455,23 @@ body.fiesta .sd-cono { animation-duration: 0.45s; }
 }
 
 .punto {
-  width: 20px;
-  height: 20px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 12px;
+  font-size: 17px;
+  /* sin esto el número hereda una altura de línea mayor que el círculo y se corta arriba y abajo */
+  line-height: 1;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.75);
   background: rgba(255, 255, 255, 0.14);
   border: 2px dashed rgba(255, 255, 255, 0.45);
   transition: background 0.3s, border-color 0.3s;
 }
+
+/* el <span> interno también, para que el dígito quede centrado de verdad */
+.punto > span { line-height: 1; display: block; }
 
 .punto.actual {
   color: #3b2a00;
@@ -465,7 +487,7 @@ body.fiesta .sd-cono { animation-duration: 0.45s; }
   animation: puntoHecho 0.6s cubic-bezier(.2, 1.6, .4, 1);
 }
 
-.punto.hecho::before { content: "\2605"; font-size: 13px; }
+.punto.hecho::before { content: "\2605"; font-size: 21px; }
 .punto.hecho span { display: none; }
 
 @keyframes puntoLatido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
@@ -593,13 +615,15 @@ body.fiesta .sd-cono { animation-duration: 0.45s; }
 }
 
 /* Zeus (3D) de pie en el centro de la tarima. */
+/* La caja es más ancha que en Simón Dice (0.62) porque aquí Zeus abre mucho los brazos
+   (Abrir_brazos, Estirarse, los de lateralidad) y las manos se salían de la escena. */
 .pj-zeus {
   position: absolute;
   left: 50%;
   bottom: 9%;
   height: 90%;
-  aspect-ratio: 0.62;
-  max-width: 34vw;
+  aspect-ratio: 0.92;
+  max-width: 46vw;
   transform: translateX(-50%);
   z-index: 3;
   pointer-events: none;
@@ -1283,11 +1307,11 @@ body.intro-activa .accion:disabled { filter: none; }
   margin: 8px 0;
 }
 
-/* ---------------------------------------------------------------- menús redondos (arriba a la derecha) */
+/* ---------------------------------------------------------------- menús redondos (abajo a la derecha) */
 
 .menu-acc {
   position: fixed;
-  top: 10px;
+  bottom: 14px;
   right: 16px;
   z-index: 1500;
 }
@@ -1316,7 +1340,7 @@ body.intro-activa .accion:disabled { filter: none; }
 .menu-acc-panel {
   position: absolute;
   right: 0;
-  top: 70px;
+  bottom: 70px;
   width: min(320px, calc(100vw - 32px));
   max-height: min(70vh, 480px);
   overflow: auto;

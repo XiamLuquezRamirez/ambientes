@@ -1,5 +1,6 @@
 /**
- * EscenarioMemorama — el tablero mágico de corcho y sus cuatro tarjetas (Phaser 4). Solo dibuja y anima:
+ * EscenarioMemorama — el tablero mágico de corcho y sus tarjetas (Phaser 4). Las rondas de 4 usan 2 × 2;
+ * la última, de 6, usa 3 × 2. Solo dibuja y anima:
  * la lógica de la partida está en reglas.js y el flujo en script.js.
  *
  * Capas (profundidad): tablero 0 → brillos que flotan 2 → tarjetas 10 (+ la carta activa 20) → efectos 40 →
@@ -30,6 +31,7 @@
     var cfg = null;
     var listoPromesa = null;
     var cartas = [];
+    var activas = 4;       // las que juegan esta ronda (4, o 6 en la última)
     var tableroImg = null;
     var cuentaG = null;
     var cuentaTxt = null;
@@ -569,7 +571,11 @@
         if (W < 10 || H < 10) return;
         var m = Math.max(6, Math.min(18, W * 0.012));
         var bh = H - m * 1.2;
-        var bw = Math.min(W - 2 * m, bh * 1.62);
+        var n = activas > 0 ? activas : 4;
+        var cols = n > 4 ? 3 : 2;
+        var rows = Math.ceil(n / cols);
+        var aspecto = n > 4 ? 1.85 : 1.62;
+        var bw = Math.min(W - 2 * m, bh * aspecto);
         var bx = (W - bw) / 2;
         var by = m * 0.4;
         var f = Math.max(12, Math.min(28, Math.min(bw, bh) * 0.035));
@@ -577,19 +583,21 @@
         var innerH = bh - 16 - 2 * f;
         var padY = innerH * 0.055;
         var gapY = innerH * 0.05;
-        var ch = (innerH - 2 * padY - gapY) / 2;
+        var ch = (innerH - 2 * padY - gapY * (rows - 1)) / rows;
         var cw = ch * PROP;
-        var gapX = Math.max(gapY * 1.4, innerW * 0.05);
-        if (2 * cw + gapX > innerW * 0.94) {
-            cw = (innerW * 0.94 - gapX) / 2;
+        var gapX = Math.max(gapY * 1.4, innerW * 0.04);
+        if (cols * cw + (cols - 1) * gapX > innerW * 0.94) {
+            cw = (innerW * 0.94 - (cols - 1) * gapX) / cols;
             ch = cw / PROP;
         }
         var cx0 = bx + bw / 2;
         var cy0 = by + 4 + f + innerH / 2;
+        var gridW = cols * cw + (cols - 1) * gapX;
+        var gridH = rows * ch + (rows - 1) * gapY;
         lay = {
             W: W, H: H, bx: bx, by: by, bw: bw, bh: bh, f: f, cw: cw, ch: ch, gapX: gapX, gapY: gapY,
             cx: cx0, cy: cy0,
-            zona: { x: cx0 - cw - gapX / 2, y: cy0 - ch - gapY / 2, w: 2 * cw + gapX, h: 2 * ch + gapY }
+            zona: { x: cx0 - gridW / 2, y: cy0 - gridH / 2, w: gridW, h: gridH }
         };
         var zonaLocal = { x: lay.zona.x - bx, y: lay.zona.y - by, w: lay.zona.w, h: lay.zona.h };
         ponerTextura("tablero", texturaTablero(bw, bh, f, zonaLocal));
@@ -601,12 +609,16 @@
         tableroImg.setPosition(bx, by);
         tableroImg.setScale(1 / RES);
         cartas.forEach(function (c, i) {
-            var col = i % 2;
-            var fil = Math.floor(i / 2);
+            if (i >= n) {
+                c.ext.setVisible(false);
+                return;
+            }
+            var col = i % cols;
+            var fil = Math.floor(i / cols);
             c.w = cw;
             c.h = ch;
-            c.x = cx0 + (col === 0 ? -1 : 1) * (cw / 2 + gapX / 2);
-            c.y = cy0 + (fil === 0 ? -1 : 1) * (ch / 2 + gapY / 2);
+            c.x = cx0 - gridW / 2 + cw / 2 + col * (cw + gapX);
+            c.y = cy0 - gridH / 2 + ch / 2 + fil * (ch + gapY);
             sc.tweens.killTweensOf(c.ext);
             c.ext.setPosition(c.x, c.y);
             c.ext.setAlpha(1);
@@ -694,19 +706,30 @@
         c.cuerpo.setPosition(0, 0);
     }
 
+    function enJuego() {
+        return cartas.slice(0, activas);
+    }
+
     function asignar(tipos) {
+        activas = tipos.length || 4;
         tipos.forEach(function (t, i) {
             var c = cartas[i];
             if (!c) return;
             c.tipo = t;
+            c.ext.setVisible(true);
             if (c.abierta) c.img.setTexture("carta-" + t);
         });
+        cartas.slice(tipos.length).forEach(function (c) {
+            c.tipo = null;
+            c.ext.setVisible(false);
+        });
+        reacomodar();
     }
 
     /** Las tarjetas caen desde arriba del tablero, una por una, boca abajo. */
     function entrar() {
         var paso = reducido() ? 0 : 160;
-        cartas.forEach(function (c, i) {
+        enJuego().forEach(function (c, i) {
             c.abierta = false;
             c.dorada = false;
             c.img.setTexture("carta-reverso");
@@ -730,13 +753,13 @@
                 onStart: function () { sonar("aparece", { vol: 0.5 }); }
             });
         });
-        return espera(paso * 3 + 700);
+        return espera(paso * Math.max(0, enJuego().length - 1) + 700);
     }
 
     /** Cada tarjeta se ilumina y da un saltito, por turnos: "¡aquí están!". */
     function llamarAtencion() {
         if (reducido()) return espera(200);
-        cartas.forEach(function (c, i) {
+        enJuego().forEach(function (c, i) {
             sc.tweens.add({
                 targets: c.haloLuz, alpha: { from: 0, to: 0.85 }, duration: 260, delay: i * 260, yoyo: true, hold: 120
             });
@@ -745,7 +768,7 @@
             });
             sc.time.delayedCall(i * 260 + 120, function () { chispas(c, 6, "fx-chispa", 0.5); });
         });
-        return espera(4 * 260 + 600);
+        return espera(enJuego().length * 260 + 600);
     }
 
     function voltear(i, abrir, ms) {
@@ -787,7 +810,7 @@
 
     function voltearTodas(abrir, separacion) {
         var sep = separacion == null ? 110 : separacion;
-        var ps = cartas.map(function (c, i) {
+        var ps = enJuego().map(function (c, i) {
             return espera(i * sep).then(function () { return voltear(i, abrir); });
         });
         return Promise.all(ps);
@@ -1013,10 +1036,10 @@
         });
     }
 
-    /** Final: las cuatro tarjetas bailan en ola y llueven estrellas doradas sobre el tablero. */
+    /** Final: las tarjetas de la ronda bailan en ola y llueven estrellas doradas sobre el tablero. */
     function celebrarFinal() {
         finalActivo = true;
-        cartas.forEach(function (c, i) {
+        enJuego().forEach(function (c, i) {
             base(c);
             if (reducido()) return;
             sc.tweens.add({
@@ -1217,7 +1240,7 @@
                             ponerTextura("carta-marco", texturaMarco());
                             tipos.forEach(function (t, k) { ponerTextura("carta-" + t.id, texturaFrente(t, res[k + 1])); });
                             crearBrillos();
-                            for (var i = 0; i < 4; i++) cartas.push(crearCarta(i));
+                            for (var i = 0; i < 6; i++) cartas.push(crearCarta(i));
                             cuentaG = sc.add.graphics().setDepth(50).setVisible(false);
                             cuentaTxt = sc.add.text(0, 0, "3", {
                                 fontFamily: '"Fredoka", sans-serif',
@@ -1242,7 +1265,7 @@
 
     global.EscenarioMemorama = {
         montar: montar,
-        listo: function () { return !!(sc && cartas.length === 4); },
+        listo: function () { return !!(sc && cartas.length === 6); },
         escena: function () { return sc; },
         diseno: function () { return lay; },
         reacomodar: reacomodar,

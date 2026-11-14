@@ -160,8 +160,10 @@ function encuadrar() {
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     const t = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
-    // ~1,45 de alto (Zeus mide ~1,15 y sus manos llegan a ~1,1 con los brazos arriba) y ~0,9 de ancho
-    const dist = Math.max(0.74 / t, 0.46 / (t * camera.aspect));
+    // ~1,45 de alto (Zeus mide ~1,15 y sus manos llegan a ~1,1 con los brazos arriba). De ancho se
+    // reservan ~1,3: este juego tiene movimientos que abren mucho los brazos (Abrir_brazos, Estirarse,
+    // los de lateralidad) y con el ancho de Simón Dice (~0,9) las manos se salían de la escena.
+    const dist = Math.max(0.74 / t, 0.66 / (t * camera.aspect));
     camera.position.set(0, 0.68, dist);
     camera.lookAt(0, 0.66, 0);
     camera.updateProjectionMatrix();

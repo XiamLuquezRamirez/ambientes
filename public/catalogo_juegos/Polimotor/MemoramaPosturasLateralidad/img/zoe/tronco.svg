@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -80 120 174" width="240" height="348">
+  <title>Tronco de Zoe</title>
+  <!-- Pieza de El Espejo de las Posiciones. Generado por scripts/generar-svg-espejo-posiciones.js -->
+  <g class="base">
+    <path class="m-piel" fill="#f2c6b9" d="M-8.6,-72 L-8.6,-52 L8.6,-52 L8.6,-72 Z"/>
+    <path class="m-blusa" fill="#95d3f0" d="M-16,-67 Q0,-58 16,-67 L31,-64 Q43,-60 45,-46 L44.5,-20 L-44.5,-20 L-45,-46 Q-43,-60 -31,-64 Z"/>
+    <path class="m-vestido" fill="#e1709c" d="M-26,-44 L26,-44 L26,-39 L39,-39 Q44.5,-37 44.5,-28 L43.5,2 L56,81 Q0,91 -56,81 L-43.5,2 L-44.5,-28 Q-44.5,-37 -39,-39 L-26,-39 Z"/>
+    <path class="m-vestido" fill="#e1709c" d="M-35,-63.5 L-21.5,-67 L-15,-41 L-27,-41 Z"/>
+    <path class="m-vestido" fill="#e1709c" d="M35,-63.5 L21.5,-67 L15,-41 L27,-41 Z"/>
+  </g>
+  <g class="detalle">
+    <path fill="#e5a796" d="M-8.6,-70 Q0,-65 8.6,-70 L8.6,-66 Q0,-62 -8.6,-66 Z"/>
+    <path fill="none" stroke="#86c3e8" stroke-width="1.3" stroke-linecap="round" d="M-38,-52 L-37,-41 M-33,-56 L-32.5,-41 M33,-56 L32.5,-41 M38,-52 L37,-41 M-10,-55 L-10,-44 M-5,-53 L-5,-44 M0,-52 L0,-44 M5,-53 L5,-44 M10,-55 L10,-44"/>
+    <path fill="#02a1dd" d="M-16.6,-68 Q0,-58 16.6,-68 L16,-64.4 A2.03,2.03 0 0 1 12.44,-62.42 A1.93,1.93 0 0 1 8.89,-60.94 A1.85,1.85 0 0 1 5.33,-59.96 A1.79,1.79 0 0 1 1.78,-59.46 A1.78,1.78 0 0 1 -1.78,-59.46 A1.79,1.79 0 0 1 -5.33,-59.96 A1.85,1.85 0 0 1 -8.89,-60.94 A1.93,1.93 0 0 1 -12.44,-62.42 A2.03,2.03 0 0 1 -16,-64.4 Z"/>
+    <path fill="none" stroke="#5cc3ee" stroke-width="0.9" stroke-linecap="round" opacity=".8" d="M-15.4,-66.4 Q0,-56.6 15.4,-66.4"/>
+    <path fill="none" stroke="#f3a6c4" stroke-width="1.2" stroke-dasharray="2.2 2" stroke-linecap="round" d="M-22,-40.5 L22,-40.5 L22.5,-1 M-22,-40.5 L-22.5,-1 M-30.5,-62 L-23,-43 M30.5,-62 L23,-43"/>
+    <path fill="#f0e387" stroke="#d9c55a" stroke-width="1.2" d="M0,-12 C-9,-18 -13.5,-23 -11,-28.5 C-8.5,-33 -3,-32 0,-27.5 C3,-32 8.5,-33 11,-28.5 C13.5,-23 9,-18 0,-12 Z"/>
+    <path fill="none" stroke="#c85a86" stroke-width="0.9" stroke-dasharray="1.6 1.6" d="M0,-9.2 C-11,-16 -16.5,-23 -13.4,-29.6 C-10.4,-35.4 -3.6,-34.6 0,-30.6 C3.6,-34.6 10.4,-35.4 13.4,-29.6 C16.5,-23 11,-16 0,-9.2 Z"/>
+    <path fill="none" stroke="#c85a86" stroke-width="1.4" stroke-linecap="round" d="M-43.5,3 Q0,9 43.5,3"/>
+    <path fill="#c85a86" opacity=".28" d="M44.5,-28 L43.5,2 L56,81 Q50,83 44,84 Q46,42 39,6 Z"/>
+  </g>
+  <path class="silueta" d="M-16,-67 Q0,-58 16,-67 L31,-64 Q43,-60 45,-46 L44.5,-28 L43.5,2 L56,81 Q0,91 -56,81 L-43.5,2 L-44.5,-28 L-45,-46 Q-43,-60 -31,-64 Z" fill="none"/>
+</svg>

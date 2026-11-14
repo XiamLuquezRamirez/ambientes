@@ -13,16 +13,32 @@
  *
  * Las parejas se reconocen por el `id` de la carta en config.json (nunca por el texto visible).
  *
- * Rondas: config.json trae el catálogo `partes` y `rondas`. Todas las rondas son de 4 tarjetas (2 parejas):
- * cada ronda tiene su grupo de partes (`partes`) y en cada partida se eligen al azar 2 de ese grupo, así el
- * niño ve partes distintas al volver a jugar. ronda(cfg, i, rnd) arma la ronda ({ cartas: [2 partes], … }) y
- * las demás funciones (crear, revisarConfig…) trabajan con esa ronda.
+ * Rondas: config.json trae el catálogo `partes` y `rondas`. Las primeras son de 4 tarjetas (2 parejas):
+ * cada una tiene su grupo (`partes`) y en cada partida se eligen al azar `parejas` (2 si no dice). La última
+ * (`resto: true`) no tiene grupo: juega las partes de los grupos anteriores que no salieron (3 partes, 6
+ * tarjetas). ronda(cfg, i, rnd, usadas) arma la ronda; `usadas` son los id ya elegidos en esta partida.
  */
 (function (global) {
     "use strict";
 
     var ESTADOS = ["preview", "waiting", "firstCard", "secondCard", "checking", "matched", "completed"];
-    var PAREJAS = 2;          // 4 tarjetas por ronda
+    var PAREJAS = 2;          // parejas por ronda si la ronda no dice otra cosa (4 tarjetas)
+
+    /** Cuántas parejas juega la ronda (2 por defecto; la última pide 3). */
+    function parejasDe(r) {
+        var n = Number(r && r.parejas);
+        return isFinite(n) && n >= 2 ? Math.floor(n) : PAREJAS;
+    }
+
+    /** Sin azar, cada ronda se queda con las primeras `parejas` de su grupo (lo que sobra va a la ronda final). */
+    function usadasPorDefecto(cfg) {
+        var usadas = [];
+        rondas(cfg).forEach(function (r) {
+            if (!r || r.resto) return;
+            (r.partes || []).slice(0, parejasDe(r)).forEach(function (id) { usadas.push(id); });
+        });
+        return usadas;
+    }
 
     /** Tipos de carta de config.json ([{ id, nombre, … }]). */
     function tiposDe(cfg) {
@@ -44,17 +60,32 @@
     }
 
     /**
-     * Configuración de la ronda i: sus datos más `cartas` (las 2 partes que juega, con todos sus campos). Con
-     * `rnd` elige 2 al azar del grupo de la ronda; sin `rnd`, las 2 primeras (para pruebas y la demo).
+     * Configuración de la ronda i: sus datos más `cartas` (las partes que juega, con todos sus campos).
+     * Con `rnd` elige al azar; sin `rnd`, las primeras del grupo. `usadas` (ids ya jugados) solo la usa la
+     * ronda `resto`: arma las partes que sobraron. Sin `usadas`, sobra lo que no cabe en las primeras parejas.
      */
-    function ronda(cfg, i, rnd) {
+    function ronda(cfg, i, rnd, usadas) {
         var r = rondas(cfg)[i];
         if (!r) return null;
         var copia = {};
         Object.keys(r).forEach(function (k) { copia[k] = r[k]; });
         copia.indice = i;
-        var grupo = (r.partes || []).slice();
-        var elegidas = (typeof rnd === "function" ? barajar(grupo, rnd) : grupo).slice(0, PAREJAS);
+        var n = parejasDe(r);
+        var grupo;
+        if (r.resto) {
+            var ya = {};
+            (usadas == null ? usadasPorDefecto(cfg) : usadas).forEach(function (id) { ya[id] = true; });
+            grupo = [];
+            rondas(cfg).forEach(function (prev, k) {
+                if (k >= i || !prev || prev.resto) return;
+                (prev.partes || []).forEach(function (id) {
+                    if (!ya[id] && grupo.indexOf(id) < 0) grupo.push(id);
+                });
+            });
+        } else {
+            grupo = (r.partes || []).slice();
+        }
+        var elegidas = (typeof rnd === "function" ? barajar(grupo, rnd) : grupo).slice(0, n);
         // en el orden del grupo, para que los textos y la barra de progreso no salten
         elegidas.sort(function (a, b) { return grupo.indexOf(a) - grupo.indexOf(b); });
         copia.elegidas = elegidas;
@@ -68,7 +99,8 @@
     function revisarConfig(cfg, dibujos) {
         var errores = [];
         var tipos = tiposDe(cfg);
-        if (tipos.length !== PAREJAS) errores.push("Cada ronda debe tener " + PAREJAS + " parejas (4 tarjetas); hay " + tipos.length + ".");
+        var n = parejasDe(cfg);
+        if (tipos.length !== n) errores.push("La ronda debe tener " + n + " parejas (" + (n * 2) + " tarjetas); hay " + tipos.length + ".");
         var vistos = {};
         tipos.forEach(function (t, i) {
             if (!t || !t.id) {
@@ -95,13 +127,28 @@
         });
         if (!rondas(cfg).length) errores.push("No hay rondas.");
         var usadas = {};
+        var sobra = 0;
+        var restos = 0;
         rondas(cfg).forEach(function (r, i) {
-            if ((r.partes || []).length < PAREJAS) errores.push("Ronda " + (i + 1) + ": su grupo necesita al menos " + PAREJAS + " partes.");
+            if (r.resto) {
+                restos++;
+                if (i !== rondas(cfg).length - 1) errores.push("La ronda de las partes que sobran tiene que ser la última.");
+                return;
+            }
+            var n = parejasDe(r);
+            if ((r.partes || []).length < n) errores.push("Ronda " + (i + 1) + ": su grupo necesita al menos " + n + " partes.");
+            sobra += Math.max(0, (r.partes || []).length - n);
             (r.partes || []).forEach(function (id) {
                 if (!vistos[id]) errores.push("Ronda " + (i + 1) + ": la parte " + id + " no está en el catálogo.");
                 if (usadas[id]) errores.push("La parte " + id + " se repite en dos rondas.");
                 usadas[id] = true;
             });
+        });
+        if (restos > 1) errores.push("Solo puede haber una ronda final con las partes que sobran.");
+        rondas(cfg).forEach(function (r, i) {
+            if (r.resto && sobra !== parejasDe(r)) {
+                errores.push("La ronda final junta " + sobra + " partes que sobran y pide " + parejasDe(r) + ".");
+            }
             revisarConfig(ronda(cfg, i), dibujos).forEach(function (e) { errores.push("Ronda " + (i + 1) + ": " + e); });
         });
         return errores;

@@ -1,0 +1,211 @@
+{
+  "nombre": "¡La Pista de Patrones de Huellas y Ritmo!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "msRespuesta": 620,
+    "debounceMs": 300,
+    "pausaAntesDeComprobarMs": 420,
+    "ayudaMs": 12000,
+    "ayudaRepetirMs": 14000,
+    "ayudasMax": 3,
+    "repetirSecuenciaTrasError": true,
+    "pausaEntreItemsMs": 700,
+    "erroresParaRepetir": 3
+  },
+  "acciones": [
+    {
+      "id": "manoIzquierda",
+      "nombre": "MANO IZQUIERDA",
+      "voz": "¡Mano izquierda!",
+      "corto": "mano izquierda",
+      "lado": "izquierda",
+      "tipo": "mano",
+      "efecto": "¡PLAF!",
+      "sonido": "palmada",
+      "color": "#f76707",
+      "colorClaro": "#ffc078",
+      "nota": 523.25
+    },
+    {
+      "id": "manoDerecha",
+      "nombre": "MANO DERECHA",
+      "voz": "¡Mano derecha!",
+      "corto": "mano derecha",
+      "lado": "derecha",
+      "tipo": "mano",
+      "efecto": "¡TING!",
+      "sonido": "campana",
+      "color": "#e03131",
+      "colorClaro": "#ffa8a8",
+      "nota": 659.25
+    },
+    {
+      "id": "pieIzquierdo",
+      "nombre": "PIE IZQUIERDO",
+      "voz": "¡Pie izquierdo!",
+      "corto": "pie izquierdo",
+      "lado": "izquierda",
+      "tipo": "pie",
+      "efecto": "¡BUM!",
+      "sonido": "tambor",
+      "color": "#228be6",
+      "colorClaro": "#74c0fc",
+      "nota": 196
+    },
+    {
+      "id": "pieDerecho",
+      "nombre": "PIE DERECHO",
+      "voz": "¡Pie derecho!",
+      "corto": "pie derecho",
+      "lado": "derecha",
+      "tipo": "pie",
+      "efecto": "¡TOC!",
+      "sonido": "bloque",
+      "color": "#5f7d95",
+      "colorClaro": "#b4c5d3",
+      "nota": 293.66
+    },
+    {
+      "id": "ambosPies",
+      "nombre": "AMBOS PIES",
+      "voz": "¡Ambos pies!",
+      "corto": "ambos pies",
+      "lado": "ambos",
+      "tipo": "salto",
+      "efecto": "¡PUM!",
+      "sonido": "salto",
+      "color": "#2f9e44",
+      "colorClaro": "#8ce99a",
+      "nota": 392
+    }
+  ],
+  "rondas": [
+    {
+      "id": 1,
+      "titulo": "RONDA 1",
+      "nombre": "Reconocimiento",
+      "items": 3,
+      "baldosas": 4,
+      "repetidas": 0,
+      "msBaldosa": 1150,
+      "pausaMs": 820,
+      "apoyo": "alto",
+      "nombrar": true,
+      "instruccion": "¡Ronda 1! Mira bien qué huellas se encienden en la pista y tócalas en el mismo orden."
+    },
+    {
+      "id": 2,
+      "titulo": "RONDA 2",
+      "nombre": "Lateralidad",
+      "items": 3,
+      "baldosas": 4,
+      "repetidas": 0,
+      "msBaldosa": 980,
+      "pausaMs": 640,
+      "apoyo": "medio",
+      "nombrar": true,
+      "instruccion": "¡Ronda 2! Ahora la pista mezcla la derecha y la izquierda. ¡Fíjate muy bien en cada lado!"
+    },
+    {
+      "id": 3,
+      "titulo": "RONDA 3",
+      "nombre": "Memoria corporal",
+      "items": 3,
+      "baldosas": 4,
+      "repetidas": 0,
+      "msBaldosa": 860,
+      "pausaMs": 520,
+      "apoyo": "bajo",
+      "nombrar": false,
+      "instruccion": "¡Ronda 3, la última! La pista va más rápido y sin pistas. ¡Confía en tu memoria!"
+    }
+  ],
+  "demo": {
+    "secuencia": [
+      "pieIzquierdo",
+      "manoDerecha",
+      "ambosPies"
+    ],
+    "msBaldosa": 1250,
+    "pausaMs": 900
+  },
+  "textos": {
+    "tituloIntro": "¡LA PISTA DE PATRONES!",
+    "subtituloIntro": "Memoriza el camino de huellas",
+    "bienvenida": "¡Alerta en la pista de huellas! Mira la secuencia de luz que se enciende en el suelo: manos y pies, izquierda y derecha. ¡Memoriza el camino y ayúdame a cruzar el circuito!",
+    "saludoCorto": "¡Alerta en la pista de huellas!",
+    "pasoObserva": "1. OBSERVA",
+    "pasoRepite": "2. REPITE",
+    "presentaBotones": "Estas son las huellas del circuito. ¡Mira cómo las hago yo!",
+    "botonEmpezar": "¡Encender el circuito!",
+    "demoInstruccion": "¡Presta mucha atención! Mira cómo se encienden las huellas del suelo. ¡Después tendrás que tocarlas en el mismo orden!",
+    "tuTurno": "¡AHORA ES TU TURNO!",
+    "tuTurnoVoz": "¡Ahora es tu turno! Recuerda el orden y toca las huellas correctas.",
+    "observa": "¡Mira con atención y recuerda el orden de las huellas!",
+    "observaCorto": "¡Observa!",
+    "faseObserva": "¡MIRA LAS HUELLAS!",
+    "faseRepite": "¡REPITE EL CAMINO!",
+    "aciertoZeus": "¡Recordaste las {cuantos} huellas del circuito! ¡Avanzamos por la pista!",
+    "errorZeus": "¡No pasa nada! Mira otra vez el camino de huellas, desde el principio.",
+    "rondaListaTitulo": "¡RONDA {n} COMPLETADA!",
+    "rondaLista": "¡Avanzamos un tramo del circuito! ¡Vamos por la siguiente parte!",
+    "ronda": "RONDA",
+    "item": "ÍTEM",
+    "de": "DE",
+    "finalTitulo": "¡ESPECTACULAR!",
+    "finalSub": "¡Zeus cruzó la meta!",
+    "finalZeus": "¡ESPECTACULAR! Dominaste la memoria corporal, el ritmo y la secuencia de huellas. ¡Completaste el desafío de la lateralidad!",
+    "botonOtraVez": "VOLVER A JUGAR",
+    "botonContinuar": "CONTINUAR",
+    "otraVez": "¡Otra vez! El circuito tiene nuevos caminos de huellas para ti.",
+    "cierre": "¡Muy bien! Memorizaste las huellas de manos y pies y cruzaste el circuito en el orden correcto.",
+    "eligeNivel": "Elige tu edad",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Bienvenido a la pista de patrones de PedNia!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Y yo soy Zeus! Aquí las huellas del suelo se encienden: manos y pies, izquierda y derecha."
+      },
+      {
+        "personaje": 1,
+        "texto": "La pista enciende un camino y tú lo repites tocando las mismas huellas. ¡Ayuda a Zeus a cruzar la meta!"
+      }
+    ],
+    "cuantos": {
+      "2": "dos",
+      "3": "tres",
+      "4": "cuatro"
+    },
+    "demoZeus": "¡Pie izquierdo, mano derecha y sigue el camino de la memoria!",
+    "aciertoCorto": "¡CAMINO PERFECTO!",
+    "errorToque": "¡Uy, esa huella no era! Piensa bien y prueba otra vez.",
+    "ayudaZeus": "¡Tú puedes! Recuerda qué huellas se encendieron. Piensa en la izquierda y la derecha.",
+    "botonMenu": "MENÚ",
+    "perfecto": "¡PERFECTO!"
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Transición: memoria corporal y lateralidad"
+    }
+  ]
+}

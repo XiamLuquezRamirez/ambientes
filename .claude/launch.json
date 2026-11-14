@@ -60,6 +60,19 @@
       "autoPort": false
     },
     {
+      "name": "juegos-huellas",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8025",
+        "--directory",
+        "public"
+      ],
+      "port": 8025,
+      "autoPort": false
+    },
+    {
       "name": "juegos-secuenciador",
       "runtimeExecutable": "python",
       "runtimeArgs": [
