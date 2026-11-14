@@ -394,4 +394,23 @@ prueba("intro: presenta solo unos pocos tríos, no los 16 comandos", function ()
     assert.ok(grupos * 3 * porMovimiento <= 16000, "la presentación no pasa de ~16 s");
 });
 
+// ---------------------------------------------------------------- Tarea 6: registro en el catálogo
+
+prueba("ambientes.sql: una sola fila del juego, Polimotor y temática 31, sin tocar las demás", function () {
+    const sql = fs.readFileSync(path.join(raiz, "database", "ambientes.sql"), "utf8");
+    const filas = sql.split("\n").filter(function (l) { return l.indexOf("'secuenciador-baile-lateralidad'") >= 0; });
+    assert.strictEqual(filas.length, 1, "exactamente una fila, hay " + filas.length);
+    const fila = filas[0];
+    assert.ok(/'secuenciador-baile-lateralidad',7,11,31,9,/.test(fila), "ambiente 7, eje 11, temática 31, módulo 9");
+    assert.ok(fila.indexOf("catalogo_juegos/Polimotor/SecuenciadorBaileLateralidad") > 0, "apunta a su carpeta");
+    assert.ok(fila.indexOf("El Secuenciador de Baile y Lateralidad") > 0, "lleva el nombre del juego");
+    assert.ok(fila.indexOf("secuenciador.png") > 0, "usa su propio icono");
+    assert.ok(/5 a 6 a[ñn]os/.test(fila), "la descripción dice la edad");
+    // no se tocaron los juegos que ya estaban
+    ["simon-dice-corporal", "pista-ritmo-pasos-magicos", "golpea-a-los-topos"].forEach(function (slug) {
+        const otras = sql.split("\n").filter(function (l) { return l.indexOf("'" + slug + "'") >= 0; });
+        assert.strictEqual(otras.length, 1, slug + " sigue con su única fila");
+    });
+});
+
 console.log("\n" + pasadas + " pruebas correctas");
