@@ -273,6 +273,17 @@ prueba("iconos: los pares izquierda/derecha se distinguen a simple vista", funct
     });
 });
 
+// El color del botón sale de la regla .accion-<id> del CSS, no del config: sin ella todos los comandos
+// nuevos se pintan con el color por defecto (dorado) y la botonera pierde su código de color.
+prueba("style.css: los 16 comandos tienen su color de botón", function () {
+    const css = fs.readFileSync(path.join(carpeta, "style.css"), "utf8");
+    COMANDOS.forEach(function (id) {
+        assert.ok(new RegExp("\\.accion-" + id + "\\s*\\{").test(css), id + " tiene su regla .accion-" + id);
+        assert.ok(new RegExp("--sd-" + id + "\\s*:").test(css), id + " define su variable --sd-" + id);
+    });
+    assert.ok(!/\.accion-tocarPies/.test(css), "no queda la regla del id viejo tocarPies");
+});
+
 prueba("iconos: dataUri sirve los 16 dibujos", function () {
     COMANDOS.forEach(function (id) {
         const uri = I.dataUri(id);
