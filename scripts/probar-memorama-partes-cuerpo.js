@@ -1,5 +1,5 @@
 /**
- * Reglas de "El Memorama de las Partes del Cuerpo" (tres rondas de 4 tarjetas con partes del cuerpo).
+ * Reglas de "El Memorama de las Partes del Cuerpo" (tres rondas de 4 tarjetas y una final de 6).
  * Uso: node scripts/probar-memorama-partes-cuerpo.js
  */
 "use strict";
@@ -48,13 +48,13 @@ function de(st, tipo) {
 
 console.log("El Memorama de las Partes del Cuerpo — reglas");
 
-prueba("config.json sin problemas: tres rondas, partes con dibujo y sin repetir", function () {
+prueba("config.json sin problemas: cuatro rondas, partes con dibujo y sin repetir", function () {
     assert.deepEqual(R.revisarJuego(config, dibujos), []);
-    assert.equal(R.rondas(config).length, 3);
+    assert.equal(R.rondas(config).length, 4);
     assert.deepEqual(R.tipos(r1).map(function (t) { return t.id; }), ["mano", "pie"]);
 });
 
-prueba("tres rondas, todas de 4 tarjetas (2 parejas) elegidas del grupo de cada ronda", function () {
+prueba("tres rondas de 4 tarjetas y una final de 6 con las partes que sobraron", function () {
     assert.deepEqual(R.ronda(config, 1).partes, ["ojos", "nariz", "boca"]);
     assert.deepEqual(R.ronda(config, 2).partes, ["oreja", "cabeza", "brazo", "pierna"]);
     for (let i = 0; i < 3; i++) {
@@ -69,7 +69,28 @@ prueba("tres rondas, todas de 4 tarjetas (2 parejas) elegidas del grupo de cada 
             Object.values(cuenta(R.orden(st))).forEach(function (c) { assert.equal(c, 2); });
         }
     }
-    assert.equal(R.ronda(config, 3), null);
+    assert.deepEqual(R.ronda(config, 3).elegidas, ["boca", "brazo", "pierna"]);
+    const fija = R.crear(R.ronda(config, 3), semilla(1));
+    assert.equal(fija.cartas.length, 6);
+    assert.equal(fija.total, 3);
+    assert.equal(R.ronda(config, 4), null);
+
+    const grupo = ["ojos", "nariz", "boca", "oreja", "cabeza", "brazo", "pierna"];
+    for (let k = 0; k < 80; k++) {
+        const usadas = [];
+        for (let i = 0; i < 3; i++) {
+            R.ronda(config, i, semilla(k * 11 + i), usadas).elegidas.forEach(function (id) { usadas.push(id); });
+        }
+        const fin = R.ronda(config, 3, semilla(k), usadas);
+        assert.equal(fin.elegidas.length, 3);
+        fin.elegidas.forEach(function (id) { assert.equal(usadas.includes(id), false); });
+        const sobra = grupo.filter(function (id) { return !usadas.includes(id); });
+        assert.deepEqual(fin.elegidas.slice().sort(), sobra.slice().sort());
+        const partida = R.crear(fin, semilla(k + 3));
+        assert.equal(partida.cartas.length, 6);
+        assert.equal(partida.total, 3);
+        Object.values(cuenta(R.orden(partida))).forEach(function (c) { assert.equal(c, 2); });
+    }
 });
 
 prueba("con el tiempo salen todas las partes de cada grupo (más partes del cuerpo)", function () {
@@ -96,10 +117,14 @@ prueba("las partes nuevas reutilizan dibujos de otro juego Polimotor (Une las Pa
 });
 
 prueba("la última ronda se juega completa hasta completed", function () {
-    const r3 = R.ronda(config, 2, semilla(3));
-    const st = R.crear(r3, semilla(9));
+    const usadas = [];
+    for (let i = 0; i < 3; i++) {
+        R.ronda(config, i, semilla(3 + i), usadas).elegidas.forEach(function (id) { usadas.push(id); });
+    }
+    const r4 = R.ronda(config, 3, semilla(8), usadas);
+    const st = R.crear(r4, semilla(9));
     R.iniciar(st);
-    r3.elegidas.forEach(function (t) {
+    r4.elegidas.forEach(function (t) {
         const par = de(st, t);
         R.tocar(st, par[0]);
         R.tocar(st, par[1]);
@@ -107,7 +132,7 @@ prueba("la última ronda se juega completa hasta completed", function () {
         R.terminarTurno(st);
     });
     assert.equal(st.estado, "completed");
-    assert.deepEqual(R.progreso(st), { hechas: 2, total: 2, completo: true });
+    assert.deepEqual(R.progreso(st), { hechas: 3, total: 3, completo: true });
 });
 
 prueba("siempre hay cuatro tarjetas: exactamente dos manos y dos pies", function () {

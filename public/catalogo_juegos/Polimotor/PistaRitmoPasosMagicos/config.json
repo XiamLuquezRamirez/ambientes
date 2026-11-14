@@ -1,0 +1,194 @@
+{
+  "nombre": "¡La Pista de Ritmo y Pasos Mágicos!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "msRespuesta": 620,
+    "debounceMs": 300,
+    "pausaAntesDeComprobarMs": 520,
+    "ayudaMs": 12000,
+    "ayudaRepetirMs": 14000,
+    "ayudasMax": 3,
+    "repetirSecuenciaTrasError": true,
+    "pausaEntreItemsMs": 700
+  },
+  "acciones": [
+    {
+      "id": "pie",
+      "nombre": "¡PIE!",
+      "voz": "¡Pie!",
+      "corto": "pie",
+      "efecto": "¡BUM!",
+      "sonido": "tambor",
+      "color": "#228be6",
+      "colorClaro": "#74c0fc",
+      "nota": 196.0
+    },
+    {
+      "id": "mano",
+      "nombre": "¡MANO!",
+      "voz": "¡Mano!",
+      "corto": "mano",
+      "efecto": "¡TING!",
+      "sonido": "campana",
+      "color": "#e03131",
+      "colorClaro": "#ffa8a8",
+      "nota": 659.25
+    },
+    {
+      "id": "carita",
+      "nombre": "¡CARITA!",
+      "voz": "¡Carita!",
+      "corto": "carita",
+      "efecto": "¡PLIM!",
+      "sonido": "plim",
+      "color": "#fab005",
+      "colorClaro": "#ffe066",
+      "nota": 1046.5
+    },
+    {
+      "id": "rodilla",
+      "nombre": "¡RODILLA!",
+      "voz": "¡Rodilla!",
+      "corto": "rodilla",
+      "efecto": "¡TOC!",
+      "sonido": "bloque",
+      "color": "#2f9e44",
+      "colorClaro": "#8ce99a",
+      "nota": 392.0
+    },
+    {
+      "id": "hombro",
+      "nombre": "¡HOMBRO!",
+      "voz": "¡Hombro!",
+      "corto": "hombro",
+      "efecto": "¡CHIS!",
+      "sonido": "maraca",
+      "color": "#7048e8",
+      "colorClaro": "#b197fc",
+      "nota": 523.25
+    },
+    {
+      "id": "barriga",
+      "nombre": "¡BARRIGA!",
+      "voz": "¡Barriga!",
+      "corto": "barriga",
+      "efecto": "¡POP!",
+      "sonido": "pop",
+      "color": "#f76707",
+      "colorClaro": "#ffc078",
+      "nota": 293.66
+    }
+  ],
+  "rondas": [
+    {
+      "id": 1,
+      "titulo": "RONDA 1",
+      "nombre": "Aprendiendo el ritmo",
+      "items": 4,
+      "baldosas": 2,
+      "repetidas": 1,
+      "msBaldosa": 1150,
+      "pausaMs": 850,
+      "apoyo": "alto",
+      "nombrar": true,
+      "instruccion": "¡Ronda 1! La pista va despacito. Escucha los dos sonidos y toca las baldosas en el mismo orden."
+    },
+    {
+      "id": 2,
+      "titulo": "RONDA 2",
+      "nombre": "Maestro del ritmo",
+      "items": 4,
+      "baldosas": 3,
+      "repetidas": 0,
+      "msBaldosa": 950,
+      "pausaMs": 600,
+      "apoyo": "medio",
+      "nombrar": true,
+      "instruccion": "¡Ronda 2, la última! Ahora la pista enciende tres baldosas y va un poquito más rápido. ¡Sigue la música!"
+    }
+  ],
+  "demo": {
+    "secuencia": [
+      "pie",
+      "mano"
+    ],
+    "msBaldosa": 1250,
+    "pausaMs": 900
+  },
+  "textos": {
+    "tituloIntro": "¡LA PISTA DE RITMO Y PASOS MÁGICOS!",
+    "subtituloIntro": "Escucha, mira y repite el ritmo",
+    "bienvenida": "¡Vamos a encender la pista musical! Escucha y mira cuáles baldosas se iluminan, y tócalas en el mismo orden para armar la canción del cuerpo.",
+    "saludoCorto": "¡Vamos a encender la pista musical!",
+    "pasoObserva": "1. ESCUCHA",
+    "pasoRepite": "2. REPITE",
+    "presentaBotones": "Estas son las seis baldosas de la pista:",
+    "botonEmpezar": "¡Encender la pista!",
+    "demoInstruccion": "¡Presta mucha atención! Escucha los sonidos y mira cómo se encienden las baldosas. ¡Después tendrás que repetir el mismo ritmo!",
+    "demoZoe": "¡Sigue la música: primero el pie y luego la mano!",
+    "tuTurno": "¡AHORA ES TU TURNO!",
+    "tuTurnoVoz": "¡Ahora es tu turno!",
+    "observa": "¡Escucha con atención y recuerda el orden!",
+    "observaCorto": "¡Escucha!",
+    "faseObserva": "¡ESCUCHA Y MIRA!",
+    "faseRepite": "¡REPITE EL RITMO!",
+    "aciertoZoe": "¡INCREÍBLE RITMO!",
+    "aciertoZeus": "Recordaste las {cuantos} baldosas de la pista musical. ¡Eres un maestro de la memoria corporal!",
+    "errorZeus": "¡Casi lo logras! Escucha otra vez el ritmo y prueba nuevamente.",
+    "ayudaZoe": "¡Recuerda los sonidos que escuchaste! ¡Sigue el ritmo de la música!",
+    "rondaListaTitulo": "¡RONDA {n} COMPLETADA!",
+    "rondaLista": "¡Qué fiesta en la pista! Completaste esta ronda. ¡Vamos por la siguiente!",
+    "ronda": "RONDA",
+    "item": "ÍTEM",
+    "de": "DE",
+    "finalTitulo": "¡ERES EL MAESTRO DEL RITMO!",
+    "finalSub": "Completaste las dos rondas: 8 ritmos recordados.",
+    "finalZoe": "¡INCREÍBLE! Completaste todas las rondas y recordaste los sonidos de la pista.",
+    "finalZeus": "¡Tienes una memoria corporal fantástica!",
+    "botonOtraVez": "VOLVER A JUGAR",
+    "botonContinuar": "CONTINUAR",
+    "otraVez": "¡Otra vez! La pista tiene nuevos ritmos para ti.",
+    "cierre": "¡Muy bien! Escuchaste los sonidos de la pista y repetiste el ritmo en el orden correcto.",
+    "eligeNivel": "Elige tu edad",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Bienvenido a la pista musical de PedNia!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Y yo soy Zeus! Aquí las baldosas se encienden y suenan con el cuerpo."
+      },
+      {
+        "personaje": 1,
+        "texto": "La pista toca un ritmo y tú lo repites tocando las mismas baldosas. ¡A bailar!"
+      }
+    ],
+    "cuantos": {
+      "2": "dos",
+      "3": "tres"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Prejardín: memoria corporal"
+    }
+  ]
+}

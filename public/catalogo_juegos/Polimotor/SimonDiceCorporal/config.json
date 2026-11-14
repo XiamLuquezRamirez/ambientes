@@ -1,0 +1,179 @@
+{
+  "nombre": "¡Simón Dice Corporal!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "msRespuesta": 1250,
+    "debounceMs": 420,
+    "pausaAntesDeComprobarMs": 550,
+    "ayudaMs": 12000,
+    "ayudaRepetirMs": 14000,
+    "ayudasMax": 3,
+    "repetirSecuenciaTrasError": true,
+    "pausaEntreItemsMs": 700,
+    "visibles": 3,
+    "msCambioOpciones": 620
+  },
+  "acciones": [
+    {
+      "id": "cabeza",
+      "nombre": "Tocar Cabeza",
+      "voz": "¡Cabeza!",
+      "corto": "cabeza",
+      "color": "#fab005",
+      "nota": 523.25
+    },
+    {
+      "id": "aplaudir",
+      "nombre": "Aplaudir",
+      "voz": "¡Aplaudir!",
+      "corto": "aplauso",
+      "color": "#228be6",
+      "nota": 659.25
+    },
+    {
+      "id": "zapatear",
+      "nombre": "Zapatear",
+      "voz": "¡Zapatear!",
+      "corto": "zapateo",
+      "color": "#40c057",
+      "nota": 783.99
+    },
+    {
+      "id": "saltar",
+      "nombre": "Saltar",
+      "voz": "¡Saltar!",
+      "corto": "salto",
+      "color": "#e64980",
+      "nota": 880.0
+    },
+    {
+      "id": "tocarPies",
+      "nombre": "Tocar Pies",
+      "voz": "¡Tocar los pies!",
+      "corto": "pies",
+      "color": "#7950f2",
+      "nota": 587.33
+    },
+    {
+      "id": "abrirBrazos",
+      "nombre": "Abrir Brazos",
+      "voz": "¡Abrir los brazos!",
+      "corto": "brazos",
+      "color": "#15aabf",
+      "nota": 698.46
+    }
+  ],
+  "rondas": [
+    {
+      "id": 1,
+      "titulo": "RONDA 1",
+      "nombre": "Simón dice",
+      "items": 6,
+      "movimientos": [
+        2,
+        2,
+        2,
+        3,
+        3,
+        3
+      ],
+      "msMovimiento": 2000,
+      "pausaMs": 950,
+      "apoyo": "alto",
+      "nombrar": true,
+      "instruccion": "¡Mira a Zeus y repite sus movimientos en el mismo orden!"
+    }
+  ],
+  "demo": {
+    "secuencia": [
+      "cabeza",
+      "aplaudir"
+    ],
+    "msMovimiento": 2100,
+    "pausaMs": 900,
+    "visibles": [
+      "cabeza",
+      "aplaudir",
+      "zapatear"
+    ]
+  },
+  "textos": {
+    "tituloIntro": "¡SIMÓN DICE CORPORAL!",
+    "subtituloIntro": "Mira, recuerda y repite",
+    "bienvenida": "¡Simón dice... muévete con memoria! Mira bien lo que hago y luego repite los mismos dos movimientos en el mismo orden.",
+    "saludoCorto": "¡Simón dice... muévete con memoria!",
+    "pasoObserva": "1. OBSERVA",
+    "pasoRepite": "2. REPITE",
+    "presentaBotones": "Estos son mis seis movimientos:",
+    "botonEmpezar": "¡Empezar!",
+    "demoInstruccion": "¡Observa con atención! Primero hago un movimiento y después otro. ¡Recuerda el orden!",
+    "demoZoe": "¡Primero cabeza y después aplauso! Toca los botones en ese orden.",
+    "tuTurno": "¡AHORA ES TU TURNO!",
+    "tuTurnoVoz": "¡Ahora es tu turno!",
+    "observa": "¡Observa bien los movimientos y recuerda el orden!",
+    "observaCorto": "¡Observa!",
+    "faseObserva": "¡OBSERVA!",
+    "faseRepite": "¡REPITE LA SECUENCIA!",
+    "aciertoZoe": "¡MUY BIEN!",
+    "aciertoZeus": "Recordaste los {cuantos} movimientos en el orden correcto. ¡Sigamos jugando!",
+    "errorZeus": "¡Casi! Recuerda los movimientos que hice. ¡Intentémoslo de nuevo!",
+    "ayudaZoe": "¡Recuerda los movimientos que hizo Zeus! ¡Intenta repetirlos en el mismo orden!",
+    "rondaListaTitulo": "¡RONDA {n} COMPLETADA!",
+    "rondaLista": "¡Excelente! Completaste esta ronda. ¡Vamos por la siguiente!",
+    "ronda": "RONDA",
+    "item": "ÍTEM",
+    "de": "DE",
+    "finalTitulo": "¡ERES UN CAMPEÓN DE LA MEMORIA CORPORAL!",
+    "finalSub": "Recordaste 6 secuencias de 2 y 3 movimientos.",
+    "finalZoe": "¡FANTÁSTICO! Completaste Simón Dice Corporal.",
+    "finalZeus": "¡Tu cuerpo y tu mente trabajan juntos!",
+    "botonOtraVez": "VOLVER A JUGAR",
+    "botonContinuar": "CONTINUAR",
+    "otraVez": "¡Otra vez! Zeus tiene nuevos movimientos para ti.",
+    "cierre": "¡Muy bien! Recordaste y repetiste los movimientos de Zeus en el orden correcto.",
+    "eligeNivel": "Elige tu edad",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola! Soy Zeus. ¡Bienvenido al teatro mágico de PedNia!"
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Y yo soy Zoe! Hoy Zeus es el protagonista del show."
+      },
+      {
+        "personaje": 0,
+        "texto": "Yo hago dos movimientos y tú los repites en el mismo orden. ¡Simón dice!"
+      }
+    ],
+    "cuantos": {
+      "2": "dos",
+      "3": "tres",
+      "4": "cuatro"
+    },
+    "cambioLargo": "¡Ahora son {cuantos} movimientos! ¡Mira con atención!",
+    "cambioOpciones": "¡Mira! Cambiaron los botones. Estos son los de ahora."
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Prejardín: memoria corporal"
+    }
+  ]
+}

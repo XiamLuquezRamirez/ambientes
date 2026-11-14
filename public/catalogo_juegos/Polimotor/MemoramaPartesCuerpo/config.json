@@ -54,6 +54,14 @@
       "titulo": "RONDA 3",
       "partes": ["oreja", "cabeza", "brazo", "pierna"],
       "previaMs": 3000,
+      "instruccion": "¡Sigue buscando! Busca {lista}."
+    },
+    {
+      "id": 4,
+      "titulo": "RONDA 4",
+      "resto": true,
+      "parejas": 3,
+      "previaMs": 3000,
       "instruccion": "¡La última ronda! Busca {lista}."
     }
   ],
@@ -89,7 +97,7 @@
     "botonOtraVez": "Volver a jugar",
     "botonContinuar": "Continuar",
     "otraVez": "¡Vamos otra vez! Las tarjetas cambiaron de lugar.",
-    "cierre": "¡Encontraste todas las parejas del cuerpo en las tres rondas! ¡Tienes una súper memoria!",
+    "cierre": "¡Encontraste todas las parejas del cuerpo en las cuatro rondas! ¡Tienes una súper memoria!",
     "conversacion": [
       {
         "personaje": 1,

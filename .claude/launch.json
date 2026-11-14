@@ -45,6 +45,45 @@
       ],
       "port": 8013,
       "autoPort": false
+    },
+    {
+      "name": "juegos-pista",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8017",
+        "--directory",
+        "public"
+      ],
+      "port": 8017,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-huellas",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8025",
+        "--directory",
+        "public"
+      ],
+      "port": 8025,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-secuenciador",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8021",
+        "--directory",
+        "public"
+      ],
+      "port": 8021,
+      "autoPort": false
     }
   ]
 }

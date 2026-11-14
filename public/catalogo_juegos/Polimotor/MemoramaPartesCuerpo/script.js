@@ -5,9 +5,11 @@
  * Flujo: pantalla de inicio → intro 3D compartida (Zeus y Zoe) → PedniaEdad → presentación que dice Zeus
  * (cartel con el título, Zeus 3D entra caminando y da la bienvenida, las cuatro tarjetas caen boca abajo y se
  * iluminan por turnos) → demostración con la mano, también narrada por Zeus (una pareja distinta que se
- * vuelve a esconder y luego dos manos iguales) → Zeus se va → "¡A jugar!" → 3 RONDAS de 4 tarjetas:
+ * vuelve a esconder y luego dos manos iguales) → Zeus se va → "¡A jugar!" → 3 RONDAS de 4 tarjetas y una
+ * última de 6 (las 3 partes que no salieron):
  *   ronda 1 mano y pie · ronda 2 dos partes al azar de ojos/nariz/boca · ronda 3 dos de oreja/cabeza/brazo/pierna
- * Cada ronda: vista previa de 3 s con cuenta 3-2-1 → partida → "¡RONDA n LISTA!". Tras la ronda 3: celebración →
+ *   · ronda 4 las tres que sobraron
+ * Cada ronda: vista previa de 3 s con cuenta 3-2-1 → partida → "¡RONDA n LISTA!". Tras la ronda 4: celebración →
  * "¡LO LOGRASTE!" con "Volver a jugar" (ronda 1, otras posiciones y otras partes) y "Continuar" (victoria
  * compartida de ../../final).
  *
@@ -33,7 +35,8 @@ let st = null;               // estado de la partida (ReglasMemorama.crear)
 let partidaId = 0;
 let ordenAnterior = null;
 let rondaActual = 0;
-let rondaCfg = null;         // ronda en juego (ReglasMemorama.ronda): sus 2 partes elegidas al azar
+let rondaCfg = null;         // ronda en juego (ReglasMemorama.ronda): sus partes elegidas al azar
+let usadasPartes = [];       // ids ya jugados en esta partida; la ronda final arma lo que sobra
 let encontradas = [];        // partes encontradas en todas las rondas (para la felicitación)
 let ayuda = { t: null, token: 0, veces: 0 };
 let tAviso = 0;
@@ -803,15 +806,17 @@ async function iniciarJuego() {
 // ------------------------------------------------------------------ rondas
 
 /**
- * Ronda i: se eligen al azar 2 partes del grupo de la ronda (4 tarjetas), se reparten (distinto del orden
- * anterior), se ven 3 s con la cuenta 3-2-1, se cierran y empieza el juego.
+ * Ronda i: se eligen las parejas del grupo (4 tarjetas, o 6 en la última con lo que sobró), se reparten
+ * (distinto del orden anterior), se ven 3 s con la cuenta 3-2-1, se cierran y empieza el juego.
  */
 async function empezarRonda(i) {
     const id = ++partidaId;
     limpiarAyuda();
     bloquear(true);
     rondaActual = i;
-    rondaCfg = ReglasMemorama.ronda(gameConfig, i, Math.random);
+    if (i === 0) usadasPartes = [];
+    rondaCfg = ReglasMemorama.ronda(gameConfig, i, Math.random, usadasPartes);
+    usadasPartes = usadasPartes.concat(rondaCfg.elegidas);
     st = ReglasMemorama.crear(rondaCfg, Math.random, ordenAnterior);
     ordenAnterior = ReglasMemorama.orden(st);
     armarRanuras();
@@ -1051,7 +1056,7 @@ function ocultarFelicitacion() {
 
 /**
  * "Volver a jugar": se apagan los dorados, las tarjetas se cierran y se vuelve a la ronda 1 (sin intro), con
- * otras posiciones y otras partes en las rondas 2 y 3.
+ * otras posiciones y otras partes en las rondas 2, 3 y 4.
  */
 async function volverAJugar() {
     ocultarFelicitacion();
@@ -1096,7 +1101,7 @@ function continuar() {
 let escenario_listo = Promise.resolve(false);
 
 $(document).ready(function () {
-    gameConfig = JSON.parse(readText("config.json?v=20261112b"));
+    gameConfig = JSON.parse(readText("config.json?v=20261113d"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = textos().conversacion || [];
     const problemas = ReglasMemorama.revisarJuego(gameConfig, Object.keys(IconosMemorama.SVG));

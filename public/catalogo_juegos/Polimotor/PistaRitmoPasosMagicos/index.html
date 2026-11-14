@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>¡La Pista de Ritmo y Pasos Mágicos!</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" href="../../../assets/css/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../../assets/css/fontawesome/css/all.min.css">
+	<link rel="stylesheet" href="../../../assets/css/fonts.css">
+	<link rel="stylesheet" href="../../../assets/css/sweetalert2.min.css">
+	<script src="../../../assets/js/jquery-4.0.0.min.js"></script>
+	<script src="../../../assets/js/sweetalert.js"></script>
+	<link rel="stylesheet" href="style.css?v=20261113d">
+	<link rel="stylesheet" href="../comun/inicio-fondo.css?v=20261030d">
+	<link rel="stylesheet" href="../comun/interfaz.css?v=20261022o">
+	<script src="../comun/inicio-fondo.js?v=20261030d"></script>
+	<link rel="stylesheet" href="../../final/final.css">
+	<link rel="stylesheet" href="../../intro3d/css/intro.css">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261005a">
+</head>
+<body class="esperando-inicio">
+	<!-- Fondo: la pista musical de PedNia (sala de luces, pantalla de ecualizador, arco de neón con bombillas,
+	     reflectores que cambian de color con cada baldosa, parlantes, guirnaldas y serpentinas). El suelo de
+	     la pista y las baldosas van en la escena. -->
+	<div class="pr-fondo" aria-hidden="true">
+		<svg class="pr-club" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+			<defs>
+				<linearGradient id="pr-sala" x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0" stop-color="#1b0a3d"/>
+					<stop offset=".5" stop-color="#3b1a7a"/>
+					<stop offset="1" stop-color="#120733"/>
+				</linearGradient>
+				<linearGradient id="pr-pantalla" x1="0" y1="0" x2="1" y2="1">
+					<stop offset="0" stop-color="#4c6ef5"/>
+					<stop offset=".5" stop-color="#7048e8"/>
+					<stop offset="1" stop-color="#d6336c"/>
+				</linearGradient>
+				<radialGradient id="pr-pantalla-luz" cx=".5" cy=".55" r=".6">
+					<stop offset="0" stop-color="#fff" stop-opacity=".45"/>
+					<stop offset="1" stop-color="#fff" stop-opacity="0"/>
+				</radialGradient>
+				<linearGradient id="pr-haz-a" x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0" style="stop-color:var(--haz-a, #fff6bf);stop-opacity:.8"/>
+					<stop offset="1" style="stop-color:var(--haz-a, #fff6bf);stop-opacity:0"/>
+				</linearGradient>
+				<linearGradient id="pr-haz-b" x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0" style="stop-color:var(--haz-b, #ffd6f0);stop-opacity:.8"/>
+					<stop offset="1" style="stop-color:var(--haz-b, #ffd6f0);stop-opacity:0"/>
+				</linearGradient>
+				<linearGradient id="pr-parlante" x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0" stop-color="#3b3b52"/>
+					<stop offset="1" stop-color="#1d1d2e"/>
+				</linearGradient>
+				<filter id="pr-neon" x="-20%" y="-20%" width="140%" height="140%">
+					<feGaussianBlur stdDeviation="6" result="b"/>
+					<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+				</filter>
+				<path id="pr-estrellita" d="M0,-12 L3,-3 L12,0 L3,3 L0,12 L-3,3 L-12,0 L-3,-3 Z"/>
+			</defs>
+			<rect width="1600" height="900" fill="url(#pr-sala)"/>
+
+			<!-- pantalla del fondo con ecualizador que late -->
+			<g class="pr-pantalla">
+				<rect x="470" y="120" width="660" height="330" rx="30" fill="url(#pr-pantalla)" opacity=".92"/>
+				<rect x="470" y="120" width="660" height="330" rx="30" fill="url(#pr-pantalla-luz)"/>
+				<g class="pr-eq" fill="#fff">
+					<rect class="pr-barra" style="--i:0" x="540" y="300" width="36" height="110" rx="10"/>
+					<rect class="pr-barra" style="--i:1" x="606" y="300" width="36" height="110" rx="10"/>
+					<rect class="pr-barra" style="--i:2" x="672" y="300" width="36" height="110" rx="10"/>
+					<rect class="pr-barra" style="--i:3" x="738" y="300" width="36" height="110" rx="10"/>
+					<rect class="pr-barra" style="--i:4" x="804" y="300" width="36" height="110" rx="10"/>
+					<rect class="pr-barra" style="--i:5" x="870" y="300" width="36" height="110" rx="10"/>
+					<rect class="pr-barra" style="--i:6" x="936" y="300" width="36" height="110" rx="10"/>
+					<rect class="pr-barra" style="--i:7" x="1002" y="300" width="36" height="110" rx="10"/>
+				</g>
+				<g class="pr-notas-fondo" fill="#fff" opacity=".85">
+					<g class="pr-nota-f" style="--i:0" transform="translate(560 180)"><circle cx="0" cy="18" r="10"/><rect x="7" y="-14" width="5" height="32"/><path d="M12,-14 q20,6 12,22 q0,-12 -12,-12 z"/></g>
+					<g class="pr-nota-f" style="--i:1" transform="translate(1000 170)"><circle cx="0" cy="18" r="10"/><rect x="7" y="-14" width="5" height="32"/><path d="M12,-14 q20,6 12,22 q0,-12 -12,-12 z"/></g>
+					<g class="pr-nota-f" style="--i:2" transform="translate(790 150)"><circle cx="0" cy="18" r="10"/><rect x="7" y="-14" width="5" height="32"/><path d="M12,-14 q20,6 12,22 q0,-12 -12,-12 z"/></g>
+				</g>
+				<rect x="470" y="120" width="660" height="330" rx="30" fill="none" stroke="#ff8ad8" stroke-width="8" filter="url(#pr-neon)" class="pr-neon-borde"/>
+			</g>
+
+			<!-- arco de neón con bombillas -->
+			<g class="pr-arco">
+				<path d="M280,860 L280,230 Q280,70 440,70 L1160,70 Q1320,70 1320,230 L1320,860" fill="none" stroke="#5ce1ff" stroke-width="10" filter="url(#pr-neon)" class="pr-neon-arco"/>
+				<g class="pr-bombillas">
+					<circle style="--i:0" cx="280" cy="300" r="9"/><circle style="--i:1" cx="280" cy="400" r="9"/>
+					<circle style="--i:2" cx="280" cy="500" r="9"/><circle style="--i:3" cx="280" cy="600" r="9"/>
+					<circle style="--i:4" cx="280" cy="700" r="9"/><circle style="--i:5" cx="310" cy="150" r="9"/>
+					<circle style="--i:6" cx="400" cy="80" r="9"/><circle style="--i:7" cx="520" cy="70" r="9"/>
+					<circle style="--i:8" cx="640" cy="70" r="9"/><circle style="--i:9" cx="760" cy="70" r="9"/>
+					<circle style="--i:10" cx="880" cy="70" r="9"/><circle style="--i:11" cx="1000" cy="70" r="9"/>
+					<circle style="--i:12" cx="1120" cy="70" r="9"/><circle style="--i:13" cx="1280" cy="140" r="9"/>
+					<circle style="--i:14" cx="1320" cy="300" r="9"/><circle style="--i:15" cx="1320" cy="400" r="9"/>
+					<circle style="--i:16" cx="1320" cy="500" r="9"/><circle style="--i:17" cx="1320" cy="600" r="9"/>
+					<circle style="--i:18" cx="1320" cy="700" r="9"/>
+				</g>
+			</g>
+
+			<!-- reflectores: haces que se mecen y toman el color de la baldosa encendida -->
+			<g class="pr-haces">
+				<polygon class="pr-haz pr-haz-1" points="330,30 400,30 920,900 560,900" fill="url(#pr-haz-a)"/>
+				<polygon class="pr-haz pr-haz-2" points="1200,30 1270,30 1040,900 680,900" fill="url(#pr-haz-b)"/>
+				<polygon class="pr-haz pr-haz-3" points="770,0 830,0 1020,900 580,900" fill="url(#pr-haz-a)" opacity=".45"/>
+			</g>
+			<g class="pr-lamparas" fill="#2b2b3d" stroke="#111" stroke-width="4">
+				<rect x="335" y="10" width="60" height="38" rx="10"/>
+				<rect x="1205" y="10" width="60" height="38" rx="10"/>
+				<rect x="770" y="0" width="60" height="28" rx="8"/>
+			</g>
+
+			<!-- bola de espejos -->
+			<g class="pr-bola">
+				<line x1="800" y1="0" x2="800" y2="96" stroke="#9aa0b5" stroke-width="5"/>
+				<circle cx="800" cy="130" r="36" fill="#cfd6ef" stroke="#6b7394" stroke-width="5"/>
+				<path d="M770,112 L830,112 M768,130 L832,130 M772,148 L828,148 M800,96 L800,166 M782,100 L782,160 M818,100 L818,160"
+					stroke="#8d96bb" stroke-width="3"/>
+				<circle cx="788" cy="118" r="8" fill="#fff" opacity=".75"/>
+			</g>
+
+			<!-- parlantes a los lados -->
+			<g class="pr-parlante pr-parlante-izq">
+				<rect x="60" y="430" width="170" height="340" rx="18" fill="url(#pr-parlante)" stroke="#0e0e1a" stroke-width="6"/>
+				<circle cx="145" cy="530" r="58" fill="#15151f" stroke="#0a0a12" stroke-width="6"/>
+				<circle class="pr-cono" cx="145" cy="530" r="34" fill="#2e2e44" stroke="#101019" stroke-width="5"/>
+				<circle cx="145" cy="530" r="13" fill="#5c5c7d"/>
+				<circle cx="145" cy="676" r="42" fill="#15151f" stroke="#0a0a12" stroke-width="6"/>
+				<circle class="pr-cono pr-cono-2" cx="145" cy="676" r="24" fill="#2e2e44" stroke="#101019" stroke-width="5"/>
+				<rect x="96" y="446" width="98" height="16" rx="8" fill="#50506e"/>
+			</g>
+			<g class="pr-parlante pr-parlante-der">
+				<rect x="1370" y="430" width="170" height="340" rx="18" fill="url(#pr-parlante)" stroke="#0e0e1a" stroke-width="6"/>
+				<circle cx="1455" cy="530" r="58" fill="#15151f" stroke="#0a0a12" stroke-width="6"/>
+				<circle class="pr-cono" cx="1455" cy="530" r="34" fill="#2e2e44" stroke="#101019" stroke-width="5"/>
+				<circle cx="1455" cy="530" r="13" fill="#5c5c7d"/>
+				<circle cx="1455" cy="676" r="42" fill="#15151f" stroke="#0a0a12" stroke-width="6"/>
+				<circle class="pr-cono pr-cono-2" cx="1455" cy="676" r="24" fill="#2e2e44" stroke="#101019" stroke-width="5"/>
+				<rect x="1406" y="446" width="98" height="16" rx="8" fill="#50506e"/>
+			</g>
+
+			<!-- guirnaldas de banderines -->
+			<g class="pr-guirnalda">
+				<path d="M220,130 Q400,220 620,150" fill="none" stroke="#ffe8a3" stroke-width="3"/>
+				<path d="M980,150 Q1200,220 1380,130" fill="none" stroke="#ffe8a3" stroke-width="3"/>
+				<g class="pr-banderin" style="--i:0"><path d="M270,152 l30,8 l-20,30 z" fill="#ff6b6b"/></g>
+				<g class="pr-banderin" style="--i:1"><path d="M330,176 l30,6 l-18,32 z" fill="#ffd43b"/></g>
+				<g class="pr-banderin" style="--i:2"><path d="M395,190 l30,2 l-14,32 z" fill="#51cf66"/></g>
+				<g class="pr-banderin" style="--i:3"><path d="M460,192 l30,-2 l-12,32 z" fill="#339af0"/></g>
+				<g class="pr-banderin" style="--i:4"><path d="M525,180 l28,-6 l-8,32 z" fill="#cc5de8"/></g>
+				<g class="pr-banderin" style="--i:5"><path d="M1050,180 l28,6 l-20,28 z" fill="#ff922b"/></g>
+				<g class="pr-banderin" style="--i:6"><path d="M1115,192 l30,2 l-16,32 z" fill="#ff6b6b"/></g>
+				<g class="pr-banderin" style="--i:7"><path d="M1180,192 l30,-2 l-12,32 z" fill="#ffd43b"/></g>
+				<g class="pr-banderin" style="--i:8"><path d="M1245,180 l30,-6 l-10,32 z" fill="#51cf66"/></g>
+				<g class="pr-banderin" style="--i:9"><path d="M1310,158 l28,-10 l-6,32 z" fill="#339af0"/></g>
+			</g>
+
+			<!-- estrellitas que titilan en la sala -->
+			<use href="#pr-estrellita" class="pr-brillo" style="--i:0" x="400" y="300" fill="#fff"/>
+			<use href="#pr-estrellita" class="pr-brillo" style="--i:1" x="1200" y="300" fill="#ffe066"/>
+			<use href="#pr-estrellita" class="pr-brillo" style="--i:2" x="360" y="560" fill="#ffe066"/>
+			<use href="#pr-estrellita" class="pr-brillo" style="--i:3" x="1240" y="580" fill="#fff"/>
+			<use href="#pr-estrellita" class="pr-brillo" style="--i:4" x="800" y="480" fill="#fff"/>
+		</svg>
+	</div>
+
+	<div id="pantalla-inicio" class="pantalla-inicio">
+		<button type="button" id="btn-inicio-volver" class="inicio-volver" hidden>
+			<img src="../../../assets/images/selector-aula/volver.png" alt="Volver">
+		</button>
+		<div class="inicio-mancha" aria-hidden="true"></div>
+		<div class="inicio-contenido">
+			<img class="inicio-icono" src="pista-ritmo.png" alt="" aria-hidden="true">
+			<p class="inicio-kicker">¡La Pista de Ritmo y Pasos Mágicos!</p>
+			<button type="button" id="btn-empecemos" class="btn-empecemos">
+				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
+				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
+				<span class="btn-empecemos-texto">¡Empecemos!</span>
+			</button>
+		</div>
+	</div>
+
+	<div id="intro3d-root" hidden>
+		<div id="three-container"></div>
+		<div id="phaser-container"></div>
+		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;">
+			Omitir <i class="fa fa-forward" aria-hidden="true"></i>
+		</button>
+		<div id="intro3d-continuar" hidden>
+			<div class="intro3d-continuar-card">
+				<div class="intro3d-titulo-wrap">
+					<span class="intro3d-ray intro3d-ray-l1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l3" aria-hidden="true"></span>
+					<h2>¡Listo!</h2>
+					<span class="intro3d-ray intro3d-ray-r1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r3" aria-hidden="true"></span>
+				</div>
+				<p>Toca el botón para empezar el juego</p>
+				<div class="intro3d-btn-wrap">
+					<span class="intro3d-ray intro3d-ray-bl1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-bl2" aria-hidden="true"></span>
+					<button type="button" id="btn-continuar-intro3d">
+						<span class="intro3d-btn-shine" aria-hidden="true"></span>
+						<span class="intro3d-play" aria-hidden="true"></span>
+						<span>CONTINUAR</span>
+					</button>
+					<span class="intro3d-ray intro3d-ray-br1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-br2" aria-hidden="true"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div style="display: none; background-color: rgba(255, 255, 255, 0.664); width: 100%; height: 100%; position: fixed; z-index: 100;" id="fondo_blanco"></div>
+
+	<div id="final" class="final" hidden>
+		<div id="victoria">
+			<img src="../../img/fondo.png" class="fondo" alt="">
+			<div class="contenido">
+				<img src="../../img/excelente.png" class="excelente" alt="¡Excelente!">
+				<p class="texto-final" id="texto_final"></p>
+				<img src="../../img/trofeo.png" class="trofeo" alt="Trofeo">
+				<img src="../../img/zeus_normal.gif" class="personaje zeus" alt="Zeus">
+				<img src="../../img/zoe_normal.gif" class="personaje zoe" alt="Zoe">
+				<div class="destello destello-1"></div>
+				<div class="destello destello-2"></div>
+				<div class="destello destello-3"></div>
+			</div>
+			<img src="../../img/cortina_izq.png" class="cortina cortina-izq" alt="">
+			<img src="../../img/cortina_der.png" class="cortina cortina-der" alt="">
+			<div class="confeti" id="confeti"></div>
+		</div>
+		<div class="final-acciones" id="final-acciones">
+			<p class="final-pregunta">¿Quieres jugar nuevamente?</p>
+			<div class="final-botones">
+				<button type="button" class="btn btn-success" onclick="window.location.reload(1)"><i class="fa-solid fa-play"></i> Sí</button>
+				<button type="button" class="btn btn-danger" onclick="history.back()"><i class="fa-solid fa-home"></i> No</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="principal">
+		<!-- Zona superior: ronda e ítem a la izquierda, título al centro, inicio y reiniciar arriba a la derecha. -->
+		<header class="hud-top">
+			<div class="hud-nav">
+				<!-- Solo se ven ronda e ítem. Los grupos de puntos y la barra de 0/12 quedan
+				     ocultos (los sigue actualizando script.js, pero no se muestran). -->
+				<div id="progreso-box" class="progreso-box" aria-live="polite">
+					<span id="progreso-ronda" class="progreso-pill progreso-pill-ronda">RONDA 1 DE 3</span>
+					<span id="progreso-estrellas" class="progreso-estrellas" role="img" aria-label="0 de 4 ítems">
+						<i class="fa-solid fa-star progreso-estrella" aria-hidden="true"></i>
+						<i class="fa-solid fa-star progreso-estrella" aria-hidden="true"></i>
+						<i class="fa-solid fa-star progreso-estrella" aria-hidden="true"></i>
+						<i class="fa-solid fa-star progreso-estrella" aria-hidden="true"></i>
+					</span>
+					<div id="progreso-grupos" class="progreso-grupos" hidden></div>
+					<div class="progreso-barra" role="progressbar" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" id="progreso-barra" hidden>
+						<span id="progreso-relleno" class="progreso-relleno"></span>
+						<strong id="progreso-num" class="progreso-num">0/12</strong>
+					</div>
+				</div>
+			</div>
+			<div class="hud-titulo">
+				<h1 aria-label="¡La pista de ritmo y pasos mágicos!"><span style="--c:#ffd43b">¡</span><span style="--c:#ffd43b">L</span><span style="--c:#ffd43b">A</span><span class="hud-espacio"> </span><span style="--c:#f783ac">P</span><span style="--c:#f783ac">I</span><span style="--c:#f783ac">S</span><span style="--c:#f783ac">T</span><span style="--c:#f783ac">A</span><span class="hud-espacio"> </span><span style="--c:#8ce99a">D</span><span style="--c:#8ce99a">E</span><span class="hud-espacio"> </span><span style="--c:#74c0fc">R</span><span style="--c:#74c0fc">I</span><span style="--c:#74c0fc">T</span><span style="--c:#74c0fc">M</span><span style="--c:#74c0fc">O</span><span class="hud-salto"></span><span style="--c:#ffd43b">Y</span><span class="hud-espacio"> </span><span style="--c:#b197fc">P</span><span style="--c:#b197fc">A</span><span style="--c:#b197fc">S</span><span style="--c:#b197fc">O</span><span style="--c:#b197fc">S</span><span class="hud-espacio"> </span><span style="--c:#ffc078">M</span><span style="--c:#ffc078">Á</span><span style="--c:#ffc078">G</span><span style="--c:#ffc078">I</span><span style="--c:#ffc078">C</span><span style="--c:#ffc078">O</span><span style="--c:#ffc078">S</span><span style="--c:#ffc078">!</span></h1>
+			</div>
+			<div class="hud-nav hud-nav-der">
+				<button type="button" onclick="history.back()" class="btn-inicio" title="Volver al inicio"><i class="fa-solid fa-house" aria-hidden="true"></i> Inicio</button>
+				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+			</div>
+		</header>
+
+		<!-- Zona central: Zoe a la izquierda y, en el centro, una columna con la marquesina horizontal
+		     (fase + ranuras de la secuencia) justo encima de la pista de seis baldosas. -->
+		<main class="escena">
+			<div id="escenario-zona" class="escenario-zona">
+				<div id="zoe" class="pj-zoe" aria-hidden="true">
+					<div class="zoe-pj">
+						<img id="zoe-img" src="../../img/zoe_normal.gif" alt="">
+					</div>
+				</div>
+				<div id="zoe-nube" class="nube nube-zoe" aria-live="polite" hidden><span id="zoe-nube-texto"></span></div>
+
+				<div class="centro">
+					<!-- marquesina horizontal: la fase a la izquierda y las ranuras en fila, sobre la pista -->
+					<aside id="marquesina" class="marquesina" aria-live="polite">
+						<div id="fase" class="fase fase-espera">
+							<i class="fa-solid fa-ear-listen fase-icono-observa" aria-hidden="true"></i>
+							<i class="fa-solid fa-hand-pointer fase-icono-repite" aria-hidden="true"></i>
+							<span id="fase-texto">¡A BAILAR!</span>
+						</div>
+						<div class="secuencia n-2" id="secuencia" data-n="2">
+							<div class="ranura" data-n="1"><span class="ranura-num">1</span><img alt="" class="ranura-img"><span class="ranura-q">?</span></div>
+							<i class="fa-solid fa-arrow-right secuencia-flecha" aria-hidden="true"></i>
+							<div class="ranura" data-n="2"><span class="ranura-num">2</span><img alt="" class="ranura-img"><span class="ranura-q">?</span></div>
+						</div>
+						<div class="pasos" id="pasos" hidden>
+							<span class="paso paso-observa"><i class="fa-solid fa-ear-listen"></i> <span id="paso-observa-txt">1. ESCUCHA</span></span>
+							<span class="paso paso-repite"><i class="fa-solid fa-hand-pointer"></i> <span id="paso-repite-txt">2. REPITE</span></span>
+						</div>
+					</aside>
+
+					<!-- la pista: seis baldosas luminosas (las arma script.js desde config.acciones) -->
+					<div class="pista-marco">
+						<div class="pista-suelo" aria-hidden="true"></div>
+						<div id="pista" class="pista" role="group" aria-label="Baldosas de la pista"></div>
+					</div>
+				</div>
+
+				<div id="escenario-cartel" class="escenario-cartel" hidden>
+					<strong id="escenario-cartel-titulo"></strong>
+					<span id="escenario-cartel-sub"></span>
+				</div>
+			</div>
+		</main>
+	</div>
+
+	<!-- Capa Phaser de efectos (ondas, estrellas, notas, serpentinas y confeti): delante de todo, sin toques. -->
+	<div id="efectos-phaser" class="efectos-phaser" aria-hidden="true"></div>
+
+	<!-- Felicitación del final -->
+	<div id="felicitacion" class="felicitacion" hidden>
+		<div class="felicitacion-tarjeta" role="dialog" aria-labelledby="felicitacion-titulo">
+			<div class="felicitacion-estrellas" aria-hidden="true">
+				<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+			</div>
+			<h2 id="felicitacion-titulo">¡ERES EL MAESTRO DEL RITMO!</h2>
+			<p id="felicitacion-sub"></p>
+			<div id="felicitacion-dibujos" class="felicitacion-dibujos" aria-hidden="true"></div>
+			<div class="felicitacion-botones">
+				<button type="button" id="btn-otra-vez" class="btn-final btn-final-otra"><i class="fa-solid fa-rotate-right"></i> <span>VOLVER A JUGAR</span></button>
+				<button type="button" id="btn-continuar" class="btn-final btn-final-seguir"><span>CONTINUAR</span> <i class="fa-solid fa-arrow-right"></i></button>
+			</div>
+		</div>
+	</div>
+
+	<div id="comenzar-wrap" class="comenzar-wrap" hidden>
+		<button type="button" id="btn-comenzar" class="btn-comenzar"><i class="fa-solid fa-music"></i><span class="btn-comenzar-texto">¡Encender la pista!</span></button>
+	</div>
+
+	<div id="menu-acc" class="menu-acc">
+		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
+			<i class="fa-solid fa-universal-access"></i>
+		</button>
+		<div id="menu-acc-panel" class="menu-acc-panel" hidden>
+			<div class="menu-acc-cab">
+				<strong>Accesibilidad</strong>
+				<button type="button" id="btn-cerrar-acc" class="menu-acc-cerrar" aria-label="Cerrar">&times;</button>
+			</div>
+			<div id="menu-acc-ops" class="menu-acc-ops"></div>
+		</div>
+	</div>
+
+	<div id="menu-vol" class="menu-acc">
+		<button type="button" id="btn-menu-vol" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-vol-panel" title="Sonido">
+			<i class="fa-solid fa-volume-high"></i>
+		</button>
+		<div id="menu-vol-panel" class="menu-acc-panel" hidden>
+			<div class="menu-acc-cab">
+				<strong>Sonido</strong>
+				<button type="button" id="btn-cerrar-vol" class="menu-acc-cerrar" aria-label="Cerrar">×</button>
+			</div>
+			<label class="menu-acc-op">
+				<input type="checkbox" id="chk-voces" checked> Voces
+			</label>
+			<label class="menu-acc-op">
+				<input type="checkbox" id="chk-efectos" checked> Efectos
+			</label>
+			<label class="menu-acc-op menu-acc-rango">
+				<span>Música de fondo <strong id="vol-val">20</strong></span>
+				<input type="range" id="rango-volumen" min="0" max="100" step="1" value="20">
+			</label>
+		</div>
+	</div>
+
+	<script src="../../texto_voz.js"></script>
+	<script src="../../shared/edad-nivel.js"></script>
+	<script src="../../../assets/vendor/phaser/phaser.min.js"></script>
+	<script src="../../intro3d/js/config.js?v=20261007a"></script>
+	<script src="../../intro3d/js/ambientes-tema.js?v=20261105a"></script>
+	<script type="importmap">
+	{
+	  "imports": {
+	    "three": "../../../assets/vendor/three/three.module.js",
+	    "three/addons/": "../../../assets/vendor/three/addons/"
+	  }
+	}
+	</script>
+	<script type="module" src="../../intro3d/js/three-scene.js?v=20261105a"></script>
+	<script type="module" src="../../intro3d/js/final-scene.js?v=20261105a"></script>
+	<script src="../../tutorial/tutorial.js?v=20261019c"></script>
+	<script src="../../intro3d/js/intro.js?v=20261028p4"></script>
+	<script src="../../final/final.js"></script>
+	<script src="../../shared/aplicar-perfil-juego.js?v=20261013a"></script>
+	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
+	<script src="../../../assets/vendor/gsap/gsap.min.js"></script>
+	<script src="../../../assets/vendor/howler/howler.core.min.js"></script>
+	<script src="../../shared/pednia-audio.js?v=20261028t"></script>
+	<script src="../../shared/pednia-fx.js?v=20261107d"></script>
+	<script src="reglas.js?v=20261113b"></script>
+	<script src="iconos.js?v=20261113b"></script>
+	<script src="sonidos.js?v=20261113b"></script>
+	<script src="escenario-phaser.js?v=20261113b"></script>
+	<script src="demo.js?v=20261113b"></script>
+	<script src="script.js?v=20261113d"></script>
+	<script type="module" src="zoe-3d.js?v=20261113b"></script>
+</body>
+</html>
