@@ -1,5 +1,5 @@
 /**
- * Zoe3D — Zoe en 3D como ayudante de "¡Simón Dice Corporal!" (window.Zoe3D). Está de pie en la esquina
+ * Zoe3D — Zoe en 3D como ayudante de "El Secuenciador de Baile y Lateralidad" (window.Zoe3D). Está de pie en la esquina
  * izquierda de la tarima, mirando a Zeus; su nube de texto acompaña lo que dice (presentación, demostración,
  * pistas y final). Mismo modelo y clips que los demás juegos (intro3d/models/nina.glb, módulo copiado de
  * "¿Dónde lo uso?" sin la caminata).

@@ -181,23 +181,37 @@ body.intro3d-activa #menu-acc {
   background: var(--sd-noche);
 }
 
-.sd-teatro { width: 100%; height: 100%; display: block; }
+.sd-pista { width: 100%; height: 100%; display: block; }
 
 .sd-punto {
   animation: sdTitila 2.6s ease-in-out infinite;
   animation-delay: calc(var(--i) * -0.4s);
 }
 
-.sd-neon-borde { animation: sdNeon 2.2s ease-in-out infinite; }
-.sd-neon-arco { animation: sdNeon 3s ease-in-out infinite reverse; }
-
-.sd-bombillas circle {
-  fill: #fff3bf;
-  stroke: #f59f00;
-  stroke-width: 3;
-  animation: sdBombilla 1.2s steps(2, jump-none) infinite;
-  animation-delay: calc(var(--i) * -0.15s);
+/* Aro de neón detrás de Zeus: late despacio y toma el color del movimiento en curso. */
+.sd-aro-linea {
+  stroke: var(--luz, #5ce1ff);
+  animation: sdNeon 3s ease-in-out infinite;
 }
+
+.sd-aro-linea-2 { animation: sdNeon 4.2s ease-in-out infinite reverse; }
+
+/* Baldosas luminosas del suelo: laten en cadena, como una pista de discoteca. */
+.sd-baldosa {
+  fill: var(--luz, #5ce1ff);
+  opacity: 0.12;
+  animation: sdBaldosa 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.4s);
+}
+
+/* Conos de los altavoces: vibran con la música. */
+.sd-cono {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: sdCono 1.1s ease-in-out infinite;
+}
+
+.sd-torre-der .sd-cono { animation-delay: -0.55s; }
 
 .sd-haz {
   transform-box: fill-box;
@@ -209,13 +223,6 @@ body.intro3d-activa #menu-acc {
 .sd-haz-2 { animation: sdHazDer 6.6s ease-in-out infinite; }
 .sd-haz-3 { animation: sdTitila 4s ease-in-out infinite; }
 
-.sd-banderin {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  animation: sdBanderin 3.2s ease-in-out infinite;
-  animation-delay: calc(var(--i) * -0.35s);
-}
-
 .sd-brillo {
   transform-box: fill-box;
   transform-origin: 50% 50%;
@@ -223,13 +230,27 @@ body.intro3d-activa #menu-acc {
   animation-delay: calc(var(--i) * -0.7s);
 }
 
-/* Fase "observa": la sala se oscurece un poco y los reflectores se cierran sobre Zeus. */
-body.fase-observa .sd-teatro { filter: brightness(0.82); transition: filter 0.6s; }
+/* Fase "observa": la pista baja de luz y los haces se cierran sobre Zeus. */
+body.fase-observa .sd-pista { filter: brightness(0.8); transition: filter 0.6s; }
 body.fase-observa .sd-haz-1 { animation: none; transform: rotate(-4deg); }
 body.fase-observa .sd-haz-2 { animation: none; transform: rotate(4deg); }
+body.fase-observa .sd-baldosa { animation-duration: 3.4s; }
+
+/* Fiesta (celebración): todo se acelera. */
 body.fiesta .sd-haz-1 { animation-duration: 1.2s; }
 body.fiesta .sd-haz-2 { animation-duration: 1.3s; }
-body.fiesta .sd-bombillas circle { animation-duration: 0.4s; }
+body.fiesta .sd-baldosa { animation-duration: 0.7s; opacity: 0.3; }
+body.fiesta .sd-cono { animation-duration: 0.45s; }
+
+@keyframes sdBaldosa {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes sdCono {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
 
 @keyframes sdTitila { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
 @keyframes sdNeon { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
@@ -501,11 +522,15 @@ body.fiesta .sd-bombillas circle { animation-duration: 0.4s; }
   position: absolute;
   inset: 0;
   border-radius: 50%;
+  /* plataforma de cristal oscuro con anillos de luz, no madera */
   background:
-    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.08) 0 2px, transparent 2px 64px),
-    radial-gradient(ellipse at 50% 38%, #f5c58a 0%, #d9944a 55%, #a8642a 100%);
-  border: 5px solid #6b3a12;
-  box-shadow: 0 10px 0 #4a2508, 0 22px 40px rgba(0, 0, 0, 0.45);
+    repeating-radial-gradient(ellipse at 50% 50%, rgba(92, 225, 255, 0.16) 0 2px, transparent 2px 26px),
+    radial-gradient(ellipse at 50% 42%, #3a1f7a 0%, #22115c 55%, #130a33 100%);
+  border: 4px solid rgba(92, 225, 255, 0.75);
+  box-shadow:
+    0 0 26px rgba(92, 225, 255, 0.45),
+    inset 0 0 40px rgba(92, 225, 255, 0.2),
+    0 18px 36px rgba(0, 0, 0, 0.5);
 }
 
 .tarima-foco {
@@ -516,7 +541,7 @@ body.fiesta .sd-bombillas circle { animation-duration: 0.4s; }
   height: 78%;
   transform: translateX(-50%);
   border-radius: 50%;
-  background: radial-gradient(ellipse, var(--luz) 0%, rgba(255, 243, 191, 0.4) 45%, transparent 72%);
+  background: radial-gradient(ellipse, var(--luz) 0%, rgba(92, 225, 255, 0.28) 45%, transparent 72%);
   z-index: 1;
   opacity: 0.9;
   transition: background 0.4s;
@@ -528,23 +553,23 @@ body.fiesta .sd-bombillas circle { animation-duration: 0.4s; }
   z-index: 2;
 }
 
+/* Luces del borde de la plataforma: recorren el anillo en vez de parpadear como bombillas de feria. */
 .tarima-borde span {
   position: absolute;
   bottom: calc(6% + 6% * var(--o, 0));
   left: calc(8% + var(--i) * 9.4%);
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: #fff3bf;
-  box-shadow: 0 0 10px 3px rgba(255, 212, 59, 0.85);
-  animation: sdBombillaDom 1.2s steps(2, jump-none) infinite;
-  animation-delay: calc(var(--i) * -0.2s);
+  background: var(--luz, #5ce1ff);
+  box-shadow: 0 0 14px 4px rgba(92, 225, 255, 0.75);
+  animation: sdLuzBorde 1.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.18s);
 }
 
-@keyframes sdBombillaDom {
-  0% { background: #fff3bf; box-shadow: 0 0 10px 3px rgba(255, 212, 59, 0.85); }
-  50% { background: #ffa94d; box-shadow: 0 0 6px 1px rgba(255, 146, 43, 0.6); }
-  100% { background: #fff3bf; box-shadow: 0 0 10px 3px rgba(255, 212, 59, 0.85); }
+@keyframes sdLuzBorde {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
 }
 
 /* Vibración de la tarima en el zapateo. */
@@ -1391,9 +1416,9 @@ body.alto-contraste .felicitacion p { color: #fff; }
   .sd-punto,
   .sd-neon-borde,
   .sd-neon-arco,
-  .sd-bombillas circle,
+  .sd-baldosa,
+  .sd-cono,
   .sd-haz,
-  .sd-banderin,
   .sd-brillo,
   .tarima-borde span,
   .hud-titulo h1 span,

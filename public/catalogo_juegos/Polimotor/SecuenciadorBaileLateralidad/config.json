@@ -199,6 +199,14 @@
       "instruccion": "¡Mira la rutina de Zeus y repítela en el mismo orden!"
     }
   ],
+  "intro": {
+    "gruposPresentados": 2,
+    "grupoLateralidad": [
+      "brazoDerecho",
+      "brazoIzquierdo",
+      "pieDerecho"
+    ]
+  },
   "demo": {
     "secuencia": [
       "cabeza",

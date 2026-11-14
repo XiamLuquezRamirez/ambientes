@@ -1,5 +1,6 @@
 /**
- * ¡Simón Dice Corporal! — control del juego (Polimotor, Prejardín 3-4 años, juegos de memoria corporal, juego 2).
+ * El Secuenciador de Baile y Lateralidad — control del juego (Polimotor, Transición 5-6 años, juegos de
+ * memoria corporal, juego 4). Zeus baila una rutina en la pista y el niño la repite con los botones.
  *
  * Flujo: pantalla de inicio → intro 3D compartida (Zeus y Zoe) → PedniaEdad → INTRODUCCIÓN en el teatro (título,
  * Zeus saluda y explica "observa y repite", presenta sus tres movimientos) → botón "¡Empezar!" → DEMO automática
@@ -1022,15 +1023,26 @@ async function presentar() {
     await Promise.race([voz, sleep(completa ? 11000 : 4000)]);
     if (!vigente(id)) return;
     if (completa) {
-        // los SEIS movimientos de Zeus, de tres en tres: la botonera muestra un trío, Zeus lo hace y luego
-        // cambia al siguiente trío, así el niño ve desde el principio que los botones se renuevan
+        // Zeus enseña unos pocos tríos de movimientos: la botonera muestra uno, Zeus lo hace y luego cambia
+        // al siguiente, así el niño ve desde el principio que los botones se renuevan. Con dieciséis
+        // comandos no caben todos (serían más de 30 s antes de jugar): se muestran los tríos que pide
+        // `config.intro.gruposPresentados`, empezando por el de la demo y siguiendo por el de lateralidad,
+        // que es el que conviene reconocer antes de empezar.
         nube("zeus", t.presentaBotones || "", false);
         const visibles = ReglasSimon.visiblesDeConfig(gameConfig);
-        const grupos = [];
-        for (let i = 0; i < ReglasSimon.ACCIONES.length; i += visibles) {
-            grupos.push(ReglasSimon.ACCIONES.slice(i, i + visibles));
+        const todas = ReglasSimon.accionesDeConfig(gameConfig);
+        const intro = gameConfig.intro || {};
+        const cuantosGrupos = Math.max(1, Number(intro.gruposPresentados) || 1);
+        const grupos = [ReglasSimon.visiblesDemo(gameConfig)];
+        const lateral = (intro.grupoLateralidad || []).filter(function (a) { return todas.indexOf(a) >= 0; });
+        if (lateral.length === visibles) grupos.push(lateral);
+        // si todavía faltan tríos, se completan con los movimientos que aún no se han enseñado
+        const yaVistos = grupos.reduce(function (acc, g) { return acc.concat(g); }, []);
+        const resto = todas.filter(function (a) { return yaVistos.indexOf(a) < 0; });
+        while (grupos.length < cuantosGrupos && resto.length >= visibles) {
+            grupos.push(resto.splice(0, visibles));
         }
-        for (const grupo of grupos) {
+        for (const grupo of grupos.slice(0, cuantosGrupos)) {
             if (!vigente(id)) return;
             await ponerBotones(grupo);
             if (!vigente(id)) return;
@@ -1455,7 +1467,7 @@ function mostrarFelicitacion() {
     const dib = document.getElementById("felicitacion-dibujos");
     if (dib) {
         dib.innerHTML = "";
-        ReglasSimon.ACCIONES.forEach(function (a) {
+        ReglasSimon.accionesDeConfig(gameConfig).forEach(function (a) {
             const s = document.createElement("span");
             s.innerHTML = IconosSimon.svg(a);
             dib.appendChild(s);

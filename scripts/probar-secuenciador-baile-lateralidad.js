@@ -370,4 +370,28 @@ prueba("script.js: cada comando tiene color de luz y efecto, y no quedan ids vie
     });
 });
 
+// La intro presenta los botones y el precargado de voces recorren TODAS las acciones: si usan la constante
+// de respaldo (6 ids viejos) en vez del config, Zeus intenta decir "tocarPies" y se saltan 10 comandos.
+prueba("script.js: la intro y el precargado recorren las acciones del config, no la constante", function () {
+    const txt = fs.readFileSync(path.join(carpeta, "script.js"), "utf8");
+    const usos = txt.match(/ReglasSimon\.ACCIONES/g) || [];
+    assert.deepStrictEqual(usos, [], "ninguna parte recorre ReglasSimon.ACCIONES: " + usos.length + " usos");
+    assert.ok(
+        /accionesDeConfig\(gameConfig\)/.test(txt),
+        "usa ReglasSimon.accionesDeConfig(gameConfig)"
+    );
+});
+
+// Con 16 comandos, presentarlos todos en la intro serían ~32 s de espera antes de jugar: se muestran
+// solo unos pocos tríos (config.intro.gruposPresentados), empezando por el de la demo.
+prueba("intro: presenta solo unos pocos tríos, no los 16 comandos", function () {
+    const grupos = (cfg.intro && cfg.intro.gruposPresentados) || 0;
+    assert.ok(grupos >= 1 && grupos <= 3, "entre 1 y 3 tríos presentados, hay " + grupos);
+    const txt = fs.readFileSync(path.join(carpeta, "script.js"), "utf8");
+    assert.ok(/gruposPresentados/.test(txt), "script.js respeta config.intro.gruposPresentados");
+    // la espera de la presentación debe quedar por debajo de medio minuto
+    const porMovimiento = 1500 + 250;
+    assert.ok(grupos * 3 * porMovimiento <= 16000, "la presentación no pasa de ~16 s");
+});
+
 console.log("\n" + pasadas + " pruebas correctas");
