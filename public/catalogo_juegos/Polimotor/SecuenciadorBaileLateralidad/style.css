@@ -328,7 +328,7 @@ body.fiesta .sd-cono { animation-duration: 0.45s; }
 
 .hud-edad strong { font-size: 24px; }
 
-/* Título "¡SIMÓN DICE CORPORAL!": letras de colores con borde oscuro, centrado respecto a la pantalla. */
+/* Título "¡EL SECUENCIADOR DE BAILE!": letras de colores con borde oscuro, centrado respecto a la pantalla. */
 .hud-titulo {
   position: absolute;
   left: 50%;

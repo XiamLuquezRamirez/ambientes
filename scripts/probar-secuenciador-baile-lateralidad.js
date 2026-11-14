@@ -394,6 +394,14 @@ prueba("intro: presenta solo unos pocos tríos, no los 16 comandos", function ()
     assert.ok(grupos * 3 * porMovimiento <= 16000, "la presentación no pasa de ~16 s");
 });
 
+// El paquete es copia de Simón Dice: ningún texto visible puede seguir nombrando al juego anterior.
+prueba("no queda ningún texto del juego anterior en la pantalla", function () {
+    ["index.html", "script.js", "style.css", "config.json"].forEach(function (f) {
+        const txt = fs.readFileSync(path.join(carpeta, f), "utf8");
+        assert.ok(!/SIM[OÓ]N\s+DICE/i.test(txt), f + ": queda un «Simón Dice» visible");
+    });
+});
+
 // ---------------------------------------------------------------- Tarea 6: registro en el catálogo
 
 prueba("ambientes.sql: una sola fila del juego, Polimotor y temática 31, sin tocar las demás", function () {

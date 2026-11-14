@@ -579,7 +579,7 @@ function fase(tipo) {
     f.className = "fase fase-" + (tipo || "espera");
     txt.textContent = tipo === "observa" ? (textos().faseObserva || "¡OBSERVA!")
         : tipo === "repite" ? (textos().faseRepite || "¡REPITE LA SECUENCIA!")
-            : "¡SIMÓN DICE!";
+            : (textos().faseEspera || "¡A BAILAR!");
     document.body.classList.toggle("fase-observa", tipo === "observa");
 }
 
