@@ -3,7 +3,8 @@
 Notas propias de este juego. Lo común a todos los juegos está en `docs/juegos-escenas-animadas.md`.
 
 Juego nuevo (2026-11-12), Prejardín 3-4 años, temática 31 "Juegos de memoria corporal", juego 1 de la serie.
-Memoria visual en **3 rondas, todas de 4 tarjetas en 2 × 2** (2 parejas). Cuarto de juegos mágico (SVG en
+Memoria visual en **4 rondas**: las tres primeras de 4 tarjetas en 2 × 2 (2 parejas) y la última de 6 tarjetas
+en 3 × 2 (las 3 partes del cuerpo que no salieron en las rondas anteriores). Cuarto de juegos mágico (SVG en
 `index.html`: pared lila y durazno, guirnalda de estrellas que se mece, huellitas de manos y pies pintadas en la
 pared a los lados, tapete) y en el centro un **tablero de corcho** (Phaser: marco de madera, corcho moteado,
 calcomanías de estrellas fuera de la zona de las tarjetas, brillos que flotan). Cada tarjeta cuelga de una chinche
@@ -17,6 +18,8 @@ sin diseño para teléfonos.
 - **3 rondas, todas con 4 tarjetas** (primero se hizo 4, 6 y 8 tarjetas; el usuario lo corrigió). Cada ronda tiene un
   grupo de partes y en cada partida se sortean 2 (`config.rondas[i].partes`, `ReglasMemorama.ronda(cfg, i, rnd)`):
   ronda 1 mano y pie · ronda 2 dos de ojos/nariz/boca · ronda 3 dos de oreja/cabeza/brazo/pierna.
+- **Ronda final de 6 tarjetas** (2026-11-13): `resto: true`, `parejas: 3`. No sortea un grupo nuevo: juega las tres
+  partes de los grupos anteriores que esa partida no usó. Así se ven las nueve partes, sin repetir dibujos.
 - **Más partes del cuerpo reutilizando dibujos de Polimotor**: ojos, nariz, boca, oreja (`orejas`), cabeza, brazo,
   pierna (y cuello, sin usar) copiados de `UnePartesCuerpo/iconos.js` a un bloque propio de `iconos.js` (con sus
   colores). Mano y pie son los dibujos propios de este juego.

@@ -394,6 +394,55 @@ prueba("intro: presenta solo unos pocos tríos, no los 16 comandos", function ()
     assert.ok(grupos * 3 * porMovimiento <= 16000, "la presentación no pasa de ~16 s");
 });
 
+// Partida completa: las 6 tandas acertadas de corrido terminan en victoria, con los largos pedidos.
+prueba("partida completa: 6 tandas de 3, 3, 3, 4, 4 y 4 → victoria", function () {
+    for (let s = 1; s <= 50; s++) {
+        const st = R.crear(cfg, semilla(s));
+        const largos = [];
+        let vuelta = 0;
+        while (st.estado !== R.E.VICTORY && vuelta++ < 20) {
+            if (st.estado === R.E.INTRO) R.pasar(st, R.E.SHOWING_SEQUENCE);
+            if (st.estado === R.E.ROUND_TRANSITION) R.siguienteRonda(st, cfg);
+            if (st.estado === R.E.CORRECT_FEEDBACK) {
+                R.avanzar(st, cfg);
+                if (st.estado === R.E.VICTORY) break;
+            }
+            if (st.estado === R.E.SHOWING_SEQUENCE) R.pasar(st, R.E.WAITING_INPUT);
+            assert.strictEqual(st.estado, R.E.WAITING_INPUT, "semilla " + s + ": se espera el turno del niño");
+            const sec = R.secuenciaActual(st);
+            largos.push(sec.length);
+            sec.forEach(function (a) {
+                const r = R.tocar(st, a, cfg);
+                assert.strictEqual(r.ok, true, "semilla " + s + ": el toque de " + a + " se acepta");
+            });
+            R.pasar(st, R.E.CHECKING_ANSWER);
+            R.comparar(st, cfg);
+            assert.strictEqual(st.estado, R.E.CORRECT_FEEDBACK, "semilla " + s + ": la secuencia correcta acierta");
+        }
+        assert.strictEqual(st.estado, R.E.VICTORY, "semilla " + s + ": la partida termina en victoria");
+        assert.deepStrictEqual(largos, [3, 3, 3, 4, 4, 4], "semilla " + s + ": los largos de las 6 tandas");
+    }
+});
+
+// Error: no resta progreso y se reintenta la MISMA secuencia (config.juego.repetirSecuenciaTrasError).
+prueba("error: el progreso no retrocede y se repite la misma rutina", function () {
+    const st = R.crear(cfg, semilla(21));
+    R.pasar(st, R.E.SHOWING_SEQUENCE);
+    R.pasar(st, R.E.WAITING_INPUT);
+    const sec = R.secuenciaActual(st).slice();
+    const visibles = R.visiblesActuales(st, cfg);
+    // responder mal: cambiar el primer movimiento por otro visible distinto
+    const malo = visibles.find(function (a) { return a !== sec[0]; });
+    const respuesta = [malo].concat(sec.slice(1));
+    respuesta.forEach(function (a) { R.tocar(st, a, cfg); });
+    R.pasar(st, R.E.CHECKING_ANSWER);
+    R.comparar(st, cfg);
+    assert.strictEqual(st.estado, R.E.INCORRECT_FEEDBACK, "una respuesta mal da feedback de error");
+    assert.strictEqual(st.item, 0, "sigue en la misma tanda: el progreso no retrocede");
+    R.reintentar(st, cfg);
+    assert.deepStrictEqual(R.secuenciaActual(st), sec, "se reintenta la misma secuencia");
+});
+
 // El paquete es copia de Simón Dice: ningún texto visible puede seguir nombrando al juego anterior.
 prueba("no queda ningún texto del juego anterior en la pantalla", function () {
     ["index.html", "script.js", "style.css", "config.json"].forEach(function (f) {
