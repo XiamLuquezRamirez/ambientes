@@ -86,13 +86,60 @@ function sonarEvento(nombre, opts) {
 
 function sfx(nombre, arg) {
     if (!efectosOn) return;
-    if (window.SonidosHuellas && typeof window.SonidosHuellas[nombre] === "function") window.SonidosHuellas[nombre](arg);
+    if (window.SonidosHuellas && typeof window.SonidosHuellas[nombre] === "function") {
+        agacharFondo(window.SonidosHuellas[nombre](arg));
+    }
 }
 
 /** Sonido característico de una huella (config.acciones[i].sonido: "palmada", "campana", "tambor", …). */
-function sonidoBaldosa(id) {
-    if (!efectosOn) return;
-    if (window.SonidosHuellas) window.SonidosHuellas.baldosa(accionCfg(id).sonido);
+function sonidoBaldosa(id, corto) {
+    if (!efectosOn || !window.SonidosHuellas) return 0;
+    const seg = window.SonidosHuellas.baldosa(accionCfg(id).sonido, corto);
+    agacharFondo(seg);
+    return seg;
+}
+
+// ------------------------------------------------------------------ la música baja mientras suenan los efectos
+
+/** Cuánto queda la música de fondo mientras suena un efecto (fracción de su volumen). */
+const FACTOR_FONDO_EFECTOS = 0.25;
+/** Nivel al que vuelve la música (1; en el cierre queda más baja). */
+let factorFondoBase = 1;
+let fondoAgachado = false;
+let timerFondo = null;
+let volFondoAgachado = null;
+
+/**
+ * Baja la música de fondo durante `seg` segundos (+ un respiro) para que el efecto se oiga claro.
+ * Si llegan más efectos seguidos (una secuencia), la música sigue baja hasta que termina el último.
+ */
+function agacharFondo(seg) {
+    if (!(seg > 0) || !audioFondo) return;
+    if (!fondoAgachado) {
+        fondoAgachado = true;
+        if (typeof audioFondo.agachar === "function") {
+            audioFondo.agachar(Math.min(factorFondoBase, FACTOR_FONDO_EFECTOS));
+        } else {
+            volFondoAgachado = audioFondo.volume * FACTOR_FONDO_EFECTOS;
+            audioFondo.volume = volFondoAgachado;
+        }
+    }
+    clearTimeout(timerFondo);
+    timerFondo = setTimeout(soltarFondo, seg * 1000 + 400);
+}
+
+function soltarFondo() {
+    timerFondo = null;
+    if (!fondoAgachado) return;
+    fondoAgachado = false;
+    if (!audioFondo) return;
+    if (typeof audioFondo.agachar === "function") {
+        audioFondo.agachar(factorFondoBase);
+    } else if (volFondoAgachado != null && Math.abs(audioFondo.volume - volFondoAgachado) < 0.001) {
+        // solo si nadie más lo cambió entretanto (p. ej. la voz, que también lo baja)
+        audioFondo.volume = TextoVoz.VOLUMEN_FONDO;
+    }
+    volFondoAgachado = null;
 }
 
 function fx() {
@@ -959,15 +1006,19 @@ function efectoBaldosa(id) {
 /**
  * La plataforma `id` se enciende durante `duracion` ms: sube, brilla con su color (y una luz de color en el
  * aula), suena y sale su efecto. Devuelve una Promise que se cumple al apagarse.
+ * `esperarSonido`: la plataforma sigue encendida hasta que termina su sonido (1,5 s), para que la pista no
+ * pase a la siguiente huella con el sonido a medias (secuencia, presentación y demo). Al tocar el niño no
+ * se espera: si toca otra huella, el sonido nuevo apaga al anterior.
  */
-function encender(id, duracion) {
+function encender(id, duracion, esperarSonido) {
     const mio = ++turnoLuz;
     luz(id);
     iluminar(id, true);
-    sonidoBaldosa(id);
+    const seg = sonidoBaldosa(id);
     efectoBaldosa(id);
-    globoEfecto(id, duracion);
-    return sleep(duracion).then(function () {
+    const total = esperarSonido ? Math.max(duracion, Math.round(seg * 1000)) : duracion;
+    globoEfecto(id, total);
+    return sleep(total).then(function () {
         iluminar(id, false);
         if (mio === turnoLuz) luz(null);
     });
@@ -986,7 +1037,7 @@ function brillarTodas(duracion) {
     ReglasHuellas.ACCIONES.forEach(function (id, i) {
         setTimeout(function () {
             iluminar(id, true);
-            sonidoBaldosa(id);
+            sonidoBaldosa(id, true);
             const e = fx();
             const r = rectBaldosa(id);
             if (e && r) e.ondaBaldosa(r, accionCfg(id).colorClaro || accionCfg(id).color);
@@ -1104,7 +1155,7 @@ async function presentar() {
         for (const a of ReglasHuellas.ACCIONES) {
             if (!vigente(id)) return;
             hablar(accionCfg(a).voz, "zeus");
-            await Promise.all([encender(a, 1100), zeusHuella(a, 1100)]);
+            await Promise.all([encender(a, 1100, true), zeusHuella(a, 1100)]);
             if (!vigente(id)) return;
             await sleep(200);
         }
@@ -1149,7 +1200,7 @@ async function demostrar() {
             ranuraDibujo(n, a);
             sfx("seleccion");
             energia(a);
-            const luzP = encender(a, ms("msRespuesta", 620));
+            const luzP = encender(a, ms("msRespuesta", 620), true);
             await zeusHuella(a, 1000);
             await avanzarZeus(posZeus + 1);
             await luzP;
@@ -1227,7 +1278,7 @@ async function mostrarSecuencia(sec, opciones, id) {
         else ranuraDibujo(n, a);
         if (i > 0) flechaHuellas(sec[i - 1], a);
         if (opciones.nombrar) hablar(accionCfg(a).voz, "zeus");
-        await Promise.all([encender(a, dur), zeusHuella(a, Math.max(700, dur - 80))]);
+        await Promise.all([encender(a, dur, true), zeusHuella(a, Math.max(700, dur - 80))]);
         if (!vigente(id)) return;
         ranuraActiva(n, false);
         if (apoyo === "medio") {
@@ -1404,6 +1455,8 @@ async function comprobar(id, ultimoToque) {
 
 /** Las huellas de la secuencia "cantan" su nota, en orden, con notas de luz que suben. */
 function cantarBaldosas(sec) {
+    // el último toque del niño se apaga para que las notas del acierto se oigan limpias
+    if (window.SonidosHuellas && window.SonidosHuellas.callar) window.SonidosHuellas.callar();
     sec.forEach(function (a, i) {
         setTimeout(function () {
             const b = baldosa(a);
@@ -1627,6 +1680,7 @@ function mostrarFelicitacion() {
         });
     }
     if (sonarEvento("victoria")) {
+        factorFondoBase = 0.35;
         sonido().agacharMusica(0.35);
     } else {
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);

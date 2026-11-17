@@ -83,13 +83,63 @@ function sonarEvento(nombre, opts) {
 
 function sfx(nombre, arg) {
     if (!efectosOn) return;
-    if (window.SonidosPista && typeof window.SonidosPista[nombre] === "function") window.SonidosPista[nombre](arg);
+    if (window.SonidosPista && typeof window.SonidosPista[nombre] === "function") {
+        agacharFondo(window.SonidosPista[nombre](arg));
+    }
 }
 
-/** Sonido característico de una baldosa (config.acciones[i].sonido: "tambor", "campana", …). */
-function sonidoBaldosa(id) {
-    if (!efectosOn) return;
-    if (window.SonidosPista) window.SonidosPista.baldosa(accionCfg(id).sonido);
+/**
+ * Sonido característico de una baldosa (config.acciones[i].sonido: "tambor", "campana", …).
+ * `corto`: versión breve (cuando las seis suenan seguidas).
+ */
+function sonidoBaldosa(id, corto) {
+    if (!efectosOn || !window.SonidosPista) return 0;
+    const seg = window.SonidosPista.baldosa(accionCfg(id).sonido, corto);
+    agacharFondo(seg);
+    return seg;
+}
+
+// ------------------------------------------------------------------ la música baja mientras suenan los efectos
+
+/** Cuánto queda la música de fondo mientras suena un efecto (fracción de su volumen). */
+const FACTOR_FONDO_EFECTOS = 0.25;
+/** Nivel al que vuelve la música (1; en el cierre queda más baja). */
+let factorFondoBase = 1;
+let fondoAgachado = false;
+let timerFondo = null;
+let volFondoAgachado = null;
+
+/**
+ * Baja la música de fondo durante `seg` segundos (+ un respiro) para que el efecto se oiga claro.
+ * Si llegan más efectos seguidos (una secuencia), la música sigue baja hasta que termina el último.
+ */
+function agacharFondo(seg) {
+    if (!(seg > 0) || !audioFondo) return;
+    if (!fondoAgachado) {
+        fondoAgachado = true;
+        if (typeof audioFondo.agachar === "function") {
+            audioFondo.agachar(Math.min(factorFondoBase, FACTOR_FONDO_EFECTOS));
+        } else {
+            volFondoAgachado = audioFondo.volume * FACTOR_FONDO_EFECTOS;
+            audioFondo.volume = volFondoAgachado;
+        }
+    }
+    clearTimeout(timerFondo);
+    timerFondo = setTimeout(soltarFondo, seg * 1000 + 400);
+}
+
+function soltarFondo() {
+    timerFondo = null;
+    if (!fondoAgachado) return;
+    fondoAgachado = false;
+    if (!audioFondo) return;
+    if (typeof audioFondo.agachar === "function") {
+        audioFondo.agachar(factorFondoBase);
+    } else if (volFondoAgachado != null && Math.abs(audioFondo.volume - volFondoAgachado) < 0.001) {
+        // solo si nadie más lo cambió entretanto (p. ej. la voz de Zoe, que también lo baja)
+        audioFondo.volume = TextoVoz.VOLUMEN_FONDO;
+    }
+    volFondoAgachado = null;
 }
 
 function fx() {
@@ -803,16 +853,19 @@ function efectoBaldosa(id) {
 /**
  * La baldosa `id` se enciende durante `duracion` ms: luz de la pista, sonido característico, el dibujo se
  * mueve y sale su efecto. Devuelve una Promise que se cumple al apagarse.
+ * `esperarSonido`: la baldosa sigue encendida hasta que termina su sonido (1,5 s), para que la pista no
+ * pase a la siguiente con el sonido a medias (secuencia y presentación). Al tocar el niño no se espera.
  */
-function encender(id, duracion) {
+function encender(id, duracion, esperarSonido) {
     const mio = ++turnoLuz;
     luz(id);
     const b = baldosa(id);
     iluminar(id, true);
     claseUnaVez(b, "presionada", Math.min(320, duracion));
-    sonidoBaldosa(id);
+    const seg = sonidoBaldosa(id);
     efectoBaldosa(id);
-    return sleep(duracion).then(function () {
+    const total = esperarSonido ? Math.max(duracion, Math.round(seg * 1000)) : duracion;
+    return sleep(total).then(function () {
         iluminar(id, false);
         if (mio === turnoLuz) luz(null);
     });
@@ -823,7 +876,7 @@ function brillarTodas(duracion) {
     ReglasPista.ACCIONES.forEach(function (id, i) {
         setTimeout(function () {
             iluminar(id, true);
-            sonidoBaldosa(id);
+            sonidoBaldosa(id, true);
             const e = fx();
             const r = rectBaldosa(id);
             if (e && r) e.ondaBaldosa(r, accionCfg(id).colorClaro || accionCfg(id).color);
@@ -963,7 +1016,7 @@ async function presentar() {
         for (const a of ReglasPista.ACCIONES) {
             if (!vigente(id)) return;
             hablar(accionCfg(a).voz, "zoe");
-            await encender(a, 780);
+            await encender(a, 780, true);
             if (!vigente(id)) return;
             await sleep(180);
         }
@@ -1007,7 +1060,7 @@ async function demostrar() {
             const n = document.querySelectorAll("#secuencia .ranura.con-dibujo").length + 1;
             ranuraDibujo(n, a);
             sfx("seleccion");
-            return encender(a, ms("msRespuesta", 620));
+            return encender(a, ms("msRespuesta", 620), true);
         },
         bien: function () {
             marcarRanuras("bien");
@@ -1072,7 +1125,7 @@ async function mostrarSecuencia(sec, opciones, id) {
         if (apoyo === "bajo") ranuraLuz(n);
         else ranuraDibujo(n, a);
         if (opciones.nombrar) hablar(accionCfg(a).voz, "zoe");
-        await encender(a, opciones.msBaldosa || 1000);
+        await encender(a, opciones.msBaldosa || 1000, true);
         if (!vigente(id)) return;
         ranuraActiva(n, false);
         if (apoyo === "medio") {
@@ -1193,6 +1246,8 @@ async function comprobar(id, ultimoToque) {
 
 /** Las baldosas de la secuencia "cantan" su nota con notas musicales que suben. */
 function cantarBaldosas(sec) {
+    // el último toque del niño se apaga para que las notas del acierto se oigan limpias
+    if (window.SonidosPista && window.SonidosPista.callar) window.SonidosPista.callar();
     sec.forEach(function (a, i) {
         setTimeout(function () {
             const b = baldosa(a);
@@ -1374,6 +1429,7 @@ function mostrarFelicitacion() {
         });
     }
     if (sonarEvento("victoria")) {
+        factorFondoBase = 0.35;
         sonido().agacharMusica(0.35);
     } else {
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
