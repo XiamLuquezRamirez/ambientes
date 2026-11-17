@@ -53,7 +53,7 @@
             this.reunidos = [];
             this.paresEstante = [];
             this.enviando = false;
-            this.estado = Log.crear(2);
+            this.regBand = Log.crear(2);
             this.luces = [];
             this.marquee = [];
             this.vuBarras = [];
@@ -672,7 +672,7 @@
         prepararNivel: async function () {
             var self = this;
             this.enviando = false;
-            this.estado = Log.crear(2);
+            this.regBand = Log.crear(2);
             this.setOnAir(false);
             this.pulsarVu(0.12);
             (this.bandejaViz || []).forEach(function (b) {
@@ -806,9 +806,9 @@
         enviar: async function (a) {
             if (!a || this.enviando || a.usada || a.enBandeja) return;
             if (this.fase !== 'jugar') return;
-            if (Log.contiene(this.estado, a.id)) return;
+            if (Log.contiene(this.regBand, a.id)) return;
 
-            var occ = Log.ocupar(this.estado, a.id);
+            var occ = Log.ocupar(this.regBand, a.id);
             if (!occ.ok) return;
 
             this.enviando = true;
@@ -887,7 +887,7 @@
         },
 
         eyectar: async function (a, indice) {
-            Log.liberar(this.estado, a.id);
+            Log.liberar(this.regBand, a.id);
             if (this.bandejaViz[indice]) {
                 this.bandejaViz[indice].luz.setFillStyle(0xff6b6b, 0.55);
                 this.bandejaViz[indice].plato.setStrokeStyle(5, 0xff6b6b);
@@ -994,7 +994,7 @@
             }
 
             this.cosas = [];
-            this.estado = Log.crear(2);
+            this.regBand = Log.crear(2);
             (this.bandejaViz || []).forEach(function (b) {
                 b.luz.setFillStyle(0x69db7c, 0);
                 b.plato.setStrokeStyle(5, 0xffe066);
@@ -1010,7 +1010,7 @@
                 return !c.usada && !c.enBandeja && self.respuestas().indexOf(c.id) >= 0;
             })[0];
             if (!ok) return Promise.resolve();
-            var idx = Log.indiceLibre(this.estado);
+            var idx = Log.indiceLibre(this.regBand);
             var B = this.L.bandejas[idx >= 0 ? idx : 0];
             return this.ctx.mano({
                 punto: { x: ok.cont.x, y: ok.cont.y },
@@ -1041,7 +1041,7 @@
             this.enviando = false;
             this.pista.parar();
             this.reunidos = [];
-            this.estado = Log.crear(2);
+            this.regBand = Log.crear(2);
             this.cosas.forEach(function (a) { a.destruir(); });
             this.cosas = [];
             this.paresEstante.forEach(function (a) { a.destruir(); });
@@ -1089,7 +1089,7 @@
 
         estadoExtra: function () {
             return {
-                bandejas: Log.ids(this.estado),
+                bandejas: Log.ids(this.regBand),
                 cosas: this.cosas.filter(function (a) { return !a.usada; }).map(function (a) {
                     return { id: a.id, x: Math.round(a.cont.x), y: Math.round(a.cont.y) };
                 })
@@ -1144,7 +1144,7 @@
 
             if (this.fase === 'jugar') {
                 (this.bandejaViz || []).forEach(function (b, i) {
-                    if (Log.ids(this.estado).length > i) return;
+                    if (Log.ids(this.regBand).length > i) return;
                     b.setScale(1 + Math.sin(time / 280 + i) * 0.025);
                 }, this);
             }

@@ -178,6 +178,7 @@
           "id": "recuerda-sonido",
           "titulo": "Recuerda el sonido",
           "tipo": "elegir",
+          "dificultad": [{ "opciones": 3 }, { "opciones": 3 }, { "opciones": 3 }, { "opciones": 3 }],
           "reproducciones": [
             [
               "vaca"

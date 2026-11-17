@@ -63,7 +63,39 @@
         g.lineBetween(-lw * 0.02, -lh * 0.05, lw * 0.36, -lh * 0.05);
     }
 
+    /* Diseño del usuario (RETO4_Qué Sonido Desapareció): fondo 1280×720 y hoja con el tren de 4 puestos
+       (jaula roja + 3 vagones + locomotora). Se recortan por cuadros; sin ellos queda el dibujo antiguo. */
+    var DW = 1280, DH = 720, HOJA_W = 1076.96;
+    var CUADROS = {          // x, y, ancho, alto en unidades del SVG del tren
+        jaula: [73.65, 180, 171.32, 165],
+        verde: [242.65, 180, 171.32, 165],
+        magenta: [426.83, 180, 171.32, 165],
+        amarillo: [613.2, 180, 171.32, 165],
+        loco: [803.02, 150, 216, 195]
+    };
+    var COLORES_VAGON = ['verde', 'magenta', 'amarillo'];
+
     var escena = {
+        precargar: function () {
+            if (!this.textures.exists('tren_fondo')) this.load.svg('tren_fondo', 'img/diseno/fondo.svg', { width: 1920, height: 1080 });
+            if (!this.textures.exists('tren_hoja')) this.load.svg('tren_hoja', 'img/diseno/tren4.svg', { width: 2154, height: 1000 });
+        },
+
+        /** Fondo a pantalla completa (cover, centrado). */
+        mapa: function () {
+            var W = this.scale.width, H = this.scale.height;
+            var k = Math.max(W / DW, H / DH);
+            var ox = (W - DW * k) / 2, oy = (H - DH * k) / 2;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
+
+        recortarHoja: function () {
+            var tx = this.textures.get('tren_hoja');
+            if (tx.has('loco')) return;
+            var f = tx.getSourceImage().width / HOJA_W;
+            Object.keys(CUADROS).forEach(function (n) { var c = CUADROS[n]; tx.add(n, 0, Math.round(c[0] * f), Math.round(c[1] * f), Math.round(c[2] * f), Math.round(c[3] * f)); });
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.tren = null;
@@ -88,7 +120,23 @@
             L.bocina = { x: 48, y: L.via - L.tam * 0.22, r: Math.max(24, Math.min(32, hueco * 0.28)) };
             L.reloj = { x: L.der * 0.12, y: L.via - L.tam * 1.15 };
             L.semaforo = { x: L.der - 52, y: L.via - L.tam * 0.35 };
+            this.dis = this.textures.exists('tren_fondo') && this.textures.exists('tren_hoja');
+            if (this.dis) {
+                var m = this.mapa();
+                L.via = m.sy(334);                               // las ruedas apoyan en el riel cercano del dibujo
+                L.fila = m.sy(560);                              // los sonidos esperan en el andén
+                L.tam = Math.max(60, Math.min(130, (L.der - 20) / 5.2, H * 0.17));
+                L.bocina = { x: 48, y: m.sy(450), r: Math.max(24, Math.min(32, hueco * 0.28)) };
+            }
             return L;
+        },
+
+        montarDiseno: function (keep) {
+            var L = this.L, m = this.mapa();
+            this.recortarHoja();
+            keep(this.add.rectangle(0, 0, L.W, L.H, 0xccfffc).setOrigin(0, 0).setDepth(-2));
+            keep(this.add.image(m.ox, m.oy, 'tren_fondo').setOrigin(0, 0).setDisplaySize(DW * m.k, DH * m.k).setDepth(0));
+            this.semaforos = [];
         },
 
         montarEstacion: function (keep) {
@@ -212,7 +260,7 @@
             var keep = this.limpiarEscenario();
             this.ruedasGirar = [];
             this.semaforos = [];
-            this.montarEstacion(keep);
+            if (this.dis) this.montarDiseno(keep); else this.montarEstacion(keep);
             this.sembrarMotes(keep, 14, { x: 0, y: 0, w: L.W, h: L.via - L.tam * 0.2, depth: 5 }, 0xfff3bf);
             this.montarHud(keep);
             if (reubicar && this.tren) this.tren.cont.setY(L.via);
@@ -220,9 +268,60 @@
 
         /* ── El tren ── */
 
+        /** Tren armado con los cuadros del diseño: locomotora + vagones cerrados (+ jaula vacía al final). */
+        armarTrenDiseno: function (n, vacio) {
+            var L = this.L;
+            this.recortarHoja();
+            var total = n + (vacio ? 1 : 0);
+            var W = Math.min(L.tam * 1.55, (L.der - 40) / (total + 1.45 + total * 0.075));
+            var s = W / CUADROS.verde[2];                   // píxeles por unidad del dibujo
+            var g = W * 0.075;
+            var H = CUADROS.verde[3] * s;
+            var Wl = CUADROS.loco[2] * s;
+            var c = this.add.container(-L.W, L.via).setDepth(20);
+            var vagones = [];
+            for (var i = 0; i < total; i++) {
+                var esVacio = vacio && i === total - 1;
+                var xc = -(Wl / 2 + g + W / 2) - i * (W + g);
+                var v = this.add.container(xc, 0);
+                var img = this.add.image(0, 0, 'tren_hoja', esVacio ? 'jaula' : COLORES_VAGON[i % COLORES_VAGON.length]).setOrigin(0.5, 1).setDisplaySize(W, H);
+                var luz = this.add.ellipse(0, -H * 0.5, W * 1.25, H * 1.3, 0xfff3bf, 0);
+                var resplandor = this.add.ellipse(0, -H * 0.62, W * 0.7, H * 0.3, 0xfff3bf, 0);
+                v.add(esVacio ? [luz, img] : [luz, img, resplandor]);
+                if (esVacio) {
+                    var brillo = this.add.ellipse(0, -H * 0.5, W * 1.05, H * 1.1, 0xfff3bf, 0.12);
+                    var marco = this.add.graphics();
+                    marco.lineStyle(5, 0xffd43b, 0.9);
+                    marco.strokeRoundedRect(-W * 0.52, -H * 0.98, W * 1.04, H * 0.98, 12);
+                    marco.setAlpha(0.38);
+                    v.add([brillo, marco]);
+                    v.brillo = brillo;
+                    v.marco = marco;
+                }
+                v.luz = luz;
+                v.resplandor = resplandor;
+                v.vacio = esVacio;
+                v.g = img;
+                vagones.push(v);
+                c.add(v);
+            }
+            var locoC = this.add.container(0, 0);
+            locoC.add(this.add.image(0, 0, 'tren_hoja', 'loco').setOrigin(0.5, 1).setDisplaySize(Wl, CUADROS.loco[3] * s));
+            c.add(locoC);
+            this.locoC = locoC;
+            this.tren = { cont: c, vagones: vagones, ww: W, wh: H, largo: total * (W + g) + Wl, Wl: Wl };
+            this.chimenea = { dx: Wl * 0.11, dy: -(CUADROS.loco[3] - 12) * s };
+            return this.tren;
+        },
+
         armarTren: function (n, vacio) {
             var self = this;
             var L = this.L;
+            if (this.dis) {
+                if (this.tren) this.tren.cont.destroy();
+                this.ruedasGirar = [];
+                return this.armarTrenDiseno(n, vacio);
+            }
             if (this.tren) this.tren.cont.destroy();
             this.ruedasGirar = [];
             var ww = Math.min(L.tam * 0.95, (L.der - 40) / (n + 2.4));
@@ -315,6 +414,7 @@
 
         centroTren: function () {
             var L = this.L;
+            if (this.dis) return L.der / 2 + (this.tren.largo - this.tren.Wl) / 2;
             return L.der / 2 + this.tren.largo / 2 - this.tren.ww * 0.4;
         },
 
@@ -446,11 +546,12 @@
             var a = this.tocado;
             var d = this.vagonVacio();
             var t = this.tren;
-            await this.saltarA(a.cont, d.x, d.y, { ms: 380, alto: 40, esc: t.ww * 0.95 / a.tam });
+            await this.saltarA(a.cont, d.x, d.y, { ms: 380, alto: 40, esc: t.ww * (this.dis ? 0.6 : 0.95) / a.tam });
             t.cont.add(a.cont);
             a.cont.setPosition(a.cont.x - t.cont.x, a.cont.y - t.cont.y);
             a.usada = true;
             this.reunidos.push(a.id);
+            t.vagones.forEach(function (q) { if (q.vacio && q.marco) { q.marco.setAlpha(0); q.brillo.setAlpha(0); } });
             K.ruido({ f: 1800, q: 3, dur: 0.06, vol: 0.1 });
             this.silbato();
             await Promise.all([this.sonar(a.id, { breve: true, bocina: false }), tw(this, { targets: t.cont, x: t.cont.x + 14, duration: 180, yoyo: true })]);
@@ -478,9 +579,9 @@
             var t = this.armarTren(ids.length, false);
             ids.forEach(function (id, i) {
                 var v = t.vagones[ids.length - 1 - i];
-                var a = self.crearCosa(id, v.x, -t.wh * 1.35, t.ww * 0.95, { sinSombra: true });
+                var a = self.crearCosa(id, v.x, -t.wh * (self.dis ? 1.22 : 1.35), t.ww * (self.dis ? 0.8 : 0.95), { sinSombra: true });
                 t.cont.add(a.cont);
-                a.cont.setPosition(v.x, -t.wh * 1.35);
+                a.cont.setPosition(v.x, -t.wh * (self.dis ? 1.22 : 1.35));
             });
             this.silbato();
             await this.andar(-t.largo, this.centroTren(), 1800);

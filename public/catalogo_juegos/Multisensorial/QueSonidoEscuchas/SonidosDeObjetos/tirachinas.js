@@ -67,13 +67,15 @@
             // Tirachinas: horquilla de madera.
             var t = keep(this.add.graphics().setDepth(50));
             var R0 = L.reposo;
-            t.lineStyle(14, 0x7a4e1e, 1);
-            t.lineBetween(R0.x, R0.y + 90, R0.x, R0.y + 14);
-            t.lineBetween(R0.x, R0.y + 14, R0.x - 26, R0.y - 26);
-            t.lineBetween(R0.x, R0.y + 14, R0.x + 26, R0.y - 26);
-            t.fillStyle(0xdc2626, 1); t.fillCircle(R0.x - 26, R0.y - 28, 9); t.fillCircle(R0.x + 26, R0.y - 28, 9);
-            this.puntas = [{ x: R0.x - 26, y: R0.y - 28 }, { x: R0.x + 26, y: R0.y - 28 }];
-            this.reposoBola = { x: R0.x, y: R0.y - 28 };
+            var f = Math.max(1.2, L.tam / 70);          // el tirachinas es grande y fácil de agarrar
+            this.fTira = f;
+            t.lineStyle(14 * f, 0x7a4e1e, 1);
+            t.lineBetween(R0.x, R0.y + 90 * f, R0.x, R0.y + 14 * f);
+            t.lineBetween(R0.x, R0.y + 14 * f, R0.x - 26 * f, R0.y - 28 * f);
+            t.lineBetween(R0.x, R0.y + 14 * f, R0.x + 26 * f, R0.y - 28 * f);
+            t.fillStyle(0xdc2626, 1); t.fillCircle(R0.x - 26 * f, R0.y - 30 * f, 9 * f); t.fillCircle(R0.x + 26 * f, R0.y - 30 * f, 9 * f);
+            this.puntas = [{ x: R0.x - 26 * f, y: R0.y - 30 * f }, { x: R0.x + 26 * f, y: R0.y - 30 * f }];
+            this.reposoBola = { x: R0.x, y: R0.y - 30 * f };
             this.montarHud(keep);
             this.sembrarMotes(keep, 10, { x: 0, y: L.horizonte, w: L.W, h: L.H - L.horizonte, depth: 8 }, 0xfff3bf);
             this.montarBola();
@@ -88,6 +90,7 @@
             g.fillStyle(0xffffff, 0.35); g.fillCircle(-6, -6, 6);
             g.lineStyle(3, 0xc92a2a, 1); g.strokeCircle(0, 0, 17);
             b.add(g);
+            b.setScale(this.fTira || 1);
             this.bola = b;
         },
 
@@ -164,7 +167,7 @@
         alTocar: function (p) {
             if (this.fase !== 'jugar' || this.ocupado) return;
             var R = this.reposoBola;
-            if (Math.hypot(p.x - R.x, p.y - R.y) < 80) { this.apuntando = true; this.pista.reiniciar(); }
+            if (Math.hypot(p.x - R.x, p.y - R.y) < 80 * (this.fTira || 1)) { this.apuntando = true; this.pista.reiniciar(); }
         },
 
         alMover: function (p) {
@@ -203,7 +206,7 @@
             this.dianaActual = obj;
             var ok = await this.elegir(obj.id, { x: obj.cont.x, y: obj.cont.y });
             b.setAlpha(0).setScale(0.2);
-            this.tweens.add({ targets: b, alpha: 1, scale: 1, duration: 300, ease: 'Back.easeOut' });
+            this.tweens.add({ targets: b, alpha: 1, scale: (this.fTira || 1), duration: 300, ease: 'Back.easeOut' });
             this.ocupado = false;
         },
 
@@ -296,7 +299,7 @@
                 g.clear();
                 var b = this.bola;
                 if (b && b.alpha > 0.1) {
-                    g.lineStyle(7, 0x3b2a14, 1);
+                    g.lineStyle(8 * (this.fTira || 1), 0x3b2a14, 1);
                     this.puntas.forEach(function (p) { g.lineBetween(p.x, p.y, b.x, b.y); });
                 }
             }
