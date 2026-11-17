@@ -2,8 +2,8 @@
   "nombre": "Clasificación Doble (olfato vs. Gusto)",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira cómo se juega! Toca lo que corresponde a la canasta.",
-    "demostracionLab": "¡Mira cómo se juega! Lleva cada cosa al tubo de su sentido.",
+    "demostracion": "¡Mira cómo se juega! Sube el ascensor para lo que se huele y bájalo para lo que se saborea.",
+    "demostracionAcierto": "¡Así se clasifica por los sentidos!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
@@ -12,7 +12,7 @@
       },
       {
         "personaje": 0,
-        "texto": "¡Clasifica cada elemento en su tubo!"
+        "texto": "¡Manejemos el ascensor de aromas y sabores!"
       }
     ]
   },
@@ -65,90 +65,219 @@
     }
   },
   "demo": {
-    "tubos": [
-      "vista"
-    ],
-    "opciones": [
-      "sol",
-      "tambor"
-    ],
-    "correcto": "sol"
-  },
-  "demoLab": {
-    "tubos": [
-      "vista",
-      "oido"
-    ],
-    "piezas": [
-      {
-        "id": "sol",
-        "tubo": "vista"
-      },
-      {
-        "id": "campana",
-        "tubo": "oido"
-      }
+    "ids": [
+      "rosa",
+      "fresa"
     ]
   },
   "elementos": {
     "arcoiris": {
-      "img": "img/arcoiris.svg",
-      "nombre": "Arcoíris"
-    },
-    "tambor": {
-      "img": "img/tambor.svg",
-      "nombre": "Tambor"
-    },
-    "chocolate": {
-      "img": "img/chocolate.svg",
-      "nombre": "Chocolate"
-    },
-    "campana": {
-      "img": "img/campana.svg",
-      "nombre": "Campana"
+      "img": "../comun/img/arcoiris.svg",
+      "nombre": "el arcoíris",
+      "sentido": "vista",
+      "efecto": "brillo"
     },
     "sol": {
-      "img": "img/sol.svg",
-      "nombre": "Sol"
+      "img": "../comun/img/sol.svg",
+      "nombre": "el sol",
+      "sentido": "vista",
+      "efecto": "brillo"
     },
-    "helado": {
-      "img": "img/helado.svg",
-      "nombre": "Helado"
+    "estrella": {
+      "img": "../comun/img/estrella.svg",
+      "nombre": "la estrella",
+      "sentido": "vista",
+      "efecto": "brillo"
     },
-    "perfume": {
-      "img": "img/perfume.svg",
-      "nombre": "Perfume"
+    "bombillo": {
+      "img": "../comun/img/bombillo.svg",
+      "nombre": "el bombillo encendido",
+      "sentido": "vista",
+      "efecto": "brillo"
     },
-    "pelota": {
-      "img": "img/pelota.svg",
-      "nombre": "Pelota"
+    "nube": {
+      "img": "../comun/img/nube.svg",
+      "nombre": "la nube",
+      "sentido": "vista",
+      "efecto": "brillo"
     },
-    "flor": {
-      "img": "img/flor.svg",
-      "nombre": "Flor"
+    "campana": {
+      "img": "../comun/img/campana.svg",
+      "nombre": "la campana",
+      "sentido": "oido",
+      "sonido": "campana"
     },
-    "limon": {
-      "img": "img/limon.svg",
-      "nombre": "Limón"
+    "tambor": {
+      "img": "../comun/img/tambor.svg",
+      "nombre": "el tambor",
+      "sentido": "oido",
+      "sonido": "tambor"
     },
-    "lija": {
-      "img": "img/lija.svg",
-      "nombre": "Lija"
+    "trompeta": {
+      "img": "../comun/img/trompeta.svg",
+      "nombre": "la trompeta",
+      "sentido": "oido",
+      "sonido": "trompeta"
+    },
+    "maracas": {
+      "img": "../comun/img/maracas.svg",
+      "nombre": "las maracas",
+      "sentido": "oido",
+      "sonido": "maracas",
+      "plural": true
+    },
+    "pandereta": {
+      "img": "../comun/img/pandereta.svg",
+      "nombre": "la pandereta",
+      "sentido": "oido",
+      "sonido": "pandereta"
+    },
+    "triangulo": {
+      "img": "../comun/img/triangulo.svg",
+      "nombre": "el triángulo",
+      "sentido": "oido",
+      "sonido": "triangulo"
+    },
+    "telefono": {
+      "img": "../comun/img/telefono.svg",
+      "nombre": "el teléfono",
+      "sentido": "oido",
+      "sonido": "telefono"
     },
     "sirena": {
-      "img": "img/sirena.svg",
-      "nombre": "Sirena"
+      "img": "../comun/img/sirena.svg",
+      "nombre": "la sirena de la ambulancia",
+      "sentido": "oido",
+      "sonido": "sirena"
+    },
+    "perfume": {
+      "img": "../comun/img/perfume.svg",
+      "nombre": "el perfume",
+      "sentido": "olfato",
+      "efecto": "aroma"
+    },
+    "flor": {
+      "img": "../comun/img/flor.svg",
+      "nombre": "la flor",
+      "sentido": "olfato",
+      "efecto": "aroma"
+    },
+    "rosa": {
+      "img": "../comun/img/rosa.svg",
+      "nombre": "la rosa",
+      "sentido": "olfato",
+      "efecto": "aroma"
+    },
+    "chocolate": {
+      "img": "../comun/img/chocolate.svg",
+      "nombre": "el chocolate caliente",
+      "sentido": "olfato",
+      "efecto": "aroma"
+    },
+    "helado": {
+      "img": "../comun/img/helado.svg",
+      "nombre": "el helado",
+      "sentido": "gusto",
+      "efecto": "nam"
+    },
+    "limon": {
+      "img": "../comun/img/limon.svg",
+      "nombre": "el limón",
+      "sentido": "gusto",
+      "efecto": "nam"
+    },
+    "fresa": {
+      "img": "../comun/img/fresa.svg",
+      "nombre": "la fresa",
+      "sentido": "gusto",
+      "efecto": "nam"
+    },
+    "manzana": {
+      "img": "../comun/img/manzana.svg",
+      "nombre": "la manzana",
+      "sentido": "gusto",
+      "efecto": "nam"
+    },
+    "uvas": {
+      "img": "../comun/img/uvas.png",
+      "nombre": "las uvas",
+      "sentido": "gusto",
+      "efecto": "nam",
+      "plural": true
+    },
+    "platano": {
+      "img": "../comun/img/platano.svg",
+      "nombre": "el plátano",
+      "sentido": "gusto",
+      "efecto": "nam"
+    },
+    "queso": {
+      "img": "../comun/img/queso.svg",
+      "nombre": "el queso",
+      "sentido": "gusto",
+      "efecto": "nam"
+    },
+    "pera": {
+      "img": "../comun/img/pera.svg",
+      "nombre": "la pera",
+      "sentido": "gusto",
+      "efecto": "nam"
+    },
+    "lija": {
+      "img": "../comun/img/lija.svg",
+      "nombre": "la lija",
+      "sentido": "tacto",
+      "efecto": "rasposo"
+    },
+    "piedra": {
+      "img": "../comun/img/piedra.svg",
+      "nombre": "la piedra rugosa",
+      "sentido": "tacto",
+      "efecto": "rasposo"
     },
     "almohada": {
-      "img": "img/almohada.svg",
-      "nombre": "Almohada"
+      "img": "../comun/img/almohada.svg",
+      "nombre": "la almohada",
+      "sentido": "tacto",
+      "efecto": "suavecito"
+    },
+    "algodon": {
+      "img": "../comun/img/algodon.svg",
+      "nombre": "el algodón",
+      "sentido": "tacto",
+      "efecto": "suavecito"
+    },
+    "peluche": {
+      "img": "../comun/img/peluche.svg",
+      "nombre": "el osito de peluche",
+      "sentido": "tacto",
+      "efecto": "suavecito"
+    },
+    "esponja": {
+      "img": "../comun/img/esponja.svg",
+      "nombre": "la esponja",
+      "sentido": "tacto",
+      "efecto": "suavecito"
+    },
+    "seda": {
+      "img": "../comun/img/seda.svg",
+      "nombre": "la seda",
+      "sentido": "tacto",
+      "efecto": "suavecito"
+    },
+    "pelota": {
+      "img": "../comun/img/pelota.svg",
+      "nombre": "la pelota",
+      "sentido": "tacto",
+      "soloOficial": true,
+      "efecto": "suavecito"
     }
   },
   "niveles": [
     {
       "id": "5",
       "edad": "5-6 años",
-      "titulo": "El laboratorio de clasificación",
+      "titulo": "El ascensor de aromas y sabores",
       "escena": "laboratorio",
       "bienvenida": [
         {
@@ -157,7 +286,7 @@
         },
         {
           "personaje": 0,
-          "texto": "¡Clasifica cada elemento en su tubo!"
+          "texto": "¡Manejemos el ascensor de aromas y sabores!"
         }
       ],
       "retos": [
@@ -200,8 +329,7 @@
             "voz": "zoe",
             "texto": "¡Inténtalo otra vez!",
             "efecto": "boing"
-          },
-          "iOrigen": 1
+          }
         }
       ],
       "cierre": [
@@ -212,7 +340,7 @@
       ],
       "cierreEscena": "organigrama",
       "insignia": {
-        "img": "img/insignia_cientifico.svg",
+        "img": "../comun/img/insignia_cientifico.svg",
         "nombre": "Científico Máster en Sensopercepción"
       }
     }

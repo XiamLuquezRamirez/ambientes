@@ -67,7 +67,7 @@
        (jaula roja + 3 vagones + locomotora). Se recortan por cuadros; sin ellos queda el dibujo antiguo. */
     var DW = 1280, DH = 720, HOJA_W = 1076.96;
     var CUADROS = {          // x, y, ancho, alto en unidades del SVG del tren
-        jaula: [73.65, 180, 171.32, 165],
+        jaula: [58.1, 180, 171.32, 165],   // el dibujo de la jaula está 15.5 unidades a la izquierda de su celda (centro 143.8)
         verde: [242.65, 180, 171.32, 165],
         magenta: [426.83, 180, 171.32, 165],
         amarillo: [613.2, 180, 171.32, 165],

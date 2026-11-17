@@ -1,7 +1,7 @@
 /**
  * «La cabina de radio» — motor propio de Recuerda dos sonidos (3-4 años).
  *
- * Estudio juguete: mientras suena, luces / ON AIR / VU / parlante late (sin delatar).
+ * Estudio juguete: mientras suena, luces / EN VIVO / VU / parlante late (sin delatar).
  * Luego caen 3 discos de vinilo al cristal. El niño TOCA un disco y vuela en arco a una
  * bandeja-grabadora libre. Correcto encaja; incorrecto se eyecta al rack. Orden libre.
  */
@@ -461,7 +461,7 @@
             var c = keep(this.add.container(O.x, O.y).setDepth(12));
             var fondo = this.add.rectangle(0, 0, O.w, O.h, 0x1a1028).setStrokeStyle(4, 0xffffff);
             var led = this.add.circle(-O.w * 0.34, 0, 8, 0xff6b6b, 0.35);
-            var txt = this.add.text(8, 0, 'ON AIR', {
+            var txt = this.add.text(8, 0, 'EN VIVO', {
                 fontFamily: 'Nunito, Arial',
                 fontSize: Math.round(O.h * 0.48) + 'px',
                 fontStyle: 'bold',
@@ -578,7 +578,7 @@
                 var viniloD = this.add.image(0, 0, 'cabina_disco').setDisplaySize(D / 0.76, D / 0.76);
                 var imgD = this.add.image(0, 0, 'el_' + id);
                 imgD.setScale((tam * 0.48) / Math.max(imgD.width, imgD.height));
-                var sombraD = this.add.ellipse(0, r * 0.95, tam * 0.62, tam * 0.12, 0x000000, 0.22);
+                var sombraD = this.add.ellipse(0, r * 0.95, tam * 0.62, tam * 0.12, 0x000000, 0);
                 c.add([sombraD, viniloD, imgD]);
                 var d0 = { id: id, cont: c, img: imgD, vinilo: viniloD, sombra: sombraD, tam: tam, radio: r, giro: 0 };
                 this.adornarDisco(d0, c, tam);
@@ -592,7 +592,7 @@
             var img = this.add.image(0, 0, 'el_' + id);
             var kImg = (tam * 0.48) / Math.max(img.width, img.height);
             img.setScale(kImg);
-            var sombra = this.add.ellipse(0, r * 0.95, tam * 0.62, tam * 0.12, 0x000000, 0.22);
+            var sombra = this.add.ellipse(0, r * 0.95, tam * 0.62, tam * 0.12, 0x000000, 0);
             c.add([sombra, vinilo, surcos, centro, img]);
             var a = { id: id, cont: c, img: img, vinilo: vinilo, sombra: sombra, tam: tam, radio: r, giro: 0 };
             this.adornarDisco(a, c, tam);

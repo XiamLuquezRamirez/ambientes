@@ -80,7 +80,8 @@
             var self = this;
             if (this.mezclando) return;
             var lug = this.lugares(this.cosas.length);
-            this.cosas.forEach(function (a, i) { a.pos = i; a.cont.setPosition(lug[i].x, lug[i].y); });
+            this.lug = lug;   // las casillas nuevas (si cambia el tamaño de la ventana, la mezcla usa estas)
+            this.cosas.forEach(function (a) { a.cont.setPosition(lug[a.pos].x, lug[a.pos].y); });
         },
 
         crearVaso: function (id, i, lug, tam) {
@@ -134,7 +135,7 @@
             var ultimo = '';
             for (var k = 0; k < veces; k++) {
                 var i, j, clave;
-                do { i = Math.floor(Math.random() * n); j = (i + 1 + Math.floor(Math.random() * (n - 1))) % n; clave = Math.min(i, j) + '-' + Math.max(i, j); } while (clave === ultimo);
+                do { i = Math.floor(Math.random() * n); j = (i + 1 + Math.floor(Math.random() * (n - 1))) % n; clave = Math.min(i, j) + '-' + Math.max(i, j); } while (clave === ultimo && n > 2);   // con 2 vasos solo hay un par posible (si no, el bucle no termina nunca)
                 ultimo = clave;
                 var A = this.cosas.filter(function (c) { return c.pos === i; })[0];
                 var B = this.cosas.filter(function (c) { return c.pos === j; })[0];

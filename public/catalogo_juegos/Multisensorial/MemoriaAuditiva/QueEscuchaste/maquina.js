@@ -1203,6 +1203,8 @@
          * de crear el objeto, una sola vez por elemento.
          */
         peluchar: function (ids) {
+            // Los elementos se ven con su dibujo normal (sin el efecto de felpa).
+            return;
             var self = this, PM = global.PelucheMaq;
             if (!PM) return;
             var hechos = this.textures.__peluche || (this.textures.__peluche = {});

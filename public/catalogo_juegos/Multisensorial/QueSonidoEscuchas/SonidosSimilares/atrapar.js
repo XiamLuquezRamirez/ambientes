@@ -30,6 +30,9 @@
             this.ciclo = [];
             this.llueve = false;
             this.cosas = [];
+            this.logrados = 0;
+            this.fichasMeta = 3;
+            this.ultAviso = 0;
         },
 
         filtrarPool: function (pool) {
@@ -65,6 +68,7 @@
             pasto.fillStyle(0x69db7c, 1); pasto.fillRect(0, L.horizonte, L.W, 8);
             pasto.fillStyle(0xe6c98f, 1); pasto.fillRect(0, L.suelo - 6, L.W, L.H - L.suelo + 6);
             this.lluviaG = keep(this.add.graphics().setDepth(26));
+            this.fichasG = keep(this.add.graphics().setDepth(80));
             // Canasta (fondo y frente, para que lo atrapado quede «dentro»).
             var c = keep(this.add.container(L.der / 2, L.cestoY).setDepth(36));
             var w = L.cestoW, h = w * 0.55;
@@ -86,6 +90,10 @@
 
         mostrarOpciones: async function (nv) {
             this.opcionesNv = nv.opciones.slice();
+            this.fichasMeta = nv.demo ? 1 : (this.nivelActual >= 2 ? 4 : 3);
+            this.logrados = 0;
+            this.ultAviso = this.time.now;
+            this.pintarFichas();
             this.ciclo = [];
             this.cosas = [];
             this.llueve = true;
@@ -94,6 +102,20 @@
             this.intervalo = 1000 - (this.nivelActual || 0) * 110;
             this.cosas = [{ activo: true }];
             await esperar(this, 500);
+        },
+
+        /** Fichas de progreso: hay que atrapar varias veces el sonido correcto para cerrar el nivel. */
+        pintarFichas: function () {
+            var g = this.fichasG;
+            if (!g || !g.active) return;
+            g.clear();
+            if (!(this.fichasMeta > 1)) return;
+            for (var i = 0; i < this.fichasMeta; i++) {
+                var x = 70 + i * 46, y = 92, on = i < this.logrados;
+                g.fillStyle(0x12263f, 0.6); g.fillCircle(x, y, 19);
+                g.lineStyle(4, on ? 0xffd43b : 0xffffff, on ? 1 : 0.5); g.strokeCircle(x, y, 19);
+                if (on) { g.fillStyle(0xffd43b, 1); g.fillCircle(x, y, 12); g.fillStyle(0xffffff, 0.5); g.fillCircle(x - 4, y - 4, 4); }
+            }
         },
 
         siguienteId: function () {
@@ -137,6 +159,19 @@
             this.tweens.add({ targets: c, scaleY: 0.88, duration: 90, yoyo: true });
             K.ruido({ f: 800, q: 1, dur: 0.08, vol: 0.08 });
             this.actual = a;
+            if (this.respuestas()[0] === a.id && this.logrados + 1 < this.fichasMeta) {
+                // Era el sonido: suma una ficha, suena y el nivel sigue (hay que atrapar varios).
+                this.logrados++;
+                this.pintarFichas();
+                this.ultAviso = this.time.now;
+                Ut.estallido(this, c.x, c.y - 30, { n: 10, tex: 'estrella', tam: 24, dist: 120, depth: 70, sinTinte: true });
+                this.tweens.add({ targets: c, scaleY: 0.85, duration: 90, yoyo: true });
+                K.tono({ f: 880, f2: 1320, dur: 0.18, vol: 0.06 });
+                await this.sonar(a.id, { breve: true, bocina: false });
+                await tw(this, { targets: a.cont, y: a.cont.y - 40, alpha: 0, duration: 260 });
+                this.quitar(a);
+                return;
+            }
             var ok = await this.elegir(a.id, { x: c.x, y: c.y });
             if (ok === false) {
                 // rebota hacia afuera y se desvanece
@@ -156,6 +191,8 @@
             this.llueve = false;
             if (!a) return;
             this.reunidos.push(a.id);
+            this.logrados = this.fichasMeta;
+            this.pintarFichas();
             var c = this.canasta;
             a.cont.setDepth(40).setScale(1);
             Ut.estallido(this, c.x, c.y - 30, { n: 16, tex: 'estrella', tam: 28, dist: 150, depth: 70, sinTinte: true });
@@ -247,7 +284,7 @@
         estadoExtra: function () {
             var c = this.canasta;
             return {
-                canasta: c ? { x: Math.round(c.x), y: Math.round(c.y) } : null,
+                canasta: c ? { x: Math.round(c.x), y: Math.round(c.y) } : null, logrados: this.logrados, fichasMeta: this.fichasMeta,
                 cosas: this.items.filter(function (a) { return a.cae && a.cont.active; }).map(function (a) { return { id: a.id, x: Math.round(a.cont.x), y: Math.round(a.cont.y) }; })
             };
         },
@@ -264,6 +301,11 @@
             } else if (this.meta != null) obj = this.meta;
             obj = Math.max(L.cestoW / 2, Math.min(L.der - L.cestoW / 2, obj));
             c.x += (obj - c.x) * Math.min(1, dt * 12);
+            // Si pasa un rato sin atrapar el correcto, el sonido se repite solo (para no olvidarlo).
+            if (this.llueve && this.fase === 'jugar' && !this.sonando && time - this.ultAviso > 9000 && this.nv && !this.nv.demo) {
+                this.ultAviso = time;
+                this.sonar(this.respuestas()[0], { breve: true });
+            }
             // Nuevos objetos.
             if (this.llueve && this.fase === 'jugar' && time > this.sigS) {
                 this.sigS = time + this.intervalo;

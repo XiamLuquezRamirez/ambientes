@@ -182,6 +182,9 @@
 
     /* ── Métodos comunes de escena ── */
 
+    /** Estrella del proyecto (diseño), compartida con Asocia. Las páginas de juego están a 2 niveles de Multisensorial. */
+    var ESTRELLA_SVG = '../../AsociaSonidoEImagen/comun/estrella.svg';
+
     var BASE = {
         preload: function () {
             var self = this;
@@ -197,7 +200,23 @@
             });
             var ins = this.nivel && this.nivel.insignia && this.nivel.insignia.img;
             if (ins && /\.svg$/i.test(ins) && !self.textures.exists('insignia_cfg')) self.load.svg('insignia_cfg', ins, { width: 420, height: 420 });
+            // Estrella del diseño (la misma que usan los juegos de Asocia): marcador de niveles, estallidos y final.
+            if (!self.textures.exists('pa:estrella@256')) self.load.svg('pa:estrella@256', ESTRELLA_SVG, { width: 256, height: 256 });
             if (this.precargar) this.precargar();
+        },
+
+        /** Reduce la estrella del diseño a los tamaños que pide el arte ('pa:estrella@64' y '@128'). */
+        estrellaDiseno: function () {
+            var self = this;
+            if (!this.textures.exists('pa:estrella@256')) return;
+            var src = this.textures.get('pa:estrella@256').getSourceImage();
+            [64, 128].forEach(function (t) {
+                var clave = 'pa:estrella@' + t;
+                if (self.textures.exists(clave)) return;
+                var cv = self.textures.createCanvas(clave, t, t);
+                cv.getContext().drawImage(src, 0, 0, t, t);
+                cv.refresh();
+            });
         },
 
         create: function () {
@@ -210,6 +229,7 @@
             this.paso = 0;
             this.coleccion = [];
             if (Ut.reducido()) this.cameras.main.shake = function () { return this; };
+            this.estrellaDiseno();
             if (this.iniciar) this.iniciar();
             this.armar(false);
             this.input.on('pointerdown', function (p) {
@@ -788,7 +808,7 @@
         crearCosa: function (id, x, y, tam, o) {
             o = o || {};
             var c = this.add.container(x, y).setDepth(o.depth || 20);
-            var sombra = this.add.ellipse(0, tam * 0.46, tam * 0.7, tam * 0.14, 0x000000, o.sinSombra ? 0 : 0.18);
+            var sombra = this.add.ellipse(0, tam * 0.46, tam * 0.7, tam * 0.14, 0x000000, 0);   // sin sombra bajo los objetos
             var img = this.add.image(0, 0, 'el_' + id);
             var k = tam / Math.max(img.width, img.height);
             img.setScale(k);
@@ -1005,6 +1025,7 @@
 
     global.MemoriaKit = {
         crear: crear,
+        BASE: BASE,   // métodos comunes de escena (los reusa ClasificaPorLosSentidos/comun/kit.js)
         ANIMALES: ANIMALES,
         generar: generar, nivelOficial: nivelOficial,
         ruido: P.ruido, tono: P.tono, actx: P.actx,

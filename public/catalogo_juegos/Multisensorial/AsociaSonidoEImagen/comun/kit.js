@@ -802,8 +802,25 @@
         esc.preload = function () {
             cargarPieles(this, prefijo, idsDesdeConfig(this, pielesExtra));
             if (userPreload) userPreload.call(this);
+            // Estrella del diseño para todos los juegos (si el motor no trae la suya en 'pa:estrella@N').
+            var cola = this.load.list ? Array.from(this.load.list) : [];
+            var yaCarga = cola.some(function (f) { return f && f.key === 'pa:estrella@256'; });
+            if (!yaCarga && !this.textures.exists('pa:estrella@256') && !this.textures.exists('pa:estrella@64')) {
+                this.load.svg('pa:estrella@256', '../comun/estrella.svg', { width: 256, height: 256 });
+            }
         };
         esc.iniciar = function () {
+            var self = this;
+            if (this.textures.exists('pa:estrella@256')) {
+                var src = this.textures.get('pa:estrella@256').getSourceImage();
+                [64, 128].forEach(function (t) {
+                    var clave = 'pa:estrella@' + t;
+                    if (self.textures.exists(clave)) return;
+                    var cv = self.textures.createCanvas(clave, t, t);
+                    cv.getContext().drawImage(src, 0, 0, t, t);
+                    cv.refresh();
+                });
+            }
             aplicarPieles(this, prefijo, idsDesdeConfig(this, pielesExtra));
             if (userIniciar) userIniciar.call(this);
         };
