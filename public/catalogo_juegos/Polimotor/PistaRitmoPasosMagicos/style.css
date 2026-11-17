@@ -657,8 +657,8 @@ body.fiesta .pr-cono { animation-duration: 0.4s; }
 }
 
 .baldosa-dibujo {
-  width: clamp(54px, 7.4vw, 108px);
-  height: clamp(54px, 7.4vw, 108px);
+  width: clamp(70px, 9.6vw, 140px);
+  height: clamp(70px, 9.6vw, 140px);
   display: grid;
   place-items: center;
   filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35));
@@ -1354,7 +1354,7 @@ body.alto-contraste .felicitacion p { color: #fff; }
   .marquesina { padding: 5px 12px; gap: 10px; }
   .pista { gap: 8px; }
   .baldosa { aspect-ratio: 1.3; }
-  .baldosa-dibujo { width: clamp(44px, 5.4vw, 74px); height: clamp(44px, 5.4vw, 74px); }
+  .baldosa-dibujo { width: clamp(58px, 7.2vw, 100px); height: clamp(58px, 7.2vw, 100px); }
 }
 
 /* Tabletas (hasta 1100 px de ancho): el título se achica y la pista se ensancha. */
