@@ -30,6 +30,72 @@
     var readyResolve = null;
 
     var FIESTA = [0xff6b6b, 0xfcc419, 0x51cf66, 0x339af0, 0xcc5de8, 0xff922b];
+
+    /* ── Arte del diseño ──────────────────────────────────────────
+     * FONDO_5.svg (1280×720) trae la granja entera: cielo, nubes, colinas, el granero
+     * rojo con sus ventanitas y su portón, el molino, el manzano, el tractor y la
+     * camioneta con pacas. Aquí solo se coloca encima lo que se mueve (aspas,
+     * portón que se abre, animales, pacas de heno), anclado a las medidas reales
+     * del dibujo. HENO.svg (500×500) es la paca de la ronda "pajar".
+     */
+    var ESCENA = {
+        // fondo_sin_aspas.svg, aspas.svg y nubeN.svg salen de FONDO_5.svg: las aspas y las
+        // nubes se recortaron aparte para poder girarlas y moverlas.
+        fondo: 'img/El Sonido Viajero/fondo_sin_aspas.svg',
+        aspas: 'img/El Sonido Viajero/aspas.svg',
+        heno: 'img/El Sonido Viajero/HENO.svg'
+    };
+    /** Las 3 nubes del dibujo, con su ancho y su alto en unidades del fondo (1280×720). */
+    var NUBES_ARTE = [
+        { src: 'img/El Sonido Viajero/nube1.svg', w: 140, h: 60, y: 70 },
+        { src: 'img/El Sonido Viajero/nube2.svg', w: 220, h: 70, y: 135 },
+        { src: 'img/El Sonido Viajero/nube3.svg', w: 220, h: 70, y: 183 }
+    ];
+    /** Mariposas del diseño (copias de AsociaSonidoEImagen/QueSuena/img/mariposaN.svg). */
+    var MARIPOSAS = ['img/mariposa1.svg', 'img/mariposa2.svg', 'img/mariposa3.svg', 'img/mariposa4.svg'];
+    var ESCENA_V = '?v=20261113viajero';
+    var FONDO_W = 1280;
+    var FONDO_H = 720;
+    // Medido sobre el propio FONDO_5.svg.
+    var GRANERO = { x: 102, y: 164, w: 297, h: 395 };                 // pared roja
+    var PORTON = { x: 190, y: 431, w: 156, h: 124 };                  // portón blanco de abajo
+    // Las 4 ventanitas del altillo (ahí se asoman los animales encontrados).
+    var VENTANAS = [
+        { x: 150, y: 325, t: 61 },
+        { x: 234, y: 325, t: 61 },
+        { x: 318, y: 326, t: 60 },
+        { x: 234, y: 241, t: 62 }
+    ];
+    var ASPAS = { x: 766, y: 305, lado: 350 };                        // eje y tamaño de las aspas del molino
+    var PASTO = { y0: 575, y1: 700, x0: 420, x1: 1240 };              // pasto libre delante del granero
+    var HENO_ALTO = 96;
+    var CIELO = 0x96e3fe;                                             // azul del cielo del propio FONDO_5.svg
+    var ANCLA_Y = 120;                                                // cuánto cielo se puede recortar por arriba
+    var PASTO_COLOR = 0xa3a307;                                       // verde del pasto del propio FONDO_5.svg                                              // alto de la paca en unidades del fondo
+
+    function texEscena(parte) { return 'granja:escena:' + parte; }
+
+    // Los SVG del diseño traen viewBox pero no width/height: hay que rasterizarlos a tamaño.
+    var ESCENA_TAM = { fondo: { width: FONDO_W, height: FONDO_H }, aspas: { width: 440, height: 440 }, heno: { width: 500, height: 500 } };
+
+    function encolarEscena(scene) {
+        Object.keys(ESCENA).forEach(function (k) {
+            var src = ESCENA[k];
+            if (!src || scene.textures.exists(texEscena(k))) return;
+            scene.load.svg(texEscena(k), src.indexOf('?') === -1 ? src + ESCENA_V : src, ESCENA_TAM[k]);
+        });
+        MARIPOSAS.forEach(function (src, i) {
+            var key = texEscena('mariposa:' + i);
+            if (scene.textures.exists(key)) return;
+            scene.load.svg(key, src + ESCENA_V, { width: 160, height: 160 });
+        });
+        NUBES_ARTE.forEach(function (n, i) {
+            var key = texEscena('nube:' + i);
+            if (scene.textures.exists(key)) return;
+            scene.load.svg(key, n.src + ESCENA_V, { width: n.w * 2, height: n.h * 2 });
+        });
+    }
+
     var VUELAN = { pajaro: true };
 
     function elemento(id) {
@@ -123,6 +189,9 @@
         },
 
         create: function () {
+            // Mientras llega el FONDO_5.svg no se pinta la granja dibujada a mano: así no se
+            // ve primero el dibujo viejo y luego el nuevo. Solo un cielo liso de espera.
+            this.esperandoArte = true;
             this.cielo = this.add.graphics().setDepth(-30);
             // Sol con rayos que giran despacio.
             this.sol = this.add.container(0, 0).setDepth(-29);
@@ -174,6 +243,12 @@
             this.dibujar();
             var scene = this;
             this.scale.on('resize', function () { scene.dibujar(); });
+            // Si el arte no llega (archivo movido, red caída), se pinta la granja de siempre.
+            this.time.delayedCall(4000, function () {
+                if (!scene.esperandoArte) return;
+                scene.esperandoArte = false;
+                scene.dibujar();
+            });
             sceneRef = this;
             if (readyResolve) {
                 readyResolve(this);
@@ -187,10 +262,138 @@
             if (sceneRef === this) sceneRef = null;
         },
 
+        /** Mapa cover del FONDO_5.svg → pantalla. null si aún no hay textura. */
+        /**
+         * Mapa del FONDO_5.svg → pantalla. El dibujo entra ENTERO a lo ancho (así no se
+         * pierden el granero ni la camioneta de los extremos) y se ancla abajo; lo que
+         * sobra arriba se rellena con el azul del cielo del propio dibujo.
+         */
+        mapaFondo: function () {
+            if (!this.textures.exists(texEscena('fondo'))) return null;
+            var src = this.textures.get(texEscena('fondo')).getSourceImage();
+            var tw = (src && src.width) || FONDO_W;
+            var th = (src && src.height) || FONDO_H;
+            var w = this.scale.width;
+            var h = this.scale.height;
+            // Manda el ancho: el dibujo entra entero y nunca se corta por los lados
+            // (si no, se pierden el granero y la camioneta de los extremos).
+            var esc = w / FONDO_W;
+            var ox = 0;
+            // Anclado abajo, pero sin comerse el granero: el recorte de arriba no pasa de
+            // ANCLA_Y (sobre esa línea solo hay cielo y la punta del tejado). Si aun así
+            // sobra sitio abajo, el pasto de relleno lo cubre.
+            var oy = h - FONDO_H * esc;
+            if (oy < -ANCLA_Y * esc) oy = -ANCLA_Y * esc;
+            if (oy > 0) oy = 0;
+            return {
+                esc: esc, ox: ox, oy: oy,
+                // escala que hay que darle a la imagen para que mida FONDO_W × FONDO_H × esc
+                escImg: (FONDO_W * esc) / tw,
+                sx: function (x) { return ox + x * esc; },
+                sy: function (y) { return oy + y * esc; }
+            };
+        },
+
+        /** ¿Está puesto el arte del diseño? */
+        hayArte: function () { return !!(this.fondoImg && this.fondoImg.visible); },
+
+        /**
+         * Pone el FONDO_5.svg y apaga todo lo que el dibujo ya trae (cielo, campo,
+         * granero, silo, molino, huerto, nubes y pájaros procedurales).
+         */
+        aplicarEscena: function () {
+            var m = this.mapaFondo();
+            if (!m) return;
+            if (!this.fondoImg) this.fondoImg = this.add.image(0, 0, texEscena('fondo')).setOrigin(0).setDepth(-40);
+            this.fondoImg.setVisible(true).setPosition(m.ox, m.oy).setScale(m.escImg);
+            // Cielo del propio dibujo por detrás, por si no llega a algún borde.
+            var hh = this.scale.height;
+            var ww = this.scale.width;
+            this.cielo.clear().setVisible(true).setDepth(-41);
+            this.cielo.fillStyle(CIELO, 1);
+            this.cielo.fillRect(0, 0, ww, hh);
+            // Pasto del dibujo por DELANTE del fondo, alargando el suelo hasta el borde
+            // de abajo cuando la pantalla es más alta que el dibujo.
+            if (!this.sueloExtra) this.sueloExtra = this.add.graphics().setDepth(-39.5);
+            var yFin = m.sy(FONDO_H);
+            this.sueloExtra.clear();
+            if (yFin < hh) {
+                this.sueloExtra.fillStyle(PASTO_COLOR, 1);
+                this.sueloExtra.fillRect(0, yFin - 1, ww, hh - yFin + 2);
+            }
+            [this.fondo, this.campo, this.molino, this.silo, this.granero, this.veleta].forEach(function (g) {
+                if (g) g.clear().setVisible(false);
+            });
+            if (this.sol) this.sol.setVisible(false);
+            this.nubes.forEach(function (n) { n.setVisible(false); });
+            this.pajaros.forEach(function (pj) { pj.clear(); });
+            // El eje de las aspas y el granero pasan a las medidas del dibujo.
+            // Aspas del dibujo, recortadas aparte: giran sobre su propio eje.
+            var keyAspas = texEscena('aspas');
+            if (this.textures.exists(keyAspas)) {
+                if (!this.aspasImg) this.aspasImg = this.add.image(0, 0, keyAspas).setOrigin(0.5).setDepth(-39);
+                var lado = ASPAS.lado * m.esc;
+                this.aspasImg.setVisible(true)
+                    .setPosition(m.sx(ASPAS.x), m.sy(ASPAS.y))
+                    .setScale(lado / (this.aspasImg.width || 1));
+            }
+            this.ejeMolino = null;
+            // Nubes del dibujo, recortadas aparte: cruzan el cielo despacio.
+            if (!this.nubesArte) {
+                this.nubesArte = [];
+                for (var ni = 0; ni < NUBES_ARTE.length; ni++) {
+                    var keyN = texEscena('nube:' + ni);
+                    if (!this.textures.exists(keyN)) continue;
+                    var nu = this.add.image(0, 0, keyN).setOrigin(0.5).setDepth(-38);
+                    nu.datos = NUBES_ARTE[ni];
+                    nu.vel = 7 + ni * 4;
+                    nu.px = [0.6, 0.3, 0.8][ni % 3];     // sitio de salida, en tanto por uno
+                    this.nubesArte.push(nu);
+                }
+            }
+            if (this.nubesArte.length) this.nubes.forEach(function (n) { n.setVisible(false); });
+            this.graneroPos = {
+                x: m.sx(GRANERO.x), w: GRANERO.w * m.esc,
+                y: m.sy(GRANERO.y + GRANERO.h), h: GRANERO.h * m.esc,
+                puertaX: m.sx(PORTON.x + PORTON.w / 2), puertaY: m.sy(PORTON.y + PORTON.h)
+            };
+            this.ventanitas = VENTANAS.map(function (v) {
+                return { x: m.sx(v.x + v.t / 2), y: m.sy(v.y + v.t / 2), t: v.t * m.esc };
+            });
+            // Mariposas del diseño en vez de las dibujadas a mano.
+            if (!this.mariposasArte) {
+                this.mariposasArte = [];
+                for (var mi = 0; mi < MARIPOSAS.length; mi++) {
+                    var keyM = texEscena('mariposa:' + mi);
+                    if (!this.textures.exists(keyM)) continue;
+                    var mar = this.add.image(0, 0, keyM).setDepth(900);
+                    mar.fase = mi * 1.7;
+                    this.mariposasArte.push(mar);
+                }
+            }
+            if (this.mariposasArte.length) this.mariposas.forEach(function (m) { m.setVisible(false); });
+            this.dibujarPuertas(this.graneroAbierto ? 1 : 0);
+            var scene = this;
+            this.enGranero.forEach(function (im, k) {
+                var vv = scene.ventanitas[k % scene.ventanitas.length];
+                im.setPosition(vv.x, vv.y + vv.t / 2);
+            });
+            this.ubicarFardos();
+        },
+
         horizonte: function () { return this.scale.height * 0.46; },
 
-        /** Zona donde caminan (evita el granero y el botón de escuchar). */
+        /** Zona donde caminan: el pasto libre del dibujo, delante del granero. */
         zona: function () {
+            var m = this.mapaFondo();
+            if (m && this.hayArte()) {
+                var h = this.scale.height;
+                // Todo el pasto que se ve: desde donde empieza en el dibujo hasta el borde
+                // de abajo (en pantallas altas el suelo sigue más allá del dibujo).
+                var y1 = Math.min(h - this.tamAnimal() * 0.1, Math.max(m.sy(PASTO.y1), h - h * 0.06));
+                var y0 = Math.min(m.sy(PASTO.y0), y1 - h * 0.1);
+                return { x0: m.sx(PASTO.x0), x1: Math.min(m.sx(PASTO.x1), this.scale.width - 20), y0: y0, y1: y1 };
+            }
             var w = this.scale.width;
             var h = this.scale.height;
             return { x0: w * 0.3, x1: w * 0.94, y0: h * 0.6, y1: h * 0.86 };
@@ -206,6 +409,19 @@
             var h = this.scale.height;
             var hz = this.horizonte();
             var k;
+
+            // Esperando el arte del diseño: cielo liso, nada del dibujo antiguo.
+            if (this.esperandoArte && !this.textures.exists(texEscena('fondo'))) {
+                this.cielo.clear().setVisible(true);
+                this.cielo.fillStyle(CIELO, 1);
+                this.cielo.fillRect(0, 0, w, h);
+                [this.fondo, this.campo, this.molino, this.silo, this.granero, this.veleta, this.puertas, this.aspas]
+                    .forEach(function (g) { if (g) g.clear().setVisible(false); });
+                if (this.sol) this.sol.setVisible(false);
+                this.nubes.forEach(function (n) { n.setVisible(false); });
+                this.mariposas.forEach(function (m) { m.setVisible(false); });
+                return;
+            }
 
             // Cielo en degradado, sol, nubes.
             var g = this.cielo;
@@ -332,6 +548,7 @@
 
             this.dibujarGranero(this.graneroAbierto ? 1 : 0);
             this.ubicarFardos();
+            if (this.textures.exists(texEscena('fondo'))) this.aplicarEscena();
         },
 
         /** Granero de tablas con altillo (4 ventanitas: ahí se asoman los encontrados) y silo. */
@@ -418,23 +635,43 @@
 
         dibujarPuertas: function (t) {
             var p = this.graneroPos;
+            if (!p) return;
             var g = this.puertas;
-            g.clear();
+            // Siempre visible: el modo de espera la había apagado y así el portón nunca se abría.
+            g.clear().setVisible(true);
             var pw = p.w * 0.5;
             var ph = p.h * 0.5;
             var x0 = p.x + (p.w - pw) / 2;
-            g.fillStyle(0x343a40, 1);
-            g.fillRect(x0, p.y - ph, pw, ph);
+            var m = this.hayArte() ? this.mapaFondo() : null;
+            if (m) {
+                // El portón blanco del dibujo: las hojas se abren dentro de su propio hueco.
+                pw = PORTON.w * m.esc;
+                ph = PORTON.h * m.esc;
+                x0 = m.sx(PORTON.x);
+            }
+            var yBase = m ? m.sy(PORTON.y + PORTON.h) : p.y;
             var hoja = (pw / 2) * (1 - t * 0.85);
-            g.fillStyle(0xe03131, 1);
-            g.fillRect(x0, p.y - ph, hoja, ph);
-            g.fillRect(x0 + pw - hoja, p.y - ph, hoja, ph);
-            g.lineStyle(4, 0xffffff, 1);
-            g.strokeRect(x0, p.y - ph, hoja, ph);
-            g.strokeRect(x0 + pw - hoja, p.y - ph, hoja, ph);
+            // Dentro del granero: penumbra cálida con un montón de paja al fondo, para que
+            // la puerta abierta no sea un rectángulo negro plano.
+            g.fillStyle(0x3a2318, 1);
+            g.fillRect(x0, yBase - ph, pw, ph);
+            if (t > 0.05) {
+                g.fillStyle(0x4a2f20, 1);
+                g.fillRect(x0 + pw * 0.08, yBase - ph * 0.92, pw * 0.84, ph * 0.92);
+                g.fillStyle(0xb8860b, 0.55);
+                g.fillEllipse(x0 + pw * 0.5, yBase - ph * 0.08, pw * 0.7, ph * 0.26);
+                g.fillStyle(0xd9a520, 0.5);
+                g.fillEllipse(x0 + pw * 0.33, yBase - ph * 0.13, pw * 0.3, ph * 0.2);
+            }
+            g.fillStyle(m ? 0xffffff : 0xe03131, 1);
+            g.fillRect(x0, yBase - ph, hoja, ph);
+            g.fillRect(x0 + pw - hoja, yBase - ph, hoja, ph);
+            g.lineStyle(4, m ? 0xdfe3e6 : 0xffffff, 1);
+            g.strokeRect(x0, yBase - ph, hoja, ph);
+            g.strokeRect(x0 + pw - hoja, yBase - ph, hoja, ph);
             if (hoja > 10) {
-                g.lineBetween(x0, p.y - ph, x0 + hoja, p.y);
-                g.lineBetween(x0 + pw - hoja, p.y - ph, x0 + pw, p.y);
+                g.lineBetween(x0, yBase - ph, x0 + hoja, yBase);
+                g.lineBetween(x0 + pw - hoja, yBase - ph, x0 + pw, yBase);
             }
         },
 
@@ -450,10 +687,28 @@
             var fw = Math.min(this.scale.width * 0.12, h * 0.2);
             var fh = fw * 0.62;
             var scene = this;
+            var m = this.hayArte() ? this.mapaFondo() : null;
+            var usaHeno = !!m && this.textures.exists(texEscena('heno'));
             this.fardos.forEach(function (f, i) {
                 var x = z.x0 + (z.x1 - z.x0) * (0.18 + i * 0.32);
                 var y = z.y0 + (z.y1 - z.y0) * (i % 2 ? 0.75 : 0.35);
                 f.clear();
+                if (usaHeno) {
+                    // Paca del diseño: el dibujo ocupa ~70 % del alto de la imagen.
+                    if (!f.heno) {
+                        f.heno = scene.add.image(0, 0, texEscena('heno')).setOrigin(0.5, 0.92);
+                        f.heno.setDepth(50);
+                    }
+                    var alto = HENO_ALTO * m.esc;
+                    f.heno.setScale(alto / ((f.heno.height || 1) * 0.7));
+                    f.heno.setPosition(x, y).setDepth(y + 0.5)
+                        .setVisible(scene.modo === 'pajar');
+                    f.fw = f.heno.displayWidth;
+                    f.fh = f.heno.displayHeight * 0.7;
+                    f.setPosition(x, y).setVisible(false);
+                    return;
+                }
+                if (f.heno) f.heno.setVisible(false);
                 f.fillStyle(0x000000, 0.12);
                 f.fillEllipse(0, 0, fw * 1.05, fh * 0.25);
                 f.fillStyle(0xfab005, 1);
@@ -639,11 +894,35 @@
             var h = this.scale.height;
             var dt = Math.min(delta || 16, 50) / 1000;
             var quieto = reducido();
+            var conArte = this.hayArte();
+            // Aspas del molino: giran despacio; en la fiesta final, de alegría, más rápido.
+            var fiesta = !!this.festejando;
+            if (this.aspasImg && this.aspasImg.visible && !quieto) {
+                this.aspasImg.rotation += dt * (fiesta ? 2.2 : 0.45);
+            }
+            var m = conArte ? this.mapaFondo() : null;
+            var arteNubes = conArte && this.nubesArte && this.nubesArte.length;
             this.nubes.forEach(function (n) {
+                n.setVisible(!arteNubes);
+                if (!n.visible) return;
                 if (!quieto) n.x += n.vel * dt;
                 if (n.x > w + 90) n.x = -90;
             });
-            if (!quieto) this.sol.rayos.rotation += dt * 0.15;
+            // Nubes del dibujo: cruzan el cielo y vuelven a entrar por la izquierda.
+            if (this.nubesArte && m) {
+                this.nubesArte.forEach(function (nu) {
+                    nu.setVisible(conArte);
+                    if (!nu.visible) return;
+                    var anchoP = nu.datos.w * m.esc;
+                    nu.setScale(anchoP / (nu.width || 1));
+                    if (!quieto) nu.px += (nu.vel * (fiesta ? 3 : 1) * dt) / Math.max(1, w);
+                    if (nu.px > 1.2) nu.px = -0.2;
+                    // Altura: la del dibujo, pero sin salirse por arriba cuando el cielo se recorta.
+                    var yN = Math.max(nu.datos.h * m.esc * 0.6 + 6, m.sy(nu.datos.y));
+                    nu.setPosition(w * nu.px, yN);
+                });
+            }
+            if (!quieto && !conArte) this.sol.rayos.rotation += dt * 0.15;
             this.pajaros.forEach(function (pj) {
                 pj.clear();
                 if (quieto) return;
@@ -654,11 +933,11 @@
                 pj.lineBetween(x - 10, y - ala, x, y);
                 pj.lineBetween(x, y, x + 10, y - ala);
             });
-            // Aspas del molino.
+            // Aspas del molino (el dibujo del diseño ya las trae: no pintar encima).
             var e = this.ejeMolino;
             var as = this.aspas;
             as.clear();
-            if (e) {
+            if (e && !conArte) {
                 var giro = quieto ? 0.3 : time / 900;
                 for (var k = 0; k < 4; k++) {
                     var an = giro + (Math.PI / 2) * k;
@@ -676,14 +955,29 @@
             }
             // Mariposas que revolotean sobre el campo.
             var z = this.zona();
+            var arteMar = conArte && this.mariposasArte && this.mariposasArte.length;
             this.mariposas.forEach(function (m) {
-                m.setVisible(!quieto);
-                if (quieto) return;
+                m.setVisible(!quieto && !arteMar);
+                if (quieto || arteMar) return;
                 var t = time / 1000 + m.fase;
                 m.x = z.x0 + (z.x1 - z.x0) * (0.5 + 0.45 * Math.sin(t * 0.21));
                 m.y = z.y0 - h * 0.12 + Math.sin(t * 0.9) * h * 0.05;
                 m.alas.forEach(function (al) { al.scaleX = 0.3 + 0.7 * Math.abs(Math.sin(t * 9)); });
             });
+            if (this.mariposasArte) {
+                // Pequeñas: acompañan, no compiten con los animales que se buscan.
+                var tm = Math.max(22, Math.min(36, w * 0.03));
+                this.mariposasArte.forEach(function (m, k) {
+                    m.setVisible(conArte && !quieto);
+                    if (!m.visible) return;
+                    var t = time / 1000 + m.fase;
+                    m.x = z.x0 + (z.x1 - z.x0) * (0.5 + 0.42 * Math.sin(t * (0.19 + k * 0.04) + k));
+                    m.y = z.y0 - h * 0.16 + Math.sin(t * (0.8 + k * 0.15)) * h * 0.06;
+                    var base = tm / (m.height || 1);
+                    // Aletea encogiéndose de lado, como en ¿Qué suena?.
+                    m.setScale(base * (0.35 + 0.65 * Math.abs(Math.sin(time / 70 + m.fase))), base);
+                });
+            }
             Object.keys(this.animales).forEach(function (id) {
                 var a = scene.animales[id];
                 if (!a.img.visible) return;
@@ -801,32 +1095,89 @@
             });
         },
 
-        /** Final: se abren las puertas y salen todos a saltar. */
+        /**
+         * Final: se abren de par en par las puertas del granero y salen todos en fila a
+         * saltar al pasto. El molino se acelera, las nubes corren y cae confeti.
+         */
         fiestaFinal: function () {
             var scene = this;
             this.jugando = false;
             this.graneroAbierto = true;
+            this.festejando = true;
+            sfx('puerta');
+            // Las puertas se abren despacio, de par en par.
             var t = { k: 0 };
-            this.tweens.add({ targets: t, k: 1, duration: reducido() ? 1 : 600, onUpdate: function () { scene.dibujarPuertas(t.k); } });
+            this.tweens.add({
+                targets: t, k: 1, duration: reducido() ? 1 : 700, ease: 'Cubic.easeOut',
+                onUpdate: function () { scene.dibujarPuertas(t.k); }
+            });
             var p = this.graneroPos;
             var z = this.zona();
             var ids = Object.keys(this.animales);
+            // Los que estaban asomados se meten dentro antes de salir por la puerta.
+            this.enGranero.forEach(function (c) {
+                scene.tweens.add({ targets: c, alpha: 0, y: c.y + 10, duration: 300 });
+            });
             ids.forEach(function (id, i) {
                 var a = scene.animales[id];
                 a.img.setVisible(true);
                 a.sombra.setVisible(true);
+                a.celebrando = false;
+                // Todos salen del portón, uno detrás de otro.
                 a.x = p.puertaX;
                 a.y = p.puertaY;
-                var destino = { x: z.x0 + (z.x1 - z.x0) * ((i + 0.5) / ids.length), y: z.y0 + (z.y1 - z.y0) * 0.5 };
-                scene.time.delayedCall(300 + i * 200, function () {
-                    scene.caminarA(a, destino, 1.4).then(function () {
-                        if (!reducido()) scene.tweens.add({ targets: a, alto: a.size * 0.3, duration: 220, yoyo: true, repeat: 3 });
+                a.alto = 0;
+                a.img.setAlpha(1);
+                var destino = {
+                    x: z.x0 + (z.x1 - z.x0) * ((i + 0.5) / ids.length),
+                    y: z.y0 + (z.y1 - z.y0) * (i % 2 ? 0.7 : 0.35)
+                };
+                scene.time.delayedCall(500 + i * 260, function () {
+                    sfx('paso');
+                    scene.caminarA(a, destino, 1.3).then(function () {
+                        if (reducido()) return;
+                        // Saltos: cada uno con su ritmo, y polvito al caer.
+                        var salto = scene.tweens.add({
+                            targets: a, alto: a.size * 0.34, duration: 230 + i * 20,
+                            ease: 'Quad.easeOut', yoyo: true, repeat: -1,
+                            onYoyo: function () { scene.polvo(a.x, a.y); }
+                        });
+                        var baile = scene.tweens.add({
+                            targets: a.img, angle: { from: -7, to: 7 }, duration: 240,
+                            yoyo: true, repeat: -1, ease: 'Sine.easeInOut'
+                        });
+                        // Saltan hasta que la fiesta termina; luego quedan quietos y derechos.
+                        a.fiestaTweens = [salto, baile];
+                        scene.chispas(a.x, a.y - a.size * 0.6, 6);
                     });
                 });
             });
-            this.enGranero.forEach(function (c) { scene.tweens.add({ targets: c, alpha: 0, duration: 300 }); });
             this.confeti();
-            return esperar(this, 3000);
+            // Más confeti a media fiesta, para que no se apague de golpe.
+            this.time.delayedCall(1400, function () { scene.confeti(); });
+            return esperar(this, 3600).then(function () {
+                scene.festejando = false;
+                ids.forEach(function (id) {
+                    var a = scene.animales[id];
+                    (a.fiestaTweens || []).forEach(function (tw) { if (tw && tw.stop) tw.stop(); });
+                    a.fiestaTweens = null;
+                    a.alto = 0;
+                    a.img.angle = 0;
+                });
+            });
+        },
+
+        /** Polvito en el suelo cuando un animal cae de un salto. */
+        polvo: function (x, y) {
+            if (reducido()) return;
+            for (var i = 0; i < 5; i++) {
+                var d = rnd(14, 34) * (i % 2 ? 1 : -1);
+                var nube = this.add.ellipse(x, y - 2, rnd(10, 18), rnd(5, 9), 0xe8dcc0, 0.75).setDepth(y - 0.5);
+                this.tweens.add({
+                    targets: nube, x: x + d, y: y - rnd(6, 16), alpha: 0, scaleX: 1.6, scaleY: 1.6,
+                    duration: rnd(350, 550), onComplete: (function (o) { return function () { o.destroy(); }; })(nube)
+                });
+            }
         },
 
         /* ── Efectos y utilidades ───────────────────────────────── */
@@ -923,13 +1274,18 @@
             if (elems[id].imgAlas) lista.push({ key: tex(id) + ':alas', src: elems[id].imgAlas });
         });
         lista = lista.filter(function (t) { return !scene.textures.exists(t.key); });
-        if (!lista.length) return Promise.resolve();
+        var faltaEscena = !scene.textures.exists(texEscena('fondo'));
+        if (!lista.length && !faltaEscena) return Promise.resolve();
         return new Promise(function (resolve) {
             lista.forEach(function (t) {
                 if (/\.svg(\?|$)/i.test(t.src)) scene.load.svg(t.key, t.src, { scale: 2 });
                 else scene.load.image(t.key, t.src);
             });
-            scene.load.once('complete', resolve);
+            if (faltaEscena) encolarEscena(scene);
+            scene.load.once('complete', function () {
+                if (scene.aplicarEscena) scene.aplicarEscena();
+                resolve();
+            });
             scene.load.start();
         });
     }

@@ -54,7 +54,7 @@
     "acierto": "../../../sounds/ok.mp3",
     "error": "../../../sounds/over.mp3",
     "cierre": "../../../sounds/victory.mp3",
-    "fondo": "../../../sounds/fondo.mp3"
+    "fondo": "../../../sounds/fondo_multisensorial.wav"
   },
   "guias": {
     "zoe": "../../img/zoe_normal.gif",

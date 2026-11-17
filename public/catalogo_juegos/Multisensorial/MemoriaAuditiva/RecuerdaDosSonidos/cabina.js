@@ -31,13 +31,29 @@
         } catch (e) { /* noop */ }
     }
 
+    /* Diseño del usuario (RETO2_Recuerda Dos Sonidos): fondo 1280×720 y disco de vinilo. Sin ellos, queda el dibujo antiguo. */
+    var DW = 1280, DH = 720;
+
     var escena = {
+        precargar: function () {
+            if (!this.textures.exists('cabina_diseno')) this.load.svg('cabina_diseno', 'img/diseno/fondo_sin_discos.svg', { width: 1920, height: 1080 });
+            if (!this.textures.exists('cabina_disco')) this.load.svg('cabina_disco', 'img/diseno/disco.svg', { width: 512, height: 512 });
+        },
+
+        /** Cabe entero en pantalla (contain), centrado; las franjas se rellenan con los colores de pared y piso. */
+        mapa: function () {
+            var W = this.scale.width, H = this.scale.height;
+            var k = Math.min(W / DW, H / DH);
+            var ox = (W - DW * k) / 2, oy = (H - DH * k) / 2;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.reunidos = [];
             this.paresEstante = [];
             this.enviando = false;
-            this.estado = Log.crear(2);
+            this.regBand = Log.crear(2);
             this.luces = [];
             this.marquee = [];
             this.vuBarras = [];
@@ -45,6 +61,25 @@
             this.huecosEstante = [];
             this.onAirLit = false;
             this.nivelSuave = 0;
+
+            // La cabina tiene DOS bandejas (es «Recuerda dos sonidos»), pero la dificultad común
+            // del kit pide 3 sonidos en el nivel 4 (y 3-4 en 5-6 años): el tercer disco no cabía
+            // en ninguna bandeja y el nivel no se podía terminar. Aquí se dejan 2 sonidos oídos;
+            // los sobrantes quedan como distractores (no sonaron), así el nivel sigue siendo difícil.
+            if (!this.planComun) {
+                this.planComun = this.planNiveles;
+                this.planNiveles = function () {
+                    return this.planComun().map(function (nv) {
+                        if (nv.tipo !== 'varios' || !nv.correctas || nv.correctas.length <= 2) return nv;
+                        var quedan = nv.correctas.slice(0, 2);
+                        nv.correctas = quedan;
+                        nv.reproducciones = nv.reproducciones.map(function (seq) {
+                            return seq.filter(function (id) { return quedan.indexOf(id) >= 0; });
+                        });
+                        return nv;
+                    });
+                };
+            }
         },
 
         /**
@@ -102,6 +137,27 @@
             // Bocina del kit: esquina inferior izquierda de la pantalla (no compite con el marquee).
             L.bocina = { x: 58, y: H - 58, r: 28 };
 
+            // Con el diseño del usuario, todo se ancla a sus coordenadas (medidas sobre el SVG 1280×720).
+            this.dis = this.textures.exists('cabina_diseno');
+            if (this.dis) {
+                var m = this.mapa(), k = m.k;
+                L.k = k;
+                L.maq = { x: m.sx(640), y: m.sy(397), w: 916 * k, h: 621 * k };      // cuerpo naranja (para luces y chispas)
+                L.cristal = { x: m.sx(645), y: m.sy(312), w: 590 * k, h: 255 * k };  // interior del cristal
+                L.estanteY = m.sy(366);                                              // la tabla de cristal
+                L.panel = { y: m.sy(568), h: 118 * k };
+                L.tam = 148 * k;                                                     // disco: diámetro 0.92·tam = 136 (como los del diseño)
+                L.bandejas = [
+                    { x: m.sx(467.07), y: m.sy(567.88), w: 117.7 * k, h: 117.7 * k },
+                    { x: m.sx(804.96), y: m.sy(567.88), w: 117.7 * k, h: 117.7 * k }
+                ];
+                L.parlante = { x: m.sx(267), y: m.sy(178), r: 34 * k };
+                L.onair = { x: m.sx(930), y: m.sy(66), w: 100 * k, h: 28 * k };
+                L.vu = { x: m.sx(610), y: m.sy(74), w: 330 * k, h: 22 * k };
+                L.estante = { x: m.sx(93.5), y0: m.sy(141), y1: m.sy(651.7), s: 120 * k, n: 4, w: 140 * k };
+                L.bocina = { x: m.sx(1190), y: m.sy(500), r: Math.max(26, 30 * k) };   // el muro libre de la derecha (a la izquierda tapaba el rack)
+            }
+
             var libre = M.x - M.w / 2 - 12;
             var vy0 = Math.max(H * 0.17, 96);
             var vy1 = Math.min(H * 0.78, M.y + M.h * 0.3);
@@ -117,7 +173,7 @@
         tamOpciones: function (n) {
             n = Math.max(1, n || 3);
             var L = this.L, C = L.cristal;
-            var ancho = C.w * 0.78;
+            var ancho = this.dis ? C.w * 0.96 : C.w * 0.78;
             var tam = Math.min(L.tam, (ancho / n) * 0.78);
             return Math.max(70, Math.floor(tam));
         },
@@ -128,6 +184,12 @@
             var L = this.L, C = L.cristal;
             var tam = this.tamOpciones(n);
             var radio = tam * 0.46;
+            if (this.dis) {
+                // Como los discos del diseño: separados 1.27·tam y apoyados en la tabla de cristal.
+                var outD = [];
+                for (var q = 0; q < n; q++) outD.push({ x: C.x + (q - (n - 1) / 2) * tam * 1.27, y: L.estanteY - radio });
+                return outD;
+            }
             var pad = radio + 10;
             var x0 = C.x - C.w * 0.39 + pad * 0.15;
             var x1 = C.x + C.w * 0.39 - pad * 0.15;
@@ -159,9 +221,13 @@
             this.vuBarras = [];
             this.bandejaViz = [];
 
-            this.montarEstudio(keep);
-            this.montarEstante(keep);
-            this.montarGabinete(keep);
+            if (this.dis) {
+                this.montarDiseno(keep);
+            } else {
+                this.montarEstudio(keep);
+                this.montarEstante(keep);
+                this.montarGabinete(keep);
+            }
             this.montarLuces(keep);
             this.montarParlante(keep);
             this.montarOnAir(keep);
@@ -171,6 +237,19 @@
             this.montarHud(keep);
 
             if (reubicar) this.ubicarCosas();
+        },
+
+        /* ── Diseño del usuario: fondo completo (cabina, rack, tornamesas, cristal con tabla) ── */
+
+        montarDiseno: function (keep) {
+            var L = this.L, m = this.mapa();
+            keep(this.add.rectangle(0, 0, L.W, L.H, 0x1a3866).setOrigin(0, 0).setDepth(-2));
+            keep(this.add.rectangle(0, m.sy(452), L.W, L.H - m.sy(452), 0x562811).setOrigin(0, 0).setDepth(-1));
+            keep(this.add.image(m.ox, m.oy, 'cabina_diseno').setOrigin(0, 0).setDisplaySize(DW * m.k, DH * m.k).setDepth(0));
+            // Rack de la izquierda: 4 casilleros; las parejas guardadas se apoyan en cada tabla.
+            this.huecosEstante = [261.9, 391.8, 521.75, 651.7].map(function (t) {
+                return { x: m.sx(93.5), y: m.sy(t), alto: 125 * m.k, libre: true };
+            });
         },
 
         /* ── Estudio (fondo vivo) ── */
@@ -355,6 +434,13 @@
         montarParlante: function (keep) {
             var P = this.L.parlante;
             var c = keep(this.add.container(P.x, P.y).setDepth(12));
+            if (this.dis) {
+                var ring = this.add.circle(0, 0, P.r * 1.3).setStrokeStyle(Math.max(3, P.r * 0.14), 0xffe066, 0.55);
+                var halo = this.add.circle(0, 0, P.r * 1.2, 0xffe066, 0.08);
+                c.add([halo, ring]);
+                this.parlante = c;
+                return;
+            }
             var aroExt = this.add.circle(0, 0, P.r * 1.45, 0x1a1028).setStrokeStyle(6, 0xffe066);
             var aro = this.add.circle(0, 0, P.r * 1.15, 0x343a40);
             var cono = this.add.circle(0, 0, P.r * 0.85, 0x212529);
@@ -410,6 +496,17 @@
             var self = this;
             this.bandejaViz = this.L.bandejas.map(function (B, idx) {
                 var c = keep(self.add.container(B.x, B.y).setDepth(14));
+                if (self.dis) {
+                    var rr = B.w / 2;
+                    var luz2 = self.add.circle(0, 0, rr * 1.12, 0x69db7c, 0);
+                    var plato2 = self.add.circle(0, 0, rr * 1.02).setStrokeStyle(5, 0xffe066);
+                    var aro2 = self.add.graphics();
+                    aro2.lineStyle(4, 0xffffff, 0.35);
+                    for (var d = 0; d < 10; d++) { aro2.beginPath(); aro2.arc(0, 0, rr * 0.8, d * 0.628, d * 0.628 + 0.32, false); aro2.strokePath(); }
+                    c.add([luz2, plato2, aro2]);
+                    c.luz = luz2; c.plato = plato2; c.aro = aro2; c.idx = idx;
+                    return c;
+                }
                 // Plato de tocadiscos.
                 var plato = self.add.circle(0, 0, Math.min(B.w, B.h) * 0.55, 0x1a1028).setStrokeStyle(5, 0xffe066);
                 var aro = self.add.circle(0, 0, Math.min(B.w, B.h) * 0.38, 0x343a40);
@@ -456,12 +553,15 @@
             g.fillRoundedRect(E.x - E.w / 2 + 8, E.y0 - 4, E.w - 16, E.y1 - E.y0 + 8, 8);
             g.lineStyle(3, 0xffe066, 0.5);
             g.strokeRoundedRect(E.x - E.w / 2, E.y0 - 14, E.w, E.y1 - E.y0 + 28, 12);
+            // n compartimentos iguales dentro del hueco oscuro; cada tabla cierra el suyo por abajo
+            // y hueco.y es la superficie de la tabla (ahí se apoya la pareja de discos).
+            var top = E.y0 - 4;
+            var alto = (E.y1 - E.y0 + 8) / E.n;
             for (var i = 0; i < E.n; i++) {
-                var t = E.n === 1 ? 0.5 : i / (E.n - 1);
-                var y = E.y0 + (E.y1 - E.y0) * t;
+                var y = top + alto * (i + 1) - 7;
                 g.fillStyle(0x8d6e4c, 1);
-                g.fillRect(E.x - E.w / 2 + 10, y + E.s * 0.38, E.w - 20, 6);
-                this.huecosEstante.push({ x: E.x, y: y, libre: true });
+                g.fillRect(E.x - E.w / 2 + 10, y, E.w - 20, 6);
+                this.huecosEstante.push({ x: E.x, y: y, alto: alto, libre: true });
             }
         },
 
@@ -472,6 +572,18 @@
             var c = this.add.container(x, y).setDepth(o.depth || 20);
             // Radio 0.46·tam → diámetro 0.92·tam (cabe en lugares() con aire).
             var r = tam * 0.46;
+            if (this.dis && this.textures.exists('cabina_disco')) {
+                // DISCO.svg: el vinilo ocupa 0.76 del lienzo y su etiqueta roja 0.4 (donde va la imagen).
+                var D = tam * 0.92;
+                var viniloD = this.add.image(0, 0, 'cabina_disco').setDisplaySize(D / 0.76, D / 0.76);
+                var imgD = this.add.image(0, 0, 'el_' + id);
+                imgD.setScale((tam * 0.48) / Math.max(imgD.width, imgD.height));
+                var sombraD = this.add.ellipse(0, r * 0.95, tam * 0.62, tam * 0.12, 0x000000, 0.22);
+                c.add([sombraD, viniloD, imgD]);
+                var d0 = { id: id, cont: c, img: imgD, vinilo: viniloD, sombra: sombraD, tam: tam, radio: r, giro: 0 };
+                this.adornarDisco(d0, c, tam);
+                return d0;
+            }
             var vinilo = this.add.circle(0, 0, r, 0x212529).setStrokeStyle(4, 0x495057);
             var surcos = this.add.graphics();
             surcos.lineStyle(1.5, 0x495057, 0.55);
@@ -483,6 +595,12 @@
             var sombra = this.add.ellipse(0, r * 0.95, tam * 0.62, tam * 0.12, 0x000000, 0.22);
             c.add([sombra, vinilo, surcos, centro, img]);
             var a = { id: id, cont: c, img: img, vinilo: vinilo, sombra: sombra, tam: tam, radio: r, giro: 0 };
+            this.adornarDisco(a, c, tam);
+            return a;
+        },
+
+        /** Gestos comunes del disco (saltito, sacudir, latir, destruir). */
+        adornarDisco: function (a, c, tam) {
             var self = this;
             a.saltito = function (alto, veces) {
                 return tw(self, {
@@ -554,7 +672,7 @@
         prepararNivel: async function () {
             var self = this;
             this.enviando = false;
-            this.estado = Log.crear(2);
+            this.regBand = Log.crear(2);
             this.setOnAir(false);
             this.pulsarVu(0.12);
             (this.bandejaViz || []).forEach(function (b) {
@@ -688,12 +806,15 @@
         enviar: async function (a) {
             if (!a || this.enviando || a.usada || a.enBandeja) return;
             if (this.fase !== 'jugar') return;
-            if (Log.contiene(this.estado, a.id)) return;
+            if (Log.contiene(this.regBand, a.id)) return;
 
-            var occ = Log.ocupar(this.estado, a.id);
+            var occ = Log.ocupar(this.regBand, a.id);
             if (!occ.ok) return;
 
             this.enviando = true;
+            // En vuelo: el vaivén de paso() no debe devolverlo al estante (saltarA anima un
+            // objeto auxiliar, así que tweens.isTweening(a.cont) no lo detecta).
+            a.enVuelo = true;
             var B = this.L.bandejas[occ.indice];
             var dest = { x: B.x, y: B.y - 4 };
             var rackCasa = { x: a.casa.x, y: a.casa.y };
@@ -721,23 +842,28 @@
             await this.saltarA(a.cont, dest.x, dest.y, {
                 ms: Ut.reducido() ? 220 : 500,
                 alto: this.L.tam * 0.85,
-                esc: 0.9
+                esc: this.escBandeja(a)
             });
             if (!this.sigue()) { this.enviando = false; return; }
 
-            var r = await this.marcar(a.id, dest);
-            if (r === 'mal') {
+            // Un disco incorrecto se eyecta. El correcto encaja ANTES de marcar(): con el último
+            // acierto, marcar() cierra el nivel y alTerminarNivel() ya busca los discos enBandeja
+            // (si no, el segundo disco no viajaba al estante y se perdía).
+            if (this.respuestas().indexOf(a.id) < 0) {
+                await this.marcar(a.id, dest);
                 a.casa = rackCasa;
                 await this.eyectar(a, occ.indice);
+                a.enVuelo = false;
                 this.enviando = false;
                 return;
             }
 
             a.enBandeja = true;
             a.usada = true;
+            a.enVuelo = false;
             a.bandeja = occ.indice;
             a.casa = dest;
-            a.cont.setDepth(22).setAngle(0).setScale(0.9);
+            a.cont.setPosition(dest.x, dest.y).setDepth(22).setAngle(0).setScale(this.escBandeja(a));
             ruidoCabina('encaja', function () { K.tono({ f: 720, dur: 0.07, vol: 0.05 }); });
             if (this.bandejaViz[occ.indice]) {
                 this.bandejaViz[occ.indice].luz.setFillStyle(0x69db7c, 0.55);
@@ -748,12 +874,20 @@
             Ut.estallido(this, dest.x, dest.y, {
                 n: 8, tex: 'estrella', tam: 14, dist: 50, sinTinte: true, depth: 40
             });
-            await a.saltito(0.2, 2);
+            // Con el último acierto el saltito lo da alAcertar() (dos tweens de «y» a la vez lo descolocan).
+            if (this.marcadas.length + 1 < this.cuantas()) a.saltito(0.2, 2);
+            await this.marcar(a.id, dest);
             this.enviando = false;
         },
 
+        /** Escala del disco sobre la tornamesa: con el diseño llena exactamente su plato. */
+        escBandeja: function (a) {
+            if (!this.dis) return 0.9;
+            return this.L.bandejas[0].w / (a.tam * 0.92);
+        },
+
         eyectar: async function (a, indice) {
-            Log.liberar(this.estado, a.id);
+            Log.liberar(this.regBand, a.id);
             if (this.bandejaViz[indice]) {
                 this.bandejaViz[indice].luz.setFillStyle(0xff6b6b, 0.55);
                 this.bandejaViz[indice].plato.setStrokeStyle(5, 0xff6b6b);
@@ -835,14 +969,18 @@
                 var hueco = this.huecosEstante.filter(function (h) { return h.libre; })[0];
                 if (hueco) {
                     hueco.libre = false;
-                    var tam = this.L.estante.s;
+                    var E = this.L.estante;
+                    // La pareja cabe dentro del estante (antes, a tamaño E.s, se salía por la
+                    // izquierda de la pantalla): diámetro d, discos algo solapados y apoyados en la tabla.
+                    var d = Math.min(E.s * 0.92, (E.w - 16) / 1.45, hueco.alto - 10);
+                    var yApoyo = hueco.y - d / 2;
                     for (var i = 0; i < enBandeja.length; i++) {
                         var a = enBandeja[i];
-                        var x = hueco.x + (i - (enBandeja.length - 1) / 2) * tam * 0.55;
-                        await this.saltarA(a.cont, x, hueco.y, {
-                            ms: 420, alto: this.L.tam * 0.5, esc: tam / a.tam
+                        var x = hueco.x + (i - (enBandeja.length - 1) / 2) * d * 0.45;
+                        await this.saltarA(a.cont, x, yApoyo, {
+                            ms: 420, alto: this.L.tam * 0.5, esc: d / (a.tam * 0.92)
                         });
-                        a.cont.setDepth(5);
+                        a.cont.setDepth(5 + i * 0.01);
                         this.paresEstante.push(a);
                     }
                     this.cosas = this.cosas.filter(function (c) {
@@ -856,7 +994,7 @@
             }
 
             this.cosas = [];
-            this.estado = Log.crear(2);
+            this.regBand = Log.crear(2);
             (this.bandejaViz || []).forEach(function (b) {
                 b.luz.setFillStyle(0x69db7c, 0);
                 b.plato.setStrokeStyle(5, 0xffe066);
@@ -872,7 +1010,7 @@
                 return !c.usada && !c.enBandeja && self.respuestas().indexOf(c.id) >= 0;
             })[0];
             if (!ok) return Promise.resolve();
-            var idx = Log.indiceLibre(this.estado);
+            var idx = Log.indiceLibre(this.regBand);
             var B = this.L.bandejas[idx >= 0 ? idx : 0];
             return this.ctx.mano({
                 punto: { x: ok.cont.x, y: ok.cont.y },
@@ -903,7 +1041,7 @@
             this.enviando = false;
             this.pista.parar();
             this.reunidos = [];
-            this.estado = Log.crear(2);
+            this.regBand = Log.crear(2);
             this.cosas.forEach(function (a) { a.destruir(); });
             this.cosas = [];
             this.paresEstante.forEach(function (a) { a.destruir(); });
@@ -951,7 +1089,7 @@
 
         estadoExtra: function () {
             return {
-                bandejas: Log.ids(this.estado),
+                bandejas: Log.ids(this.regBand),
                 cosas: this.cosas.filter(function (a) { return !a.usada; }).map(function (a) {
                     return { id: a.id, x: Math.round(a.cont.x), y: Math.round(a.cont.y) };
                 })
@@ -996,7 +1134,7 @@
 
             // Idle suave: no desplazar X; Y mínimo para no “bailar” fuera del estante.
             this.cosas.forEach(function (a) {
-                if (!a.casa || a.enBandeja || a.usada) return;
+                if (!a.casa || a.enBandeja || a.usada || a.enVuelo) return;
                 if (this.tweens.isTweening(a.cont)) return;
                 a.fase = (a.fase || 0) + 0.028;
                 a.cont.x = a.casa.x;
@@ -1006,7 +1144,7 @@
 
             if (this.fase === 'jugar') {
                 (this.bandejaViz || []).forEach(function (b, i) {
-                    if (Log.ids(this.estado).length > i) return;
+                    if (Log.ids(this.regBand).length > i) return;
                     b.setScale(1 + Math.sin(time / 280 + i) * 0.025);
                 }, this);
             }

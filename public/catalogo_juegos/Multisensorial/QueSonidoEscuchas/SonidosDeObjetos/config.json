@@ -2,7 +2,7 @@
   "nombre": "Sonidos De Objetos",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el botón para escuchar y luego toca la imagen del sonido.",
+    "demostracion": "¡Mira! Estira la liga y suelta para lanzar al objeto que escuchaste.",
     "demostracionAcierto": "¡Así se descubre el sonido!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
@@ -24,12 +24,16 @@
   },
   "audios": {
     "cierre": "../../../sounds/victory.mp3",
-    "fondo": "../../../sounds/fondo.mp3",
+    "fondo": "../../../sounds/fondo_multisensorial.wav",
     "sonidos": {},
     "efectos": {}
   },
   "demo": {
-    "sonido": "vaca"
+    "sonido": "pelota",
+    "opciones": [
+      "pelota",
+      "tambor"
+    ]
   },
   "sonidos": {
     "perro": {
@@ -116,7 +120,7 @@
       "retos": [
         {
           "id": "objetos",
-          "tipo": "escuchar",
+          "tipo": "elegir",
           "titulo": "Sonidos de objetos",
           "opciones": [
             "campana",
@@ -134,7 +138,12 @@
             "voz": "zeus",
             "texto": "¡Escucha bien!"
           },
-          "iOrigen": 3
+          "iOrigen": 3,
+          "reproducciones": [
+            [
+              "campana"
+            ]
+          ]
         }
       ],
       "cierre": {
@@ -147,5 +156,72 @@
         "sonido": "celebracion"
       }
     }
-  ]
+  ],
+  "elementos": {
+    "perro": {
+      "img": "img/perro.png",
+      "nombre": "Perro",
+      "sonido": "ladrido"
+    },
+    "gato": {
+      "img": "img/gato.png",
+      "nombre": "Gato",
+      "sonido": "maullido"
+    },
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pájaro",
+      "sonido": "trino"
+    },
+    "vaca": {
+      "img": "img/vaca.svg",
+      "nombre": "Vaca",
+      "sonido": "mugido"
+    },
+    "gallo": {
+      "img": "img/gallo.svg",
+      "nombre": "Gallo",
+      "sonido": "quiquiriqui"
+    },
+    "lluvia": {
+      "img": "img/lluvia.svg",
+      "nombre": "Lluvia",
+      "sonido": "lluvia"
+    },
+    "mar": {
+      "img": "img/mar.svg",
+      "nombre": "Mar",
+      "sonido": "olas"
+    },
+    "viento": {
+      "img": "img/viento.svg",
+      "nombre": "Viento",
+      "sonido": "viento"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana",
+      "sonido": "campana"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota",
+      "sonido": "rebote"
+    },
+    "carro": {
+      "img": "img/carro.svg",
+      "nombre": "Carro",
+      "sonido": "carro"
+    },
+    "triangulo": {
+      "img": "img/triangulo.svg",
+      "nombre": "Triángulo",
+      "sonido": "triangulo"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor",
+      "sonido": "tambor"
+    }
+  }
 }

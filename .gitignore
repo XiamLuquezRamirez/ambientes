@@ -24,3 +24,6 @@ yarn-error.log
 /graphify-out/.needs_update
 cookies.txt
 /storage/framework/lsp-*.php
+
+# Catálogo empaquetado (supera el límite de 100MB de GitHub)
+/public/catalogo_juegos.zip

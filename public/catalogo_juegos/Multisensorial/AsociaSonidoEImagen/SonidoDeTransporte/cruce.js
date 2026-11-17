@@ -23,8 +23,37 @@
     var CALLE = ['ambulancia', 'camion', 'motocicleta', 'bicicleta'];
     var CARRIL = { avion: 0, tren: 1 };
 
+    /* Escenario del diseño (img/diseno/fondo.svg, 1280x720) y semáforo (semaforo.svg + palanca.svg).
+       Medidas tomadas por color: centro y bordes del asfalto de cada carril, en unidades del dibujo. */
+    var DISENO = 'img/diseno/';
+    var FW = 1280, FH = 720;
+    var VIA = {
+        centros: [195, 312, 430, 547, 664],      // pista, vía del tren y tres calles
+        bordes: [227, 352, 469, 586, 703],       // borde de abajo de cada carril (el poste se planta en el pasto de abajo)
+        cielo: 0x7dddff, pasto: 0x6d9338,
+        alto: 122,                               // alto del semáforo con su poste, en unidades del dibujo
+        // Semáforo (viewBox 16..172 x 29..471, 442 de alto): lámparas y palanca respecto a la base del poste.
+        lampR: 346.7, lampV: 187.5, lampRadio: 44, palX: 116.2, palY: 361.5, palBaja: 159.2,
+        ciudad: { y0: 30, y1: 112 }              // franja del horizonte con edificios
+    };
+
     var escena = {
         iniciar: function () { this.carriles = []; },
+
+        preload: function () {
+            if (!this.textures.exists('tr_fondo')) this.load.svg('tr_fondo', DISENO + 'fondo.svg', { width: 1920, height: 1080 });
+            if (!this.textures.exists('tr_semaforo')) this.load.svg('tr_semaforo', DISENO + 'semaforo.svg', { width: 234, height: 663 });
+            if (!this.textures.exists('tr_palanca')) this.load.svg('tr_palanca', DISENO + 'palanca.svg', { width: 144, height: 107 });
+        },
+
+        /** Encaje del fondo: en horizontal se ve TODO el ancho (si sobra alto se rellena con cielo y pasto). */
+        marcoFondo: function (W, H) {
+            if (!this.textures.exists('tr_fondo') || !this.textures.exists('tr_semaforo') || !this.textures.exists('tr_palanca')) return null;
+            var k = W >= H ? Math.min(W / FW, H / FH * 1.12) : Math.max(W / FW, Math.min(H / FH, W * 1.35 / FW));
+            var fw = FW * k, fh = FH * k;
+            var ox = (W - fw) / 2, oy = fh < H ? H - fh : (H - fh) * 0.5;
+            return { k: k, ox: ox, oy: oy, w: fw, h: fh, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
 
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
@@ -33,6 +62,18 @@
             L.bocina = { x: W / 2, y: Math.max(60, Math.min(96, 54 + hueco * 0.2)), r: Math.max(28, Math.min(38, hueco * 0.3)) };
             L.pres = W >= 760 ? { x: W - 66, piso: H - 104, alto: Math.min(150, H * 0.26), modelo: 'nino' } : null;
             var vertical = H > W * 1.15;
+            var F = L.F = this.marcoFondo(W, H);
+            if (F) {
+                // Carriles del dibujo: cada vehículo va centrado sobre su asfalto.
+                L.tam = Math.max(64, Math.min(150, 122 * F.k));
+                var esc = [0.8, 0.85, 0.85, 0.85, 0.85];
+                L.lanes = VIA.centros.map(function (cy, i) {
+                    return { y: F.sy(cy) + L.tam * esc[i] * 0.22, cy: F.sy(cy), base: F.sy(VIA.bordes[i] + 14), esc: esc[i], tipo: i === 0 ? 'pista' : (i === 1 ? 'via' : 'calle') };
+                });
+                L.xEspera = W * (vertical ? 0.3 : 0.28);
+                L.xSenal = L.xEspera + L.tam * 0.95;
+                return L;
+            }
             // En vertical el semáforo de la pista quedaría bajo la bocina: los carriles bajan un poco más.
             var top = L.bocina.y + L.bocina.r + (vertical ? 44 : 16);
             var alto = H - top - 10;
@@ -50,11 +91,24 @@
             var self = this;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
-            K.textura(this, 'cruce_fondo', L.W, L.H, function (x, w, h) { self.pintarCruce(x, w, h); });
-            keep(this.add.image(0, 0, 'cruce_fondo').setOrigin(0, 0).setDepth(0));
-            var V = this.montarVida(keep);
+            var V;
+            if (L.F) {
+                var F = L.F;
+                if (F.oy > 0) keep(this.add.rectangle(0, 0, L.W, F.oy + 2, VIA.cielo).setOrigin(0, 0).setDepth(0));
+                if (F.oy + F.h < L.H) keep(this.add.rectangle(0, F.oy + F.h - 1, L.W, L.H - F.oy - F.h + 2, VIA.pasto).setOrigin(0, 0).setDepth(0));
+                keep(this.add.image(F.ox, F.oy, 'tr_fondo').setOrigin(0, 0).setDisplaySize(F.w, F.h).setDepth(0.2));
+                V = this.montarVida(keep);
+                if (V) {
+                    for (var nn = 0; nn < 3; nn++) V.nube(Math.random() * L.W, F.sy(rnd(8, 60)), 0.55 * F.k + 0.2);
+                    V.pajaros(2, F.sy(10), F.sy(90));
+                }
+            } else {
+                K.textura(this, 'cruce_fondo', L.W, L.H, function (x, w, h) { self.pintarCruce(x, w, h); });
+                keep(this.add.image(0, 0, 'cruce_fondo').setOrigin(0, 0).setDepth(0));
+                V = this.montarVida(keep);
+            }
             var techo = L.lanes[0].y - L.tam * 0.6;
-            if (V) {
+            if (V && !L.F) {
                 V.sol(L.W * 0.08, Math.max(40, techo * 0.4), Math.min(34, techo * 0.3));
                 for (var nn = 0; nn < 3; nn++) V.nube(Math.random() * L.W, 20 + Math.random() * Math.max(10, techo - 70), 0.7);
                 V.pajaros(2, 20, Math.max(30, techo - 40));
@@ -108,6 +162,7 @@
         crearSenal: function (keep, i) {
             var L = this.L, ln = L.lanes[i];
             var k = ln.esc;
+            if (L.F) return this.crearSenalDiseno(keep, i);
             var c = keep(this.add.container(L.xSenal + 14 * k, ln.y - L.tam * k * 0.95).setDepth(30 + i));
             var poste = this.add.rectangle(0, L.tam * k * 0.45, 6 * k, L.tam * k * 0.9, 0x495057);
             var caja = this.add.rectangle(0, 0, 26 * k, 50 * k, 0x212529).setStrokeStyle(2, 0x000000);
@@ -119,8 +174,48 @@
             return c;
         },
 
+        /** Semáforo del diseño: casa con las dos lámparas apagadas; encima se enciende la que toca y la palanca baja. */
+        crearSenalDiseno: function (keep, i) {
+            var L = this.L, ln = L.lanes[i];
+            var sc = VIA.alto * L.F.k / 442;
+            var c = keep(this.add.container(L.xSenal, ln.base).setDepth(30 + i));
+            var pal = this.add.image(VIA.palX * sc, -VIA.palY * sc, 'tr_palanca').setDisplaySize(96 * sc, 71 * sc);
+            var casa = this.add.image(0, 0, 'tr_semaforo').setOrigin(0.5, 1).setDisplaySize(156 * sc, 442 * sc);
+            var self = this;
+            var luz = function (y, col) {
+                var r = VIA.lampRadio * sc;
+                var halo = self.add.circle(0, -y * sc, r * 1.55, col, 0.28).setBlendMode(Phaser.BlendModes.ADD);
+                var nucleo = self.add.circle(0, -y * sc, r, col, 0.88);
+                var brillo = self.add.ellipse(-r * 0.3, -y * sc - r * 0.38, r * 0.7, r * 0.4, 0xffffff, 0.55);
+                return { halo: halo, nucleo: nucleo, brillo: brillo, lista: [halo, nucleo, brillo] };
+            };
+            var gr = luz(VIA.lampR, 0xff3b3b), gv = luz(VIA.lampV, 0x4cff7a);
+            gv.lista.forEach(function (o) { o.setVisible(false); });
+            c.add([pal, casa].concat(gr.lista, gv.lista));
+            c.nuevo = true; c.sc = sc; c.k = ln.esc; c.i = i; c.palanca = pal; c.gr = gr; c.gv = gv; c.verdeOn = false;
+            c.palY0 = -VIA.palY * sc; c.dyLev = VIA.palBaja * sc;
+            c.px = c.x + VIA.palX * sc; c.py = c.y - VIA.palY * sc;
+            return c;
+        },
+
+        /** Punto de la palanca (para la mano de ayuda y el arrastre). */
+        puntoPalanca: function (i) {
+            var s = this.senales[i];
+            if (s.nuevo) return { x: s.px, y: s.py, dy: s.dyLev };
+            return { x: s.x + 24 * s.k, y: s.y - 8 * s.k, dy: 26 * s.k };
+        },
+
         ponerSenal: function (i, verde) {
             var s = this.senales[i];
+            if (s.nuevo) {
+                s.verdeOn = !!verde;
+                s.gr.lista.forEach(function (o) { o.setVisible(!verde); });
+                s.gv.lista.forEach(function (o) { o.setVisible(!!verde); });
+                this.tweens.killTweensOf(s.palanca);
+                this.tweens.add({ targets: s.palanca, y: s.palY0 + (verde ? s.dyLev : 0), duration: 160, ease: 'Back.easeOut' });
+                K.tono({ f: verde ? 900 : 500, dur: 0.08, vol: 0.06, tipo: 'square' });
+                return;
+            }
             s.roja.setFillStyle(verde ? 0x5c1a1a : 0xff3b3b);
             s.verde.setFillStyle(verde ? 0x51ff7a : 0x1b4d2b);
             this.tweens.add({ targets: s.palanca, y: (verde ? 10 : -8) * s.k, duration: 140 });
@@ -164,6 +259,11 @@
             for (var i = 0; i < this.senales.length; i++) {
                 var s = this.senales[i];
                 var k = s.k;
+                if (s.nuevo) {
+                    // Casa del semáforo + palanca: un rectángulo holgado alrededor.
+                    if (Math.abs(x - (s.x + 40 * s.sc)) < 98 * s.sc && y < s.y + 12 && y > s.y - 400 * s.sc) return i;
+                    continue;
+                }
                 if (Math.abs(x - s.x - 10 * k) < 34 * k && Math.abs(y - s.y) < 40 * k) return i;
             }
             // También vale tocar el carril cerca de la señal.
@@ -283,9 +383,18 @@
             if (this.fase !== 'jugar' || this.sonando) return Promise.resolve();
             var c = this.carriles.filter(function (q) { return q && q.id === self.objetivo && q.estado === 'espera'; })[0];
             if (!c) return Promise.resolve();
-            var s = this.senales[c.i];
+            var pp = this.puntoPalanca(c.i);
             if (this.ayuda) this.brillo(c.actor.cont.x, c.actor.cont.y, 6);
-            return this.ctx.mano({ punto: { x: s.x + 24 * s.k, y: s.y - 8 * s.k }, holdMs: 200, arrastre: { dx: 0, dy: 26 * s.k, durMs: 300 }, cancelado: function () { return cancelada() || self.fase !== 'jugar'; } });
+            return this.ctx.mano({ punto: { x: pp.x, y: pp.y }, holdMs: 200, arrastre: { dx: 0, dy: pp.dy, durMs: 450 }, cancelado: function () { return cancelada() || self.fase !== 'jugar'; } });
+        },
+
+        paso: function (time) {
+            (this.senales || []).forEach(function (s) {
+                if (!s.nuevo) return;
+                var l = s.verdeOn ? s.gv : s.gr;
+                l.halo.setAlpha(0.26 + Math.sin(time / 230 + s.i) * 0.1);
+                l.nucleo.setAlpha(0.86 + Math.sin(time / 230 + s.i) * 0.08);
+            });
         },
 
         estadoExtra: function () {
@@ -307,12 +416,21 @@
             // Ventanas de la ciudad (mismas cuentas que pintarCruce).
             var ventanas = [];
             var base = ln[0].y - L.tam * 0.55;
+            if (L.F) {
+                // Solo donde el dibujo tiene edificios (tono azul más oscuro que el cielo).
+                var Fd = L.F, tx = this.textures.get('tr_fondo').getSourceImage();
+                var esc = tx.width / FW;
+                for (var gy = VIA.ciudad.y0; gy < VIA.ciudad.y1; gy += 7) for (var gx = 6; gx < FW - 6; gx += 9) {
+                    var col = this.textures.getPixel(Math.round(gx * esc), Math.round(gy * esc), 'tr_fondo');
+                    if (col && col.r < 90 && col.alpha > 0) ventanas.push({ x: Fd.sx(gx), y: Fd.sy(gy), w: Math.max(3, 4 * Fd.k), h: Math.max(4, 5 * Fd.k) });
+                }
+            } else
             for (var b = 0; b < 14; b++) {
                 var bw = L.W / 14, bh = 30 + ((b * 37) % 60), top = base - bh;
                 for (var yy = top + 8; yy < base - 8; yy += 12) for (var v = 0; v < 3; v++) if (b * bw + 6 + v * 10 + 5 < (b + 1) * bw - 4) ventanas.push({ x: b * bw + 6 + v * 10, y: yy });
             }
             ventanas = Ut.mezclar(ventanas);
-            var vg = this.add.graphics().setDepth(0.5);
+            var vg = this.add.graphics().setDepth(0.5);   // por encima del fondo (0.2)
             var prendidas = 0;
             // 1) Los cinco semáforos en verde, de arriba abajo.
             for (var i = 0; i < this.senales.length; i++) { this.ponerSenal(i, true); await esperar(this, 140); }
@@ -340,7 +458,7 @@
                         }
                     });
                     var meta = Math.floor(ventanas.length * Math.min(1, o.t * 1.2));
-                    for (; prendidas < meta; prendidas++) { var w = ventanas[prendidas]; vg.fillStyle(0xffe066, 0.95); vg.fillRect(w.x, w.y, 5, 6); }
+                    for (; prendidas < meta; prendidas++) { var w = ventanas[prendidas]; vg.fillStyle(0xffe066, 0.95); vg.fillRect(w.x, w.y, w.w || 5, w.h || 6); }
                 }
             });
             if (!this.sigue()) return;
@@ -375,9 +493,9 @@
             await ctx.mano({ punto: { x: b.x, y: b.y }, holdMs: 500, onPresionar: function () { sonando = self.escuchar('tren'); } });
             await sonando;
             if (!ctx.vivo() || !ctx.enDemo()) return limpiar();
-            var s = this.senales[1];
+            var pp = this.puntoPalanca(1);
             var c = this.carriles[1];
-            await ctx.mano({ punto: { x: s.x + 24 * s.k, y: s.y - 8 * s.k }, holdMs: 200, arrastre: { dx: 0, dy: 26 * s.k, durMs: 300, soltarEnDestino: true }, onDuranteArrastre: function () { self.ponerSenal(1, true); } });
+            await ctx.mano({ punto: { x: pp.x, y: pp.y }, holdMs: 200, arrastre: { dx: 0, dy: pp.dy, durMs: 450, soltarEnDestino: true }, onDuranteArrastre: function () { self.ponerSenal(1, true); } });
             if (!ctx.vivo()) return limpiar();
             this.tweens.add({ targets: c.actor.cont, x: L.W * 0.62, duration: 1500, ease: 'Quad.easeIn' });
             K.efecto(this, 'recompensa');

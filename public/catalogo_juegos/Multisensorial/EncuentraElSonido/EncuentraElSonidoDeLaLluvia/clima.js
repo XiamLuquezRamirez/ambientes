@@ -70,13 +70,31 @@
         { src: 'img/capas/nube_6.svg', x: 265, y: 187, vel: 8 },
         { src: 'img/capas/nube_7.svg', x: 618, y: 253, vel: 10 }
     ];
-    /** Laguna de la ilustración: el agua va de x 826 a 1223 y de y 453 a 533 (de 1280×720). */
-    var LAGUNA = { x: 1024, y: 493, rx: 190, ry: 36 };
+    /**
+     * Laguna de la ilustración (FONDO_6, 1280×720), medida sobre el dibujo: el
+     * agua va de y 464 a 556 y su fila más ancha (y≈488) de x 834 hasta salirse
+     * por el borde derecho. Es más grande y más baja que en la versión anterior.
+     */
+    var LAGUNA = { x: 1055, y: 508, rx: 215, ry: 45 };
+    /**
+     * Dónde nadan los patitos (agua de la ilustración, 1280×720): la parte ancha
+     * de la laguna y la de abajo, más estrecha. y = línea del agua. Se dejan
+     * márgenes para que el patito no se salga del agua por los lados.
+     */
+    var NADO = [{ y: 496, x0: 880, x1: 1230 }, { y: 530, x0: 920, x1: 1150 }];
+    /** Alto del patito en unidades del fondo (la laguna mide unos 90 de alto). */
+    var ALTO_PATO = 46;
+    /**
+     * Alto de las cosas que se buscan, en unidades del fondo (1280×720). La
+     * casita de la ilustración mide 126 y el árbol algo menos: a 92 las cosas
+     * se ven grandes y claras sin desentonar con el paisaje.
+     */
+    var ALTO_COSA = 92;
     /** Mariposas del diseño (copias de AsociaSonidoEImagen/QueSuena/img/mariposaN.svg). */
     var MARIPOSAS = ['img/mariposa1.svg', 'img/mariposa2.svg', 'img/mariposa3.svg', 'img/mariposa4.svg'];
     var HOJAS_VIENTO = [0x8cc63f, 0xa6d728, 0x6f9e1a, 0xc9d46a, 0xe8a33d];
     function texEscena(parte) { return 'clima:escena:' + parte; }
-    var ESCENA_V = '?v=20261113capas';
+    var ESCENA_V = '?v=20261114laguna';
     /** Todo lo del escenario que se carga. */
     function listaEscena() {
         var l = [
@@ -344,7 +362,7 @@
                     this.arcoImg.setVisible(true).setPosition(w / 2, h / 2).setScale(esc);
                 }
                 var sceneArt = this;
-                this.patos.forEach(function (pt, k) { var q = sceneArt.puestoPato(k); pt.setPosition(q.x, q.y); pt.base = q.y; });
+                this.patos.forEach(function (pt, k) { sceneArt.ubicarPato(pt, k); });
                 return;
             }
             if (this.fondoImg) this.fondoImg.setVisible(false);
@@ -427,7 +445,7 @@
                 a.strokePath();
             });
             var scene = this;
-            this.patos.forEach(function (pt, k) { var q = scene.puestoPato(k); pt.setPosition(q.x, q.y); pt.base = q.y; });
+            this.patos.forEach(function (pt, k) { scene.ubicarPato(pt, k); });
         },
 
         /** ¿Están la base sin cielo y todas las nubes sueltas? Si no, se usa el fondo entero. */
@@ -576,10 +594,42 @@
             this.tweens.add({ targets: g, alpha: 0, duration: 420, delay: 120, onComplete: function () { g.clear(); } });
         },
 
+        /**
+         * Carril de nado del patito k: en la ilustración, dentro del agua de verdad (NADO);
+         * con el fondo dibujado, en la mitad de adelante de la laguna.
+         */
         puestoPato: function (k) {
+            var F = this.marcoFondo();
+            if (F && this.fondoImg && this.fondoImg.visible) {
+                var c = NADO[k % NADO.length];
+                var x0 = F.px(c.x0), x1 = F.px(c.x1);
+                var t = [0.3, 0.6, 0.75, 0.4][k % 4];
+                return { x: x0 + (x1 - x0) * t, y: F.py(c.y), x0: x0, x1: x1 };
+            }
             var p = this.lagunaPos;
-            // Flotando en la mitad de adelante del agua (así se ven enteros sobre el estanque).
-            return { x: p.x - p.rx * 0.55 + (k % 4) * p.rx * 0.36, y: p.y + p.ry * 0.5 };
+            return { x: p.x - p.rx * 0.55 + (k % 4) * p.rx * 0.36, y: p.y + p.ry * 0.5, x0: p.x - p.rx * 0.6, x1: p.x + p.rx * 0.6 };
+        },
+
+        /** Pone al patito k en su carril y le da su vaivén de nado. */
+        ubicarPato: function (pt, k) {
+            var q = this.puestoPato(k);
+            pt.setPosition(q.x, q.y);
+            pt.base = q.y;
+            pt.nado = { x0: q.x0, x1: q.x1, fase: Math.asin(Math.max(-1, Math.min(1, ((q.x - q.x0) / Math.max(1, q.x1 - q.x0)) * 2 - 1))), vel: 0.22 + (k % 3) * 0.05 };
+        },
+
+        /** Mete al patito en el agua: se le hunde la panza y una onda clara lo rodea. */
+        meterEnAgua: function (pt) {
+            var im = pt.ala;
+            if (!im || !im.setCrop || pt.onda) return;
+            var LINEA = 0.74;                       // fila del dibujo que queda en la línea del agua
+            im.setOrigin(0.5, LINEA);
+            im.setCrop(0, 0, im.width, im.height * LINEA);
+            var ancho = im.displayWidth * 0.62;
+            var onda = this.add.ellipse(0, 0, ancho, Math.max(4, ancho * 0.16), 0xd8f3ff, 0.75);
+            pt.add(onda);
+            pt.onda = onda;
+            onda.ancho = ancho;
         },
 
         /** Patito: arte de escena o dibujo procedural. */
@@ -588,9 +638,11 @@
             var c = this.add.container(x, y).setDepth(6);
             var keyPato = texEscena('pato');
             if (this.textures.exists(keyPato)) {
-                // El dibujo ocupa ~70 % de la imagen: el patito queda a ~38 % del tamaño de las cosas.
+                // El dibujo ocupa ~69 % de la imagen. Del tamaño que le cabe a la laguna del fondo.
                 var im = this.add.image(0, 0, keyPato).setOrigin(0.5, 0.86);
-                im.setScale((this.tamCosa() * 0.38) / ((im.width || 1) * 0.7));
+                var F = this.marcoFondo();
+                var alto = F ? ALTO_PATO * F.k : this.tamCosa() * 0.28;
+                im.setScale(alto / ((im.height || 1) * 0.69));
                 c.add(im);
                 c.ala = im;
                 return c;
@@ -607,8 +659,16 @@
 
         /* ── Cosas del parque ─────────────────────────────────────── */
 
+        /**
+         * Tamaño de las cosas del parque. Con el dibujo del diseño se mide en sus
+         * propias unidades (1280×720) para que guarden la escala del paisaje: la
+         * casita de la ilustración mide 126 de alto, así que una cosa de ALTO_COSA
+         * queda por debajo de ella. Sin dibujo, se cae al tamaño de antes.
+         */
         tamCosa: function () {
-            return Math.min(this.scale.height * 0.26, this.scale.width * 0.17, 220);
+            var F = this.marcoFondo();
+            if (F) return ALTO_COSA * F.k;
+            return Math.min(this.scale.height * 0.2, this.scale.width * 0.13, 170);
         },
 
         /** Lugares en el pasto; evita la laguna y el botón de escuchar (abajo al centro). */
@@ -965,8 +1025,8 @@
                 this.relampago();
             }
             var conSol = this.tiempo === 'sol' || this.tiempo === 'viento';
-            // Tamaño de las mariposas: como en ¿Qué suena? (5 % del ancho, entre 30 y 54 px).
-            var tm = Math.max(30, Math.min(54, w * 0.05));
+            // Mariposas pequeñas: acompañan, no compiten con las cosas que se buscan.
+            var tm = Math.max(22, Math.min(36, w * 0.03));
             this.mariposas.forEach(function (m) {
                 m.setVisible(conSol && !quieto);
                 if (!m.visible) return;
@@ -978,9 +1038,19 @@
                 // Aletea encogiéndose de lado, como en ¿Qué suena?.
                 m.setScale(base * (0.35 + 0.65 * Math.abs(Math.sin(time / 70 + m.fase))), base);
             });
+            // Patitos: nadan de un lado al otro de la laguna, mirando hacia donde van, y se mecen.
             this.patos.forEach(function (p, k) {
-                p.y = p.base + Math.sin(time / 500 + k) * 2;
-                if (p.ala) p.ala.angle = Math.sin(time / 260 + k) * 6;
+                p.y = p.base + Math.sin(time / 520 + k) * 1.5;
+                if (p.nado && !quieto) {
+                    var n = p.nado, t = time / 1000 * n.vel + n.fase;
+                    var mitad = (n.x1 - n.x0) / 2;
+                    p.x = n.x0 + mitad + Math.sin(t) * mitad;
+                    // El dibujo mira a la izquierda: si va a la derecha, se voltea.
+                    var dir = Math.cos(t) >= 0 ? -1 : 1;
+                    if (Math.abs(p.scaleX - dir) > 0.01) p.scaleX += (dir - p.scaleX) * Math.min(1, dt * 6);
+                }
+                if (p.ala) p.ala.angle = Math.sin(time / 300 + k) * 4;
+                if (p.onda) p.onda.setScale(1 + Math.sin(time / 380 + k) * 0.08, 1);
             });
         },
 
@@ -1241,8 +1311,9 @@
                         onUpdate: function (tw) { pato.y = Phaser.Math.Linear(c.y, p.y, tw.progress) - Math.abs(Math.sin(tw.progress * Math.PI * 5)) * 10; },
                         onComplete: function () {
                             pato.setScale(1, 1);
-                            pato.base = p.y;
                             pato.setDepth(-19);
+                            scene.meterEnAgua(pato);
+                            scene.ubicarPato(pato, k);
                             scene.patos.push(pato);
                             scene.estrellas(p.x, p.y - 20, 8);
                             sfx('ding');

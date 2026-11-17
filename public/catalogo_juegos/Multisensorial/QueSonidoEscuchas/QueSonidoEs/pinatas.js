@@ -1,0 +1,318 @@
+/**
+ * «Las piñatas» — motor propio de ¿Qué sonido es? (5-6 años, ¿Qué sonido escuchas?).
+ *
+ * Fiesta en el patio: de una viga cuelgan piñatas que se balancean, cada una con un animal. Suena
+ * un animal y el niño GOLPEA la piñata de ese animal, varias veces (se agrieta con cada golpe)
+ * hasta romperla. La que rompe es su respuesta: si era esa, caen dulces y el animal sale a bailar;
+ * si no, el animal sale, suena su propio sonido y la piñata se vuelve a colgar (sin castigo).
+ * En los niveles altos hacen falta más golpes.
+ */
+(function (global) {
+    'use strict';
+
+    var K = global.MemoriaKit;
+    var Ut = global.PedniaParejaBase.util;
+    var esperar = Ut.esperar;
+    var tw = Ut.tween;
+
+    var COLORES = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8, 0xff922b];
+
+    var escena = {
+        iniciar: function () {
+            this.cosas = [];
+            this.reunidos = [];
+            this.ocupado = false;
+            this.papeles = [];
+        },
+
+        filtrarPool: function (pool) {
+            var f = pool.filter(function (id) { return K.ANIMALES.indexOf(id) >= 0; });
+            return f.length >= 4 ? f : pool;
+        },
+
+        calcular: function () {
+            var W = this.scale.width, H = this.scale.height;
+            var L = { W: W, H: H };
+            var hueco = Math.max(60, H * 0.16);
+            L.pres = W >= 900 ? { x: W - 88, piso: H - 70, alto: Math.min(165, H * 0.28), giro: 0.35 } : null;
+            L.der = L.pres ? W - 168 : W - 16;
+            L.viga = Math.round(H * 0.15);
+            L.suelo = Math.round(H * 0.86);
+            L.largo = Math.round(H * 0.24);
+            L.tam = Math.max(100, Math.min(160, (L.der - 80) / 4.2, H * 0.22));
+            L.bocina = { x: 48, y: Math.round(H * 0.3), r: Math.max(24, Math.min(32, hueco * 0.28)) };
+            return L;
+        },
+
+        armar: function (reubicar) {
+            var L = this.L = this.calcular();
+            var keep = this.limpiarEscenario();
+            var V = this.montarVida(keep);
+            if (V) {
+                V.parque({ horizonte: L.suelo - 90, arboles: [0.04, 0.96], solX: 0.12 });
+                V.globos && V.globos({ x: 0, y: L.H * 0.35, w: L.W, h: L.H * 0.4 });
+            }
+            var g = keep(this.add.graphics().setDepth(1.6));
+            g.fillStyle(0xf4a261, 1); g.fillRect(0, L.suelo - 40, L.W, L.H - L.suelo + 40);
+            g.fillStyle(0xe76f51, 1); g.fillRect(0, L.suelo - 40, L.W, 8);
+            // viga y banderines
+            var v = keep(this.add.graphics().setDepth(5));
+            v.fillStyle(0x7a4e1e, 1); v.fillRoundedRect(-10, L.viga - 14, L.W + 20, 28, 8);
+            v.lineStyle(3, 0x6d4c41, 1); v.lineBetween(0, L.viga + 22, L.W, L.viga + 22);
+            for (var b = 0; b < L.W; b += 46) { v.fillStyle(COLORES[(b / 46) % COLORES.length | 0], 1); v.fillTriangle(b, L.viga + 22, b + 34, L.viga + 22, b + 17, L.viga + 52); }
+            this.papelG = keep(this.add.graphics().setDepth(70));
+            this.bate = keep(this.add.container(-200, -200).setDepth(85));
+            var bg = this.add.graphics();
+            bg.fillStyle(0x7a4e1e, 1); bg.fillRoundedRect(-8, -70, 16, 140, 8);
+            bg.fillStyle(0xffd43b, 1); bg.fillRoundedRect(-9, -70, 18, 26, 8);
+            bg.fillStyle(0xff6b6b, 1); bg.fillRect(-9, -44, 18, 10);
+            this.bate.add(bg); this.bate.setAlpha(0);
+            this.montarHud(keep);
+            if (reubicar) this.ubicarCosas();
+        },
+
+        lugares: function (n) {
+            var L = this.L;
+            var x0 = 90, disp = L.der - x0 - 30;
+            var out = [];
+            for (var i = 0; i < n; i++) out.push({ x: x0 + disp * (i + 0.5) / n });
+            return out;
+        },
+
+        ubicarCosas: function () {
+            var lug = this.lugares(this.cosas.length);
+            this.cosas.forEach(function (a, i) { a.x0 = lug[i].x; a.pivote.setPosition(lug[i].x, this.L.viga + 8); }, this);
+        },
+
+        crearPinata: function (id, i, lug, tam) {
+            var L = this.L;
+            var piv = this.add.container(lug.x, L.viga + 8).setDepth(30);
+            var cuerda = this.add.graphics();
+            cuerda.lineStyle(5, 0xf1e0b0, 1); cuerda.lineBetween(0, 0, 0, L.largo - tam * 0.45);
+            var cuerpo = this.add.container(0, L.largo);
+            var col = COLORES[i % COLORES.length], col2 = COLORES[(i + 3) % COLORES.length];
+            var g = this.add.graphics();
+            g.fillStyle(0x000000, 0.15); g.fillEllipse(6, tam * 0.5 + 6, tam * 0.8, tam * 0.12);
+            // flecos de papel
+            for (var f = 0; f < 5; f++) {
+                g.fillStyle(f % 2 ? col : col2, 1);
+                g.fillRoundedRect(-tam * 0.46, -tam * 0.4 + f * tam * 0.17, tam * 0.92, tam * 0.2, 10);
+            }
+            g.fillStyle(0xffffff, 0.2); g.fillEllipse(-tam * 0.2, -tam * 0.2, tam * 0.3, tam * 0.2);
+            g.fillStyle(0xfff9db, 1); g.fillCircle(0, 0, tam * 0.31);
+            g.lineStyle(4, 0xffffff, 1); g.strokeCircle(0, 0, tam * 0.31);
+            var grietas = this.add.graphics();
+            cuerpo.add([g, grietas]);
+            piv.add([cuerda, cuerpo]);
+            var img = this.add.image(0, 0, 'el_' + id);
+            img.setScale((tam * 0.52) / Math.max(img.width, img.height));
+            cuerpo.add(img);
+            var a = { id: id, pivote: piv, cuerpo: cuerpo, grietas: grietas, img: img, tam: tam, x0: lug.x, golpes: 0, rot: 0, imp: 0, fase2: Math.random() * 6, rota: false, cx: lug.x, cy: L.viga + L.largo };
+            a.pivote.setAlpha(0);
+            return a;
+        },
+
+        necesarios: function () { return (this.nivelActual || 0) >= 2 ? 4 : 3; },
+
+        mostrarOpciones: async function (nv) {
+            var self = this;
+            var lug = this.lugares(nv.opciones.length);
+            var tam = Math.min(this.L.tam, (this.L.der - 120) / nv.opciones.length * 0.8);
+            this.cosas = nv.opciones.map(function (id, i) { return self.crearPinata(id, i, lug[i], tam); });
+            K.ruido({ f: 1000, q: 1, dur: 0.1, vol: 0.05 });
+            this.cosas.forEach(function (a, i) {
+                a.pivote.y -= 160;
+                self.tweens.add({ targets: a.pivote, alpha: 1, y: self.L.viga + 8, duration: 420, delay: i * 120, ease: 'Bounce.easeOut' });
+            });
+            await esperar(this, 600 + nv.opciones.length * 120);
+        },
+
+        prepararNivel: async function () {
+            var self = this;
+            this.cosas.forEach(function (a) { if (a.pivote.active) a.pivote.destroy(); });
+            this.cosas = [];
+            this.ocupado = false;
+        },
+
+        alSonar: function () {
+            Ut.estallido(this, this.L.W * 0.5, this.L.viga + 70, { n: 3, tex: 'nota', tam: 24, dist: 100, depth: 70 });
+        },
+
+        /* ── Golpear ── */
+
+        alTocar: function (p) {
+            if (this.fase !== 'jugar' || this.ocupado) return;
+            var mejor = null, dm = Infinity;
+            this.cosas.forEach(function (a) {
+                if (a.rota) return;
+                var d = Math.hypot(p.x - a.cx, p.y - a.cy);
+                if (d < a.tam * 0.62 && d < dm) { dm = d; mejor = a; }
+            });
+            if (mejor) { this.pista.reiniciar(); this.golpear(mejor, p.x < mejor.cx ? -1 : 1); }
+        },
+
+        golpear: async function (a, lado) {
+            if (a.rota || this.ocupado) return;
+            a.golpes++;
+            a.imp = lado * 0.55;                         // el golpe la hace balancearse
+            var b = this.bate;
+            b.setPosition(a.cx - lado * a.tam * 0.7, a.cy).setAlpha(1).setAngle(lado * -70);
+            this.tweens.killTweensOf(b);
+            this.tweens.add({ targets: b, angle: lado * 20, duration: 110, ease: 'Quad.easeIn', onComplete: function () { b.setAlpha(0); } });
+            K.ruido({ f: 220, q: 0.8, dur: 0.1, vol: 0.14 });
+            K.tono({ f: 180 + a.golpes * 40, dur: 0.06, vol: 0.04, tipo: 'square' });
+            this.cameras.main.shake(70, 0.003);
+            // papelitos y grietas
+            for (var i = 0; i < 6; i++) this.papeles.push({ x: a.cx, y: a.cy, vx: (Math.random() - 0.5) * 6 + lado * 2, vy: -2 - Math.random() * 3, col: COLORES[i % COLORES.length], t: 1 });
+            this.dibujarGrietas(a);
+            if (a.golpes >= this.necesarios()) await this.romper(a);
+        },
+
+        dibujarGrietas: function (a) {
+            var g = a.grietas, t = a.tam;
+            g.clear();
+            g.lineStyle(4, 0x3b2a14, 0.85);
+            for (var k = 0; k < a.golpes; k++) {
+                var ang = k * 1.9 + 0.5, x = Math.cos(ang) * t * 0.1, y = Math.sin(ang) * t * 0.1;
+                g.beginPath(); g.moveTo(x, y);
+                g.lineTo(x + Math.cos(ang) * t * 0.2, y + Math.sin(ang) * t * 0.2 + 6);
+                g.lineTo(x + Math.cos(ang + 0.4) * t * 0.36, y + Math.sin(ang + 0.4) * t * 0.36);
+                g.strokePath();
+            }
+        },
+
+        romper: async function (a) {
+            this.ocupado = true;
+            a.rota = true;
+            this.actual = a;
+            K.tono({ f: 900, f2: 300, dur: 0.3, vol: 0.06 });
+            // lluvia de dulces
+            for (var i = 0; i < 28; i++) this.papeles.push({ x: a.cx, y: a.cy, vx: (Math.random() - 0.5) * 9, vy: -3 - Math.random() * 6, col: COLORES[i % COLORES.length], t: 1.4, dulce: true });
+            // el animal sale de la piñata
+            var animal = this.crearCosa(a.id, a.cx, a.cy, a.tam * 0.7, { depth: 40 });
+            a.animal = animal;
+            a.pivote.setAlpha(0);
+            animal.saltito(0.4, 1);
+            var ok = await this.elegir(a.id, { x: a.cx, y: a.cy });
+            if (ok === false) {
+                await esperar(this, 300);
+                animal.destruir();
+                a.animal = null;
+                a.golpes = 0; a.rota = false;
+                this.dibujarGrietas(a);
+                a.pivote.setAlpha(0).setY(this.L.viga - 100);
+                this.tweens.add({ targets: a.pivote, alpha: 1, y: this.L.viga + 8, duration: 500, ease: 'Bounce.easeOut' });
+            }
+            this.ocupado = false;
+        },
+
+        alAcertar: async function () {
+            var a = this.actual;
+            if (!a) return;
+            this.reunidos.push(a.id);
+            var an = a.animal;
+            Ut.estallido(this, a.cx, a.cy, { n: 16, tex: 'estrella', tam: 28, dist: 160, depth: 70, sinTinte: true });
+            if (an) { await this.saltarA(an.cont, a.cx, this.L.suelo - a.tam * 0.45, { ms: 500, alto: 80 }); an.saltito(0.4, 3); }
+            await this.sonar(a.id, { breve: true, bocina: false });
+            await esperar(this, 250);
+        },
+
+        alFallar: async function () {
+            var a = this.actual;
+            if (a && a.animal) a.animal.sacudir();
+            await esperar(this, 500);
+        },
+
+        alTerminarNivel: async function () {
+            var self = this;
+            this.cosas.forEach(function (a) { if (a.animal) a.animal.destruir(); self.tweens.add({ targets: a.pivote, alpha: 0, duration: 250 }); });
+            await esperar(this, 300);
+            this.cosas.forEach(function (a) { if (a.pivote.active) a.pivote.destroy(); });
+            this.cosas = [];
+        },
+
+        mostrarPista: function (cancelada) {
+            var self = this;
+            if (this.fase !== 'jugar' || this.sonando) return Promise.resolve();
+            var r = this.respuestas()[0];
+            var a = this.cosas.filter(function (q) { return q.id === r && !q.rota; })[0];
+            if (!a || !this.ayuda) {
+                if (this.bocina) this.tweens.add({ targets: this.bocina, scale: 1.18, duration: 220, yoyo: true, repeat: 2 });
+                return esperar(this, 900);
+            }
+            return this.ctx.mano({ punto: { x: a.cx, y: a.cy }, holdMs: 400, cancelado: function () { return cancelada() || self.fase !== 'jugar'; } });
+        },
+
+        demoPaso: function () {
+            var self = this;
+            var r = this.respuestas()[0];
+            var pasos = [];
+            for (var k = 0; k < this.necesarios(); k++) pasos.push(function () {
+                var a = self.cosas.filter(function (q) { return q.id === r; })[0];
+                if (!a || a.rota) return { desde: { x: self.L.W / 2, y: self.L.H / 2 }, hacer: function () {} };
+                return { desde: { x: a.cx, y: a.cy }, mantener: 200, hacer: function () { return self.golpear(a, 1); } };
+            });
+            return pasos;
+        },
+
+        escenaFinal: async function () {
+            var self = this, L = this.L;
+            this.cosas.forEach(function (a) { if (a.pivote.active) a.pivote.destroy(); });
+            this.cosas = [];
+            var vistos = {};
+            var ids = this.reunidos.filter(function (id) { if (vistos[id]) return false; vistos[id] = 1; return true; }).slice(0, 5);
+            if (!ids.length) ids = ['perro', 'gato', 'pajaro'];
+            var lug = this.lugares(ids.length);
+            var tam = Math.min(L.tam, (L.der - 120) / ids.length * 0.8);
+            this.cosas = ids.map(function (id, i) { return self.crearPinata(id, i, lug[i], tam); });
+            this.cosas.forEach(function (a, i) { self.tweens.add({ targets: a.pivote, alpha: 1, duration: 300, delay: i * 90 }); });
+            await esperar(this, 700);
+            for (var i = 0; i < this.cosas.length; i++) {
+                if (!this.sigue()) return;
+                var a = this.cosas[i];
+                a.golpes = 99; this.dibujarGrietas(a);
+                for (var k = 0; k < 24; k++) this.papeles.push({ x: a.cx, y: a.cy, vx: (Math.random() - 0.5) * 9, vy: -3 - Math.random() * 6, col: COLORES[k % COLORES.length], t: 1.4, dulce: true });
+                a.rota = true; a.pivote.setAlpha(0);
+                var an = this.crearCosa(a.id, a.cx, a.cy, a.tam * 0.7, { depth: 40 });
+                await this.saltarA(an.cont, a.cx, L.suelo - a.tam * 0.4, { ms: 480, alto: 80 });
+                an.saltito(0.3, 2);
+                await this.sonar(a.id, { breve: true, bocina: false });
+            }
+            Ut.confeti(this, 100);
+            await esperar(this, 1100);
+        },
+
+        estadoExtra: function () {
+            return {
+                necesarios: this.necesarios(),
+                cosas: this.cosas.filter(function (a) { return a.pivote.active; }).map(function (a) { return { id: a.id, x: Math.round(a.cx), y: Math.round(a.cy), golpes: a.golpes, rota: a.rota }; })
+            };
+        },
+
+        paso: function (time, delta) {
+            var L = this.L, dt = Math.min(0.05, (delta || 16) / 1000), self = this;
+            this.cosas.forEach(function (a) {
+                if (!a.pivote.active) return;
+                // péndulo: balanceo suave + golpe que se amortigua
+                a.imp *= Math.pow(0.5, dt * 1.4);
+                var th = Math.sin(time / 900 + a.fase2) * 0.07 + a.imp * Math.sin(time / 120);
+                a.pivote.setRotation(th);
+                a.cx = a.pivote.x + Math.sin(-th) * L.largo * 1 * -1;
+                a.cx = a.pivote.x - Math.sin(th) * L.largo;
+                a.cy = a.pivote.y + Math.cos(th) * L.largo;
+            });
+            var g = this.papelG;
+            if (!g || !g.active) return;
+            g.clear();
+            this.papeles = this.papeles.filter(function (p) {
+                p.x += p.vx * dt * 60; p.y += p.vy * dt * 60; p.vy += 0.35 * dt * 60; p.t -= dt * 0.8;
+                if (p.y > L.suelo) { p.y = L.suelo; p.vy *= -0.4; p.vx *= 0.7; }
+                g.fillStyle(p.col, Math.min(1, p.t));
+                if (p.dulce) g.fillCircle(p.x, p.y, 7); else g.fillRect(p.x, p.y, 9, 5);
+                return p.t > 0;
+            });
+        }
+    };
+
+    K.crear({ id: 'pinatas', fondo: '#a5d8ff', escena: escena });
+})(typeof window !== 'undefined' ? window : this);

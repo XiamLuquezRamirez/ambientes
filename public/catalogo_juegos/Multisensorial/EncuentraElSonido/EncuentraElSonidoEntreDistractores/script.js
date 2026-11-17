@@ -841,7 +841,8 @@
             modo: ronda.modo,
             coro: ronda.coro,
             dificultad: esMayor() ? "56" : "34",
-            ronda: indiceRonda
+            ronda: indiceRonda,
+            total: rondas.length
         });
         if (ronda.intro) await decir({ voz: indiceRonda % 2 ? "zeus" : "zoe", texto: textoRonda(INTRO_RONDA[ronda.intro], ronda.objetivo) }, { minMs: 1200 });
         await listos;

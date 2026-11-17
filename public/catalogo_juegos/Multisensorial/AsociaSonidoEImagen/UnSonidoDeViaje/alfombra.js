@@ -112,7 +112,10 @@
          */
         calcularConFondo: function (L, der) {
             var W = L.W, H = L.H, F = FONDO;
-            var s = Math.max(W / F.w, Math.min(H / F.h, W * 1.35 / F.w));
+            // Horizontal: se ve TODO el ancho del dibujo (no se corta ni la ciudad ni la salida);
+            // si sobra alto se completa con cielo y pasto, y si falta se recorta hasta un 12 % arriba.
+            // Vertical: se acerca un poco y se recortan las casitas de la izquierda.
+            var s = W >= H ? Math.min(W / F.w, H / F.h * 1.12) : Math.max(W / F.w, Math.min(H / F.h, W * 1.35 / F.w));
             var fw = F.w * s, fh = F.h * s;
             var ix = Math.max((W - fw) / 2, -F.recorte * s), iy = (H - fh) * 0.7;
             if (ix + fw < W) ix = W - fw;

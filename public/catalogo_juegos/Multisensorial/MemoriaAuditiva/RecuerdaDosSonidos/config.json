@@ -25,7 +25,7 @@
   "audios": {
     "tema": "cabina",
     "cierre": "../../../sounds/victory.mp3",
-    "fondo": "../../../sounds/fondo.mp3",
+    "fondo": "../../../sounds/fondo_multisensorial.wav",
     "sonidos": {},
     "efectos": {}
   },

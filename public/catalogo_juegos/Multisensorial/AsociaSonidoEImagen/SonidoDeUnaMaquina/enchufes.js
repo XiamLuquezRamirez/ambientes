@@ -1,7 +1,7 @@
 /**
  * «Enchufa la máquina» — motor propio de Sonido de una máquina (5-6 años).
  *
- * En el cuarto de lavado, las máquinas están sobre el mesón y sus cables cuelgan y se enredan
+ * En la cocina (fondo del diseño en img/diseno/fondo.svg), las máquinas están sobre el mesón y sus cables cuelgan y se enredan
  * hasta los enchufes que quedan en el piso (en otro orden). Suena una máquina. El niño SIGUE CON
  * LA VISTA el cable de la que cree que es y ARRASTRA ese enchufe hasta la regleta: al enchufar,
  * la máquina arranca con su sonido real. Si es la correcta, trabaja completa (la aspiradora limpia
@@ -23,6 +23,20 @@
     var EXTRA = ['lavadora'];
     var COLORES = [0xe03131, 0x1c7ed6, 0xf59f00, 0x2f9e44, 0x9c36b5];
 
+    /* Cocina del diseño (img/diseno/fondo.svg, lienzo 1280×720). Medidas tomadas por color. */
+    var DISENO = 'img/diseno/';
+    var FONDO_W = 1280, FONDO_H = 720;
+    var COCINA = {
+        meson: { x0: 152, x1: 1128, y: 347 },      // tablero 347-366; cajones hasta 548
+        piso: 549,                                  // zócalo 517-548; piso de madera desde aquí
+        anchoUtil: 1000,                            // el mesón entero siempre debe caber
+        alto: 540,                                  // alto del dibujo (desde y 180) que debe caber bajo la bocina
+        tam: 135,                                   // alto de cada máquina en unidades del dibujo (cajón: 240 de ancho)
+        vidrio: { x0: 868, x1: 1035, y0: 217, y1: 278 },   // vidrio bajo la persiana
+        repisa: { x0: 1107, x1: 1274, alta: 96, baja: 179 }, // repisas vacías de la derecha
+        pared: 0xf9f8e4
+    };
+
     function bezier(p0, p1, p2, p3, t) {
         var u = 1 - t;
         return {
@@ -32,7 +46,19 @@
     }
 
     var escena = {
-        iniciar: function () { this.maqs = []; },
+        iniciar: function () { this.maqs = []; this.adornos = []; },
+
+        preload: function () {
+            if (!this.textures.exists('mq_fondo')) this.load.svg('mq_fondo', DISENO + 'fondo.svg', { width: 1920, height: 1080 });
+        },
+
+        /** Encaje del fondo: cubre la pantalla anclado abajo, sin recortar el mesón ni dejarlo bajo la bocina. */
+        marcoFondo: function (W, H, techo) {
+            if (!this.textures.exists('mq_fondo')) return null;
+            var k = Math.min(Math.max(W / FONDO_W, H / FONDO_H), W / COCINA.anchoUtil, (H - techo) / COCINA.alto);
+            var ox = (W - FONDO_W * k) / 2, oy = H - FONDO_H * k;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
 
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
@@ -41,6 +67,8 @@
             L.bocina = { x: W / 2, y: Math.max(60, Math.min(100, 56 + hueco * 0.2)), r: Math.max(28, Math.min(40, hueco * 0.3)) };
             L.pres = W >= 760 ? { x: W - 70, piso: H - 104, alto: Math.min(160, H * 0.28), modelo: 'nino' } : null;
             var der = L.pres ? W - 145 : W - 16;
+            var F = L.F = this.marcoFondo(W, H, L.bocina.y + L.bocina.r + 14);
+            if (F) return this.calcularConFondo(L, F, der);
             L.meson = { y: Math.max(L.bocina.y + L.bocina.r + H * 0.22, H * 0.46), x0: 16, x1: der - 10 };
             L.tam = Math.max(70, Math.min(135, H * 0.2, (L.meson.x1 - L.meson.x0) / 5.6));
             L.y0 = L.meson.y + H * 0.12;                        // piso
@@ -50,18 +78,198 @@
             return L;
         },
 
+        /** Máquinas sobre el tablero del mesón del dibujo; enchufes y regleta en el piso de madera. */
+        calcularConFondo: function (L, F, der) {
+            var W = L.W, H = L.H, M = COCINA.meson;
+            L.y0 = F.sy(COCINA.piso);
+            L.meson = { y: F.sy(M.y) + 2, x0: Math.max(16, F.sx(M.x0) + 8), x1: Math.min(der - 10, F.sx(M.x1) - 8) };
+            var techo = L.bocina.y + L.bocina.r + 10;
+            L.tam = Math.max(60, Math.min(COCINA.tam * F.k, (L.meson.y - techo) / 0.95, (L.meson.x1 - L.meson.x0) / 5.2));
+            var piso = H - L.y0;
+            L.enchufesY = Math.max(L.y0 + 36, H - Math.max(52, piso * 0.42));
+            L.regleta = { x: Math.min(der - 60, W * 0.74), y: L.enchufesY, w: Math.max(110, Math.min(170, 150 * F.k)), h: 34 };
+            L.zonaEnch = { x0: Math.max(W * 0.06, 30), x1: L.regleta.x - L.regleta.w * 0.7 - 20 };
+            return L;
+        },
+
         armar: function (reubicar) {
             var self = this;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
-            K.textura(this, 'lavado_fondo', L.W, L.H, function (x, w, h) { self.pintarCuarto(x, w, h); });
-            keep(this.add.image(0, 0, 'lavado_fondo').setOrigin(0, 0).setDepth(0));
+            this.adornos = [];
+            this.cielo = null;
+            if (L.F) this.montarCocina(keep);
+            else {
+                K.textura(this, 'lavado_fondo', L.W, L.H, function (x, w, h) { self.pintarCuarto(x, w, h); });
+                keep(this.add.image(0, 0, 'lavado_fondo').setOrigin(0, 0).setDepth(0));
+            }
             this.cablesG = keep(this.add.graphics().setDepth(15));
             var V = this.montarVida(keep);
-            if (V) V.burbujas({ x: L.W * 0.05, y: L.bocina.y + L.bocina.r, w: L.meson.x1 - L.W * 0.05, h: L.meson.y - L.tam - L.bocina.y - L.bocina.r, n: 7, depth: 9 });
+            if (V) {
+                var by = L.bocina.y + L.bocina.r;
+                V.burbujas({ x: L.W * 0.05, y: by, w: L.meson.x1 - L.W * 0.05, h: Math.max(30, L.meson.y - L.tam - by), n: 7, depth: 9 });
+                // El escenario también festeja o se sorprende: los adornos de la cocina se suman.
+                var reac = V.reaccionar;
+                V.reaccionar = function (tipo, p) { reac(tipo, p); self.reaccionarCocina(tipo); };
+                var toc = V.tocar;
+                V.tocar = function (p) { return self.tocarCocina(p) || toc(p); };
+            }
             this.montarRegleta(keep);
             this.montarHud(keep);
             if (reubicar && this.maqs.length) this.ubicar(false);
+        },
+
+        /* ── Cocina del diseño: fondo, cielo en la ventana y adornos de las repisas vacías ── */
+
+        montarCocina: function (keep) {
+            var self = this, L = this.L, F = L.F, k = F.k;
+            var fw = FONDO_W * k, fh = FONDO_H * k;
+            // Si sobra pantalla arriba, la pared lisa sigue con su color; a los lados, copias en espejo.
+            if (F.oy > 0) keep(this.add.rectangle(0, 0, L.W, F.oy + 2, COCINA.pared).setOrigin(0, 0).setDepth(0));
+            keep(this.add.image(F.ox, F.oy, 'mq_fondo').setOrigin(0, 0).setDisplaySize(fw, fh).setDepth(0));
+            if (F.ox > 0) {
+                keep(this.add.image(F.ox, F.oy, 'mq_fondo').setOrigin(1, 0).setDisplaySize(fw, fh).setFlipX(true).setDepth(0));
+                keep(this.add.image(F.ox + fw, F.oy, 'mq_fondo').setOrigin(0, 0).setDisplaySize(fw, fh).setFlipX(true).setDepth(0));
+            }
+            // Cielo vivo detrás del vidrio (nubes que pasan, un pájaro de vez en cuando).
+            var v = COCINA.vidrio;
+            var cx = F.sx(v.x0 + 1), cy = F.sy(v.y0 + 1);
+            var cw = Math.ceil((v.x1 - v.x0 - 2) * k), ch = Math.ceil((v.y1 - v.y0 - 2) * k);
+            if (cw > 24 && cx > -cw && cx < L.W) {
+                var clave = 'mq_cielo_' + cw + 'x' + ch;
+                var tex = this.textures.exists(clave) ? this.textures.get(clave) : this.textures.createCanvas(clave, cw, ch);
+                var nubes = [];
+                for (var n = 0; n < 3; n++) nubes.push({ x: rnd(0, 1.2), y: rnd(0.25, 0.7), s: rnd(0.7, 1.15), v: rnd(0.018, 0.035) });
+                this.cielo = { tex: tex, w: cw, h: ch, x: cx, y: cy, nubes: nubes, pajaro: null, ult: -1 };
+                keep(this.add.image(cx, cy, clave).setOrigin(0, 0).setDepth(1));
+                this.pintarCielo(0);
+            }
+            // Repisa baja: frascos de detergente y toallas dobladas (la alta queda bajo los botones de la esquina).
+            var R = COCINA.repisa;
+            var frascos = [[1126, 0x4dabf7, 46], [1156, 0xff8787, 38]];
+            frascos.forEach(function (q, i) {
+                self.adorno(keep, 'frasco', F.sx(q[0]), F.sy(R.baja), k, function (g) {
+                    var h = q[2], w = 26;
+                    g.fillStyle(0x000000, 0.12); g.fillEllipse(0, 0, w + 8, 6);
+                    g.fillStyle(q[1], 1); g.fillRoundedRect(-w / 2, -h, w, h, 7);
+                    g.fillStyle(0xffffff, 0.25); g.fillRoundedRect(-w / 2 + 3, -h + 4, 6, h - 10, 3);
+                    g.fillStyle(0xffffff, 0.75); g.fillRoundedRect(-w / 2 + 4, -h * 0.62, w - 8, h * 0.28, 3);
+                    g.fillStyle(q[1], 0.7); g.fillCircle(0, -h * 0.48, 4);
+                    g.fillStyle(Phaser.Display.Color.ValueToColor(q[1]).darken(25).color, 1); g.fillRoundedRect(-6, -h - 9, 12, 10, 3);
+                    if (i === 1) { g.fillRect(4, -h - 7, 10, 4); }
+                }, i);
+            });
+            var toallas = [[0x63e6be, 0], [0xffa8a8, 1], [0x91a7ff, 2]];
+            this.adorno(keep, 'toallas', F.sx(1226), F.sy(R.baja), k, function (g) {
+                g.fillStyle(0x000000, 0.12); g.fillEllipse(0, 0, 92, 6);
+                toallas.forEach(function (t) {
+                    var y = -13 - t[1] * 13, w = 80 - t[1] * 6;
+                    g.fillStyle(t[0], 1); g.fillRoundedRect(-w / 2, y, w, 13, 6);
+                    g.fillStyle(0xffffff, 0.55); g.fillRect(-w / 2 + 8, y + 4, w - 16, 2);
+                    g.fillStyle(0x000000, 0.08); g.fillRect(-w / 2 + 2, y + 10, w - 4, 3);
+                });
+            }, 3);
+        },
+
+        /** Adorno de la cocina: graphics con base en (0,0) para que salte y se aplaste desde abajo. */
+        adorno: function (keep, tipo, x, y, k, dibujar, i) {
+            if (x < 10 || x > this.L.W - 10) return null;
+            var c = keep(this.add.container(x, y).setDepth(2).setScale(k));
+            var g = this.add.graphics();
+            dibujar(g);
+            c.add(g);
+            var a = { tipo: tipo, c: c, k: k, i: i, x: x, y: y };
+            this.adornos.push(a);
+            return a;
+        },
+
+        saltarAdorno: function (a, alto, ms) {
+            var self = this;
+            this.tweens.killTweensOf(a.c);
+            a.c.setPosition(a.x, a.y).setScale(a.k).setAngle(0);
+            this.tweens.add({ targets: a.c, scaleY: a.k * 0.82, scaleX: a.k * 1.12, duration: 90, yoyo: true, onComplete: function () {
+                self.tweens.add({ targets: a.c, y: a.y - alto * a.k, duration: ms, yoyo: true, ease: 'Quad.easeOut', onComplete: function () {
+                    self.tweens.add({ targets: a.c, scaleY: a.k * 0.88, scaleX: a.k * 1.08, duration: 80, yoyo: true });
+                } });
+            } });
+        },
+
+        reaccionarCocina: function (tipo) {
+            var self = this;
+            this.adornos.forEach(function (a, j) {
+                if (!a.c.active) return;
+                if (tipo === 'acierto') self.time.delayedCall(j * 90, function () { if (a.c.active) self.saltarAdorno(a, 14, 170); });
+                else { self.tweens.killTweensOf(a.c); a.c.setAngle(0); self.tweens.add({ targets: a.c, angle: 7, duration: 70, yoyo: true, repeat: 3, onComplete: function () { a.c.setAngle(0); } }); }
+            });
+            if (tipo === 'acierto' && this.cielo) this.cielo.pajaro = { t: this.time.now };
+        },
+
+        tocarCocina: function (p) {
+            var self = this;
+            var S = this.vidaAmb && this.vidaAmb.sonido;
+            var a = this.adornos.filter(function (q) { return q.c.active && Math.abs(p.x - q.x) < 22 * q.k + 14 && p.y < q.y + 10 && p.y > q.y - 64 * q.k; })[0];
+            if (a) {
+                this.saltarAdorno(a, a.tipo === 'frasco' ? 22 : 10, 200);
+                if (a.tipo === 'frasco') {
+                    if (S) S.blup();
+                    for (var b = 0; b < 3; b++) {
+                        var r = rnd(4, 8) * a.k + 2;
+                        var bu = this.add.circle(a.x + rnd(-8, 8) * a.k, a.y - 50 * a.k, r, 0xd0ebff, 0.35).setStrokeStyle(1.5, 0xffffff, 0.9).setDepth(9);
+                        this.tweens.add({ targets: bu, y: bu.y - rnd(40, 80), x: bu.x + rnd(-20, 20), alpha: 0, duration: rnd(700, 1100), delay: b * 90, onComplete: function (tw0, tg) { tg[0].destroy(); } });
+                    }
+                } else if (S) S.puf();
+                return true;
+            }
+            var c = this.cielo;
+            if (c && p.x > c.x && p.x < c.x + c.w && p.y > c.y - 140 * this.L.F.k && p.y < c.y + c.h) {
+                // Tocar la ventana (o su persiana): pasa un pájaro y las nubes se apuran un momento.
+                c.pajaro = { t: this.time.now };
+                c.prisa = this.time.now + 1200;
+                if (S) S.pio();
+                return true;
+            }
+            return false;
+        },
+
+        pintarCielo: function (t) {
+            var c = this.cielo;
+            if (!c || !c.tex) return;
+            var x = c.tex.getContext(), w = c.w, h = c.h;
+            var g = x.createLinearGradient(0, 0, 0, h);
+            g.addColorStop(0, '#8fcaf3'); g.addColorStop(1, '#e3f4fd');
+            x.fillStyle = g; x.fillRect(0, 0, w, h);
+            x.fillStyle = 'rgba(255,255,255,0.95)';
+            c.nubes.forEach(function (n) {
+                var cx = (n.x % 1.4) * w * 1.0 - w * 0.2, cy = n.y * h, r = h * 0.17 * n.s;
+                x.beginPath();
+                x.arc(cx, cy, r, 0, Math.PI * 2); x.arc(cx + r * 1.1, cy - r * 0.45, r * 1.15, 0, Math.PI * 2);
+                x.arc(cx + r * 2.2, cy, r * 0.95, 0, Math.PI * 2); x.rect(cx, cy, r * 2.2, r * 0.9);
+                x.fill();
+            });
+            if (c.pajaro) {
+                var f = (t - c.pajaro.t) / 2600;
+                if (f > 1) c.pajaro = null;
+                else {
+                    var px = -10 + f * (w + 20), py = h * (0.45 - Math.sin(f * Math.PI) * 0.2), ala = Math.sin(t / 70) * h * 0.06;
+                    x.strokeStyle = '#343a40'; x.lineWidth = Math.max(1.5, h * 0.03); x.lineCap = 'round';
+                    x.beginPath(); x.moveTo(px - h * 0.09, py - ala); x.quadraticCurveTo(px - h * 0.04, py - h * 0.03, px, py);
+                    x.quadraticCurveTo(px + h * 0.04, py - h * 0.03, px + h * 0.09, py - ala); x.stroke();
+                }
+            }
+            // Reflejo del vidrio.
+            x.fillStyle = 'rgba(255,255,255,0.28)';
+            x.beginPath(); x.moveTo(w * 0.12, h); x.lineTo(w * 0.3, 0); x.lineTo(w * 0.38, 0); x.lineTo(w * 0.2, h); x.fill();
+            c.tex.refresh();
+        },
+
+        moverCielo: function (t, dt) {
+            var c = this.cielo;
+            if (!c) return;
+            var vel = (c.prisa && t < c.prisa ? 5 : 1) * (Ut.reducido && Ut.reducido() ? 0.33 : 1);
+            c.nubes.forEach(function (n) { n.x += n.v * vel * (dt || 16) / 1000; });
+            if (t - c.ult < 50) return;
+            c.ult = t;
+            this.pintarCielo(t);
         },
 
         pintarCuarto: function (x, w, h) {
@@ -105,6 +313,16 @@
 
         montarRegleta: function (keep) {
             var r = this.L.regleta;
+            if (this.L.F) {
+                // Cable de la regleta: corre por el piso hasta el borde derecho (detrás del presentador).
+                var cg = keep(this.add.graphics().setDepth(13));
+                var x0 = r.x + r.w / 2 - 4, x1 = this.L.W + 10, yc = r.y + 2;
+                [[8, 0x000000, 0.15, 3], [7, 0x343a40, 1, 0], [2, 0xffffff, 0.2, -2]].forEach(function (s) {
+                    cg.lineStyle(s[0], s[1], s[2]);
+                    var cv = new Phaser.Curves.QuadraticBezier(new Phaser.Math.Vector2(x0, yc + s[3]), new Phaser.Math.Vector2((x0 + x1) / 2, yc + 26 + s[3]), new Phaser.Math.Vector2(x1, yc - 6 + s[3]));
+                    cv.draw(cg, 24);
+                });
+            }
             var c = keep(this.add.container(r.x, r.y).setDepth(14));
             c.add(this.add.rectangle(0, 0, r.w, r.h, 0xf8f9fa).setStrokeStyle(3, 0xadb5bd));
             c.add(this.add.rectangle(-r.w * 0.38, 0, 14, 14, 0xe03131).setStrokeStyle(2, 0xc92a2a));
@@ -299,7 +517,7 @@
             await esperar(this, 700);
         },
 
-        paso: function (time) { this.dibujarCables(time); },
+        paso: function (time, delta) { this.dibujarCables(time); this.moverCielo(time, delta); },
 
         mostrarPista: function (cancelada) {
             var self = this;
@@ -425,7 +643,7 @@
 
     K.crear({
         id: 'enchufes',
-        fondo: '#d0ebff',
+        fondo: '#f9f8e4',
         /* SVG en img/ — sin esto Act.crear sigue con PedniaArte */
         pieles: ['aspiradora', 'secador', 'licuadora', 'ventilador', 'lavadora', 'gallo', 'vaca'],
         escena: escena

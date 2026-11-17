@@ -174,11 +174,15 @@
                 '<path d="M195 270 v-50 a30 30 0 0 1 60 0 v50z"/><path d="M545 270 v-50 a30 30 0 0 1 60 0 v50z"/>' +
                 '<path d="M290 380 v-45 a28 28 0 0 1 56 0 v45z"/><path d="M454 380 v-45 a28 28 0 0 1 56 0 v45z"/></g>' +
                 '<path d="M370 400 v-56 a30 30 0 0 1 60 0 v56z" fill="#8d5524"/>',
+            // El castillo del diseño. Las ventanas se pueblan dentro del juego, así
+            // que aquí los instrumentos flotan en el cielo, sin taparlas.
+            img: 'img/fondo.svg',
+            imgPos: 'center 62%',
             items: [
-                { src: 'img/campana.svg', x: 28, y: 43, w: 7, anim: 'pt-mece' },
-                { src: 'img/tambor.svg', x: 72, y: 43, w: 7, anim: 'pt-flota' },
-                { src: 'img/trompeta.svg', x: 39.5, y: 19.5, w: 7, anim: '' },
-                { src: 'img/triangulo.svg', x: 60, y: 19.5, w: 6, anim: 'pt-mece' }
+                { src: 'img/trompeta.svg', x: 12, y: 62, w: 9, anim: 'pt-flota' },
+                { src: 'img/campana.svg', x: 88, y: 66, w: 8, anim: 'pt-mece' },
+                { src: 'img/pandereta.svg', x: 20, y: 18, w: 9, anim: 'pt-mece' },
+                { src: 'img/maracas.svg', x: 80, y: 16, w: 9, anim: 'pt-flota' }
             ]
         },
 
@@ -249,8 +253,17 @@
         var fondo = tarjeta.querySelector('.parque-fondo');
         if (fondo) {
             if (p.fondo) fondo.style.background = p.fondo;
-            fondo.insertAdjacentHTML('beforeend',
-                '<svg class="portada-svg" viewBox="0 0 800 470" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + p.svg + '</svg>');
+            if (p.img) {
+                // El juego trae su propio arte: se usa esa imagen en vez del dibujo.
+                Array.prototype.forEach.call(fondo.children, function (el) { el.style.display = 'none'; });
+                fondo.insertAdjacentHTML('beforeend',
+                    '<img class="portada-img" src="' + p.img + '" alt="" draggable="false" ' +
+                    'style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;' +
+                    (p.imgPos ? 'object-position:' + p.imgPos + ';' : '') + '">');
+            } else {
+                fondo.insertAdjacentHTML('beforeend',
+                    '<svg class="portada-svg" viewBox="0 0 800 470" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + p.svg + '</svg>');
+            }
         }
         // Los elementos de este juego en vez del perro, el carro y el pájaro de siempre.
         var nuevas = [];

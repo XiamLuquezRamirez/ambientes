@@ -32,7 +32,63 @@
 
     var FIESTA = [0xff6b6b, 0xfcc419, 0x51cf66, 0x339af0, 0xcc5de8, 0xff922b];
     var BANDERAS = [0xe03131, 0x1c7ed6, 0xf59f00, 0x2f9e44];
-    var ZONAS = ['arribaIzq', 'arribaDer', 'abajoIzq', 'abajoDer'];
+    // Las 4 ventanas del castillo del diseño, de izquierda a derecha.
+    var ZONAS = ['torreAzul', 'torreVerde', 'torreRoja', 'torreMorada'];
+
+    /* ── Arte del diseño ──────────────────────────────────────────
+     * El FONDO.svg (1280×720) trae el castillo entero: cielo, colinas,
+     * muro, las 4 torres con su techo de color y las 4 ventanas. Aquí
+     * solo se colocan encima las ventanas interactivas, las banderas,
+     * el sol y la luna, ancladas a las coordenadas reales del dibujo.
+     */
+    var ESCENA = {
+        fondo: 'img/fondo.svg',
+        sol: 'img/sol.svg',
+        luna: 'img/luna.svg',
+        banderas: ['img/bandera_azul.svg', 'img/bandera_verde.svg',
+                   'img/bandera_roja.svg', 'img/bandera_morada.svg']
+    };
+    var FONDO_W = 1280;
+    var FONDO_H = 720;
+    // Ancho del castillo dentro del dibujo (torre azul a torre morada, con margen).
+    var CASTILLO_ANCHO = 900;
+    // Medido sobre el propio FONDO.svg: ventana grande y punta de cada torre.
+    // vx/vy: centro del hueco del arco; vw/vh: su tamaño; sy: el alféizar donde se
+    // apoya el instrumento; px/py: la punta del techo, donde se iza la bandera.
+    var TORRES = [
+        { zona: 'torreAzul',   vx: 352, vy: 499, vw: 82, vh: 107, sy: 552, px: 354, py: 176 },
+        { zona: 'torreVerde',  vx: 534, vy: 475, vw: 82, vh: 107, sy: 528, px: 534, py: 103 },
+        { zona: 'torreRoja',   vx: 728, vy: 475, vw: 82, vh: 107, sy: 528, px: 728, py: 104 },
+        { zona: 'torreMorada', vx: 908, vy: 498, vw: 82, vh: 107, sy: 552, px: 906, py: 176 }
+    ];
+    // Puerta del muro central, medida sobre el dibujo: x 605..657, y 604..662.
+    var PUERTA = { x: 631, y: 633, w: 52, h: 58, suelo: 662 };
+    // Las dos antorchas que el dibujo ya trae junto a la puerta: medidas sobre
+    // él, la llama va de y 582 a 636 en x 577 y 681. El halo se centra en el
+    // fuego (y≈596), no en el palo, o queda flotando debajo de la antorcha.
+    var ANTORCHAS = [{ x: 577, y: 596 }, { x: 681, y: 596 }];
+    // Las banderas del diseño ocupan 366×191 dentro de su lienzo 500×500, con el pie
+    // del asta abajo a la izquierda: de ahí salen el origen y la escala del izado.
+    // El asta va de y=154 a y=345 (alto 191) en x 66..105; su pie está en (85, 345),
+    // y el paño sale hacia la derecha hasta x=432.
+    var BANDERA_UTIL = { h: 191, w: 366, astaX: 85, astaY: 345 };
+    // Ancho que la bandera entera (asta + paño) debe ocupar sobre su torre.
+    var BANDERA_ANCHO = 118;
+    var ESCENA_V = '?v=20261113castillo';
+
+    function texEscena(parte) { return 'castillo:escena:' + parte; }
+
+    function encolarEscena(load) {
+        function add(key, src) {
+            if (!src) return;
+            if (src.indexOf('?') === -1) src += ESCENA_V;
+            load.svg(key, src);
+        }
+        add(texEscena('fondo'), ESCENA.fondo);
+        add(texEscena('sol'), ESCENA.sol);
+        add(texEscena('luna'), ESCENA.luna);
+        ESCENA.banderas.forEach(function (src, i) { add(texEscena('bandera:' + i), src); });
+    }
 
     function elemento(id) {
         return (gameConfig && gameConfig.elementos && gameConfig.elementos[id]) || {};
@@ -174,11 +230,30 @@
                 c.add([halo, palo, llama, centro]);
                 c.llama = llama;
                 c.halo = halo;
+                c.palo = palo;
+                c.centro = centro;
                 return c;
             }, this);
+            // El castillo dibujado a mano es solo el respaldo por si el arte del
+            // diseño no carga: hasta saberlo, nada de esto se muestra (si no, se ve
+            // un castillo gris que luego salta al del diseño).
+            this.arteDecidido = false;
             this.dibujar();
+            this.mostrarDibujo(false);
             var scene = this;
-            this.scale.on('resize', function () { scene.dibujar(); scene.reubicar(); });
+            this.scale.on('resize', function () {
+                scene.dibujar();
+                // Primero se apaga el castillo a mano y DESPUÉS se aplica el arte:
+                // mostrarDibujo(false) también oculta ventanas, antorchas, sol y luna,
+                // y aplicarEscena es quien los vuelve a encender sobre el diseño. En el
+                // orden inverso, al cambiar el tamaño de la pantalla las ventanas
+                // interactivas desaparecían (se veía la madera del dibujo con los
+                // instrumentos pintados encima y no se abría ninguna).
+                if (scene.arteDecidido) scene.mostrarDibujo(!scene.mapaFondo());
+                scene.aplicarEscena();
+                scene.reubicar();
+                scene.reubicarBanderas();
+            });
             sceneRef = this;
             if (readyResolve) {
                 readyResolve(this);
@@ -201,6 +276,155 @@
         shutdown: function () {
             this.tweens.killAll();
             if (sceneRef === this) sceneRef = null;
+        },
+
+        /** Mapa cover del FONDO.svg → pantalla. null si aún no hay textura. */
+        mapaFondo: function () {
+            if (!this.textures.exists(texEscena('fondo'))) return null;
+            var w = this.scale.width;
+            var h = this.scale.height;
+            // Cover, pero nunca tanto que las 4 torres se salgan de pantalla: el
+            // castillo ocupa x 160..1100 del dibujo y entero tiene que caber.
+            var esc = Math.max(w / FONDO_W, h / FONDO_H);
+            var escMax = w / CASTILLO_ANCHO;
+            if (esc > escMax) esc = Math.max(escMax, w / FONDO_W);
+            var ox = (w - FONDO_W * esc) / 2;
+            var oy = (h - FONDO_H * esc) / 2;
+            // Con el castillo centrado en el dibujo, al recortar se mantiene a la vista.
+            if (oy < 0) oy = Math.max(h - FONDO_H * esc, Math.min(0, (h - FONDO_H * esc) * 0.62));
+            return {
+                esc: esc, ox: ox, oy: oy,
+                sx: function (x) { return ox + x * esc; },
+                sy: function (y) { return oy + y * esc; }
+            };
+        },
+
+        /** Enciende o apaga todo el castillo dibujado a mano (el respaldo). */
+        mostrarDibujo: function (si) {
+            [this.cielo, this.montanas, this.campo, this.agua, this.muro, this.puente,
+             this.estrellasNoche].forEach(function (g) {
+                if (g) g.setVisible(si);
+            });
+            this.nubes.forEach(function (n) { n.setVisible(si); });
+            this.pajaros.forEach(function (p) { p.setVisible(si); });
+            this.antorchas.forEach(function (a) { a.setVisible(si); });
+            if (this.sol) this.sol.setVisible(si);
+            if (this.luna) this.luna.setVisible(si);
+            this.ventanas.forEach(function (v) {
+                v.cont.setVisible(si);
+                v.postigos.setVisible(si);
+            });
+        },
+
+        /** Da por resuelto el arte: o se usa el del diseño, o el dibujo a mano. */
+        decidirArte: function () {
+            this.arteDecidido = true;
+            if (this.mapaFondo()) {
+                // dibujar() coloca las antorchas, ventanas y banderas sobre las
+                // coordenadas del diseño. En create() se llamó sin fondo cargado y las
+                // antorchas quedaron en la posición de respaldo, flotando dentro de las
+                // ventanas de las torres.
+                this.dibujar();
+                this.aplicarEscena();
+                this.reubicar();
+                return;
+            }
+            // Sin arte: se repinta el castillo a mano (aplicarEscena pudo borrarlo).
+            if (this.bordes) this.bordes.clear().setVisible(false);
+            if (this.fondoImg) this.fondoImg.setVisible(false);
+            this.dibujar();
+            this.mostrarDibujo(true);
+            this.reubicar();
+        },
+
+        /** Coloca el arte del diseño y apaga el castillo dibujado a mano. */
+        aplicarEscena: function () {
+            var m = this.mapaFondo();
+            if (!m) return;
+            this.arteDecidido = true;
+            var keyFondo = texEscena('fondo');
+            if (!this.fondoImg) this.fondoImg = this.add.image(0, 0, keyFondo).setOrigin(0).setDepth(-31);
+            this.fondoImg.setVisible(true).setPosition(m.ox, m.oy).setScale(m.esc);
+            // En pantallas altas el dibujo no llega a los bordes: se prolongan su
+            // cielo por arriba y su pasto por abajo para que no se vea el fondo.
+            var w = this.scale.width;
+            var h = this.scale.height;
+            if (!this.bordes) this.bordes = this.add.graphics().setDepth(-32);
+            var bg = this.bordes;
+            bg.clear().setVisible(true);
+            bg.fillStyle(0x96e3fe, 1);
+            if (m.oy > 0) bg.fillRect(0, 0, w, m.oy + 2);
+            var pie = m.oy + FONDO_H * m.esc;
+            if (pie < h) {
+                bg.fillStyle(0x669943, 1);
+                bg.fillRect(0, pie - 2, w, h - pie + 2);
+            }
+            if (m.ox > 0) {
+                bg.fillStyle(0x96e3fe, 1);
+                bg.fillRect(0, 0, m.ox + 2, h);
+                bg.fillRect(w - m.ox - 2, 0, m.ox + 2, h);
+            }
+            // El SVG ya trae cielo, colinas, muro y torres: no pintar encima.
+            [this.cielo, this.montanas, this.campo, this.agua, this.muro, this.puente].forEach(function (g) {
+                if (g) g.clear().setVisible(false);
+            });
+            // El cielo del dibujo es fijo: se le suman nubes y pájaros que se mueven,
+            // del mismo color celeste pálido que las nubes pintadas.
+            this.vestirCieloArte(m);
+            // Sol, luna, antorchas y ventanas sí se usan sobre el arte.
+            if (this.sol) this.sol.setVisible(true);
+            if (this.luna) this.luna.setVisible(true);
+            if (this.estrellasNoche) this.estrellasNoche.setVisible(true);
+            this.antorchas.forEach(function (a) { a.setVisible(true); });
+            this.ventanas.forEach(function (v) {
+                v.cont.setVisible(true);
+                v.postigos.setVisible(true);
+            });
+            this.ponerAstro('sol', this.sol, texEscena('sol'), m);
+            this.ponerAstro('luna', this.luna, texEscena('luna'), m);
+            this.reubicar();
+            this.reubicarBanderas();
+        },
+
+        /** Nubes y pájaros que cruzan el cielo del arte, en su mismo estilo. */
+        vestirCieloArte: function (m) {
+            var scene = this;
+            // Las nubes del dibujo son celestes (#baeefe..#ccf3fd), no blancas: se
+            // toma el tono claro para que se despeguen del cielo (#96e3fe).
+            if (!this.nubesVestidas) {
+                this.nubes.forEach(function (n) {
+                    n.list.forEach(function (c) { if (c.setFillStyle) c.setFillStyle(0xccf3fd, 1); });
+                });
+                this.nubesVestidas = true;
+            }
+            this.nubes.forEach(function (n, i) {
+                n.setVisible(true);
+                // A la altura de las nubes del dibujo y de su tamaño.
+                n.y = m.sy([46, 96, 60, 120][i % 4]);
+                n.setScale(m.esc * [1.05, 0.8, 0.95, 0.7][i % 4]);
+                n.vel = 5 + i * 2.5;
+                if (!n.listo) { n.x = m.sx([220, 640, 1020, 400][i % 4]); n.listo = true; }
+            });
+            this.pajaros.forEach(function (p, i) {
+                p.setVisible(true);
+                p.alto = [0.17, 0.24, 0.3][i % 3];
+                p.vel = 26 + i * 10;
+            });
+            scene.nubesSobreArte = true;
+        },
+
+        /** Cambia el sol/luna dibujados por el SVG del diseño. */
+        ponerAstro: function (nombre, cont, key, m) {
+            if (!cont || !this.textures.exists(key)) return;
+            if (!cont.artePuesto) {
+                cont.removeAll(true);
+                var im = this.add.image(0, 0, key);
+                var lado = 150 * m.esc;
+                im.setScale(Math.min(lado / (im.width || 1), lado / (im.height || 1)));
+                cont.add(im);
+                cont.artePuesto = true;
+            }
+            cont.setPosition(m.sx(nombre === 'sol' ? 150 : 170), m.sy(nombre === 'sol' ? 140 : 130)).setScale(1);
         },
 
         /** Medidas del castillo (centrado, sobre el foso). */
@@ -439,21 +663,55 @@
                 c.fillCircle(hx, hy, 7 - k * 0.25);
             }
 
-            // Antorchas a los lados de la puerta.
+            // Antorchas a los lados de la puerta. Con el arte del diseño ya están
+            // dibujadas: allí solo queda el halo, encima del velo de la noche.
+            var mf = this.mapaFondo();
             var pa = m.muroH * 0.5;
             this.antorchas.forEach(function (a, i) {
-                a.setPosition(m.cx + (i ? 1 : -1) * (pw / 2 + m.ancho * 0.0125), m.base - pa * 1.05);
-                a.setScale(Math.max(0.8, h / 760));
+                if (mf) {
+                    // El dibujo ya trae las dos antorchas encendidas: de las dibujadas
+                    // a mano no se usa ninguna pieza (ni llama, ni palo, ni el punto
+                    // amarillo del centro, que se veía como una segunda llamita sobre
+                    // la puerta). Solo queda el halo, y ajustado al tamaño de la llama
+                    // del dibujo (unos 38 de alto) para no desbordarse sobre el portón.
+                    a.setPosition(mf.sx(ANTORCHAS[i].x), mf.sy(ANTORCHAS[i].y));
+                    a.setScale(mf.esc * 0.55);
+                    if (a.llama) a.llama.setVisible(false);
+                    if (a.palo) a.palo.setVisible(false);
+                    if (a.centro) a.centro.setVisible(false);
+                } else {
+                    a.setPosition(m.cx + (i ? 1 : -1) * (pw / 2 + m.ancho * 0.0125), m.base - pa * 1.05);
+                    a.setScale(Math.max(0.8, h / 760));
+                }
             });
 
             this.dibujarPuente(this.puenteBajo ? 1 : 0);
-            this.banderas.forEach(function (bd, n) { var p = scene.puntas[n]; bd.setPosition(p.x, p.y); });
+            this.reubicarBanderas();
         },
 
         dibujarPuente: function (t) {
             var m = this.medidas();
+            var mf = this.mapaFondo();
             var p = this.puente;
             p.clear();
+            if (mf) {
+                // La puerta ya está dibujada: el puente solo se tiende desde su umbral
+                // hacia el camino, a ras de suelo, sin tapar el arco de piedra.
+                p.setVisible(t > 0.01);
+                if (t <= 0.01) return;
+                var bx = mf.sx(PUERTA.x);
+                var by = mf.sy(PUERTA.suelo);
+                var bw = PUERTA.w * mf.esc;
+                var largoA = 46 * mf.esc * t;
+                p.fillStyle(0x8d5524, 1);
+                p.fillRect(bx - bw / 2, by, bw, largoA);
+                p.lineStyle(2, 0x5c3d1e, 1);
+                for (var q = 1; q < 4; q++) {
+                    var qx = bx - bw / 2 + (bw / 4) * q;
+                    p.lineBetween(qx, by, qx, by + largoA);
+                }
+                return;
+            }
             var pw = m.ancho * 0.16;
             var ph = m.muroH * 0.5;
             // Arco de piedra alrededor de la puerta.
@@ -475,44 +733,48 @@
             p.lineBetween(m.cx + pw / 2 - 4, extremo, m.cx + pw / 2 + 6, m.base - ph - 4);
         },
 
-        /** Centro de cada ventana (zona): arriba en las torres, abajo en el muro. */
-        posZona: function (z) {
-            var m = this.medidas();
-            var arriba = m.base - m.torreH + m.torreH * 0.3;
-            var abajo = m.base - m.muroH * 0.48;
-            var xi = m.izq + m.torreW / 2;
-            var xd = m.der - m.torreW / 2;
-            // Las de abajo van entre la puerta y las torres (sin montarse en ellas).
-            var xbi = m.cx - m.ancho * 0.175;
-            var xbd = m.cx + m.ancho * 0.175;
-            return {
-                arribaIzq: { x: xi, y: arriba }, arribaDer: { x: xd, y: arriba },
-                abajoIzq: { x: xbi, y: abajo }, abajoDer: { x: xbd, y: abajo }
-            }[z];
+        /** Datos de diseño de una zona (torre) por su nombre. */
+        torreDe: function (z) {
+            for (var i = 0; i < TORRES.length; i++) if (TORRES[i].zona === z) return TORRES[i];
+            return TORRES[0];
         },
 
-        /** Arriba (torres) más grandes; abajo (muro) más angostas para caber junto a la puerta. */
+        /** Centro de cada ventana: la ventana real que trae el dibujo de su torre. */
+        posZona: function (z) {
+            var m = this.mapaFondo();
+            var t = this.torreDe(z);
+            if (m) return { x: m.sx(t.vx), y: m.sy(t.vy) };
+            // Reserva mientras el SVG no ha cargado: repartidas en fila.
+            var me = this.medidas();
+            var i = ZONAS.indexOf(z);
+            return { x: me.izq + me.ancho * (0.12 + i * 0.253), y: me.base - me.muroH * 0.6 };
+        },
+
+        /** Tamaño de cada ventana: el del hueco dibujado en su torre. */
         tamVentana: function (zona) {
-            var m = this.medidas();
-            if (zona && zona.indexOf('abajo') === 0) return { w: m.ancho * 0.14, h: m.muroH * 0.5 };
-            return { w: m.torreW * 0.7, h: Math.min(m.torreW * 0.9, m.torreH * 0.36) };
+            var m = this.mapaFondo();
+            var t = this.torreDe(zona);
+            if (m) return { w: t.vw * m.esc, h: t.vh * m.esc };
+            var me = this.medidas();
+            return { w: me.ancho * 0.12, h: me.muroH * 0.5 };
         },
 
         /** Media ventana de arco (k = 0 izquierda, 1 derecha), con el centro en (0, 0). */
-        hojaArco: function (g, t, k) {
+        hojaArco: function (g, t, k, dx) {
             var r = t.w / 2;
             var cy = -t.h / 2 + r;
+            dx = dx || 0;
             g.beginPath();
             if (!k) {
-                g.moveTo(-r, t.h / 2);
-                g.lineTo(-r, cy);
-                g.arc(0, cy, r, Math.PI, Math.PI * 1.5, false);
-                g.lineTo(0, t.h / 2);
+                g.moveTo(dx - r, t.h / 2);
+                g.lineTo(dx - r, cy);
+                g.arc(dx, cy, r, Math.PI, Math.PI * 1.5, false);
+                g.lineTo(dx, t.h / 2);
             } else {
-                g.moveTo(0, t.h / 2);
-                g.lineTo(0, -t.h / 2);
-                g.arc(0, cy, r, Math.PI * 1.5, Math.PI * 2, false);
-                g.lineTo(r, t.h / 2);
+                g.moveTo(dx, t.h / 2);
+                g.lineTo(dx, -t.h / 2);
+                g.arc(dx, cy, r, Math.PI * 1.5, Math.PI * 2, false);
+                g.lineTo(dx + r, t.h / 2);
             }
             g.closePath();
         },
@@ -528,6 +790,9 @@
                 var izq = scene.add.graphics();
                 var der = scene.add.graphics();
                 cont.add([fondo, luz, marco]);
+                // Sin arte son las hojas de madera y van DELANTE del músico (4).
+                // Con el arte del diseño pintan el interior del torreón, así que
+                // van DETRÁS (2.5): el instrumento se ve recortado sobre ellas.
                 var postigos = scene.add.container(0, 0).setDepth(4);
                 postigos.add([izq, der]);
                 scene.ventanas.push({ zona: z, i: i, cont: cont, fondo: fondo, marco: marco, luz: luz, izq: izq, der: der, postigos: postigos, cerrada: false, ocupante: null, abriendo: 0, resaltada: false });
@@ -544,27 +809,86 @@
             v.h = t.h;
             v.cont.setPosition(p.x, p.y);
             v.postigos.setPosition(p.x, p.y);
+            var conArte = !!this.mapaFondo();
+            // La profundidad depende de si hay arte, y al crearse puede no haberlo aún.
+            v.postigos.setDepth(4);
             v.fondo.clear();
-            v.fondo.fillStyle(0x343a40, 1);
-            v.fondo.fillRoundedRect(-t.w / 2, -t.h / 2, t.w, t.h, { tl: t.w / 2, tr: t.w / 2, bl: 4, br: 4 });
-            v.luz.setSize(t.w - 8, t.h - 8);
             v.marco.clear();
-            v.marco.lineStyle(6, 0x868e96, 1);
-            v.marco.strokeRoundedRect(-t.w / 2, -t.h / 2, t.w, t.h, { tl: t.w / 2, tr: t.w / 2, bl: 4, br: 4 });
-            v.marco.fillStyle(0x868e96, 1);
-            v.marco.fillRect(-t.w / 2 - 8, t.h / 2 - 2, t.w + 16, 10);
-            // Postigos: dos hojas de madera con la forma del arco, que giran sobre sus bisagras.
+            if (conArte) {
+                // Detrás del portón: el interior del torreón (piedra en penumbra).
+                // Se ve cuando las hojas de madera se abren.
+                v.fondo.setVisible(true);
+                v.marco.setVisible(false);
+                v.fondo.fillStyle(0x3b2d22, 1);
+                this.hojaArco(v.fondo, t, 0);
+                v.fondo.fillPath();
+                this.hojaArco(v.fondo, t, 1);
+                v.fondo.fillPath();
+            } else {
+                v.fondo.setVisible(true);
+                v.marco.setVisible(true);
+                v.fondo.fillStyle(0x343a40, 1);
+                v.fondo.fillRoundedRect(-t.w / 2, -t.h / 2, t.w, t.h, { tl: t.w / 2, tr: t.w / 2, bl: 4, br: 4 });
+                v.marco.lineStyle(6, 0x868e96, 1);
+                v.marco.strokeRoundedRect(-t.w / 2, -t.h / 2, t.w, t.h, { tl: t.w / 2, tr: t.w / 2, bl: 4, br: 4 });
+                v.marco.fillStyle(0x868e96, 1);
+                v.marco.fillRect(-t.w / 2 - 8, t.h / 2 - 2, t.w + 16, 10);
+            }
+            v.luz.setSize(t.w - 8, t.h - 8);
+            // Postigos: dos hojas con la forma del arco, que giran sobre sus bisagras.
+            // Sobre el arte van del color del portón del dibujo, para que al cerrarse
+            // la ventana parezca la misma madera del castillo.
             var scene = this;
             var r = t.w / 2;
             var cyArco = -t.h / 2 + r;
+            var maderaHoja = 0xb7793f;
+            var maderaRaya = 0x8a5a2b;
+            var maderaBorde = 0x7f4f24;
+            if (conArte) {
+                // Dos hojas de madera calcadas del portón del dibujo (mismos colores,
+                // barrotes y travesaño). Cada gráfico se coloca en su jamba (la
+                // bisagra) y la hoja se dibuja desde ahí hacia el centro: con scaleX 1
+                // tapa su mitad del arco; con scaleX negativo gira y queda abierta
+                // hacia afuera, sobre la piedra, como un postigo de verdad.
+                [v.izq, v.der].forEach(function (g, k) {
+                    var lado = k ? 1 : -1;
+                    var dx = -lado * r;
+                    g.clear();
+                    g.fillStyle(0xb3531d, 1);
+                    scene.hojaArco(g, t, k, dx);
+                    g.fillPath();
+                    // Sombra junto a la bisagra.
+                    var sombra = r * 0.22;
+                    g.fillStyle(0xa3481b, 1);
+                    g.fillRect(k ? -sombra : 0, cyArco, sombra, t.h / 2 - cyArco);
+                    // Travesaño.
+                    g.fillStyle(0x8e3511, 1);
+                    var yT = -t.h / 2 + t.h * 0.32;
+                    g.fillRect(k ? -r : 0, yT - 3, r, 6);
+                    // Barrotes verticales oscuros, hasta la curva del arco.
+                    g.lineStyle(Math.max(2, r * 0.08), 0x543420, 1);
+                    [0.36, 0.72].forEach(function (f) {
+                        var xl = -lado * r * f;              // desde la bisagra
+                        var xc = r * (1 - f);                // distancia al centro del arco
+                        var arriba = cyArco - Math.sqrt(Math.max(0, r * r - xc * xc));
+                        g.lineBetween(xl, arriba + 3, xl, t.h / 2 - 2);
+                    });
+                    g.lineStyle(2, 0x5b3a23, 1);
+                    scene.hojaArco(g, t, k, dx);
+                    g.strokePath();
+                    g.x = lado * r;
+                    g.scaleX = v.cerrada ? 1 : -0.32;
+                });
+                return;
+            }
             [v.izq, v.der].forEach(function (g, k) {
                 var lado = k ? 1 : -1;
                 g.clear();
-                g.fillStyle(0xb7793f, 1);
+                g.fillStyle(maderaHoja, 1);
                 scene.hojaArco(g, t, k);
                 g.fillPath();
                 // Tablas verticales (hasta la curva del arco).
-                g.lineStyle(2, 0x8a5a2b, 1);
+                g.lineStyle(2, maderaRaya, 1);
                 for (var q = 1; q < 3; q++) {
                     var x = lado * r * (q / 3);
                     var arriba = cyArco - Math.sqrt(Math.max(0, r * r - x * x));
@@ -579,7 +903,7 @@
                 });
                 g.fillStyle(0xfcc419, 1);
                 g.fillCircle(lado * 6, t.h * 0.1, Math.max(3, r * 0.08));
-                g.lineStyle(3, 0x7f4f24, 1);
+                g.lineStyle(3, maderaBorde, 1);
                 scene.hojaArco(g, t, k);
                 g.strokePath();
             });
@@ -600,8 +924,15 @@
         postigar: function (v, cerrar, ms) {
             v.cerrada = cerrar;
             var t = this.tamVentana(v.zona);
-            var dur = reducido() ? 1 : (ms || 260);
-            // Hoja izquierda: gira sobre su borde izquierdo; derecha: sobre su borde derecho.
+            var dur = reducido() ? 1 : (ms || 420);
+            if (this.mapaFondo()) {
+                // Las hojas giran sobre la bisagra de su jamba: cerradas tapan el arco
+                // (scaleX 1); abiertas quedan plegadas hacia afuera sobre la piedra.
+                this.tweens.killTweensOf([v.izq, v.der]);
+                this.tweens.add({ targets: [v.izq, v.der], scaleX: cerrar ? 1 : -0.32, duration: dur, ease: cerrar ? 'Sine.easeIn' : 'Back.easeOut' });
+                return;
+            }
+            // Sin arte: las hojas se cierran sobre el hueco hacia su bisagra.
             this.tweens.add({ targets: v.izq, scaleX: cerrar ? 1 : 0.08, x: cerrar ? 0 : -t.w / 2 * 0.92, duration: dur });
             this.tweens.add({ targets: v.der, scaleX: cerrar ? 1 : 0.08, x: cerrar ? 0 : t.w / 2 * 0.92, duration: dur });
         },
@@ -618,12 +949,25 @@
 
         sentarEn: function (mu, v, sinMover) {
             var t = this.tamVentana(v.zona);
-            var caja = Math.min(t.w, t.h) * 0.82;
+            // Sobre el arte el arco es alto y angosto: el instrumento se mide por el
+            // ancho del arco y se apoya cerca de su alféizar.
+            var conArte = !!this.mapaFondo();
+            var caja = conArte ? t.w * 0.84 : Math.min(t.w, t.h) * 0.82;
             mu.esc = Math.min(caja / (mu.img.width || 1), caja / (mu.img.height || 1));
             mu.img.setScale(mu.esc);
             mu.ventana = v;
             v.ocupante = mu.id;
-            if (sinMover !== false) mu.img.setPosition(v.x, v.y + t.h * 0.08);
+            if (sinMover !== false) {
+                if (conArte) {
+                    // Se apoya en el alféizar del arco, dentro del hueco.
+                    var m = this.mapaFondo();
+                    var tr = this.torreDe(v.zona);
+                    var alto = (mu.img.height || 1) * mu.esc;
+                    mu.img.setPosition(v.x, m.sy(tr.sy) - alto / 2 - 4 * m.esc);
+                } else {
+                    mu.img.setPosition(v.x, v.y + t.h * 0.08);
+                }
+            }
         },
 
         prepararRonda: function (o) {
@@ -647,13 +991,14 @@
             // Primero se cierran, se reparten adentro y luego se abren (o no, según el modo).
             this.ventanas.forEach(function (v) { scene.postigar(v, true, 200); });
             return esperar(this, 260).then(function () {
+                var abrir = scene.modo === 'abiertas' || scene.modo === 'cambio';
                 ids.forEach(function (id, n) {
                     var mu = scene.crearMusico(id);
+                    scene.tweens.killTweensOf(mu.img);
                     mu.img.setVisible(true).clearTint().setAlpha(1);
                     mu.img.angle = 0;
                     scene.sentarEn(mu, scene.ventanas[orden[n]]);
                 });
-                var abrir = scene.modo === 'abiertas' || scene.modo === 'cambio';
                 if (abrir) {
                     scene.ventanas.forEach(function (v, i) { scene.time.delayedCall(i * 150, function () { sfx('pop'); scene.postigar(v, false); }); });
                 }
@@ -744,9 +1089,14 @@
                 pj.lineBetween(x - 10, y - ala, x, y);
                 pj.lineBetween(x, y, x + 10, y - ala);
             });
-            // Agua del foso con ondas que se mueven.
+            // Agua del foso con ondas que se mueven (solo en el castillo dibujado:
+            // el arte del diseño no tiene foso).
+            var conArte = !!this.mapaFondo();
             var m = this.medidas();
             var ag = this.agua;
+            if (conArte) {
+                if (ag.visible) ag.clear().setVisible(false);
+            } else {
             ag.clear();
             var y0 = m.base;
             var alto = h * 0.05;
@@ -759,6 +1109,7 @@
                 var ox = m.izq - 20 + ((o * (m.ancho + 40)) / 9 + (quieto ? 0 : time / 40)) % (m.ancho + 40);
                 ag.lineBetween(ox, y0 + alto * 0.6, ox + 16, y0 + alto * 0.6);
             }
+            }
             // Llamas que titilan; de noche iluminan más.
             this.antorchas.forEach(function (a, i) {
                 var f = quieto ? 1 : 1 + 0.12 * Math.sin(time / 90 + i * 2) + 0.06 * Math.sin(time / 37 + i);
@@ -770,7 +1121,11 @@
                 if (v.resaltada) v.luz.fillAlpha = 0.35 + 0.3 * Math.sin(time / 140);
                 else if (!v.encendida) v.luz.fillAlpha = 0;
             });
-            this.banderas.forEach(function (b, k) { b.bandera.scaleX = 0.85 + 0.15 * Math.sin(time / 180 + k); });
+            // Las banderas del diseño ondean con su propio tween (ondearBandera):
+            // aquí solo se mece el triángulo de respaldo, que no lo tiene.
+            this.banderas.forEach(function (b, k) {
+                if (!b.ondeando && !b.bandera.escBase) b.bandera.scaleX = 0.85 + 0.15 * Math.sin(time / 180 + k);
+            });
             Object.keys(this.musicos).forEach(function (id) {
                 var mu = scene.musicos[id];
                 if (scene.jugando && mu.img.visible && !reducido() && mu.ventana && !mu.saltando) mu.img.angle = Math.sin(time / 500 + id.length) * 3;
@@ -855,30 +1210,108 @@
             return esperar(this, 1300).then(function () { v.encendida = false; scene.tweens.add({ targets: v.luz, fillAlpha: 0, duration: 300 }); });
         },
 
+        /** Punta del mástil de la torre k (sobre el dibujo si ya cargó). */
+        puntaDe: function (k) {
+            var m = this.mapaFondo();
+            if (m) {
+                var t = TORRES[k % TORRES.length];
+                return { x: m.sx(t.px), y: m.sy(t.py) };
+            }
+            return this.puntas && this.puntas[k % this.puntas.length];
+        },
+
+        /** Alto del mástil, proporcional al dibujo. */
+        altoMastil: function () {
+            var m = this.mapaFondo();
+            return m ? 52 * m.esc : this.scale.height * 0.055;
+        },
+
+        /** Escala de la bandera: su largo total cabe sobre la torre. */
+        escalaBandera: function (img) {
+            var m = this.mapaFondo();
+            // La textura puede venir rasterizada a otra resolución que el lienzo 500.
+            var k = (img.width || 500) / 500;
+            var destino = m ? BANDERA_ANCHO * m.esc : this.scale.width * 0.09;
+            return destino / (BANDERA_UTIL.w * k);
+        },
+
         /** Una bandera sube por el mástil de la torre que toca. */
         izarBandera: function () {
             var scene = this;
             var k = this.banderas.length;
-            var p = this.puntas[k % this.puntas.length];
-            var m = this.medidas();
-            var alto = m.h * 0.09;
-            var c = this.add.container(p.x, p.y).setDepth(-8);
-            var mastil = this.add.rectangle(0, 0, 4, alto, 0x495057).setOrigin(0.5, 1);
-            var bandera = this.add.triangle(2, -alto * 0.15, 0, 0, alto * 0.6, alto * 0.2, 0, alto * 0.4, BANDERAS[k % BANDERAS.length]).setOrigin(0, 1);
-            c.add([mastil, bandera]);
+            var p = this.puntaDe(k);
+            if (!p) return Promise.resolve();
+            var alto = this.altoMastil();
+            var c = this.add.container(p.x, p.y).setDepth(2.5);
+            // Bandera del diseño (trae su propia asta), del color del techo de su torre.
+            var key = texEscena('bandera:' + (k % TORRES.length));
+            var bandera;
+            if (this.textures.exists(key)) {
+                bandera = this.add.image(0, 0, key);
+                bandera.escBase = this.escalaBandera(bandera);
+                bandera.setScale(bandera.escBase);
+                // Ancla el pie del asta en la punta del techo de la torre.
+                bandera.setOrigin(BANDERA_UTIL.astaX / 500, BANDERA_UTIL.astaY / 500);
+            } else {
+                var mastil = this.add.rectangle(0, 0, Math.max(3, alto * 0.045), alto, 0x6b4a2a).setOrigin(0.5, 1);
+                c.add(mastil);
+                c.mastil = mastil;
+                bandera = this.add.triangle(2, 0, 0, 0, alto * 0.6, alto * 0.2, 0, alto * 0.4,
+                    BANDERAS[k % BANDERAS.length]).setOrigin(0, 1);
+            }
+            c.add(bandera);
             c.bandera = bandera;
+            c.torre = k % TORRES.length;
             this.banderas.push(c);
-            bandera.y = 0;
+            // Sube desde dentro de la torre hasta quedar sobre su punta.
+            var subida = alto * 0.9;
+            c.y = p.y + subida;
+            c.setAlpha(0);
             return new Promise(function (resolve) {
                 sfx('magia');
+                scene.tweens.add({ targets: c, alpha: 1, duration: reducido() ? 1 : 260 });
                 scene.tweens.add({
-                    targets: bandera, y: -alto * 0.6, duration: reducido() ? 1 : 900, ease: 'Sine.easeOut',
+                    targets: c, y: p.y, duration: reducido() ? 1 : 900, ease: 'Back.easeOut',
                     onComplete: function () {
                         sfx('ding');
-                        scene.chispas(p.x, p.y - alto * 0.7, 8);
+                        scene.chispas(p.x, p.y - alto * 0.8, 8);
+                        scene.ondearBandera(c);
                         resolve();
                     }
                 });
+            });
+        },
+
+        /** La bandera ondea despacio una vez izada. */
+        ondearBandera: function (c) {
+            if (reducido() || !c || !c.bandera || c.ondeando) return;
+            c.ondeando = true;
+            var base = c.bandera.escBase || c.bandera.scaleX;
+            c.bandera.setScale(base);
+            this.tweens.add({
+                targets: c.bandera, scaleX: base * 0.92,
+                duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut'
+            });
+        },
+
+        /** Al cambiar de tamaño, las banderas vuelven a su torre. */
+        reubicarBanderas: function () {
+            var scene = this;
+            var alto = this.altoMastil();
+            this.banderas.forEach(function (c, k) {
+                var p = scene.puntaDe(c.torre != null ? c.torre : k);
+                if (!p) return;
+                c.setPosition(p.x, p.y);
+                if (c.mastil) c.mastil.setSize(Math.max(3, alto * 0.045), alto);
+                if (c.bandera && c.bandera.setOrigin && scene.textures.exists(texEscena('bandera:0'))) {
+                    c.bandera.escBase = scene.escalaBandera(c.bandera);
+                    c.bandera.setScale(c.bandera.escBase);
+                    if (c.ondeando) {
+                        scene.tweens.killTweensOf(c.bandera);
+                        c.ondeando = false;
+                        scene.ondearBandera(c);
+                    }
+                }
             });
         },
 
@@ -969,7 +1402,7 @@
             };
         },
 
-        /** Izquierda o derecha según la ventana (las de abajo suenan un poco más al centro). */
+        /** De dónde viene el sonido: izquierda o derecha según la torre. */
         panDe: function (id) {
             var v = this.ventanaDe(id);
             if (!v) return 0;
@@ -997,13 +1430,22 @@
             if (elems[id].img) lista.push({ key: tex(id), src: elems[id].img });
         });
         lista = lista.filter(function (t) { return !scene.textures.exists(t.key); });
-        if (!lista.length) return Promise.resolve();
+        var faltaEscena = !scene.textures.exists(texEscena('fondo'));
+        if (!lista.length && !faltaEscena) {
+            if (scene.decidirArte) scene.decidirArte();
+            return Promise.resolve();
+        }
         return new Promise(function (resolve) {
             lista.forEach(function (t) {
                 if (/\.svg(\?|$)/i.test(t.src)) scene.load.svg(t.key, t.src, { scale: 2 });
                 else scene.load.image(t.key, t.src);
             });
-            scene.load.once('complete', resolve);
+            if (faltaEscena) encolarEscena(scene.load);
+            scene.load.once('complete', function () {
+                // Cargue o falle el arte, aquí se resuelve qué castillo se ve.
+                if (scene.decidirArte) scene.decidirArte();
+                resolve();
+            });
             scene.load.start();
         });
     }

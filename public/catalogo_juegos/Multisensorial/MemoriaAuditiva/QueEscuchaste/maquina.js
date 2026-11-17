@@ -41,7 +41,64 @@
     /** Distancia del pivote de las pinzas (centro del carrito, donde termina el cable) al origen del gancho. */
     var PIVOTE = 46;
 
+    /**
+     * Arte del diseñador (img/diseno): máquina de peluches de 1280×720. Todas las medidas están en unidades del
+     * dibujo; mapaFondo() las lleva a la pantalla. Si el dibujo no carga, queda la máquina dibujada a mano.
+     */
+    var ARTE = {
+        dir: 'img/diseno/', fw: 1280, fh: 720, util: 1100,
+        maq: { x: 648, y: 359, w: 891, h: 680 },
+        cristal: { x: 649, y: 353, w: 700, h: 315 },
+        piso: 475, riel: 214, tam: 112,
+        salida: { x: 380, y: 445, w: 115, h: 123 },
+        premio: { x: 375, y: 613, w: 150, h: 64 },
+        panel: { y: 614, h: 100 },
+        joy: { x: 669, y: 575, r: 50, px: 669, py: 597 },
+        flechaL: { x: 568, y: 611, r: 37 }, flechaR: { x: 781, y: 611, r: 37 },
+        btn: { x: 966, y: 597, r: 48 },
+        altavoz: { x: 1038, y: 147, r: 35 }, bocina: { x: 262, y: 146 },
+        vit: { x: 100, y0: 140, y1: 660, s: 108, w: 170 },
+        luces: { xs: [244, 1056], ys: [235, 315, 395, 475] },
+        toldo: { x0: 352, x1: 925, y: 142, n: 9 },
+        pared: 453
+    };
+    /** Juguetes del montón (peluches.svg partido en piezas). Se descartan los que son elementos del juego. */
+    var PIEZAS = [
+        { i: 2, x: 0, y: 0, w: 103.6, h: 138.6 }, { i: 3, x: 200, y: 0, w: 182.3, h: 122.7 },
+        { i: 7, x: 400, y: 0, w: 158.8, h: 211.5 }, { i: 8, x: 0, y: 220, w: 143.5, h: 199.1 },
+        { i: 9, x: 200, y: 220, w: 110.9, h: 180.1 }, { i: 10, x: 400, y: 220, w: 163.6, h: 130.6 },
+        { i: 11, x: 0, y: 440, w: 160.1, h: 158.2 }, { i: 14, x: 200, y: 440, w: 142, h: 145.6 },
+        { i: 16, x: 400, y: 440, w: 182.3, h: 122.7 }
+    ];
+    /** Hoja única (juguetes.svg, 600×880 u. dibujada al doble): los juguetes y la varilla de la palanca (0,660,60,100). */
+    var HOJA = { clave: 'mq_juguetes', archivo: 'juguetes.svg', ancho: 1200, alto: 1760, esc: 2 };
+
     var escena = {
+        precargar: function () {
+            var self = this;
+            var svg = function (k, f, w, h) { if (!self.textures.exists(k)) self.load.svg(k, ARTE.dir + f, { width: w, height: h }); };
+            svg('mq_fondo', 'fondo.svg', 1920, 1080);
+            svg(HOJA.clave, HOJA.archivo, HOJA.ancho, HOJA.alto);
+        },
+
+        /** Recorta de la hoja de juguetes el cuadro `nombre` (una sola vez). */
+        marco: function (nombre, x, y, w, h) {
+            var tx = this.textures.get(HOJA.clave);
+            if (tx && !tx.has(nombre)) tx.add(nombre, 0, Math.round(x * HOJA.esc), Math.round(y * HOJA.esc), Math.round(w * HOJA.esc), Math.round(h * HOJA.esc));
+            return nombre;
+        },
+
+        /** Encaje del dibujo: se ajusta entero y anclado abajo; se ve entero. */
+        mapaFondo: function () {
+            if (!this.textures.exists('mq_fondo')) return null;
+            var W = this.scale.width, H = this.scale.height;
+            // Se ve el dibujo entero (sin recortar los costados); lo que sobra se rellena con pared y piso.
+            var k = Math.min(W / ARTE.fw, H / ARTE.fh);
+            var ox = (W - ARTE.fw * k) / 2;
+            var oy = H - ARTE.fh * k;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.ganados = [];
@@ -110,6 +167,27 @@
             var vs = Math.min(libre * 0.78, (vy1 - vy0) / 4 * 0.82);
             // (El mueble suma 8 px de marco a cada lado: no debe tocar la máquina ni salirse de la pantalla.)
             L.vitrina = vs >= 56 ? { x: libre / 2 + 2, y0: vy0, y1: vy1, s: vs, n: 4, w: Math.min(libre - 28, vs * 1.3) } : null;
+            var F = this.mapaFondo();
+            if (F) {
+                var A = ARTE, k = F.k;
+                var pt = function (o) {
+                    var q = { x: F.sx(o.x), y: F.sy(o.y) };
+                    if (o.w != null) { q.w = o.w * k; q.h = o.h * k; }
+                    if (o.r != null) q.r = o.r * k;
+                    return q;
+                };
+                L.arte = true; L.F = F;
+                L.maq = pt(A.maq); L.cristal = pt(A.cristal);
+                L.panel = { y: F.sy(A.panel.y), h: A.panel.h * k };
+                L.salida = pt(A.salida); L.premio = pt(A.premio);
+                L.joy = pt(A.joy); L.joy.px = F.sx(A.joy.px); L.joy.py = F.sy(A.joy.py);
+                L.flechaL = pt(A.flechaL); L.flechaR = pt(A.flechaR); L.btn = pt(A.btn);
+                L.rielY = F.sy(A.riel); L.pisoY = F.sy(A.piso);
+                L.tam = A.tam * k;
+                L.bocina = { x: F.sx(A.bocina.x), y: F.sy(A.bocina.y), r: Math.max(26, Math.min(34, 28 * k)) };
+                L.altavoz = pt(A.altavoz);
+                L.vitrina = { x: F.sx(A.vit.x), y0: F.sy(A.vit.y0), y1: F.sy(A.vit.y1), s: A.vit.s * k, n: 4, w: A.vit.w * k };
+            }
             return L;
         },
 
@@ -188,6 +266,7 @@
             this.huecos = [];
             if (!V) return;
             var self = this;
+            if (this.L.arte) { this.montarHuecos(keep); return; }
             var x0 = V.x - V.w / 2, top = V.y0 - 30, alto = V.y1 - V.y0 + 44;
             var g = keep(this.add.graphics().setDepth(3));
             // Mueble de madera con fondo oscuro de exhibición.
@@ -289,6 +368,7 @@
 
         montarMall: function (keep) {
             var L = this.L;
+            if (L.arte) { this.montarEscenaArte(keep); return; }
             K.textura(this, 'maq_mall', L.W, L.H, function (x, w, h) {
                 var cielo = x.createLinearGradient(0, 0, 0, h);
                 cielo.addColorStop(0, '#1b3a5f');
@@ -383,11 +463,135 @@
             this.sombraMaq = sombra;
         },
 
+        /* ── Escena con el arte del diseñador ── */
+
+        montarEscenaArte: function (keep) {
+            var L = this.L, F = L.F;
+            var yp = F.sy(ARTE.pared);
+            // Pared y piso: cubren lo que el dibujo no alcanza (franjas en pantallas más anchas o altas).
+            keep(this.add.rectangle(0, Math.min(0, F.oy), L.W, yp - Math.min(0, F.oy), 0x07142f).setOrigin(0, 0).setDepth(-1));
+            keep(this.add.rectangle(0, yp, L.W, Math.max(0, L.H - yp), 0xe2b27f).setOrigin(0, 0).setDepth(-1));
+            keep(this.add.image(F.ox, F.oy, 'mq_fondo').setOrigin(0, 0).setDisplaySize(ARTE.fw * F.k, ARTE.fh * F.k).setDepth(0));
+        },
+
+        /** Bombillas y luces del toldo: ya están dibujadas; aquí solo se les suma el brillo que late con el sonido. */
+        montarLucesArte: function (keep) {
+            var self = this, L = this.L, F = L.F, k = F.k;
+            this.luces = [];
+            this.marquee = [];
+            ARTE.luces.xs.forEach(function (x) {
+                ARTE.luces.ys.forEach(function (y) {
+                    var px = F.sx(x), py = F.sy(y);
+                    var halo = keep(self.add.circle(px, py, 17 * k, 0xffe066, 0.25).setDepth(15).setBlendMode('ADD'));
+                    var bulb = keep(self.add.circle(px, py, 8 * k, 0x806000, 1).setDepth(15).setBlendMode('ADD'));
+                    self.luces.push(bulb);
+                    self.luces.push(halo);
+                });
+            });
+            var T = ARTE.toldo;
+            for (var s = 0; s < T.n; s++) {
+                var sx = F.sx(T.x0 + (s + 0.5) * (T.x1 - T.x0) / T.n);
+                this.marquee.push(keep(this.add.star(sx, F.sy(T.y), 5, 3 * k, 8 * k, 0xffe066).setDepth(15)));
+            }
+        },
+
+        /** Flechas, palanca y botón: el dibujo los trae; se les agrega el movimiento (palanca) y los destellos. */
+        montarControlesArte: function (keep) {
+            var self = this, L = this.L, F = L.F, k = F.k;
+            this.ledsPanel = [];
+            var flecha = function (Q, dir) {
+                var c = keep(self.add.container(Q.x, Q.y).setDepth(17));
+                var glow = self.add.circle(0, 0, Q.r * 1.02, 0xfff3bf, 1).setBlendMode('ADD').setAlpha(0);
+                c.add(glow);
+                c.glow = glow;
+                c.dir = dir;
+                c.r = Q.r;
+                c.tapa = self.add.container(0, 0);
+                c.add(c.tapa);
+                return c;
+            };
+            this.btnIzq = flecha(L.flechaL, -1);
+            this.btnDer = flecha(L.flechaR, 1);
+            // La palanca (varilla y bola) se quitó del fondo para que pueda inclinarse.
+            this.palanca = keep(this.add.image(L.joy.px, L.joy.py, HOJA.clave, this.marco('mq_palanca', 0, 660, 60, 100)).setOrigin(29 / 60, 92 / 100)
+                .setDisplaySize(60 * k, 100 * k).setDepth(18));
+            this.joyG = this.palanca;
+            this.joyVis = 0;
+            this.joyObjetivo = 0;
+            var B = L.btn;
+            this.btnHalo = keep(this.add.circle(B.x, B.y, B.r * 1.22).setStrokeStyle(Math.max(4, 6 * k), 0x69db7c, 1).setDepth(17));
+            this.btnGrab = keep(this.add.container(B.x, B.y).setDepth(18));
+            this.btnGrab.tapa = this.add.container(0, 0);
+            this.btnGrab.add(this.btnGrab.tapa);
+            this.btnFlash = keep(this.add.circle(B.x, B.y, B.r * 0.92, 0xffffff, 1).setAlpha(0).setDepth(18).setBlendMode('ADD'));
+        },
+
+        /** Repisas de la vitrina: el mueble es del dibujo; solo quedan los huecos punteados que se apagan al llegar el premio. */
+        montarHuecos: function (keep) {
+            var V = this.L.vitrina, self = this;
+            this.huecos = [];
+            for (var k = 0; k < V.n; k++) {
+                var q = this.slotVitrina(k);
+                var h = keep(this.add.graphics().setDepth(3.2));
+                var r = V.s * 0.36;
+                for (var a = 0; a < 12; a++) {
+                    var a0 = a / 12 * Math.PI * 2;
+                    h.lineStyle(3, 0xffffff, 0.45);
+                    h.beginPath();
+                    h.arc(q.x, q.y, r, a0, a0 + Math.PI / 12);
+                    h.strokePath();
+                }
+                h.fillStyle(0xffffff, 0.2);
+                h.fillPoints(this.puntosEstrella(q.x, q.y, r * 0.42, r * 0.18), true);
+                this.huecos.push(h);
+            }
+            this.ganados.forEach(function (a, n) {
+                var hk = self.huecos[n % V.n];
+                if (hk) hk.setVisible(false);
+            });
+        },
+
+        /**
+         * El montón de juguetes del diseñador (dinosaurios, barcos, cohete, nave, aros) en tres filas pegadas al piso.
+         * Ninguno es un elemento del juego. Si el gancho agarra uno, se le resbala (no cuenta como error).
+         */
+        sembrarJuguetes: function (keep) {
+            var self = this, L = this.L, C = L.cristal, S = L.salida, k = L.F.k;
+            if (!this.textures.exists(HOJA.clave)) return;
+            var piezas = PIEZAS;
+            var PM = global.PelucheMaq;
+            var rnd2 = PM ? PM.generador(20261117) : Math.random;
+            var tamR = L.tam * 0.72;
+            var x0 = S.x + S.w / 2 + tamR * 0.2, x1 = C.x + C.w * 0.47 - tamR * 0.2;
+            var filas = [
+                { b: -9, prof: 10.4, esc: 0.84, paso: 0.62, sombra: true },
+                { b: 13, prof: 10.8, esc: 0.92, paso: 0.7 },
+                { b: 36, prof: 12.6, esc: 0.7, paso: 0.74 }
+            ];
+            var idx = 0;
+            filas.forEach(function (f, fi) {
+                var paso = tamR * f.paso;
+                for (var x = x0 + (fi % 2) * paso * 0.5; x <= x1; x += paso * (0.85 + rnd2() * 0.3)) {
+                    idx = (idx + 1 + Math.floor(rnd2() * 3)) % piezas.length;
+                    var q = piezas[idx];
+                    var img = keep(self.add.image(x, 0, HOJA.clave, self.marco('mq_rel_' + q.i, q.x, q.y, q.w, q.h)));
+                    var t = tamR * f.esc * (0.85 + rnd2() * 0.3);
+                    var sc = t / Math.max(img.width, img.height);
+                    img.setScale(sc).setFlipX(rnd2() < 0.5);
+                    var y = L.pisoY + f.b * k - img.displayHeight / 2;
+                    img.setPosition(x, y).setAngle((rnd2() - 0.5) * 16).setDepth(f.prof + rnd2() * 0.1);
+                    if (f.sombra) img.setTint(0xcfcfe0);
+                    self.rellenos.push({ cont: img, tam: t, x0: img.x, y0: img.y, a0: img.angle, prof: img.depth, relleno: true });
+                }
+            });
+        },
+
         /* ── Gabinete ── */
 
         montarMaquina: function (keep) {
             var self = this;
             var L = this.L, M = L.maq, C = L.cristal;
+            if (L.arte) { this.montarLucesArte(keep); return; }
 
             K.textura(this, 'maq_cuerpo', Math.ceil(M.w + 60), Math.ceil(M.h + 60), function (x, w, h) {
                 // Sombra interna / volumen.
@@ -525,6 +729,7 @@
 
         montarControles: function (keep) {
             var L = this.L, M = L.maq;
+            if (L.arte) { this.montarControlesArte(keep); return; }
             var px = M.x - M.w * 0.36, pw = M.w * 0.72, py = L.panel.y - L.panel.h * 0.48, ph = L.panel.h;
             var panel = keep(this.add.graphics().setDepth(16));
             // Consola: borde oscuro, cara azul con brillo de metal y filo cromado.
@@ -625,6 +830,7 @@
         dibujarJoy: function (t) {
             var g = this.joyG, J = this.L.joy;
             if (!g) return;
+            if (this.palanca) { this.palanca.setRotation(t * 0.55); return; }
             var r = J.r;
             var bx = J.x + t * r * 0.78;
             var by = J.y - r * 1.02 + Math.abs(t) * r * 0.2;
@@ -934,6 +1140,7 @@
         sembrarRellenos: function (keep) {
             var self = this, PM = global.PelucheMaq;
             this.rellenos = [];
+            if (this.L.arte) { this.sembrarJuguetes(keep); return; }
             if (!PM) return;
             var L = this.L, C = L.cristal, S = L.salida;
             var cols = [0xffa8a8, 0x91a7ff, 0xffd8a8, 0xb2f2bb, 0xd0bfff, 0x99e9f2, 0xfcc2d7, 0xffe066];
@@ -1053,6 +1260,18 @@
 
         montarAltavoz: function (keep) {
             var A = this.L.altavoz;
+            if (this.L.arte) {
+                // El altavoz ya está en el dibujo: solo se le suma el latido (cono oscuro y ondas).
+                var ca = keep(this.add.container(A.x, A.y).setDepth(80));
+                var co = this.add.circle(0, 0, A.r * 0.5, 0x120f3a, 0.45);
+                var ta = this.add.circle(0, 0, A.r * 0.2, 0xffe066, 0);
+                ca.add([co, ta]);
+                ca.cono = co;
+                ca.tapa = ta;
+                this.altavoz = ca;
+                this.altavozG = keep(this.add.graphics().setDepth(79));
+                return;
+            }
             var c = keep(this.add.container(A.x, A.y).setDepth(80));
             var aro = this.add.circle(0, 0, A.r, 0x212529).setStrokeStyle(5, 0xffe066);
             var cono = this.add.circle(0, 0, A.r * 0.74, 0x495057);
@@ -1168,7 +1387,7 @@
             var tam = this.tamOpciones(n);
             var x0 = L.salida.x + L.salida.w / 2 + 6 + tam * 0.5;
             var x1 = L.cristal.x + L.cristal.w * 0.42 - tam * 0.5;
-            var y = L.pisoY - L.tam * 0.22;
+            var y = L.pisoY - L.tam * (L.arte ? 0.46 : 0.22);
             for (var i = 0; i < n; i++) {
                 var t = n === 1 ? 0.5 : i / (n - 1);
                 out.push({ x: x0 + (x1 - x0) * t, y: y });
@@ -1373,6 +1592,11 @@
         /** Botón de flecha hundido (on) o arriba; mientras está hundido la palanca se inclina igual. */
         iluminarFlecha: function (btn, on) {
             if (!btn || !btn.tapa) return;
+            if (btn.glow) {
+                btn.glow.setAlpha(on ? 0.5 : 0);
+                if (on) this.joyObjetivo = btn.dir * 0.85;
+                return;
+            }
             btn.tapa.y = on ? btn.r * 0.12 : 0;
             btn.top.setFillStyle(on ? 0xffe066 : 0xffd43b);
             if (on) this.joyObjetivo = btn.dir * 0.85;
@@ -1416,6 +1640,11 @@
                 this.tweens.add({ targets: t, y: r * 0.14, duration: 70, yoyo: true, hold: 90, ease: 'Quad.easeOut' });
             }
             if (this.btnHalo) this.tweens.add({ targets: this.btnHalo, scale: 1.25, alpha: 0.7, duration: 90, yoyo: true });
+            if (this.btnFlash) {
+                this.tweens.killTweensOf(this.btnFlash);
+                this.btnFlash.setAlpha(0.55);
+                this.tweens.add({ targets: this.btnFlash, alpha: 0, duration: 280 });
+            }
             ruidoMaq('boton', function () { K.ruido({ f: 1200, q: 1, dur: 0.05, vol: 0.05 }); });
         },
 

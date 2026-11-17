@@ -13,6 +13,25 @@
     var tw = Ut.tween;
     var rnd = Ut.rnd;
 
+    /** Arte del diseñador (img/diseno), en unidades de su dibujo de 1280×720. Sin él queda la cueva dibujada a mano. */
+    var ARTE = {
+        dir: 'img/diseno/', fw: 1280, fh: 720,
+        horizonte: 378,
+        cueva: { x: 629, y: 500, w: 428, h: 270 },
+        antorchas: [{ x: 594, y: 420 }, { x: 671, y: 420 }],
+        prado: { x0: 230, x1: 1215, y0: 548, y1: 680 },
+        nino: { x: 120, y: 560 },
+        tam: 108,
+        // Hoja escenario.svg (dibujada al doble): [x, y, ancho, alto] en la hoja y [x0, y0] donde va en el dibujo.
+        hoja: {
+            sol: [0, 0, 97, 99, 659, 32], nube1: [260, 0, 140, 57, 322, 132], nube2: [520, 0, 167, 49, -34, 82],
+            nube3: [0, 260, 143, 42, 1176, 125], nube4: [260, 260, 168, 48, 759, 169],
+            arbolI: [520, 260, 184, 251, 75, 233], arbolD: [0, 520, 180, 245, 930, 229], pasto: [260, 520, 251, 121, -30, 617]
+        },
+        // Red: centro del aro y tamaño del aro dentro de red.svg (500×500).
+        red: { cx: 395.5, cy: 242.5, aro: 139, giro: 24 }
+    };
+
     function dibujarRed(g, r) {
         var palo = r * 1.85;
         g.lineStyle(Math.max(5, r * 0.09), 0x8c5a2b, 1);
@@ -34,6 +53,22 @@
     }
 
     var escena = {
+        precargar: function () {
+            var self = this;
+            if (!self.textures.exists('cv_fondo')) self.load.svg('cv_fondo', ARTE.dir + 'fondo.svg', { width: 1920, height: 1080 });
+            if (!self.textures.exists('cv_red')) self.load.svg('cv_red', ARTE.dir + 'red.svg', { width: 500, height: 500 });
+            if (!self.textures.exists('cv_esc')) self.load.svg('cv_esc', ARTE.dir + 'escenario.svg', { width: 1560, height: 1560 });
+        },
+
+        /** Encaje del dibujo: se ve entero, centrado y apoyado abajo; lo que sobra se rellena con cielo y pasto. */
+        mapaFondo: function () {
+            if (!this.textures.exists('cv_fondo')) return null;
+            var W = this.scale.width, H = this.scale.height;
+            var k = Math.min(W / ARTE.fw, H / ARTE.fh);
+            var ox = (W - ARTE.fw * k) / 2, oy = H - ARTE.fh * k;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.reunidos = [];
@@ -54,6 +89,20 @@
             L.prado = { x0: 20 + L.tam * 0.5, x1: L.der - L.tam * 0.5, y0: L.y0 + (H - L.y0) * 0.38, y1: H - L.tam * 0.55 };
             L.ninoPt = { x: Math.round(W * 0.11), y: L.y0 + (H - L.y0) * 0.32 };
             L.bocina = { x: Math.max(52, L.ninoPt.x + 38), y: L.ninoPt.y - 48, r: Math.max(24, Math.min(30, hueco * 0.28)) };
+            var F = this.mapaFondo();
+            if (F) {
+                var A = ARTE, k = F.k;
+                L.arte = true; L.F = F;
+                L.y0 = F.sy(A.horizonte);
+                L.tam = A.tam * k;
+                L.cueva = { x: F.sx(A.cueva.x), y: F.sy(A.cueva.y), w: A.cueva.w * k, h: A.cueva.h * k };
+                L.prado = {
+                    x0: F.sx(A.prado.x0), x1: Math.min(F.sx(A.prado.x1), L.der - L.tam * 0.5),
+                    y0: F.sy(A.prado.y0), y1: F.sy(A.prado.y1)
+                };
+                L.ninoPt = { x: F.sx(A.nino.x), y: F.sy(A.nino.y) };
+                L.bocina = { x: Math.max(52, L.ninoPt.x + 38), y: L.ninoPt.y - 52, r: L.bocina.r };
+            }
             return L;
         },
 
@@ -62,6 +111,7 @@
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
             var V = this.montarVida(keep);
+            if (L.arte) { this.armarArte(keep, V); return; }
             if (V) {
                 V.parque({ horizonte: L.y0, arboles: [0.04, 0.14, 0.78, 0.94], solX: 0.12 });
                 V.mariposas(3, { x: L.prado.x0, y: L.prado.y0 - 30, w: L.der - L.prado.x0, h: 80, depth: 8 });
@@ -190,6 +240,81 @@
             this.ecoG = keep(this.add.graphics().setDepth(6));
             this.miraG = keep(this.add.graphics().setDepth(58));
             this.montarHud(keep);
+        },
+
+        /** Escena con el dibujo del diseñador: cielo, cueva, antorchas, camino y prado ya vienen en el fondo. */
+        armarArte: function (keep, V) {
+            var self = this, L = this.L, F = L.F, k = F.k;
+            var yh = F.sy(ARTE.horizonte);
+            keep(this.add.rectangle(0, 0, L.W, yh, 0x8bd3fc).setOrigin(0, 0).setDepth(-1));
+            keep(this.add.rectangle(0, yh, L.W, L.H - yh, 0x65b242).setOrigin(0, 0).setDepth(-1));
+            keep(this.add.image(F.ox, F.oy, 'cv_fondo').setOrigin(0, 0).setDisplaySize(ARTE.fw * k, ARTE.fh * k).setDepth(1));
+            this.montarEscenario(keep);
+            if (V) {
+                V.mariposas(3, { x: L.prado.x0, y: L.prado.y0 - 30 * k, w: L.der - L.prado.x0, h: 80 * k, depth: 8 });
+                if (V.pajaros) V.pajaros(3, F.sy(40), F.sy(300));
+            }
+            this.cerro = null;
+            this.pradoImg = null;
+            // Las llamas de las antorchas ya están dibujadas: solo se les suma el parpadeo.
+            this.antorchas = ARTE.antorchas.map(function (a) {
+                var tx = F.sx(a.x), ty = F.sy(a.y);
+                var llama = keep(self.add.circle(tx, ty, 13 * k, 0x8a4a10, 1).setDepth(8).setBlendMode('ADD'));
+                var nucleo = keep(self.add.circle(tx, ty + 3 * k, 6 * k, 0x806000, 1).setDepth(9).setBlendMode('ADD'));
+                return { llama: llama, nucleo: nucleo, baseY: ty };
+            });
+            this.sembrarMotes(keep, 16, { x: L.cueva.x - L.cueva.w * 0.35, y: L.cueva.y - L.cueva.h * 1.1, w: L.cueva.w * 0.7, h: L.cueva.h * 0.55, depth: 9 }, 0xe7f5ff);
+            this.ecoG = keep(this.add.graphics().setDepth(6));
+            this.miraG = keep(this.add.graphics().setDepth(58));
+            this.montarHud(keep);
+        },
+
+        /** Sol, nubes, árboles y pasto del dibujo, sueltos del fondo para poder moverlos (ver animarEscenario). */
+        montarEscenario: function (keep) {
+            var self = this, L = this.L, F = L.F, k = F.k;
+            this.escen = null;
+            var tx = this.textures.get('cv_esc');
+            if (!tx || !this.textures.exists('cv_esc')) return;
+            var pieza = function (nombre, origen, depth) {
+                var q = ARTE.hoja[nombre];
+                if (!tx.has('cv_' + nombre)) tx.add('cv_' + nombre, 0, q[0] * 2, q[1] * 2, q[2] * 2, q[3] * 2);
+                var ox = origen[0], oy = origen[1];
+                var img = keep(self.add.image(F.sx(q[4] + q[2] * ox), F.sy(q[5] + q[3] * oy), 'cv_esc', 'cv_' + nombre)
+                    .setOrigin(ox, oy).setDisplaySize(q[2] * k, q[3] * k).setDepth(depth));
+                return img;
+            };
+            var E = { nubes: [], arboles: [] };
+            E.sol = pieza('sol', [0.5, 0.5], 1.1);
+            E.sol.scaleX0 = E.sol.scaleX;
+            E.sol.scaleY0 = E.sol.scaleY;
+            [['nube1', 18], ['nube2', 12], ['nube3', 24], ['nube4', 15]].forEach(function (n) {
+                var im = pieza(n[0], [0, 0.5], 1.1);
+                E.nubes.push({ img: im, v: n[1] * k, w: im.displayWidth });
+            });
+            ['arbolI', 'arbolD'].forEach(function (n, i) {
+                E.arboles.push({ img: pieza(n, [0.5, 1], 1.5), fase: i * 2.1 });
+            });
+            E.pasto = pieza('pasto', [0.5, 1], 3);
+            this.escen = E;
+        },
+
+        animarEscenario: function (time, delta) {
+            var E = this.escen, L = this.L;
+            if (!E) return;
+            var dt = Math.min(delta, 60) / 1000;
+            var quieto = Ut.reducido();
+            E.sol.setRotation(quieto ? 0 : time / 7000);
+            var pulso = quieto ? 1 : 1 + Math.sin(time / 900) * 0.05;
+            E.sol.setScale(E.sol.scaleX0 * pulso, E.sol.scaleY0 * pulso);
+            E.nubes.forEach(function (n) {
+                if (quieto) return;
+                n.img.x += n.v * dt;
+                if (n.img.x > L.W + 10) n.img.x = -n.w - 10;
+            });
+            E.arboles.forEach(function (a) {
+                a.img.setRotation(quieto ? 0 : Math.sin(time / 1100 + a.fase) * 0.02 + Math.sin(time / 430 + a.fase) * 0.006);
+            });
+            E.pasto.setRotation(quieto ? 0 : Math.sin(time / 800) * 0.025);
         },
 
         pulsoEco: function () {
@@ -355,8 +480,18 @@
             var swingY = Math.min(destY - r * 2.6, L.prado.y0 - r * 1.2);
 
             var red = this.add.container(swingX, swingY).setDepth(65).setAngle(-32 * lado);
-            var g = this.add.graphics();
-            dibujarRed(g, r);
+            var g;
+            if (L.arte && this.textures.exists('cv_red')) {
+                // La red del diseñador: el aro queda sobre el objeto y el mango sube.
+                var sr = (L.tam * 1.2) / ARTE.red.aro;
+                // El mango viene del lado de donde entra la red; el aro queda casi horizontal sobre el objeto.
+                var ox = lado < 0 ? 1 - ARTE.red.cx / 500 : ARTE.red.cx / 500;
+                g = this.add.image(0, 0, 'cv_red').setOrigin(ox, ARTE.red.cy / 500)
+                    .setDisplaySize(500 * sr, 500 * sr).setFlipX(lado < 0).setAngle(ARTE.red.giro * lado);
+            } else {
+                g = this.add.graphics();
+                dibujarRed(g, r);
+            }
             red.add(g);
             red.mango = r;
 
@@ -495,6 +630,7 @@
 
         paso: function (time, delta) {
             var self = this;
+            this.animarEscenario(time, delta);
             if (this.antorchas) {
                 this.antorchas.forEach(function (t, i) {
                     var w = Math.sin(time / 85 + i * 1.3) * 0.18 + 1;
