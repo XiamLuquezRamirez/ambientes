@@ -39,11 +39,7 @@
   "elementos": {
     "pluma": {
       "img": "img/pluma.svg",
-      "nombre": "Pluma",
-      "fotogramas": [
-        "img/pluma_abierta.svg"
-      ],
-      "quedaAbierta": true
+      "nombre": "Pluma"
     },
     "ducha": {
       "img": "img/ducha.svg",

@@ -14,6 +14,13 @@ se genera al azar con un catálogo de 33 objetos con `sentido` en `config.elemen
 | ClasificacionDobleOlfatoVsGusto | 5-6 | olfato / gusto | Ascensor: subir la cabina (olfato) o bajarla (gusto); error = la puerta no abre | `ascensor.js` |
 | MultipleDiscriminacionTactoVsOlfatoVsOido | 5-6 | tacto / olfato / oído | Dibujar con el dedo la tubería de luz hasta el tubo correcto | `tuberias.js` |
 
+## Escenarios propios (2026-11-17, segunda pasada)
+El usuario dijo que los escenarios parecían los mismos (todos el parque de `vida.js`) y la interacción corta. Ahora: **árbol** = atardecer mágico (cielo
+violeta→naranja, sol que se pone, estrellas, luciérnagas, flores brillantes), ramas dibujadas de donde cuelgan los objetos, copa que se mece, pájaro que se espanta,
+estela de luz y destello en la canasta, arcoíris que se completa con los aciertos, hojas al viento. **Río** = valle de montaña (picos con nieve, pinos, cascada con roca y
+bruma), ranas en nenúfares que croan al tocarlas, peces que saltan solos y al acertar, ondas y salpicaduras, red que sigue el dedo. Escoba y los 3 de 5-6 siguen con el escenario
+de cocina / laboratorio: pendiente variarlos igual.
+
 ## Archivos
 Todo lo común vive en `ClasificaPorLosSentidos/comun/`: `kit.js` (SentidosKit sobre `MemoriaKit.BASE`: niveles, `sacar`, `clasificar`, voces,
 `propiedad` = lo que «hace» cada objeto según su sentido, canasta, tubo de ensayo, demo, final), `sfx.js` (estímulos del oído y efectos de cada sentido,

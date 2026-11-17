@@ -34,7 +34,7 @@
         QueSuena: ['avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca'],
         SonidoDeTransporte: ['ambulancia', 'avion', 'camion', 'gallo', 'motocicleta', 'tren', 'vaca'],
         SonidoDeUnaMaquina: ['aspiradora', 'gallo', 'lavadora', 'licuadora', 'secador', 'vaca', 'ventilador'],
-        SonidoDelAgua: ['lavadora'],
+        SonidoDelAgua: ['ducha', 'fuente', 'lavadora', 'pluma', 'regadera'],
         SonidoYObjeto: ['aspiradora', 'cajon', 'gallo', 'licuadora', 'puerta', 'reloj', 'telefono', 'vaca', 'ventana', 'ventilador'],
         UnSonidoDeViaje: ['ambulancia', 'avion', 'bicicleta', 'camion', 'gallo', 'motocicleta', 'tren', 'vaca']
     };
