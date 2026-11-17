@@ -1,0 +1,60 @@
+/*
+ * Botones de la cabecera (Reiniciar / Salir) con la imagen del diseño.
+ * Misma solución que Polimotor/comun/interfaz.css: el botón queda transparente y
+ * la imagen (repetir.png / volver.png, 501×501 con margen) se dibuja con ::before.
+ * Se carga DESPUÉS del style.css de cada juego de Percepción auditiva
+ * (Asocia, Encuentra el sonido, Memoria auditiva, ¿Qué sonido escuchas?, Repite la secuencia).
+ */
+.hud-nav .btn-round.btn {
+  position: relative;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  font-size: 0;
+  color: transparent;
+  transition: transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hud-nav .btn-round.btn > i {
+  display: none;
+}
+
+.hud-nav .btn-round.btn::before {
+  content: "";
+  position: absolute;
+  left: -15.47%;
+  top: -15.47%;
+  width: 138.4%;
+  height: 138.4%;
+  background: center / contain no-repeat;
+  pointer-events: none;
+}
+
+.hud-nav .btn-round.btn[onclick*="reload"]::before {
+  background-image: url("img/repetir.png");
+}
+
+/* El kiosco (banco-juegos.js) quita el onclick y deja data-salir. */
+.hud-nav .btn-round.btn[onclick*="history.back"]::before,
+.hud-nav .btn-round.btn[data-salir]::before {
+  background-image: url("img/volver.png");
+}
+
+.hud-nav .btn-round.btn:hover,
+.hud-nav .btn-round.btn:focus,
+.hud-nav .btn-round.btn:active {
+  background: transparent;
+  box-shadow: none;
+}
+
+.hud-nav .btn-round.btn:active {
+  transform: translateY(2px);
+}
+
+.hud-nav .btn-round.btn:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}

@@ -28,7 +28,7 @@
   },
   "audios": {
     "cierre": "../../../sounds/victory.mp3",
-    "fondo": "../../../sounds/fondo.mp3"
+    "fondo": "../../../sounds/fondo_multisensorial.wav"
   },
   "demo": {
     "material": "pluma",

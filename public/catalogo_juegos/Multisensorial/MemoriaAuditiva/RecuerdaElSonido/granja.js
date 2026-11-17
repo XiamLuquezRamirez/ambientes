@@ -26,7 +26,20 @@
         hueco: { w: 124, top: 407, base: 561 },
         ventana: { y: 313.5, w: 84, h: 65 },  // ventanas crema sobre cada hueco: ahí van los carteles
         establo: { x: 180, y: 45, w: 880 },
-        hoja: { x: 82, y: 67, w: 306, h: 390 } // recorte de la hoja dentro de puerta.svg (500×500)
+        hoja: [60, 730, 367.3, 1121.1],        // hoja de la puerta, colocada en la franja baja del atlas
+        cielo: 0x8bd3fc,
+        pasto: 0x5fae3f
+    };
+    // Piezas que se mueven, sacadas del mismo dibujo y guardadas en UNA hoja (animados.svg: lienzo
+    // ampliado x -200…1480, dibujada al 1.5×). Cajas en unidades del dibujo; base = punto donde se
+    // apoya cada árbol/mata para balancearse.
+    var ATLAS = { x0: -200, k: 1.5, pad: 3, h: 1695 };
+    var PIEZAS = {
+        nubes: [[204, 190, 341, 243], [-45, 121, 119, 166], [1180, 189, 1319, 227], [899, 81, 1038, 119]],
+        colinas: [-4, 530, 1281, 720],
+        arboles: [{ caja: [31, 303, 211, 551], base: [100, 551] }, { caja: [1069, 297, 1245, 538], base: [1185, 538] }],
+        mata: { caja: [1177, 497, 1301, 549], base: [1240, 549] },
+        ventanas: [[239, 434, 298, 509], [954, 434, 1013, 509], [434, 279, 522, 348], [579, 279, 667, 348], [727, 279, 815, 348]]
     };
 
     var escena = {
@@ -41,7 +54,9 @@
 
         precargar: function () {
             if (!this.textures.exists('gr_fondo')) this.load.svg('gr_fondo', DISENO + 'fondo.svg', { width: 1920, height: 1080 });
-            if (!this.textures.exists('gr_puerta')) this.load.svg('gr_puerta', DISENO + 'puerta.svg', { width: 500, height: 500 });
+            // Un solo archivo para todo lo que se mueve y la hoja de la puerta (el cargador de Phaser se
+            // atasca con más de ~32 archivos y este juego ya carga unos 28).
+            if (!this.textures.exists('gr_anim')) this.load.svg('gr_anim', DISENO + 'animados.svg', { width: 2520, height: 1695 });
         },
 
         /** Encaje del fondo: cubre la pantalla anclado abajo sin recortar el establo. */
@@ -95,22 +110,53 @@
             return L;
         },
 
-        /** El fondo del diseño; si sobra pantalla, se estiran los bordes del propio dibujo (cielo y pasto). */
+        /** Recorte de una pieza animada del atlas (cajas en unidades del dibujo). */
+        pieza: function (nombre, caja, pad) {
+            var tex = this.textures.get('gr_anim');
+            var A = ATLAS;
+            var m = pad == null ? A.pad : pad;
+            var x0 = Math.floor((caja[0] - m - A.x0) * A.k), y0 = Math.max(0, Math.floor((caja[1] - m) * A.k));
+            var x1 = Math.ceil((caja[2] + m - A.x0) * A.k), y1 = Math.min(A.h, Math.ceil((caja[3] + m) * A.k));
+            if (!tex.has(nombre)) tex.add(nombre, 0, x0, y0, x1 - x0, y1 - y0);
+            return { w: (x1 - x0) / A.k, h: (y1 - y0) / A.k, x: x0 / A.k + A.x0, y: y0 / A.k };
+        },
+
+        /**
+         * El fondo del diseño en capas, en el mismo orden del dibujo: cielo → nubes (se desplazan) →
+         * colinas → árboles y mata (se mecen) → establo, camino y cerca. Si sobra pantalla a los lados
+         * el cielo y el pasto se prolongan con un color liso.
+         */
         montarFondo: function (keep) {
             var L = this.L, F = L.F;
-            var fw = FONDO_W * F.k, fh = FONDO_H * F.k;
-            var tex = this.textures.get('gr_fondo');
-            var src = tex.getSourceImage();
-            // OJO: al añadir un recorte, Phaser lo vuelve el "primer cuadro" de la textura; por eso el
-            // cuadro completo se pide siempre por su nombre '__BASE'.
-            if (F.oy > 1 && !tex.has('gr_arriba')) tex.add('gr_arriba', 0, 0, 0, src.width, Math.max(2, Math.round(src.height / 120)));
-            if (F.ox > 1 && !tex.has('gr_izq')) { tex.add('gr_izq', 0, 0, 0, 3, src.height); tex.add('gr_der', 0, src.width - 3, 0, 3, src.height); }
-            if (F.ox > 1) {
-                keep(this.add.image(F.ox + 1, 0, 'gr_fondo', 'gr_izq').setOrigin(1, 0).setDisplaySize(F.ox + 2, L.H).setDepth(0));
-                keep(this.add.image(F.ox + fw - 1, 0, 'gr_fondo', 'gr_der').setOrigin(0, 0).setDisplaySize(F.ox + 2, L.H).setDepth(0));
+            var G = GRANJA;
+            var self = this;
+            this.animados = [];
+            keep(this.add.rectangle(0, 0, L.W, L.H, G.cielo).setOrigin(0, 0).setDepth(-2));
+            keep(this.add.rectangle(0, F.sy(545), L.W, L.H - F.sy(545) + 2, G.pasto).setOrigin(0, 0).setDepth(-1));
+            if (this.textures.exists('gr_anim')) {
+                // Nubes: cada una se desplaza a su paso y reaparece por el otro lado.
+                PIEZAS.nubes.forEach(function (caja, i) {
+                    var d = self.pieza('gr_nube' + i, caja);
+                    var im = keep(self.add.image(F.sx(d.x), F.sy(d.y), 'gr_anim', 'gr_nube' + i).setOrigin(0, 0).setScale(F.k / ATLAS.k).setDepth(0.5));
+                    self.animados.push({ tipo: 'nube', im: im, v: 5 + i * 3.2, ancho: d.w * F.k });
+                });
+                var c = this.pieza('gr_colinas', PIEZAS.colinas);
+                keep(this.add.image(F.sx(c.x), F.sy(c.y), 'gr_anim', 'gr_colinas').setOrigin(0, 0).setScale(F.k / ATLAS.k).setDepth(0.8));
+                // Árboles y mata: se mecen desde la base del tronco.
+                PIEZAS.arboles.concat([PIEZAS.mata]).forEach(function (a, i) {
+                    var d = self.pieza('gr_arbol' + i, a.caja);
+                    var ox = (a.base[0] - d.x) / d.w, oy = (a.base[1] - d.y) / d.h;
+                    var im = keep(self.add.image(F.sx(a.base[0]), F.sy(a.base[1]), 'gr_anim', 'gr_arbol' + i).setOrigin(ox, oy).setScale(F.k / ATLAS.k).setDepth(1));
+                    self.animados.push({ tipo: 'arbol', im: im, fase: i * 1.7, amp: i === 2 ? 2.4 : 1.2 });
+                });
             }
-            if (F.oy > 1) keep(this.add.image(F.ox, F.oy + 1, 'gr_fondo', 'gr_arriba').setOrigin(0, 1).setDisplaySize(fw, F.oy + 2).setDepth(0));
-            keep(this.add.image(F.ox, F.oy, 'gr_fondo', '__BASE').setOrigin(0, 0).setDisplaySize(fw, fh).setDepth(0));
+            keep(this.add.image(F.ox, F.oy, 'gr_fondo').setOrigin(0, 0).setDisplaySize(FONDO_W * F.k, FONDO_H * F.k).setDepth(1.8));
+            // Ventanas del establo: de noche se encienden con una luz cálida que titila.
+            this.luzVentanas = PIEZAS.ventanas.map(function (v, i) {
+                var r = keep(self.add.rectangle(F.sx((v[0] + v[2]) / 2), F.sy((v[1] + v[3]) / 2), (v[2] - v[0]) * F.k, (v[3] - v[1]) * F.k, 0xffe7a0, 1).setAlpha(0).setDepth(45.5));   // encima del velo de la noche, para que brillen
+                r.fase = i * 1.3;
+                return r;
+            });
         },
 
         armar: function (reubicar) {
@@ -125,7 +171,9 @@
                     // Estrellas solo en el cielo libre a los lados del techo; el diseño ya trae sus nubes.
                     V.estrellas({ x: 0, y: 0, w: F.sx(330), h: F.sy(225), depth: 1.6 }, 8);
                     V.estrellas({ x: F.sx(960), y: 0, w: Math.max(40, L.W - F.sx(960)), h: F.sy(225), depth: 1.6 }, 8);
-                    V.pajaros(2, 28, F.sy(150));
+                    V.pajaros(3, F.sy(28), F.sy(170));
+                    // Mariposas del diseño sobre el pasto; se retiran al caer la noche (ver paso).
+                    if (V.mariposas) V.mariposas(4, { x: 0, y: F.sy(470), w: L.W, h: F.sy(690) - F.sy(470), depth: 7 });
                 }
             } else {
                 if (V) {
@@ -140,10 +188,15 @@
             this.montarNoche(keep);
             this.montarGallinas(keep);
             // Con el diseño, el niño va en el pasto de la derecha (a la izquierda está la cerca).
-            keep(K.nino(this, F ? Math.round(F.sx(1165)) : Math.round(L.W * 0.18), L.y0 + (L.H - L.y0) * 0.62, 50, {
-                ropa: 0x37b24d, pelo: 0x5c3317, esc: 2.15
-            }));
-            this.sembrarMotes(keep, 20, {
+            if (!F) {
+                keep(K.nino(this, Math.round(L.W * 0.18), L.y0 + (L.H - L.y0) * 0.62, 50, {
+                    ropa: 0x37b24d, pelo: 0x5c3317, esc: 2.15
+                }));
+            }
+            // Con el diseño las luciérnagas flotan sobre el pasto (de noche); sin él, arriba como antes.
+            this.sembrarMotes(keep, F ? 26 : 20, F ? {
+                x: 0, y: F.sy(430), w: L.W, h: F.sy(700) - F.sy(430), depth: 47
+            } : {
                 x: 0, y: 10, w: L.W, h: Math.max(36, L.establo.y - 6), depth: 47
             }, 0xffe066);
             this.miraG = keep(this.add.graphics().setDepth(55));
@@ -400,11 +453,10 @@
                 var animal = self.crearCosa(id, cx, base - ph * 0.42, Math.min(pw * 0.85, ph * 0.78), { depth: 21 });
                 animal.cont.setVisible(false);
                 var hoja = self.add.container(-pw / 2, -ph);
-                if (F && self.textures.exists('gr_puerta')) {
-                    // La hoja del diseño (puerta.svg): se recorta su dibujo del lienzo de 500×500.
-                    var tp = self.textures.get('gr_puerta');
-                    if (!tp.has('hoja')) tp.add('hoja', 0, GRANJA.hoja.x, GRANJA.hoja.y, GRANJA.hoja.w, GRANJA.hoja.h);
-                    hoja.add(self.add.image(0, 0, 'gr_puerta', 'hoja').setOrigin(0, 0).setDisplaySize(pw, ph));
+                if (F && self.textures.exists('gr_anim')) {
+                    // La hoja del diseño (puerta.svg), recortada del atlas sin margen.
+                    self.pieza('gr_hoja', GRANJA.hoja, 0);
+                    hoja.add(self.add.image(0, 0, 'gr_anim', 'gr_hoja').setOrigin(0, 0).setDisplaySize(pw, ph));
                 } else {
                     var g = self.add.graphics();
                     g.fillStyle(0x8c3b1a, 1);
@@ -704,6 +756,7 @@
             var self = this;
             var dt = (delta || 16) / 1000;
             this.dibujarMira();
+            this.animarEscenario(time, dt);
             if (this.veleta && !this.tweens.isTweening(this.veleta)) {
                 this.veleta.angle = Math.sin(time / 480) * 18;
             }
@@ -744,6 +797,30 @@
                     if (!p.ojos || p.abierta) return;
                     p.ojos.setAlpha(0.55 + Math.sin(time / 280 + i) * 0.4);
                 });
+            }
+        },
+
+        /** Vida del escenario del diseño: nubes que pasan, árboles que se mecen, ventanas, mariposas y luciérnagas. */
+        animarEscenario: function (time, dt) {
+            var L = this.L;
+            if (!L || !L.F) return;
+            var noche = this.noche == null ? 0 : this.noche;
+            (this.animados || []).forEach(function (a) {
+                if (!a.im || !a.im.active) return;
+                if (a.tipo === 'nube') {
+                    a.im.x += a.v * dt;
+                    if (a.im.x > L.W + 10) a.im.x = -a.ancho - 10;
+                } else {
+                    a.im.angle = Math.sin(time / 1500 + a.fase) * a.amp + Math.sin(time / 520 + a.fase * 2) * a.amp * 0.25;
+                }
+            });
+            (this.luzVentanas || []).forEach(function (r) {
+                if (!r.active) return;
+                r.setAlpha(noche * (0.8 + Math.sin(time / 330 + r.fase) * 0.12));
+            });
+            if (this.motesG && this.motesG.active) this.motesG.setAlpha(noche);
+            if (this.vidaAmb && this.vidaAmb.buscar) {
+                this.vidaAmb.buscar('mariposa').forEach(function (m) { if (m.c && m.c.active) m.c.setAlpha(Math.max(0, 1 - noche * 1.2)); });
             }
         },
 
