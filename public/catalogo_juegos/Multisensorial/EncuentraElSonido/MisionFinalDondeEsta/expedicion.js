@@ -39,6 +39,119 @@
     };
     var ORDEN = ['selva', 'desierto', 'cueva', 'cima'];
 
+    /* ── Arte del diseño ──────────────────────────────────────────
+     * El diseñador entregó las cuatro regiones ya pintadas (1280×720)
+     * con sus tres pedestales dibujados: tocones en la selva, rocas en
+     * el desierto, piedras en la cueva y rocas nevadas en la cima.
+     * El mundo es más ancho que una pantalla, así que el dibujo se
+     * repite en mosaico y cada copia aporta sus tres apoyos reales.
+     * Aquí solo se colocan encima las cosas, las flechas, el mapa del
+     * premio y el cofre final; nada del paisaje se vuelve a pintar.
+     */
+    var ESCENA_V = '?v=20261114expedicion';
+    var FONDO_W = 1280;
+    var FONDO_H = 720;
+    var ESCENA = {
+        selva: 'img/selva.svg',
+        desierto: 'img/desierto.svg',
+        cueva: 'img/cueva.svg',
+        cima: 'img/cima.svg',
+        mapa: 'img/mapa.svg',
+        bandera: 'img/bandera_mapa.svg',
+        cofreCaja: 'img/cofre_caja.svg',
+        cofreTapa: 'img/cofre_tapa.svg',
+        flechaIzq: 'img/flecha_izq.svg',
+        flechaDer: 'img/flecha_der.svg'
+    };
+    // Apoyos medidos sobre cada dibujo 1280×720: x del centro del pedestal
+    // e y de su superficie, donde se posa la cosa.
+    // La y es la superficie medida más unos píxeles de hundido, para que la
+    // cosa se apoye en el pedestal y no parezca flotar sobre él.
+    var APOYOS = {
+        selva: [{ x: 354, y: 532 }, { x: 657, y: 464 }, { x: 940, y: 587 }],
+        desierto: [{ x: 376, y: 598 }, { x: 659, y: 490 }, { x: 952, y: 566 }],
+        cueva: [{ x: 370, y: 490 }, { x: 680, y: 390 }, { x: 960, y: 522 }],
+        cima: [{ x: 318, y: 540 }, { x: 640, y: 494 }, { x: 920, y: 580 }]
+    };
+    // Color del borde superior e inferior de cada dibujo, para rellenar las
+    // franjas que el mosaico no cubre en pantallas más altas que 16:9.
+    var BORDES = {
+        selva: { arriba: 0x71b738, abajo: 0x438926 },
+        desierto: { arriba: 0xf4b168, abajo: 0xfaa262 },
+        cueva: { arriba: 0x100d16, abajo: 0x0d0b12 },
+        cima: { arriba: 0x3c5884, abajo: 0xeef4fb }
+    };
+    // Las cuatro marcas del MAPA del diseño, en su lienzo 837×500, en el
+    // orden del recorrido: selva, desierto, cueva, cima.
+    var MAPA_W = 837;
+    var MAPA_H = 500;
+    var MAPA_PARADAS = [
+        { x: 218, y: 166, r: 24 },
+        { x: 312, y: 221, r: 30 },
+        { x: 591, y: 116, r: 31 },
+        { x: 578, y: 328, r: 47 }
+    ];
+    // El camino punteado del mapa.svg (su <path class="cls-5"> y las dos puntas),
+    // muestreado cada ~13 px de su largo (1156) en el mismo lienzo 837×500. Va de
+    // la marca verde a la azul; MAPA_CAMINO_PARADA dice qué punto del camino toca
+    // cada marca (el más cercano a su centro).
+    var MAPA_CAMINO = ('216,175 213,188 211,200 212,213 216,225 223,236 233,244 245,248 258,249 ' +
+        '271,247 283,243 294,237 305,229 314,221 323,211 331,201 339,191 347,181 356,172 365,163 ' +
+        '375,155 385,147 395,139 406,132 417,126 428,120 440,114 452,110 464,105 477,102 489,99 ' +
+        '502,97 515,96 527,96 540,96 553,98 565,102 577,107 588,114 596,124 602,135 604,148 ' +
+        '606,160 605,173 600,185 593,196 583,204 572,210 560,215 548,219 535,222 523,225 510,227 ' +
+        '498,230 485,233 472,235 460,238 448,242 436,246 424,251 412,257 401,264 391,272 382,281 ' +
+        '375,291 369,303 364,314 361,327 359,340 360,352 363,365 368,377 374,388 383,398 392,406 ' +
+        '403,413 414,419 426,424 439,427 452,428 464,428 477,427 490,424 502,420 513,415 524,408 ' +
+        '534,400 544,391 552,381 559,370 565,359').split(' ').map(function (par) {
+            var xy = par.split(',');
+            return { x: +xy[0], y: +xy[1] };
+        });
+    var MAPA_CAMINO_PARADA = [0, 13, 38, 90];
+    // Velocidad del explorador sobre el mapa (px del lienzo por segundo): lenta,
+    // para que el niño siga con la vista el camino de una parada a la otra.
+    var MAPA_VELOCIDAD = 95;
+    // Alto de la bandera en px del lienzo del mapa (igual en todas las marcas).
+    var MAPA_BANDERA_ALTO = 62;
+    // La bandera ocupa 419×451 de su lienzo 500×500, con el pie del asta
+    // abajo a la izquierda: de ahí salen su origen y su escala.
+    var BANDERA = { x0: 40, y0: 24, w: 419, h: 451, pieX: 52, pieY: 475 };
+    // Las flechas del diseño traen mucho aire: el disco ocupa 263 de 500 px.
+    var FLECHA_LIENZO = 500;
+    var FLECHA_UTIL = 263;
+    // Lo lejano se desplaza a un tercio de lo cercano: así se nota la distancia.
+    var PARALLAX = 0.34;
+    // De la capa lejana solo se ve la franja del relieve del dibujo (en partes
+    // de su alto): ni su cielo, que duplicaría el sol, ni su suelo.
+    var CIELO_LEJOS = 0.34;
+    var SUELO_LEJOS = 0.78;
+    // Mariposas del diseño (mariposa1..5.svg), compartidas con los demás juegos.
+    var MARIPOSAS = 5;
+    // Las tres antorchas que el dibujo de la cueva ya trae, medidas sobre él.
+    var ANTORCHAS = [{ x: 240, y: 190 }, { x: 695, y: 172 }, { x: 1172, y: 173 }];
+
+    function texEscena(parte) {
+        return 'expedicion:escena:' + parte;
+    }
+
+    function encolarEscena(load) {
+        Object.keys(ESCENA).forEach(function (k) {
+            var src = ESCENA[k];
+            if (!src) return;
+            if (src.indexOf('?') === -1) src += ESCENA_V;
+            load.svg(texEscena(k), src);
+        });
+        // Las mariposas son siempre las del diseño, nunca dibujadas por código.
+        // Son SVG sin ancho/alto: hay que darles tamaño o salen en negro.
+        for (var i = 1; i <= MARIPOSAS; i++) {
+            load.svg(texEscena('mariposa' + i), 'img/mariposa' + i + '.svg' + ESCENA_V, { width: 160, height: 160 });
+        }
+    }
+
+    function hayArte(scene) {
+        return !!(scene && scene.textures && scene.textures.exists(texEscena('selva')));
+    }
+
     function elemento(id) {
         return (gameConfig && gameConfig.elementos && gameConfig.elementos[id]) || {};
     }
@@ -106,7 +219,7 @@
         css.textContent = [
             '#expedicion-canvas{position:fixed;inset:0;z-index:0;touch-action:none}',
             '#expedicion-canvas canvas{display:block;width:100% !important;height:100% !important;cursor:grab}',
-            'body.modo-expedicion{background:#63e6be !important}',
+            'body.modo-expedicion{background:#71b738 !important}',
             'body.modo-expedicion #principal{position:relative;z-index:1;pointer-events:none;background:transparent}',
             'body.modo-expedicion #principal button,body.modo-expedicion .dialogo{pointer-events:auto}',
             'body.modo-expedicion .escenario{grid-template-columns:minmax(0,1fr);grid-template-areas:"centro"}',
@@ -135,9 +248,14 @@
             this.mundoW = 1;
             this.paradas = [];
             this.arrastre = null;
+            // Hasta que se sepa si hay arte del diseño no se pinta paisaje alguno.
+            this.arteDecidido = false;
         },
 
         create: function () {
+            // Arte del diseño: franjas del borde y, encima, las copias del dibujo
+            // (se crean en aplicarEscena, ya con su textura) y todo lo demás.
+            this.bordes = this.add.graphics().setDepth(-36).setScrollFactor(0).setVisible(false);
             this.cielo = this.add.graphics().setDepth(-30).setScrollFactor(0);
             // Capa lejana: se mueve más lento al arrastrar (da profundidad).
             this.lejos = this.add.graphics().setDepth(-25).setScrollFactor(0.45);
@@ -148,11 +266,17 @@
             this.copos = [];
             this.frente = this.add.graphics().setDepth(20);
             this.penumbra = this.add.rectangle(0, 0, 10, 10, 0x000000, 0).setOrigin(0).setDepth(25).setScrollFactor(0);
-            // Flechas para mirar a los lados (fijas en la pantalla).
+            // Flechas para mirar a los lados (fijas en la pantalla). Si el diseño
+            // trae las suyas se usan esas; si no, el botón dibujado de siempre.
             this.flechas = [-1, 1].map(function (dir) {
                 var c = this.add.container(0, 0).setDepth(40).setScrollFactor(0);
-                c.add(this.add.circle(0, 0, 34, 0xffffff, 0.85));
-                c.add(this.add.triangle(dir * 4, 0, 0, -16, 0, 16, dir * 22, 0, 0x1971c2).setOrigin(0.5));
+                var key = texEscena(dir < 0 ? 'flechaIzq' : 'flechaDer');
+                if (this.textures.exists(key)) {
+                    c.add(this.add.image(0, 0, key));
+                } else {
+                    c.add(this.add.circle(0, 0, 34, 0xffffff, 0.85));
+                    c.add(this.add.triangle(dir * 4, 0, 0, -16, 0, 16, dir * 22, 0, 0x1971c2).setOrigin(0.5));
+                }
                 c.dir = dir;
                 return c;
             }, this);
@@ -175,15 +299,223 @@
             if (sceneRef === this) sceneRef = null;
         },
 
+        /** Cuando llega el arte, las flechas dibujadas se cambian por las del diseño. */
+        rehacerFlechas: function () {
+            var scene = this;
+            if (!this.textures.exists(texEscena('flechaIzq'))) return;
+            this.flechas.forEach(function (c) {
+                if (c.conArte) return;
+                c.removeAll(true);
+                c.add(scene.add.image(0, 0, texEscena(c.dir < 0 ? 'flechaIzq' : 'flechaDer')));
+                c.conArte = true;
+            });
+        },
+
         ubicarFijos: function () {
             var w = this.scale.width;
             var h = this.scale.height;
-            this.flechas[0].setPosition(46, h * 0.5);
-            this.flechas[1].setPosition(w - 46, h * 0.5);
+            // Tamaño del botón: el mismo que tenía el dibujado (68 px de diámetro).
+            var lado = Math.min(96, Math.max(68, Math.min(w, h) * 0.13));
+            this.flechas.forEach(function (c) {
+                var im = c.list[0];
+                // El disco del diseño ocupa 263 de los 500 px del lienzo: se escala
+                // por esa parte útil, o la flecha se vería a poco más de la mitad.
+                if (im && im.setDisplaySize && im.width) {
+                    var lienzo = lado * (FLECHA_LIENZO / FLECHA_UTIL);
+                    im.setDisplaySize(lienzo, lienzo);
+                }
+            });
+            // Separada del borde lo bastante para poder tocarla con el dedo.
+            var margen = lado * 0.5 + 14;
+            this.margenFlecha = margen;
+            this.flechas[0].setPosition(margen, h * 0.5);
+            this.flechas[1].setPosition(w - margen, h * 0.5);
+            this.radioFlecha = lado * 0.5;
             this.penumbra.setSize(w, h);
         },
 
-        suelo: function () { return this.scale.height * 0.86; },
+        /**
+         * Mapa del dibujo del diseño → pantalla. El dibujo se escala por su
+         * alto (ocupa toda la pantalla) y se repite a lo ancho del mundo, así
+         * que de cada copia salen tres apoyos. null si aún no hay textura.
+         */
+        mapaArte: function () {
+            if (!hayArte(this)) return null;
+            var h = this.scale.height;
+            // El dibujo llena el alto de la pantalla; a lo ancho se repite en
+            // mosaico cuantas veces haga falta, así que nunca sobra espacio.
+            var esc = h / FONDO_H;
+            var anchoCopia = FONDO_W * esc;
+            var altoCopia = FONDO_H * esc;
+            var oy = 0;
+            return {
+                esc: esc, oy: oy, copia: anchoCopia, alto: altoCopia,
+                sx: function (x, i) { return (i || 0) * anchoCopia + x * esc; },
+                sy: function (y) { return oy + y * esc; }
+            };
+        },
+
+        /**
+         * Los apoyos reales del dibujo, repetidos a lo ancho del mundo. Las
+         * copias impares van espejadas, así que sus apoyos también se reflejan.
+         */
+        apoyosArte: function () {
+            var m = this.mapaArte();
+            if (!m) return null;
+            var lista = APOYOS[this.region] || APOYOS.selva;
+            var copias = Math.ceil(this.mundoW / m.copia);
+            var out = [];
+            for (var i = 0; i < copias; i++) {
+                var espejo = i % 2 === 1;
+                for (var k = 0; k < lista.length; k++) {
+                    var xd = espejo ? FONDO_W - lista[k].x : lista[k].x;
+                    var x = m.sx(xd, i);
+                    if (x > this.mundoW - 20) continue;
+                    out.push({ x: x, y: m.sy(lista[k].y) });
+                }
+            }
+            // De izquierda a derecha, que lugares() los reparte por tramos.
+            out.sort(function (a, b) { return a.x - b.x; });
+            return out;
+        },
+
+        /**
+         * Mientras llega el dibujo del diseño: solo el color del lugar, en vez
+         * del paisaje a mano, que asomaría un instante y luego desaparecería.
+         */
+        esperandoArte: function (W) {
+            var w = this.scale.width;
+            var h = this.scale.height;
+            var col = BORDES[this.region] || BORDES.selva;
+            this.ocultarArte();
+            [this.cielo, this.lejos, this.fondo, this.sueloG, this.frente].forEach(function (g) {
+                if (g) g.clear().setVisible(false);
+            });
+            var bg = this.bordes;
+            bg.clear().setVisible(true);
+            bg.fillStyle(col.arriba, 1);
+            bg.fillRect(0, 0, w, h * 0.72);
+            bg.fillStyle(col.abajo, 1);
+            bg.fillRect(0, h * 0.72 - 1, w, h - h * 0.72 + 1);
+            this.penumbra.fillAlpha = 0;
+            this.copos = [];
+            void W;
+        },
+
+        /** Apaga el dibujo del diseño (sus copias espejadas y el mosaico antiguo). */
+        ocultarArte: function () {
+            if (this.copias) this.copias.forEach(function (im) { if (im) im.setVisible(false); });
+            if (this.lejanas) this.lejanas.forEach(function (im) { if (im) im.setVisible(false); });
+            if (this.niebla) this.niebla.setVisible(false);
+            if (this.luz) this.luz.clear().setVisible(false);
+        },
+
+        /**
+         * Profundidad al mirar a los lados: detrás del paisaje va el mismo dibujo
+         * más grande, desvaído y con `scrollFactor` bajo, así que se desplaza
+         * más despacio que el suelo. Delante, un velo de niebla del color del
+         * lugar separa el fondo de las cosas que se tocan.
+         */
+        ponerLejania: function (m, key, W) {
+            var h = this.scale.height;
+            var col = BORDES[this.region] || BORDES.selva;
+            // La capa lejana se mueve a un tercio: necesita menos ancho.
+            var escL = m.esc * 1.22;
+            var copiaL = FONDO_W * escL;
+            var nL = Math.ceil((W * PARALLAX + this.scale.width) / copiaL) + 1;
+            if (!this.lejanas) this.lejanas = [];
+            for (var i = 0; i < nL; i++) {
+                var im = this.lejanas[i];
+                if (!im) {
+                    im = this.add.image(0, 0, key).setOrigin(0, 0).setDepth(-34)
+                        .setScrollFactor(PARALLAX, 1);
+                    this.lejanas[i] = im;
+                }
+                im.setTexture(key).setVisible(true)
+                    .setScale(escL).setFlipX(i % 2 === 1)
+                    .setAlpha(0.42)
+                    // Un poco más arriba: al estar lejos, su horizonte sube.
+                    .setPosition(i * copiaL, m.oy - h * 0.06);
+                // Del dibujo lejano solo se usa la franja del relieve (montañas,
+                // mesetas, copas): con su cielo se verían dos soles y dos nevadas,
+                // y con su suelo taparía el paisaje cercano. setCrop es por objeto,
+                // así que no afecta a las copias de primer plano.
+                im.setCrop(0, FONDO_H * CIELO_LEJOS, FONDO_W, FONDO_H * (SUELO_LEJOS - CIELO_LEJOS));
+            }
+            this.lejanas.forEach(function (im, i) {
+                if (i >= nL && im) im.setVisible(false);
+            });
+            // Velo de aire entre la lejanía y el paisaje: va DETRÁS de las copias
+            // (depth -35) para no cubrirlas; solo matiza lo que se ve al fondo.
+            if (!this.niebla) {
+                this.niebla = this.add.graphics().setDepth(-35).setScrollFactor(0);
+            }
+            var g = this.niebla;
+            g.clear().setVisible(true);
+            g.fillStyle(col.arriba, 1);
+            g.fillRect(0, 0, this.scale.width, h);
+        },
+
+        /** Coloca el dibujo del diseño y apaga todo el paisaje pintado a mano. */
+        aplicarEscena: function (W) {
+            var m = this.mapaArte();
+            if (!m) return false;
+            var w = this.scale.width;
+            var h = this.scale.height;
+            var key = texEscena(this.region);
+            if (!this.textures.exists(key)) return false;
+            // El dibujo no está hecho para repetirse: sus bordes izquierdo y derecho
+            // no casan (árboles y montañas quedarían cortados en la unión). Por eso
+            // no se usa un mosaico, sino copias sueltas con las impares espejadas:
+            // así cada junta enfrenta un borde con su propio reflejo y no se ve.
+            if (!this.copias) this.copias = [];
+            var n = Math.ceil(W / m.copia);
+            var scene = this;
+            for (var i = 0; i < n; i++) {
+                var im = this.copias[i];
+                if (!im) {
+                    im = this.add.image(0, 0, key).setOrigin(0, 0).setDepth(-32);
+                    this.copias[i] = im;
+                }
+                im.setTexture(key).setVisible(true)
+                    .setScale(m.esc).setFlipX(i % 2 === 1)
+                    // Con flipX el origen sigue arriba a la izquierda, así que la
+                    // posición no cambia; solo se invierte el contenido.
+                    .setPosition(i * m.copia, m.oy);
+            }
+            this.copias.forEach(function (im, i) {
+                if (i >= n && im) im.setVisible(false);
+                void scene;
+            });
+            this.ponerLejania(m, key, W);
+            // Franjas: el dibujo es 16:9; si la pantalla es más alta, se prolongan sus bordes.
+            var col = BORDES[this.region] || BORDES.selva;
+            var bg = this.bordes;
+            bg.clear().setVisible(true);
+            if (m.oy > 0) {
+                bg.fillStyle(col.arriba, 1);
+                bg.fillRect(0, 0, w, m.oy + 2);
+            }
+            var pie = m.oy + m.alto;
+            if (pie < h) {
+                bg.fillStyle(col.abajo, 1);
+                bg.fillRect(0, pie - 2, w, h - pie + 2);
+            }
+            // El dibujo ya trae cielo, montañas, suelo y pedestales: no pintar encima.
+            [this.cielo, this.lejos, this.fondo, this.sueloG, this.frente].forEach(function (g) {
+                if (g) g.clear().setVisible(false);
+            });
+            this.penumbra.fillAlpha = 0;
+            this.copos = [];
+            return true;
+        },
+
+        suelo: function () {
+            var m = this.mapaArte();
+            // Con arte, el suelo es la base de los pedestales del dibujo (y≈660).
+            if (m) return Math.min(this.scale.height * 0.96, m.sy(662));
+            return this.scale.height * 0.86;
+        },
 
         /* ── Región: paisaje ancho que se recorre arrastrando ──────── */
 
@@ -194,6 +526,21 @@
             var W = Math.round(w * R.ancho);
             this.mundoW = W;
             this.cameras.main.setBounds(0, 0, W, h);
+            // Con el arte del diseño no se pinta nada del paisaje: el dibujo lo trae todo.
+            if (this.aplicarEscena(W)) return;
+            // Mientras el arte todavía está cargando no se dibuja el paisaje a mano:
+            // asomaría un instante el dibujo viejo antes de que llegue el del diseño.
+            // Solo queda el color de fondo del lugar, y al terminar la carga se repinta.
+            if (!this.arteDecidido) {
+                this.esperandoArte(W);
+                return;
+            }
+            // Sin arte: se vuelve al paisaje de siempre (esperandoArte lo había apagado).
+            this.ocultarArte();
+            if (this.bordes) this.bordes.clear().setVisible(false);
+            [this.cielo, this.lejos, this.fondo, this.sueloG, this.frente].forEach(function (g) {
+                if (g) g.setVisible(true);
+            });
             var s = this.suelo();
             var c = this.cielo;
             c.clear();
@@ -493,6 +840,8 @@
 
         /** Pedestal según la región: roca, tocón, duna, estalagmita, montículo de nieve. */
         pedestal: function (x, y) {
+            // Con el arte del diseño los pedestales ya están dibujados: no se pinta ninguno.
+            if (this.mapaArte()) return;
             var g = this.add.graphics().setDepth(4);
             var t = this.tamCosa();
             var abajo = this.suelo() + 4;
@@ -546,6 +895,40 @@
             var W = this.mundoW;
             var h = this.scale.height;
             var s = this.suelo();
+            // Con el arte del diseño, cada cosa va sobre un pedestal dibujado.
+            var apoyos = this.apoyosArte();
+            if (apoyos && apoyos.length) {
+                // Nunca puede faltar sitio: si el mundo no da para tantos pedestales
+                // como cosas, se ensancha hasta que quepan todos (cada copia del
+                // dibujo aporta tres). Sin esto la ronda se quedaba sin colocar nada.
+                var m = this.mapaArte();
+                if (apoyos.length < n && m) {
+                    var copiasNec = Math.ceil(n / APOYOS[this.region].length);
+                    this.mundoW = Math.max(this.mundoW, Math.round(copiasNec * m.copia));
+                    this.cameras.main.setBounds(0, 0, this.mundoW, this.scale.height);
+                    // Se repinta el fondo con las copias que ahora hacen falta.
+                    this.aplicarEscena(this.mundoW);
+                    apoyos = this.apoyosArte() || apoyos;
+                }
+                var elegidos;
+                if (apoyos.length > n) {
+                    // Repartidos a lo ancho: se toma uno de cada tramo.
+                    var paso = apoyos.length / n;
+                    elegidos = [];
+                    for (var a = 0; a < n; a++) {
+                        var base = Math.floor(a * paso);
+                        var desp = Math.floor(Math.random() * Math.max(1, Math.floor(paso)));
+                        elegidos.push(apoyos[Math.min(apoyos.length - 1, base + desp)]);
+                    }
+                } else {
+                    elegidos = apoyos.slice(0, n);
+                }
+                // Último seguro: si aun así faltara alguno, se reparte por el suelo.
+                while (elegidos.length < n) {
+                    elegidos.push({ x: rnd(this.scale.width * 0.1, this.mundoW - this.scale.width * 0.1), y: s });
+                }
+                return mezclar(elegidos.map(function (p) { return { x: p.x, y: p.y }; }));
+            }
             var margen = this.scale.width * 0.12;
             var paso = (W - margen * 2) / n;
             var out = [];
@@ -575,15 +958,28 @@
             var lug = this.lugares(o.elementos.length);
             // Desde la segunda región el objetivo empieza fuera de la vista: hay que buscarlo.
             var iObj = o.elementos.indexOf(o.objetivo);
-            if (this.ronda > 0 && iObj !== -1 && lug[iObj].x < this.scale.width) {
-                var j = lug.reduce(function (m, p, k) { return p.x > lug[m].x ? k : m; }, 0);
-                var tmp = lug[iObj]; lug[iObj] = lug[j]; lug[j] = tmp;
+            var tmp;
+            if (iObj !== -1 && lug[iObj]) {
+                if (this.ronda > 0 && lug[iObj].x < this.scale.width) {
+                    // Desde la segunda región el objetivo se busca: va al fondo del mundo.
+                    var j = lug.reduce(function (m, p, k) { return p.x > lug[m].x ? k : m; }, 0);
+                    tmp = lug[iObj]; lug[iObj] = lug[j]; lug[j] = tmp;
+                } else if (this.ronda === 0 && lug[iObj].x > this.scale.width * 0.88) {
+                    // En la primera, en cambio, tiene que verse de entrada: si cayó
+                    // fuera de la pantalla se cambia por el sitio visible más cercano.
+                    var v = lug.reduce(function (m, p, k) {
+                        return p.x < scene.scale.width * 0.88 && (m < 0 || p.x > lug[m].x) ? k : m;
+                    }, -1);
+                    if (v !== -1) { tmp = lug[iObj]; lug[iObj] = lug[v]; lug[v] = tmp; }
+                }
             }
             o.elementos.forEach(function (id, i) {
                 var c = scene.crearCosa(id);
                 scene.medir(c);
-                c.x = lug[i].x;
-                c.y = lug[i].y;
+                // Sin sitio asignado la cosa quedaría sin colocar y la ronda sin jugarse.
+                var p = lug[i] || { x: scene.scale.width * (0.2 + 0.2 * i), y: scene.suelo() };
+                c.x = p.x;
+                c.y = p.y;
                 c.img.setVisible(true).setAlpha(1).setPosition(c.x, c.y);
                 c.img.angle = 0;
                 c.resaltada = false;
@@ -607,7 +1003,12 @@
             this.animarAmbiente(time, Math.min(delta || 16, 50) / 1000);
             this.flechas[0].setVisible(this.jugando && cam.scrollX > 4);
             this.flechas[1].setVisible(this.jugando && cam.scrollX < this.mundoW - this.scale.width - 4);
-            this.flechas.forEach(function (f, i) { f.x = (i ? scene.scale.width - 46 : 46) + Math.sin(time / 300) * 4 * f.dir; });
+            // Vaivén que invita a tocar: hacia DENTRO de la pantalla, desde el margen
+            // de ubicarFijos (que ya cuenta el tamaño del botón). Con 46 px fijos y el
+            // vaivén hacia afuera, el botón grande se salía del borde.
+            var mf = this.margenFlecha || 46;
+            var va = (1 + Math.sin(time / 300)) * 3;
+            this.flechas.forEach(function (f, i) { f.x = i ? scene.scale.width - mf - va : mf + va; });
             Object.keys(this.cosas).forEach(function (id) {
                 var c = scene.cosas[id];
                 if (!c.img.visible || c.celebrando) return;
@@ -620,7 +1021,12 @@
         animarAmbiente: function (time, dt) {
             var a = this.ambiente;
             a.clear();
+            this.animarMariposas(time);
             if (reducido()) return;
+            // El dibujo de la cima ya trae una nevada de fondo, pero plana: encima
+            // van copos cercanos que caen de verdad, y en la cueva el resplandor
+            // de sus antorchas. Lo que el dibujo ya hace no se repite.
+            var conArte = !!this.mapaArte();
             var w = this.scale.width;
             var h = this.scale.height;
             var s = this.suelo();
@@ -633,17 +1039,15 @@
                 a.lineBetween(x, y, x + 11, y - ala);
             }
             if (this.region === 'selva') {
-                [0xff8787, 0xffd43b, 0xb197fc].forEach(function (col, i) {
-                    var x = w * (0.5 + 0.42 * Math.sin(t * 0.2 + i * 2.1));
-                    var y = h * (0.42 + 0.12 * Math.sin(t * 0.7 + i));
-                    var ab = 0.3 + 0.7 * Math.abs(Math.sin(t * 9 + i));
-                    a.fillStyle(col, 1);
-                    a.fillEllipse(x - 6 * ab, y, 12 * ab, 16);
-                    a.fillEllipse(x + 6 * ab, y, 12 * ab, 16);
-                    a.fillStyle(0x495057, 1);
-                    a.fillRect(x - 1.5, y - 6, 3, 12);
-                });
+                // Las mariposas son las del diseño (animarMariposas); aquí solo
+                // los pájaros del fondo y las motas de polen entre los rayos de luz.
                 for (k = 0; k < 2; k++) pajaro(((t * (40 + k * 15) + k * 400) % (w + 200)) - 100, h * (0.16 + k * 0.06), k, 0x2b8a3e);
+                for (k = 0; k < 16; k++) {
+                    var px = w * ((k * 0.0717 + t * 0.012 + Math.sin(t * 0.3 + k) * 0.02) % 1);
+                    var py = h * (0.2 + 0.6 * ((k * 0.41) % 1)) + Math.sin(t * 0.6 + k) * 18;
+                    a.fillStyle(0xfff9db, 0.25 + 0.25 * Math.sin(t * 1.5 + k * 2));
+                    a.fillCircle(px, py, 2.5 + (k % 3));
+                }
             } else if (this.region === 'desierto') {
                 // Rodadora que cruza rodando y un buitre planeando.
                 var rx = ((t * 90) % (w + 300)) - 150;
@@ -659,6 +1063,9 @@
                 a.lineBetween(bx - 22, by - 6, bx, by);
                 a.lineBetween(bx, by, bx + 22, by - 6);
             } else if (this.region === 'cueva') {
+                // El dibujo trae tres antorchas encendidas pero quietas: se les
+                // pone encima un halo que late, para que parezcan arder.
+                this.animarAntorchas(t, conArte);
                 // Luciérnagas que brillan y un murciélago a ratos.
                 for (k = 0; k < 10; k++) {
                     var fx = w * ((k * 0.13 + 0.05 + Math.sin(t * 0.3 + k) * 0.05) % 1);
@@ -682,14 +1089,127 @@
                     a.fillTriangle(mx + 4, my, mx + 26, my - al, mx + 18, my + 6);
                 }
             } else {
-                // Nieve cayendo.
-                while (this.copos.length < 70) this.copos.push({ x: Math.random(), y: Math.random(), v: 0.04 + Math.random() * 0.06, r: 1.5 + Math.random() * 2.5, f: Math.random() * 6 });
-                a.fillStyle(0xffffff, 0.9);
+                // Nieve cercana, en tres profundidades: los copos de delante son
+                // grandes, caen deprisa y se mecen; los de atrás, finos y lentos.
+                // El dibujo ya trae una nevada de fondo, así que esta va encima.
+                while (this.copos.length < 90) {
+                    var cerca = Math.random();
+                    this.copos.push({
+                        x: Math.random(), y: Math.random(),
+                        v: 0.03 + cerca * 0.12,
+                        r: 1.2 + cerca * 4,
+                        f: Math.random() * 6,
+                        vaiven: 8 + cerca * 26,
+                        alfa: 0.45 + cerca * 0.5
+                    });
+                }
                 this.copos.forEach(function (c) {
                     c.y += c.v * dt;
-                    if (c.y > 1) { c.y = 0; c.x = Math.random(); }
-                    a.fillCircle(c.x * w + Math.sin(t + c.f) * 14, c.y * h, c.r);
+                    if (c.y > 1) { c.y = -0.02; c.x = Math.random(); }
+                    a.fillStyle(0xffffff, c.alfa);
+                    a.fillCircle(c.x * w + Math.sin(t * 0.8 + c.f) * c.vaiven, c.y * h, c.r);
                 });
+                // Ráfagas de viento que cruzan la cumbre.
+                var raf = (t * 0.24) % 1;
+                var ry2 = h * (0.3 + 0.18 * Math.sin(t * 0.3));
+                a.lineStyle(2, 0xffffff, 0.3 * Math.sin(raf * Math.PI));
+                for (k = 0; k < 4; k++) {
+                    var rx2 = raf * (w + 300) - 200 + k * 46;
+                    a.lineBetween(rx2, ry2 + k * 9, rx2 + 70 - k * 8, ry2 + k * 9 - 4);
+                }
+                // Un ave grande planeando muy alto, casi en silueta.
+                var ax = w * (0.5 + 0.44 * Math.sin(t * 0.17));
+                var ay = h * (0.15 + 0.04 * Math.sin(t * 0.5));
+                var aleteo = 5 + Math.sin(t * 1.6) * 9;
+                a.lineStyle(3, 0x3c5884, 0.75);
+                a.lineBetween(ax - 26, ay - aleteo, ax, ay);
+                a.lineBetween(ax, ay, ax + 26, ay - aleteo);
+            }
+        },
+
+        /**
+         * Las antorchas que el dibujo de la cueva ya trae (medidas en x 240, 695
+         * y 1172 de su lienzo) reciben un halo que late, uno por copia del
+         * mosaico. Va en coordenadas del mundo para moverse con el paisaje.
+         */
+        animarAntorchas: function (t, conArte) {
+            if (!this.luz) {
+                this.luz = this.add.graphics().setDepth(-31);
+            }
+            var g = this.luz;
+            g.clear().setVisible(true);
+            var m = conArte ? this.mapaArte() : null;
+            if (!m) { g.setVisible(false); return; }
+            var copias = Math.ceil(this.mundoW / m.copia);
+            for (var i = 0; i < copias; i++) {
+                var espejo = i % 2 === 1;
+                for (var k = 0; k < ANTORCHAS.length; k++) {
+                    var p = ANTORCHAS[k];
+                    var xd = espejo ? FONDO_W - p.x : p.x;
+                    var x = m.sx(xd, i);
+                    if (x > this.mundoW) continue;
+                    var y = m.sy(p.y);
+                    // Cada llama late a su ritmo, para que no parpadeen a la vez.
+                    var late = 0.72 + 0.28 * Math.sin(t * 5.5 + k * 2.1 + i);
+                    var r = m.esc * 86 * late;
+                    g.fillStyle(0xff922b, 0.1 * late);
+                    g.fillCircle(x, y, r * 1.5);
+                    g.fillStyle(0xffc078, 0.16 * late);
+                    g.fillCircle(x, y, r);
+                    g.fillStyle(0xfff3bf, 0.26 * late);
+                    g.fillCircle(x, y, r * 0.5);
+                }
+            }
+        },
+
+        /**
+         * Mariposas del diseño (mariposa1..5.svg), no dibujadas por código.
+         * Solo en la selva: vuelan en bucles suaves y abren y cierran las alas.
+         */
+        animarMariposas: function (time) {
+            var scene = this;
+            var hay = this.textures.exists(texEscena('mariposa1'));
+            var activas = hay && !reducido() && this.region === 'selva';
+            if (!this.mariposas) this.mariposas = [];
+            if (!activas) {
+                this.mariposas.forEach(function (m) { m.setVisible(false); });
+                return;
+            }
+            var w = this.scale.width;
+            var h = this.scale.height;
+            var t = time / 1000;
+            var lado = Math.max(30, Math.min(54, w * 0.05));
+            for (var i = 0; i < MARIPOSAS; i++) {
+                // Cada mariposa espera SU imagen: los SVG llegan por separado y, si
+                // se creaba con una que aún no había cargado, Phaser le ponía la
+                // textura de «falta imagen» (cuadro negro con borde verde) para siempre.
+                var clave = texEscena('mariposa' + (i + 1));
+                if (!this.textures.exists(clave)) {
+                    if (this.mariposas[i]) this.mariposas[i].setVisible(false);
+                    continue;
+                }
+                var m = this.mariposas[i];
+                if (!m) {
+                    m = this.add.image(0, 0, clave)
+                        .setDepth(27).setScrollFactor(0);
+                    this.mariposas[i] = m;
+                } else if (m.texture.key !== clave) {
+                    m.setTexture(clave);
+                }
+                var fase = i * 1.7;
+                // Recorrido en ocho, cada una a su altura y a su ritmo.
+                var x = w * (0.5 + 0.4 * Math.sin(t * (0.16 + i * 0.03) + fase));
+                // A media altura: por encima de los pedestales, lejos de la
+                // cabecera y del globo de diálogo.
+                var y = h * (0.44 + 0.14 * Math.sin(t * (0.42 + i * 0.05) + fase * 1.3));
+                var base = lado / (m.width || 160);
+                // Aleteo: se estrecha y se ensancha, como en los demás juegos.
+                var ale = base * (0.35 + 0.65 * Math.abs(Math.sin(t * 7 + fase)));
+                m.setVisible(true).setPosition(x, y);
+                m.setScale(ale, base);
+                // Mira hacia donde va.
+                m.setFlipX(Math.cos(t * (0.16 + i * 0.03) + fase) < 0);
+                void scene;
             }
         },
 
@@ -714,7 +1234,7 @@
             // ¿Flecha?
             for (var i = 0; i < this.flechas.length; i++) {
                 var f = this.flechas[i];
-                if (f.visible && Phaser.Math.Distance.Between(p.x, p.y, f.x, f.y) < 44) {
+                if (f.visible && Phaser.Math.Distance.Between(p.x, p.y, f.x, f.y) < (this.radioFlecha || 34) + 10) {
                     this.mirarHacia(this.cameras.main.scrollX + f.dir * this.scale.width * 0.6);
                     return;
                 }
@@ -788,16 +1308,182 @@
             return esperar(this, 1400).then(function () { c.celebrando = false; c.img.angle = 0; c.img.y = c.y; });
         },
 
+        /**
+         * El mapa del diseño: pergamino con las cuatro marcas de colores ya
+         * pintadas (selva, desierto, cueva, cima). Encima van los sellos de lo
+         * encontrado y la bandera del explorador en la parada actual.
+         */
+        mostrarMapaArte: function (k, ms, opts) {
+            var scene = this;
+            var w = this.scale.width;
+            var h = this.scale.height;
+            var m = this.mapa;
+            var quieto = reducido();
+            var esc = Math.min(w * 0.78 / MAPA_W, h * 0.68 / MAPA_H);
+            var pergamino = this.add.image(0, 0, texEscena('mapa')).setScale(esc);
+            m.add(pergamino);
+            function enMapa(p) { return { x: (p.x - MAPA_W / 2) * esc, y: (p.y - MAPA_H / 2) * esc }; }
+            // Las marcas del dibujo, llevadas al centro del pergamino.
+            var puntos = MAPA_PARADAS.map(function (p) {
+                var q = enMapa(p);
+                q.r = p.r * esc;
+                return q;
+            });
+            var camino = MAPA_CAMINO.map(enMapa);
+            var idx = MAPA_CAMINO_PARADA;
+            var ultima = puntos.length - 1;
+            k = Math.min(k, ultima);
+            // ¿Viaje a la parada siguiente? (al completar un nivel).
+            var destino = opts && typeof opts.viajeA === 'number' && opts.viajeA <= ultima ? opts.viajeA : -1;
+
+            // Rastro: el tramo ya recorrido se repasa en rojo sobre el punteado.
+            var rastro = this.add.graphics();
+            m.add(rastro);
+            var grosor = Math.max(3, 5 * esc);
+            function pintarRastro(hasta) {
+                // hasta: índice (con decimales) del punto del camino.
+                rastro.clear();
+                if (hasta <= 0) return;
+                rastro.lineStyle(grosor, 0xe03131, 0.85);
+                rastro.beginPath();
+                rastro.moveTo(camino[0].x, camino[0].y);
+                var n = Math.floor(hasta);
+                for (var a = 1; a <= n; a++) rastro.lineTo(camino[a].x, camino[a].y);
+                var f = hasta - n;
+                if (f > 0 && camino[n + 1]) {
+                    rastro.lineTo(camino[n].x + (camino[n + 1].x - camino[n].x) * f,
+                        camino[n].y + (camino[n + 1].y - camino[n].y) * f);
+                }
+                rastro.strokePath();
+            }
+            pintarRastro(idx[k]);
+
+            // Sellos: lo encontrado en cada parada, dentro de su propia marca.
+            this.paradas.forEach(function (id, i) {
+                var p = puntos[i];
+                if (!p) return;
+                var lado = p.r * 1.45;
+                var im = scene.add.image(p.x, p.y, tex(id));
+                im.setScale(Math.min(lado / (im.width || 1), lado / (im.height || 1)));
+                m.add(im);
+                var est = scene.add.star(p.x + p.r * 0.95, p.y - p.r * 0.95, 5, p.r * 0.22, p.r * 0.46, 0xfcc419);
+                m.add(est);
+                // El sello recién ganado aparece con un saltito.
+                if (opts && opts.nuevo === i && !quieto) {
+                    var e0 = im.scale;
+                    im.setScale(0.01);
+                    est.setScale(0.01);
+                    scene.tweens.add({ targets: im, scale: e0, duration: 450, delay: 300, ease: 'Back.easeOut' });
+                    scene.tweens.add({ targets: est, scale: 1, duration: 450, delay: 550, ease: 'Back.easeOut' });
+                }
+            });
+
+            // La bandera del diseño, clavada en el CENTRO de la marca: el pie del
+            // asta en el centro, un poco abajo, y el paño por encima.
+            var ban = null;
+            var escBan = 1;
+            function lugarBandera(p) { return { x: p.x, y: p.y + p.r * 0.3 }; }
+            if (this.textures.exists(texEscena('bandera'))) {
+                var lb = lugarBandera(puntos[k]);
+                ban = this.add.image(lb.x, lb.y, texEscena('bandera'));
+                escBan = MAPA_BANDERA_ALTO * esc / BANDERA.h;
+                ban.setScale(escBan);
+                // El pie del asta (52,475 del lienzo 500) queda en ese punto.
+                ban.setOrigin(BANDERA.pieX / 500, BANDERA.pieY / 500);
+            }
+
+            // El explorador: un punto rojo que recorre el camino.
+            var explorador = null;
+            if (destino > k) {
+                explorador = this.add.container(camino[idx[k]].x, camino[idx[k]].y);
+                var halo = this.add.circle(0, 0, 16 * esc, 0xffffff, 0.55);
+                var punto = this.add.circle(0, 0, 10 * esc, 0xe03131, 1).setStrokeStyle(Math.max(2, 3 * esc), 0xffffff, 1);
+                explorador.add([halo, punto]);
+                explorador.halo = halo;
+                explorador.setVisible(false);
+                m.add(explorador);
+            }
+            if (ban) m.add(ban);
+
+            this.puntosMapa = puntos;
+            m.setVisible(true).setAlpha(0).setScale(0.8);
+            sfx('magia');
+
+            function cerrar(resolve) {
+                scene.time.delayedCall(quieto ? 300 : (ms || 1400), function () {
+                    scene.tweens.add({ targets: m, alpha: 0, duration: quieto ? 1 : 300, onComplete: function () { m.setVisible(false); resolve(); } });
+                });
+            }
+
+            return new Promise(function (resolve) {
+                scene.tweens.add({ targets: m, alpha: 1, scale: 1, duration: quieto ? 1 : 300, ease: 'Back.easeOut' });
+                if (!explorador) { cerrar(resolve); return; }
+
+                var desde = idx[k];
+                var hasta = idx[destino];
+                // Largo del tramo en px del lienzo: de ahí sale la duración.
+                var largo = 0;
+                for (var a = desde; a < hasta; a++) {
+                    largo += Math.hypot(MAPA_CAMINO[a + 1].x - MAPA_CAMINO[a].x, MAPA_CAMINO[a + 1].y - MAPA_CAMINO[a].y);
+                }
+                var dur = quieto ? 1 : Math.max(2600, Math.min(6500, largo / MAPA_VELOCIDAD * 1000));
+                var pDest = puntos[destino];
+                var lbDest = lugarBandera(pDest);
+
+                // 1) Se ve el sello nuevo; la bandera se arranca de la parada hecha.
+                scene.time.delayedCall(quieto ? 1 : 1300, function () {
+                    if (ban) scene.tweens.add({ targets: ban, scaleY: 0.01, alpha: 0, duration: quieto ? 1 : 350, ease: 'Sine.easeIn' });
+                    explorador.setVisible(true).setScale(0.01);
+                    scene.tweens.add({ targets: explorador, scale: 1, duration: quieto ? 1 : 300, ease: 'Back.easeOut' });
+                    // 2) El explorador sigue el camino punteado, despacio, y deja rastro.
+                    var t = { v: desde };
+                    var latido = quieto ? null : scene.tweens.add({ targets: explorador.halo, scale: 1.35, alpha: 0.2, duration: 450, yoyo: true, repeat: -1 });
+                    scene.tweens.add({
+                        targets: t, v: hasta, duration: dur, delay: quieto ? 0 : 400, ease: 'Sine.easeInOut',
+                        onUpdate: function () {
+                            var n = Math.min(Math.floor(t.v), camino.length - 1);
+                            var f = t.v - n;
+                            var a0 = camino[n];
+                            var a1 = camino[Math.min(n + 1, camino.length - 1)];
+                            explorador.setPosition(a0.x + (a1.x - a0.x) * f, a0.y + (a1.y - a0.y) * f);
+                            pintarRastro(t.v);
+                        },
+                        onComplete: function () {
+                            // 3) Del final del camino al centro de la marca.
+                            scene.tweens.add({
+                                targets: explorador, x: pDest.x, y: pDest.y, duration: quieto ? 1 : 450, ease: 'Sine.easeOut',
+                                onComplete: function () {
+                                    if (latido) latido.stop();
+                                    scene.tweens.add({ targets: explorador, scale: 0.01, alpha: 0, duration: quieto ? 1 : 250 });
+                                    // 4) ¡Llegamos! Sale la bandera en el centro de la marca.
+                                    if (ban) {
+                                        ban.setPosition(lbDest.x, lbDest.y).setAlpha(1).setScale(escBan, 0.01);
+                                        scene.tweens.add({ targets: ban, scaleY: escBan, duration: quieto ? 1 : 650, ease: 'Back.easeOut' });
+                                    }
+                                    sfx('ding');
+                                    cerrar(resolve);
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+        },
+
         /** Mapa de pergamino con las 4 paradas; muestra la ruta hasta la parada k. */
-        mostrarMapa: function (k, ms) {
+        mostrarMapa: function (k, ms, opts) {
             var scene = this;
             var w = this.scale.width;
             var h = this.scale.height;
             var m = this.mapa;
             m.removeAll(true);
+            m.setPosition(w / 2, h * 0.5);
+            // El mapa del diseño, con sus cuatro marcas ya pintadas.
+            if (this.textures.exists(texEscena('mapa'))) {
+                return this.mostrarMapaArte(k, ms, opts);
+            }
             var mw = Math.min(w * 0.7, 640);
             var mh = Math.min(h * 0.5, 320);
-            m.setPosition(w / 2, h * 0.5);
             var g = this.add.graphics();
             g.fillStyle(0xf3d9a4, 1);
             g.fillRoundedRect(-mw / 2, -mh / 2, mw, mh, 18);
@@ -847,7 +1533,70 @@
             this.paradas.push(id);
             var scene = this;
             sfx('ding');
-            return this.mostrarMapa(this.paradas.length - 1, 1500).then(function () { void scene; });
+            // Al completar el nivel: se sella lo encontrado y el explorador recorre
+            // el camino punteado hasta la parada siguiente, donde sale la bandera.
+            var k = this.paradas.length - 1;
+            return this.mostrarMapa(k, 1800, { nuevo: k, viajeA: k + 1 }).then(function () { void scene; });
+        },
+
+        /**
+         * Final con el cofre del diseño, en dos piezas sobre el mismo lienzo
+         * 609×500: la caja ocupa y 118..382 y la tapa (la cúpula) y 194..305, pero
+         * dibujada DENTRO de la caja. Para armarlo como en el diseño, la tapa se
+         * sube hasta que su borde de abajo (305) quede sobre el borde de arriba de
+         * la caja (118). El cofre aparece entero y cerrado, y después SOLO se
+         * levanta la tapa (bisagra atrás) y sale la luz con la insignia.
+         */
+        fiestaFinalArte: function (cx, s, cw, h) {
+            var scene = this;
+            var quieto = reducido();
+            var ancho = Math.max(cw * 1.5, Math.min(this.scale.width * 0.3, 280));
+            var esc = ancho / 609;
+            var cofre = this.add.container(cx, s).setDepth(30);
+            // La base de la caja (y 382 del lienzo) se apoya en el suelo (y 0).
+            var CAJA_ARRIBA = 118, CAJA_ABAJO = 382, TAPA_ABAJO = 305, TAPA_ALTO = 111;
+            var caja = this.add.image(0, -CAJA_ABAJO * esc, texEscena('cofreCaja')).setOrigin(0.5, 0).setScale(esc);
+            // Bisagra de la tapa: el centro de su borde de abajo, apoyado sobre la caja
+            // (se montan 3 px del lienzo para que no quede una rendija).
+            var yBisagra = (CAJA_ARRIBA + 3 - CAJA_ABAJO) * esc;
+            var tapa = this.add.image(0, yBisagra, texEscena('cofreTapa')).setOrigin(0.5, TAPA_ABAJO / 500).setScale(esc);
+            // Luz que sale de dentro al abrir (detrás de la caja y de la tapa).
+            var luz = this.add.ellipse(0, yBisagra, (552 - 56) * esc * 0.9, TAPA_ALTO * esc * 0.9, 0xffe066, 0);
+            var rayos = this.add.graphics();
+            rayos.fillStyle(0xfff3bf, 1);
+            for (var r = -2; r <= 2; r++) {
+                var bx = r * 90 * esc;
+                rayos.fillTriangle(bx - 22 * esc, 0, bx + 22 * esc, 0, bx + r * 40 * esc, -190 * esc);
+            }
+            rayos.setPosition(0, yBisagra).setAlpha(0);
+            cofre.add([rayos, luz, caja, tapa]);
+            cofre.setScale(0.01);
+            var yInsignia = s + yBisagra - TAPA_ALTO * esc * 0.4;
+            var ins = this.textures.exists(tex('__insignia'))
+                ? this.add.image(cx, yInsignia, tex('__insignia')).setDepth(29).setScale(0.01) : null;
+            // 1) Aparece el cofre cerrado, entero.
+            this.tweens.add({ targets: cofre, scale: 1, duration: quieto ? 1 : 500, ease: 'Back.easeOut' });
+            // 2) Se queda cerrado un momento, tiembla un poquito y se abre la tapa.
+            this.time.delayedCall(quieto ? 1 : 1000, function () {
+                if (!quieto) scene.tweens.add({ targets: cofre, angle: { from: -2, to: 2 }, duration: 70, yoyo: true, repeat: 3, onComplete: function () { cofre.angle = 0; } });
+            });
+            this.time.delayedCall(quieto ? 1 : 1500, function () {
+                sfx('magia');
+                // La tapa gira hacia atrás sobre su bisagra: sube, se inclina un poco
+                // y se ve más corta (se aleja), sin despegarse de la caja.
+                scene.tweens.add({ targets: tapa, y: yBisagra - TAPA_ALTO * esc * 0.42, scaleY: esc * 0.72, angle: -8, duration: quieto ? 1 : 650, ease: 'Back.easeOut' });
+                scene.tweens.add({ targets: luz, fillAlpha: 0.85, duration: quieto ? 1 : 400 });
+                scene.tweens.add({ targets: rayos, alpha: 0.75, duration: quieto ? 1 : 500 });
+                if (!quieto) scene.tweens.add({ targets: rayos, scaleX: 1.08, alpha: 0.45, duration: 700, yoyo: true, repeat: -1, delay: 500 });
+                scene.chispas(cx, s + yBisagra, 24);
+                if (ins) {
+                    var t = h * 0.22;
+                    var e2 = Math.min(t / (ins.width || 1), t / (ins.height || 1));
+                    scene.tweens.add({ targets: ins, scale: e2, y: yInsignia - h * 0.2, duration: quieto ? 1 : 800, delay: quieto ? 0 : 200, ease: 'Back.easeOut' });
+                }
+            });
+            this.confeti();
+            return esperar(this, 3600);
         },
 
         /** Final: el mapa completo y un cofre que se abre con la insignia de explorador. */
@@ -860,6 +1609,10 @@
             var cw = Math.min(w * 0.2, 200);
             // A la izquierda del botón de escuchar (abajo al centro), no detrás de él.
             var cx = this.cameras.main.scrollX + w / 2 - Math.max(cw * 0.75 + 70, w * 0.16);
+            // Con el cofre del diseño: la caja y su tapa, que gira sobre la bisagra.
+            if (this.textures.exists(texEscena('cofreCaja'))) {
+                return this.fiestaFinalArte(cx, s, cw, h);
+            }
             var cofre = this.add.container(cx, s).setDepth(30);
             var caja = this.add.graphics();
             caja.fillStyle(0x8d5524, 1);
@@ -930,8 +1683,17 @@
             Object.keys(this.cosas).forEach(function (k) { scene.cosas[k].img.setVisible(false); });
             var c = this.crearCosa(id);
             // A un lado: abajo al centro están el botón de escuchar y la mano del tutorial.
-            c.x = this.scale.width * 0.32;
-            c.y = this.suelo();
+            // Con el arte, sobre el primer tocón que quede a ese lado de la pantalla.
+            var apoyos = this.apoyosArte();
+            var elegido = null;
+            if (apoyos) {
+                for (var i = 0; i < apoyos.length; i++) {
+                    if (apoyos[i].x < this.scale.width * 0.48) elegido = apoyos[i];
+                }
+                if (!elegido) elegido = apoyos[0];
+            }
+            c.x = elegido ? elegido.x : this.scale.width * 0.32;
+            c.y = elegido ? elegido.y : this.suelo();
             c.img.setVisible(true).setPosition(c.x, c.y);
             this.cameras.main.setScroll(0, 0);
             this.demoObj = c;
@@ -996,13 +1758,34 @@
         var conInsignia = niveles.filter(function (n) { return n.insignia && n.insignia.img; })[0];
         if (conInsignia) lista.push({ key: tex('__insignia'), src: conInsignia.insignia.img });
         lista = lista.filter(function (t) { return !scene.textures.exists(t.key); });
-        if (!lista.length) return Promise.resolve();
+        var faltaEscena = !hayArte(scene);
+        if (!lista.length && !faltaEscena) {
+            // Ya estaba todo: se da por resuelto el arte y se pinta lo que toque.
+            scene.arteDecidido = true;
+            scene.dibujarRegion();
+            return Promise.resolve();
+        }
         return new Promise(function (resolve) {
             lista.forEach(function (t) {
                 if (/\.svg(\?|$)/i.test(t.src)) scene.load.svg(t.key, t.src, { scale: 2 });
                 else scene.load.image(t.key, t.src);
             });
-            scene.load.once('complete', resolve);
+            if (faltaEscena) encolarEscena(scene.load);
+            function terminar() {
+                // Ya se sabe si hay arte: se rehacen las flechas y se repinta la
+                // región, con el dibujo del diseño o, si falló, con el de siempre.
+                scene.arteDecidido = true;
+                scene.rehacerFlechas();
+                scene.dibujarRegion();
+                scene.ubicarFijos();
+                scene.reubicar();
+                resolve();
+            }
+            // Si la carga falla, tampoco puede quedarse en el color de espera.
+            scene.load.once('complete', terminar);
+            scene.load.once('loaderror', function () {
+                scene.load.once('complete', terminar);
+            });
             scene.load.start();
         });
     }
@@ -1031,7 +1814,7 @@
             parent: el,
             width: global.innerWidth || 1024,
             height: global.innerHeight || 640,
-            backgroundColor: '#63e6be',
+            backgroundColor: '#71b738',
             audio: { noAudio: true },
             scene: [EscenaExpedicion],
             scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.CENTER_BOTH }

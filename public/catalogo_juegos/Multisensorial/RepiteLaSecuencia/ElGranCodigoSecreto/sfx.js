@@ -159,6 +159,24 @@
         });
     }
 
+    /** Palmada: golpe de ruido medio-agudo muy corto. */
+    function palmada(c, d, t, vol) {
+        ruido(c, d, t, 0.06, { vol: vol, ataque: 0.002, caida: 0.05, filtros: [{ tipo: "bandpass", f: 1700, q: 1.1 }, { tipo: "highpass", f: 700 }] });
+        ruido(c, d, t, 0.02, { vol: vol * 0.5, ataque: 0.001, caida: 0.018, filtros: [{ tipo: "bandpass", f: 3600, q: 1.5 }] });
+    }
+
+    /** Golpe seco de madera o casco. */
+    function clac(c, d, t, f, vol) {
+        osc(c, d, t, 0.05, { tipo: "triangle", f: f, vol: vol, ataque: 0.001, caida: 0.045, curva: [[0, f], [0.05, f * 0.7]] });
+        ruido(c, d, t, 0.03, { vol: vol * 0.6, ataque: 0.001, caida: 0.028, filtros: [{ tipo: "bandpass", f: f * 3, q: 3 }] });
+    }
+
+    /** "Pío" de pollito: agudo y descendente (distinto del trino del pájaro, que sube y baja). */
+    function pioPollito(c, d, t) {
+        osc(c, d, t, 0.16, { tipo: "sine", vol: 0.26, ataque: 0.01, caida: 0.1, curva: [[0, 4200], [0.16, 2900]] });
+        osc(c, d, t, 0.16, { tipo: "sine", vol: 0.05, ataque: 0.01, caida: 0.1, curva: [[0, 8400], [0.16, 5800]] });
+    }
+
     function pio(c, d, t) {
         osc(c, d, t, 0.1, {
             tipo: "sine", vol: 0.22, ataque: 0.008, caida: 0.06,
@@ -331,6 +349,151 @@
                 }
             });
             return (grupos[grupos.length - 1] + 0.5) * k;
+        },
+        /** Una persona aplaudiendo. */
+        aplauso: function (c, d, t, k, breve) {
+            const golpes = breve ? [0, 0.32, 0.64] : [0, 0.32, 0.64, 0.96, 1.28, 1.6];
+            golpes.forEach(function (s) { palmada(c, d, t + s * k, 0.55); });
+            return (golpes[golpes.length - 1] + 0.12) * k;
+        },
+        /** "Chu-chu" de la locomotora y su silbato. */
+        tren: function (c, d, t, k, breve) {
+            const chu = breve ? 4 : 8;
+            for (let i = 0; i < chu; i++) {
+                ruido(c, d, t + i * 0.2 * k, 0.16 * k, {
+                    vol: i % 2 ? 0.16 : 0.26, ataque: 0.015, caida: 0.12 * k,
+                    filtros: [{ tipo: "bandpass", f: 900, q: 0.8 }, { tipo: "lowpass", f: 2400 }]
+                });
+            }
+            const silbato = chu * 0.2 * k;
+            const dur = (breve ? 0.55 : 0.9) * k;
+            [[740, 0.13], [932, 0.1]].forEach(function (p) {
+                osc(c, d, t + silbato, dur, { tipo: "triangle", f: p[0], vol: p[1], ataque: 0.05, caida: 0.15, vibrato: [6, 5] });
+            });
+            ruido(c, d, t + silbato, dur, { vol: 0.04, ataque: 0.05, caida: 0.15, filtros: [{ tipo: "bandpass", f: 2000, q: 2 }] });
+            return silbato + dur + 0.05;
+        },
+        /** Botella plástica con semillas: sacudidas largas y huecas. */
+        semillas: function (c, d, t, k, breve) {
+            const sacudidas = breve ? [0, 0.38] : [0, 0.38, 0.76, 1.14];
+            sacudidas.forEach(function (s) {
+                ruido(c, d, t + s * k, 0.26 * k, {
+                    ganancia: [[0.03, 0.2], [0.12, 0.08], [0.2, 0.18], [0.26, 0.0001]].map(function (p) { return [p[0] * k, p[1]]; }),
+                    filtros: [{ tipo: "bandpass", f: 2400, q: 1.4 }, { tipo: "lowpass", f: 4500 }]
+                });
+            });
+            return (sacudidas[sacudidas.length - 1] + 0.3) * k;
+        },
+        pollito: function (c, d, t, k, breve) {
+            const pios = breve ? [0, 0.28] : [0, 0.28, 0.56, 0.95, 1.23];
+            pios.forEach(function (s) { pioPollito(c, d, t + s * k); });
+            return (pios[pios.length - 1] + 0.2) * k;
+        },
+        /** Pasos de pies sobre el suelo. */
+        pasos: function (c, d, t, k, breve) {
+            const n = breve ? 3 : 6;
+            for (let i = 0; i < n; i++) {
+                const s = t + i * 0.42 * k;
+                const vol = i % 2 ? 0.45 : 0.6;
+                osc(c, d, s, 0.12, { tipo: "sine", vol: vol, ataque: 0.004, caida: 0.1, curva: [[0, 120], [0.12, 60]] });
+                ruido(c, d, s, 0.09, { vol: vol * 0.35, ataque: 0.004, caida: 0.08, filtros: [{ tipo: "lowpass", f: 700 }] });
+            }
+            return ((n - 1) * 0.42 + 0.15) * k;
+        },
+        /** Caballo galopando: tres cascos por zancada. */
+        galope: function (c, d, t, k, breve) {
+            const zancadas = breve ? 3 : 6;
+            for (let z = 0; z < zancadas; z++) {
+                [0, 0.09, 0.18].forEach(function (s, i) {
+                    clac(c, d, t + (z * 0.42 + s) * k, 260 + i * 40, i === 2 ? 0.45 : 0.32);
+                });
+            }
+            return (zancadas * 0.42) * k;
+        },
+        /** Agujas del reloj: tic-tac. */
+        reloj: function (c, d, t, k, breve) {
+            const n = breve ? 4 : 8;
+            for (let i = 0; i < n; i++) {
+                const f = i % 2 ? 1900 : 2600;
+                osc(c, d, t + i * 0.42 * k, 0.03, { tipo: "square", f: f, vol: 0.09, ataque: 0.001, caida: 0.028, filtros: [{ tipo: "bandpass", f: f, q: 6 }] });
+                ruido(c, d, t + i * 0.42 * k, 0.015, { vol: 0.18, ataque: 0.001, caida: 0.013, filtros: [{ tipo: "highpass", f: 3000 }] });
+            }
+            return ((n - 1) * 0.42 + 0.05) * k;
+        },
+        /** Burro: "ii-aa" (inspiración aguda, espiración grave). */
+        rebuzno: function (c, d, t, k, breve) {
+            const ciclos = breve ? 1 : 2;
+            let s = 0;
+            for (let i = 0; i < ciclos; i++) {
+                const ii = 0.32 * k;
+                const aa = 0.42 * k;
+                osc(c, d, t + s, ii, { tipo: "sawtooth", vol: 0.24, ataque: 0.03, caida: 0.1, curva: [[0, 820], [ii, 1000]], filtros: [{ tipo: "bandpass", f: 1800, q: 3 }] });
+                ruido(c, d, t + s, ii, { vol: 0.06, ataque: 0.03, caida: 0.1, filtros: [{ tipo: "bandpass", f: 3000, q: 2 }] });
+                osc(c, d, t + s + ii, aa, { tipo: "sawtooth", vol: 0.38, ataque: 0.02, caida: 0.14, curva: [[0, 300], [aa, 220]], vibrato: [24, 18], filtros: [{ tipo: "lowpass", f: 1400, q: 2 }] });
+                s += ii + aa + 0.08 * k;
+            }
+            return s;
+        },
+        /** Elefante: barrito agudo que sube como una trompeta. */
+        barrito: function (c, d, t, k, breve) {
+            const dur = (breve ? 0.9 : 1.5) * k;
+            [[1, 0.26], [1.5, 0.1]].forEach(function (p) {
+                osc(c, d, t, dur, {
+                    tipo: "sawtooth", vol: p[1], ataque: 0.06, caida: dur * 0.35,
+                    curva: [[0, 380 * p[0]], [dur * 0.3, 900 * p[0]], [dur * 0.7, 820 * p[0]], [dur, 560 * p[0]]],
+                    vibrato: [11, 25],
+                    filtros: [{ tipo: "bandpass", f: 1500, q: 2.5 }]
+                });
+            });
+            ruido(c, d, t, dur, { vol: 0.05, ataque: 0.1, caida: dur * 0.4, filtros: [{ tipo: "bandpass", f: 2500, q: 2 }] });
+            return dur + 0.05;
+        },
+        /** Pato: "cuac" nasal. */
+        cuac: function (c, d, t, k, breve) {
+            const golpes = breve ? [0, 0.3] : [0, 0.3, 0.75, 1.05];
+            golpes.forEach(function (s) {
+                const dur = 0.2 * k;
+                osc(c, d, t + s * k, dur, { tipo: "sawtooth", vol: 0.32, ataque: 0.01, caida: 0.12, curva: [[0, 560], [dur, 420]], filtros: [{ tipo: "bandpass", f: 1250, q: 5 }] });
+                osc(c, d, t + s * k, dur, { tipo: "square", vol: 0.08, ataque: 0.01, caida: 0.12, curva: [[0, 560], [dur, 420]], filtros: [{ tipo: "bandpass", f: 2600, q: 4 }] });
+            });
+            return (golpes[golpes.length - 1] + 0.25) * k;
+        },
+        /** León: rugido grave y áspero. */
+        rugido: function (c, d, t, k, breve) {
+            const dur = (breve ? 1.0 : 1.7) * k;
+            osc(c, d, t, dur, {
+                tipo: "sawtooth", vol: 0.5, ataque: 0.15, caida: dur * 0.5,
+                curva: [[0, 85], [dur * 0.35, 150], [dur, 70]],
+                vibrato: [28, 14],
+                filtros: [{ tipo: "lowpass", q: 1.5, curva: [[0, 400], [dur * 0.35, 1100], [dur, 300]] }]
+            });
+            ruido(c, d, t, dur, { vol: 0.2, ataque: 0.15, caida: dur * 0.5, filtros: [{ tipo: "lowpass", f: 650 }] });
+            return dur + 0.05;
+        },
+        /** Rana: "croac" de pulsos rápidos. */
+        croar: function (c, d, t, k, breve) {
+            const croacs = breve ? [0, 0.45] : [0, 0.45, 1.0, 1.45];
+            croacs.forEach(function (s) {
+                for (let i = 0; i < 7; i++) {
+                    osc(c, d, t + (s + i * 0.032) * k, 0.028, { tipo: "square", f: 190, vol: 0.2, ataque: 0.002, caida: 0.024, filtros: [{ tipo: "bandpass", f: 700, q: 3 }] });
+                }
+            });
+            return (croacs[croacs.length - 1] + 0.3) * k;
+        },
+        /** Gaita: bordón grave continuo y melodía nasal encima. */
+        gaita: function (c, d, t, k, breve) {
+            const notas = breve
+                ? [[0, 0.3, 659], [0.3, 0.3, 740], [0.6, 0.5, 880]]
+                : [[0, 0.3, 659], [0.3, 0.3, 740], [0.6, 0.3, 880], [0.9, 0.3, 740], [1.2, 0.6, 988]];
+            const ult = notas[notas.length - 1];
+            const dur = (ult[0] + ult[1]) * k;
+            [[110, 0.12], [220, 0.08]].forEach(function (p) {
+                osc(c, d, t, dur, { tipo: "sawtooth", f: p[0], vol: p[1], ataque: 0.08, caida: 0.15, filtros: [{ tipo: "lowpass", f: 900 }] });
+            });
+            notas.forEach(function (n) {
+                osc(c, d, t + n[0] * k, n[1] * k, { tipo: "sawtooth", f: n[2], vol: 0.16, ataque: 0.02, caida: 0.05, filtros: [{ tipo: "bandpass", f: 1800, q: 3 }] });
+            });
+            return dur + 0.05;
         }
     };
 
@@ -392,6 +555,7 @@
             [2093, 2637, 3136].forEach(function (f, i) { nota(f, 0.6 + i * 0.07, 0.3, 0.05); });
         },
         aplausos: function () { aplausos(2.6); },
+        aplausoBreve: function () { aplausos(1.3); },
         suave: function () {
             nota(392, 0, 0.18, 0.12);
             nota(330, 0.16, 0.26, 0.1);

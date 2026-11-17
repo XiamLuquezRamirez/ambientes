@@ -35,12 +35,39 @@
     var PIEL = [0xf1c27d, 0xe0ac69, 0xc68642, 0x8d5524, 0xffdbac];
     var SILUETA = 0x2b2140;
     var ESCENA = {
-        fondo: 'img/fondo.svg',
+        // fondo.svg sin las personas (img/publico), sin cielo, nubes, árboles altos ni banderines:
+        // esas piezas van en el atlas img/escena_capas.svg (escena-capas.js) y se animan.
+        fondo: 'img/fondo_capa.svg',
         carroza: 'img/carroza.svg',
         tapadera: 'img/tapadera.svg'
     };
+    /**
+     * Medidas del fondo (1280×720): la tarima ya está dibujada (piso en y 412, x 960-1265)
+     * y la calle va de y 495 al borde. Cada persona del público (sacada de fondo.svg) con su
+     * caja en unidades del fondo.
+     */
+    var FONDO = {
+        w: 1280, h: 720,
+        tarima: { x0: 960, x1: 1265, piso: 412 },
+        carriles: [692, 588],               // suelo del carril cercano y del lejano
+        publico: [
+            [12, 39, 354, 40, 122], [11, 78, 362, 39, 115], [4, 117, 366, 67, 103], [14, 184, 365, 48, 104],
+            [1, 231, 362, 39, 115], [3, 270, 365, 48, 104], [16, 317, 372, 55, 102], [2, 372, 354, 39, 122],
+            [13, 411, 367, 44, 112], [19, 455, 366, 68, 103], [18, 523, 357, 40, 122], [9, 562, 365, 68, 103],
+            [5, 630, 364, 38, 115], [8, 668, 367, 48, 104], [6, 716, 353, 39, 122], [17, 755, 364, 39, 115],
+            [10, 793, 367, 55, 102], [7, 848, 363, 44, 112], [15, 892, 364, 68, 103]
+        ]
+    };
+    function nombrePersona(n) { return 'img/publico/persona' + (n < 10 ? '0' : '') + n + '.svg'; }
+    /**
+     * Medidas de carroza.svg (632×500): la caja roja va de x 186 a 604 y el borde de adelante
+     * está en y 283. La tapadera.svg (forma de 392×234 en un lienzo de 500, centrada) se apoya
+     * ahí, del mismo tamaño que en el diseño, y lo que viaja va en el centro de la caja.
+     */
+    var CARRO = { w: 632, h: 500, centroX: 395, piso: 283, cajaW: 392, cajaH: 234 };
+    var TAPA = { lienzo: 500, w: 392 };
     function texEscena(parte) { return 'desfile:escena:' + parte; }
-    var ESCENA_V = '?v=20261112preload2';
+    var ESCENA_V = '?v=20261113vivo';
     function encolarEscena(load) {
         function add(key, src) {
             if (!src) return;
@@ -50,6 +77,8 @@
         add(texEscena('fondo'), ESCENA.fondo);
         add(texEscena('carroza'), ESCENA.carroza);
         add(texEscena('tapadera'), ESCENA.tapadera);
+        if (global.DesfileCapas) load.svg(texEscena('capas'), 'img/escena_capas.svg' + ESCENA_V, { scale: 2 });
+        FONDO.publico.forEach(function (p) { add(texEscena('persona' + p[0]), nombrePersona(p[0])); });
     }
 
     function elemento(id) {
@@ -149,6 +178,8 @@
 
         create: function () {
             this.fondoImg = null;
+            this.capas = null;
+            this.viento = 1;
             this.cielo = this.add.graphics().setDepth(-30);
             this.fondo = this.add.graphics().setDepth(-25);
             this.banderines = this.add.graphics().setDepth(-20);
@@ -174,7 +205,18 @@
         /** Suelo del carril cercano (0) y del lejano (1). */
         sueloCarril: function (i) {
             var h = this.scale.height;
+            var f = this.marcoFondo();
+            if (f) return Math.min(h - 8, f.y(FONDO.carriles[i ? 1 : 0]));
             return i ? h * 0.66 : h * 0.88;
+        },
+
+        /** Dónde cae el fondo ilustrado en pantalla (cubre la pantalla, centrado). */
+        marcoFondo: function () {
+            var img = this.fondoImg;
+            if (!img || !img.visible) return null;
+            var k = img.scaleX * (img.width || FONDO.w) / FONDO.w;
+            var ix = img.x - FONDO.w * k / 2, iy = img.y - FONDO.h * k / 2;
+            return { k: k, x: function (u) { return ix + u * k; }, y: function (v) { return iy + v * k; } };
         },
 
         escalaCarril: function (i) {
@@ -201,6 +243,10 @@
                 if (!this.fondoImg) this.fondoImg = this.add.image(w / 2, h / 2, keyFondo).setDepth(-31);
                 this.fondoImg.setVisible(true).setPosition(w / 2, h / 2);
                 this.fondoImg.setScale(Math.max(w / (this.fondoImg.width || 1), h / (this.fondoImg.height || 1)));
+                // Si sobra ancho se recorta por la izquierda: la tarima (a la derecha) siempre se ve.
+                var anchoF = this.fondoImg.width * this.fondoImg.scaleX;
+                if (anchoF > w) this.fondoImg.x = w - anchoF / 2;
+                this.ubicarCapas();
             } else {
                 if (this.fondoImg) this.fondoImg.setVisible(false);
                 for (var b = 0; b < 16; b++) {
@@ -260,9 +306,14 @@
                 });
             }
 
-            // Calle del desfile: dos carriles con línea punteada.
+            // Calle del desfile: dos carriles con línea punteada (el fondo ilustrado ya la trae).
             var v = this.via;
             v.clear();
+            if (this.marcoFondo()) {
+                this.dibujarTarima();
+                this.ubicarPublico();
+                return;
+            }
             v.fillStyle(0xadb5bd, 1);
             v.fillRect(0, h * 0.6, w, h * 0.4);
             v.fillStyle(0x868e96, 1);
@@ -280,6 +331,18 @@
             var h = this.scale.height;
             var t = this.tarima;
             t.clear();
+            var scene = this;
+            var f = this.marcoFondo();
+            if (f) {
+                // La tarima del fondo: solo se toma su piso para subir ahí a la banda.
+                this.tarimaRect = { x: f.x(FONDO.tarima.x0), y: f.y(FONDO.tarima.piso), w: (FONDO.tarima.x1 - FONDO.tarima.x0) * f.k };
+                this.banda.forEach(function (m, j) {
+                    var p = scene.puestoBanda(j);
+                    m.setPosition(p.x, p.y);
+                    m.base = p.y;
+                });
+                return;
+            }
             var tw = Math.min(w * 0.24, 300);
             var x0 = w - tw - w * 0.02;
             var y0 = h * 0.5;
@@ -304,7 +367,6 @@
             t.fillStyle(0x7f3f1d, 1);
             for (var k = 0; k < 6; k++) t.fillRect(x0 - 10 + k * (tw + 20) / 6, y0, 3, h * 0.05);
             // Las trompetas ya en la tarima se reacomodan.
-            var scene = this;
             this.banda.forEach(function (m, j) {
                 var p = scene.puestoBanda(j);
                 m.setPosition(p.x, p.y);
@@ -321,36 +383,22 @@
         },
 
         /**
-         * El fondo ilustrado (img/fondo.svg) ya trae al público en la acera: la franja
-         * y 406-470 de la imagen. En vez de dibujar gente encima, esa franja se recorta en
-         * tiras verticales que se mecen y saltan como si fueran los espectadores.
+         * El público del fondo ilustrado: cada persona es su propia imagen (img/publico,
+         * recortada de fondo.svg) puesta donde estaba en el dibujo. Solo brincan.
          */
-        PUBLICO_FONDO: { y0: 392, y1: 472, tiras: 22 },
-
         publicoDelFondo: function () {
-            var keyFondo = texEscena('fondo');
-            if (!this.textures.exists(keyFondo)) return false;
-            var src = this.textures.get(keyFondo).getSourceImage();
-            var P = this.PUBLICO_FONDO;
-            var anchoTira = src.width / P.tiras;
-            // Cada tira se copia a su propia textura (recortar la del fondo no funciona:
-            // ya está en uso y Phaser sigue dibujándola entera).
-            for (var i = 0; i < P.tiras; i++) {
-                var clave = 'desfile:publico:' + i;
-                if (!this.textures.exists(clave)) {
-                    var x0 = Math.max(0, Math.round(i * anchoTira) - 1);
-                    var w0 = Math.min(src.width - x0, Math.round(anchoTira) + 2);
-                    var alto = P.y1 - P.y0;
-                    var cv = this.textures.createCanvas(clave, w0, alto);
-                    cv.getContext().drawImage(src, x0, P.y0, w0, alto, 0, 0, w0, alto);
-                    cv.refresh();
-                }
-                var im = this.add.image(0, 0, clave).setOrigin(0.5, 1).setDepth(-15);
-                im.fase = Math.random() * Math.PI * 2;
-                im.escala = 1;
-                im.tira = i;
-                this.publico.push(im);
-            }
+            var scene = this;
+            if (!this.textures.exists(texEscena('fondo'))) return false;
+            var faltan = FONDO.publico.some(function (p) { return !scene.textures.exists(texEscena('persona' + p[0])); });
+            if (faltan) return false;
+            FONDO.publico.forEach(function (p, i) {
+                var im = scene.add.image(0, 0, texEscena('persona' + p[0])).setOrigin(0.5, 1).setDepth(-15);
+                im.caja = { x: p[1], y: p[2], w: p[3], h: p[4] };
+                // Cada uno a su ritmo, pero todos al compás.
+                im.fase = (i * 1.7) % (Math.PI * 2);
+                im.salto = 0;
+                scene.publico.push(im);
+            });
             return true;
         },
 
@@ -376,20 +424,16 @@
             var h = this.scale.height;
             var n = this.publico.length;
             var limite = this.tarimaRect ? this.tarimaRect.x - 20 : w;
-            if (this.publico.length && this.publico[0].tira !== undefined) {
-                // Tiras del fondo: cada una va justo donde está en la imagen.
-                var img = this.fondoImg;
-                if (!img) return;
-                var k = img.scaleX;
-                var ix = img.x - img.width * k / 2;
-                var iy = img.y - img.height * k / 2;
-                var P = this.PUBLICO_FONDO;
-                var anchoTira = img.width / P.tiras;
-                this.publico.forEach(function (im, i) {
-                    im.setScale(k);
-                    im.setPosition(ix + (i + 0.5) * anchoTira * k, iy + P.y1 * k);
+            if (this.publico.length && this.publico[0].caja) {
+                // Cada persona justo donde está en el dibujo (apoyada por los pies).
+                var f = this.marcoFondo();
+                if (!f) return;
+                this.publico.forEach(function (im) {
+                    var c = im.caja;
+                    im.setDisplaySize(c.w * f.k, c.h * f.k);
+                    im.setPosition(f.x(c.x + c.w / 2), f.y(c.y + c.h));
                     im.base = im.y;
-                    im.baseX = im.x;
+                    im.alto = f.k;
                 });
                 return;
             }
@@ -401,6 +445,80 @@
             });
         },
 
+        /**
+         * Fondo vivo: el cielo es un color, y las nubes, los árboles altos y los banderines son
+         * piezas sueltas del dibujo (atlas img/escena_capas.svg) puestas en su sitio, detrás o
+         * delante del resto del fondo según dónde estaban.
+         */
+        ubicarCapas: function () {
+            var f = this.marcoFondo();
+            var D = global.DesfileCapas;
+            var w = this.scale.width, h = this.scale.height;
+            if (!this.cieloFondo) this.cieloFondo = this.add.rectangle(0, 0, 1, 1, 0x96e3fe).setOrigin(0, 0).setDepth(-40);
+            this.cieloFondo.setSize(w, h).setDisplaySize(w, h).setVisible(!!f);
+            var key = texEscena('capas');
+            if (!f || !D || !this.textures.exists(key)) return;
+            var scene = this;
+            if (!this.capas) {
+                var tx = this.textures.get(key);
+                var k2 = tx.getSourceImage().width / D.atlas.w;
+                this.capas = D.piezas.map(function (p, i) {
+                    var nombre = 'pieza' + i;
+                    if (!tx.has(nombre)) tx.add(nombre, 0, p[1] * k2, p[2] * k2, p[5] * k2, p[6] * k2);
+                    var hondo = p[0] === 'n' ? -36 : p[0] === 'a' ? -34 : -30;
+                    var im = scene.add.image(0, 0, key, nombre).setOrigin(p[7], p[8]).setDepth(hondo);
+                    im.pieza = p;
+                    im.fase = i * 0.55;
+                    // Nubes: cada una a su velocidad (las grandes, más lentas).
+                    im.vel = p[0] === 'n' ? 5 + (i % 3) * 2.5 : 0;
+                    im.deriva = 0;
+                    return im;
+                });
+            }
+            this.capas.forEach(function (im) {
+                var p = im.pieza;
+                im.setDisplaySize(p[5] * f.k, p[6] * f.k);
+                im.baseX = f.x(p[3] + p[5] * p[7]);
+                im.y = f.y(p[4] + p[6] * p[8]);
+                im.x = im.baseX + im.deriva * f.k;
+                im.k = f.k;
+            });
+        },
+
+        /** Mueve las piezas del fondo cada cuadro: nubes que pasan, árboles y banderines al viento. */
+        animarCapas: function (time, dt) {
+            if (!this.capas || reducido()) return;
+            var w = this.scale.width;
+            var v = this.viento || 1;
+            this.capas.forEach(function (im) {
+                var t = im.pieza[0];
+                if (t === 'n') {
+                    // Pasa despacio hacia la derecha y vuelve a entrar por la izquierda.
+                    im.deriva += im.vel * dt * (0.6 + v * 0.4);
+                    var x = im.baseX + im.deriva * im.k;
+                    var mitad = im.displayWidth / 2;
+                    if (x - mitad > w) { im.deriva -= (w + im.displayWidth) / im.k; x = im.baseX + im.deriva * im.k; }
+                    im.x = x;
+                } else if (t === 'a') {
+                    im.angle = Math.sin(time / 1500 + im.fase) * 1.3 * v;
+                } else {
+                    // Ola que recorre la cuerda: cada banderín un poco después del anterior.
+                    im.angle = Math.sin(time / 330 - im.fase) * 7 * v;
+                }
+            });
+        },
+
+        /** Una ráfaga de viento: nubes, árboles y banderines se agitan y vuelven a la calma. */
+        rafaga: function (fuerza) {
+            if (reducido()) return;
+            var scene = this;
+            this.tweens.killTweensOf(this);
+            this.tweens.add({
+                targets: this, viento: fuerza + 1, duration: 300, ease: 'Sine.easeOut',
+                onComplete: function () { scene.tweens.add({ targets: scene, viento: 1, duration: 1800, delay: 600, ease: 'Sine.easeInOut' }); }
+            });
+        },
+
         /* ── Carrozas ──────────────────────────────────────────────── */
 
         crearCarroza: function (id, carril, color) {
@@ -409,7 +527,7 @@
             var Hf = W * 0.3;
             var cont = this.add.container(0, this.sueloCarril(carril));
             var keyCarroza = texEscena('carroza');
-            var mastil, bandera, g, ruedas, pisoArte = null;
+            var mastil, bandera, g, ruedas, pisoArte = null, arte = null;
             if (this.textures.exists(keyCarroza)) {
                 mastil = this.add.rectangle(0, 0, 1, 1, 0x000000, 0).setVisible(false);
                 bandera = this.add.triangle(0, 0, 0, 0, 1, 0, 0, 1, 0xffffff).setVisible(false);
@@ -417,9 +535,11 @@
                 // Que ocupe el ancho del carril: la ilustración lleva encima al pasajero.
                 var escC = W / (g.width || 1);
                 g.setScale(escC);
-                // Piso de la carroza ilustrada: está al 54 % de su alto (medido sobre carroza.svg).
-                // Ahí se apoya lo que viaja encima, en vez de en la plataforma dibujada.
-                pisoArte = -r - g.displayHeight * (1 - 0.539);
+                // Caja roja del carrito (medidas de carroza.svg): lo que viaja va en su centro,
+                // apoyado en el borde de adelante; la manija queda a la izquierda.
+                var ux = W / CARRO.w, uy = g.displayHeight / CARRO.h;
+                pisoArte = -r - (CARRO.h - CARRO.piso) * uy;
+                arte = { x: (CARRO.centroX - CARRO.w / 2) * ux, cajaW: CARRO.cajaW * ux, cajaH: CARRO.cajaH * uy };
                 ruedas = [this.add.graphics().setVisible(false), this.add.graphics().setVisible(false)];
             } else {
                 // Bandera en un mástil.
@@ -455,26 +575,26 @@
                 }, this);
             }
             var baseY = pisoArte !== null ? pisoArte : (-r - Hf + 6);
-            var img = this.add.image(0, baseY, tex(id)).setOrigin(0.5, 1);
-            // Sobre la carroza ilustrada el pasajero va más pequeño, para que se vea encima de ella.
-            var caja = W * (pisoArte !== null ? 0.52 : 0.78);
-            var esc = Math.min(caja / (img.width || 1), caja / (img.height || 1));
+            var imgX = arte ? arte.x : 0;
+            var img = this.add.image(imgX, baseY, tex(id)).setOrigin(0.5, 1);
+            var caja = arte ? arte.cajaW * 0.8 : W * 0.78;
+            var cajaAlto = arte ? arte.cajaH * 0.82 : caja;
+            var esc = Math.min(caja / (img.width || 1), cajaAlto / (img.height || 1));
             img.setScale(esc);
             // Sábana / tapadera (ronda "sombras"): tapa la silueta.
             var sh = img.height * esc + 14;
             var sabana;
             var keyTapa = texEscena('tapadera');
             var sabanaBaseY = 0;
-            if (this.textures.exists(keyTapa)) {
-                sabanaBaseY = baseY - sh / 2;
-                sabana = this.add.image(0, sabanaBaseY, keyTapa).setOrigin(0.5, 0.5);
-                // En tapadera.svg la forma solo ocupa y 133-367 de 500 (46,8 % del alto) y
-                // x 54-446 (78,4 % del ancho): hay que escalar por eso, no por el lienzo,
-                // o la tapa sale corta y el objeto asoma por encima.
-                var usoX = 0.784, usoY = 0.468;
-                sabana.setScale(Math.max(
-                    (caja + 20) / ((sabana.width || 1) * usoX),
-                    (sh + 10) / ((sabana.height || 1) * usoY)));
+            if (this.textures.exists(keyTapa) && arte) {
+                // Como en el diseño: la tapa gris cubre la caja del carrito, del mismo ancho,
+                // con su borde de abajo en el borde de adelante de la caja. La forma está
+                // centrada en el lienzo de tapadera.svg, así que su centro es el de la imagen.
+                sabana = this.add.image(imgX, 0, keyTapa).setOrigin(0.5, 0.5);
+                var escT = arte.cajaW / ((sabana.width || 1) * TAPA.w / TAPA.lienzo);
+                sabana.setScale(escT);
+                sabanaBaseY = baseY - arte.cajaH / 2;
+                sabana.y = sabanaBaseY;
             } else {
                 sabana = this.add.graphics();
                 sabana.fillStyle(0xfff9db, 0.78);
@@ -485,9 +605,11 @@
             }
             sabana.setVisible(false);
             var brillo = this.add.ellipse(0, -r - Hf * 0.6, W * 1.2, Hf * 1.6, 0xffe066, 0).setVisible(true);
-            cont.add([brillo, mastil, bandera, g, ruedas[0], ruedas[1], sabana, img]);
+            // La tapadera va encima de lo que viaja (si no, el objeto asoma sobre ella).
+            cont.add([brillo, mastil, bandera, g, ruedas[0], ruedas[1], img, sabana]);
             var c = {
                 id: id, cont: cont, img: img, sabana: sabana, sabanaBaseY: sabanaBaseY, bandera: bandera, brillo: brillo, ruedas: ruedas,
+                imgX: imgX, pisoY: baseY,
                 carril: carril, W: W, r: r, Hf: Hf, escImg: esc, tapada: false, resaltada: false,
                 altoImg: img.height * esc, salto: 0, fase: Math.random() * 6
             };
@@ -596,17 +718,18 @@
             var dt = Math.min(delta, 50) / 1000;
             var scene = this;
             var musica = time / 260;
+            this.animarCapas(time, dt);
             this.publico.forEach(function (p) {
                 // Tiras del fondo: botan y se balancean un poco (no tienen brazo propio).
                 if (p.brazo) {
-                    p.y = p.base - Math.abs(Math.sin(musica * 0.5 + p.fase)) * 3;
+                    p.y = p.base - Math.abs(Math.sin(musica * 0.5 + p.fase)) * 3 - (p.salto || 0);
                     p.brazo.angle = Math.sin(musica + p.fase) * 25;
                     return;
                 }
                 if (p.base === undefined) return;
-                p.y = p.base - Math.abs(Math.sin(musica * 0.5 + p.fase)) * 4;
-                p.x = p.baseX + Math.sin(musica * 0.5 + p.fase) * 2;
-                p.angle = Math.sin(musica * 0.5 + p.fase) * 1.2;
+                // Público del dibujo: solo brinca (sin mecerse ni ladearse).
+                var brinco = reducido() ? 0 : Math.abs(Math.sin(musica * 0.5 + p.fase)) * 7 * (p.alto || 1);
+                p.y = p.base - brinco - (p.salto || 0);
             });
             this.banda.forEach(function (m, i) {
                 m.y = m.base - Math.abs(Math.sin(musica + i)) * 6;
@@ -642,10 +765,13 @@
                 c.ruedas.forEach(function (rg) { rg.rotation += paso / c.r; });
                 // Marcha: el elemento brinca al ritmo y la bandera ondea.
                 var brinco = paso !== 0 && !reducido() ? Math.abs(Math.sin(musica + c.fase)) * 5 : 0;
-                c.img.y = -c.r - c.Hf + 6 - brinco - c.salto;
+                // Lo que viaja va en el centro de la caja del carrito (pisoY) y brinca ahí;
+                // la tapadera queda quieta sobre la caja.
+                c.img.x = c.imgX;
+                c.img.y = c.pisoY - brinco - c.salto;
                 c.bandera.scaleX = 0.8 + 0.2 * Math.sin(time / (c.resaltada ? 60 : 160) + c.fase);
                 c.brillo.fillAlpha = c.resaltada ? 0.25 + 0.2 * Math.sin(time / 140) : 0;
-                if (c.tapada) c.sabana.y = (c.sabanaBaseY || 0) - brinco - c.salto;
+                if (c.tapada) c.sabana.y = c.sabanaBaseY || 0;
             });
         },
 
@@ -725,15 +851,16 @@
             this.destapar(c);
             c.resaltada = false;
             var s = this.escalaCarril(c.carril);
-            var cx = c.x;
+            var cx = c.x + (c.imgX || 0) * s;
             var cy = this.sueloCarril(c.carril) - (c.r + c.Hf + c.altoImg / 2) * s;
             this.estrellas(cx, cy, 18);
+            this.rafaga(1.2);
             this.notas(cx, cy, 6);
             if (!reducido()) {
                 this.tweens.add({ targets: c.img, scale: c.escImg * 1.35, duration: 260, yoyo: true, repeat: 2, ease: 'Sine.easeInOut' });
                 // El público salta.
                 this.publico.forEach(function (p, i) {
-                    scene.tweens.add({ targets: p, y: p.base - 14, duration: 180, yoyo: true, delay: (i % 6) * 40 });
+                    scene.tweens.add({ targets: p, salto: 26 * (p.alto || 1), duration: 200, yoyo: true, ease: 'Quad.easeOut', delay: (i % 6) * 40 });
                 });
             }
             return esperar(scene, 1400);
@@ -745,7 +872,7 @@
             var scene = this;
             if (!c) return Promise.resolve();
             var s = this.escalaCarril(c.carril);
-            var desde = { x: c.x, y: this.sueloCarril(c.carril) - (c.r + c.Hf) * s };
+            var desde = { x: c.x + (c.imgX || 0) * s, y: this.sueloCarril(c.carril) - (c.r + c.Hf) * s };
             c.img.setVisible(false);
             var m = this.add.image(desde.x, desde.y, tex(id)).setOrigin(0.5, 1).setDepth(8);
             var alto = this.scale.height * 0.1;
@@ -797,9 +924,10 @@
                 this.time.delayedCall(700, function () { scene.notas(r.x + r.w / 2, r.y - scene.scale.height * 0.12, 10); });
             }
             this.publico.forEach(function (p, i) {
-                if (!reducido()) scene.tweens.add({ targets: p, y: p.base - 18, duration: 200, yoyo: true, repeat: 4, delay: (i % 5) * 60 });
+                if (!reducido()) scene.tweens.add({ targets: p, salto: 30 * (p.alto || 1), duration: 220, yoyo: true, repeat: 4, ease: 'Quad.easeOut', delay: (i % 5) * 60 });
             });
             this.confeti();
+            this.rafaga(2.6);
             return esperar(this, 2600);
         },
 

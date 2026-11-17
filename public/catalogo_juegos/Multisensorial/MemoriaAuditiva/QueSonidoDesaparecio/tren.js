@@ -169,7 +169,8 @@
                     x.fillRect(bx + 28, by - 28, 6, 22);
                 });
 
-                var vy = L.tam * 0.55;
+                // Vía bajo las ruedas del tren (antes se pintaba arriba, pegada al borde superior).
+                var vy = L.via + L.tam * 0.26;
                 x.fillStyle = '#6d4c41';
                 x.fillRect(0, vy - 10, w, 30);
                 for (var dx = 0; dx < w; dx += 20) x.fillRect(dx, vy - 12, 11, 28);
@@ -184,8 +185,8 @@
             sem.fillStyle(0x343a40, 1);
             sem.fillRect(S.x - 5, S.y - 52, 10, 70);
             sem.fillStyle(0x212529, 1);
-            K.rr(sem, S.x - 18, S.y - 68, 36, 72, 8);
-            sem.fill();
+            // sem es un Graphics de Phaser, no un contexto 2D: K.rr no sirve aquí.
+            sem.fillRoundedRect(S.x - 18, S.y - 68, 36, 72, 8);
             var luces = [
                 keep(this.add.circle(S.x, S.y - 48, 9, 0xe03131, 0.35).setDepth(13)),
                 keep(this.add.circle(S.x, S.y - 22, 9, 0xffd43b, 0.9).setDepth(13)),

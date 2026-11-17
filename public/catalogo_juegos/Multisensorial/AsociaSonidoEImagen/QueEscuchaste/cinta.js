@@ -22,8 +22,69 @@
     var rnd = Ut.rnd;
     var EXTRA = ['bicicleta', 'avion', 'vaca', 'gallo', 'ambulancia'];
 
+    /*
+     * Arte del diseño (img/diseno): nave industrial 1280×720 y consola con palanca. Medidas en
+     * unidades del dibujo: piso azul desde y 524, cornisa clara (449-524) bajo los ventanales,
+     * máquinas a la izquierda (x 0-463). La palanca se parte en base y brazo; el brazo gira en la
+     * ranura de la consola (x 310, y 225 de su lienzo 500×341.44; contenido útil x 47-453).
+     */
+    var DISENO = 'img/diseno/';
+    var NAVE = {
+        fw: 1280, fh: 720, tex: 1920 / 1280,
+        cinta: { y: 566, x0: 50, x1: 1230 },
+        vent: 660,                                   // pórtico de inspección
+        cornisa: { y: 472, x0: 790, x1: 1050 },      // donde quedan los entregados
+        consola: { x: 400, ancho: 220, base: 710 },  // centro y piso de la consola
+        palomas: 688,
+        arriba: '#7491a2'
+    };
+    var PAL = { w: 500, h: 341.44, pivX: 310, pivY: 225, bola: 67, bolaR: 49, util: 406, pie: 323.65,
+        botones: [[102.85, 266.3], [147.7, 266.3], [192.6, 266.3]] };
+
     var escena = {
+        preload: function () {
+            var self = this;
+            var svg = function (k, f, w, h) { if (!self.textures.exists(k)) self.load.svg(k, DISENO + f, { width: w, height: h }); };
+            svg('qe_fondo', 'fondo.svg', 1920, 1080);
+            svg('qe_pal_base', 'palanca_base.svg', 1000, 683);
+            svg('qe_pal_brazo', 'palanca_brazo.svg', 1000, 683);
+        },
+
         iniciar: function () { this.objs = []; this.vel = 0; this.velMeta = 0; this.mov = 0; },
+
+        /** Encaje del dibujo: cubre la pantalla anclado abajo; en vertical se acota el recorte lateral. */
+        mapaFondo: function () {
+            if (!this.textures.exists('qe_fondo')) return null;
+            var W = this.scale.width, H = this.scale.height;
+            // En vertical se recorta más a los lados para que la escena no quede diminuta, pero
+            // siempre cabe la franja de juego: consola (x 290) a cornisa (x 1050), ≈ 800 de ancho.
+            var vertical = H > W;
+            var k = Math.min(Math.max(W / NAVE.fw, H / NAVE.fh), vertical ? W / 800 : W * 1.3 / NAVE.fw);
+            var cx = vertical ? 670 : NAVE.fw / 2;
+            var ox = Math.min(0, Math.max(W - NAVE.fw * k, W / 2 - cx * k)), oy = H - NAVE.fh * k;
+            // En vertical la cinta sube a ~70 % del alto; el piso se completa por debajo (armar).
+            if (vertical) oy = Math.min(oy, H * 0.7 - NAVE.cinta.y * k);
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
+
+        calcularConFondo: function (L, m) {
+            var W = L.W, H = L.H, k = m.k;
+            L.m = m;
+            L.tam = Math.max(58, 112 * k);
+            L.cinta = { y: m.sy(NAVE.cinta.y), alto: Math.max(22, 32 * k), x0: Math.max(m.sx(NAVE.cinta.x0), W * 0.04), x1: Math.min(m.sx(NAVE.cinta.x1), W * 0.96) };
+            L.vent = { x: m.sx(NAVE.vent), w: L.tam * 1.5 };
+            L.mostrador = L.cinta.y - L.tam * 1.15;
+            // Consola: el brazo gira en su ranura; P.y queda a media palanca (como el dibujo a mano).
+            var s = NAVE.consola.ancho * k / PAL.util;
+            // El contenido útil de la consola va de x 47 a 453 (centro 250) en su lienzo.
+            var piv = { x: m.sx(NAVE.consola.x + (PAL.pivX - 250) * NAVE.consola.ancho / PAL.util), y: m.sy(NAVE.consola.base) - (PAL.pie - PAL.pivY) * s };
+            var largo = (PAL.pivY - PAL.bola) * s;
+            L.palanca = { x: piv.x, y: piv.y - largo * 0.5, largo: largo, piv: piv.y, s: s, arte: true };
+            var rx0 = m.sx(NAVE.cornisa.x0);
+            L.repisa = { x: rx0, y: m.sy(NAVE.cornisa.y), w: Math.min(m.sx(NAVE.cornisa.x1), W - 12) - rx0, arte: true };
+            L.yPalomas = Math.min(H - 20, m.sy(NAVE.palomas));
+            return L;
+        },
 
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
@@ -31,6 +92,8 @@
             var hueco = Math.max(60, H * 0.18);
             L.bocina = { x: W / 2, y: Math.max(60, Math.min(108, 58 + hueco * 0.22)), r: Math.max(28, Math.min(40, hueco * 0.3)) };
             L.pres = W >= 760 ? { x: W - 70, piso: H - 104, alto: Math.min(160, H * 0.28) } : null;
+            var m = this.mapaFondo();
+            if (m) return this.calcularConFondo(L, m);
             L.tam = Math.max(64, Math.min(120, H * 0.17, W / 8));
             L.cinta = { y: H * 0.66, alto: Math.max(26, L.tam * 0.28), x0: W * 0.04, x1: W * 0.96 };
             L.vent = { x: W * 0.46, w: L.tam * 1.5 };                    // ventanilla sobre la cinta
@@ -46,7 +109,20 @@
             var self = this;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
-            K.textura(this, 'estacion_fondo', L.W, L.H, function (x, w, h) { self.pintarEstacion(x, w, h); });
+            if (L.m) {
+                // Nave del diseño. Si no llega arriba, la pared se completa estirando su franja
+                // superior (pared lisa con sus columnas).
+                var m = L.m, esc = m.k / NAVE.tex;
+                var tex = this.textures.get('qe_fondo');
+                if (m.oy > 0) {
+                    if (!tex.has('arriba')) tex.add('arriba', 0, 0, 0, NAVE.fw * NAVE.tex, 18 * NAVE.tex);
+                    keep(this.add.image(m.ox, 0, 'qe_fondo', 'arriba').setOrigin(0, 0).setDisplaySize(NAVE.fw * m.k, m.oy + 2).setDepth(-1));
+                }
+                keep(this.add.image(m.ox, m.oy, 'qe_fondo', '__BASE').setOrigin(0, 0).setScale(esc).setDepth(-1));
+                var fin = m.sy(NAVE.fh);
+                if (fin < L.H) keep(this.add.rectangle(0, fin - 1, L.W, L.H - fin + 1, 0x245170).setOrigin(0, 0).setDepth(-1));
+            }
+            K.textura(this, 'estacion_fondo', L.W, L.H, function (x, w, h) { if (L.m) self.pintarNave(x, w, h); else self.pintarEstacion(x, w, h); });
             keep(this.add.image(0, 0, 'estacion_fondo').setOrigin(0, 0).setDepth(0));
             this.cintaG = keep(this.add.graphics().setDepth(10));
             // Cortinas de tiras en las bocas de la cinta (los objetos pasan por detrás).
@@ -57,7 +133,7 @@
                 self.tiras.push(g);
             });
             var V = this.montarVida(keep);
-            if (V) V.palomas(3, Math.min(L.H - 30, L.cinta.y + L.cinta.alto + L.tam * 0.55 + 40), L.W * 0.05, Math.max(L.W * 0.1, L.palanca.x - 80));
+            if (V) V.palomas(3, L.yPalomas || Math.min(L.H - 30, L.cinta.y + L.cinta.alto + L.tam * 0.55 + 40), L.W * 0.05, Math.max(L.W * 0.1, L.palanca.x - (L.palanca.arte ? L.palanca.largo * 1.7 : 80)));
             this.montarPalanca(keep);
             this.montarHud(keep);
             this.coleccion.forEach(function (a, k) { var p = self.sitioRepisa(k); a.cont.setPosition(p.x, p.y).setScale(p.esc); });
@@ -143,10 +219,66 @@
             for (var p = L.cinta.x0 + 40; p < L.cinta.x1; p += 160) x.fillRect(p, L.cinta.y + L.cinta.alto, 8, yp - L.cinta.y - L.cinta.alto + 10);
         },
 
+        /**
+         * Sobre la nave del diseño solo se pinta lo que el dibujo no trae: el pórtico de inspección
+         * (la «ventanilla» donde hay que frenar), su bandeja, las bocas de la cinta y sus patas.
+         * Paleta tomada del propio fondo (pizarra azulada y el amarillo de la franja del piso).
+         */
+        pintarNave: function (x, w, h) {
+            var L = this.L, k = L.m.k;
+            var v = L.vent, vy0 = L.mostrador - L.tam * 0.9, vy1 = L.cinta.y + L.cinta.alto;
+            var ym = L.mostrador;
+            var poste = Math.max(10, 16 * k);
+            // Sombra del pórtico sobre la pared.
+            x.fillStyle = 'rgba(6,27,53,0.18)'; K.rr(x, v.x - v.w / 2 - poste + 6, vy0 - poste + 8, v.w + poste * 2, vy1 - vy0 + poste, 14); x.fill();
+            // Cabina de vidrio (arriba) con luz cálida.
+            x.fillStyle = '#3d4f5c'; K.rr(x, v.x - v.w / 2 - poste, vy0 - poste, v.w + poste * 2, ym - vy0 + poste + 6, 14); x.fill();
+            x.fillStyle = '#d7f1fb'; K.rr(x, v.x - v.w / 2, vy0, v.w, ym - vy0 + 4, 10); x.fill();
+            var luz = x.createRadialGradient(v.x, vy0 + 16, 4, v.x, vy0 + 16, v.w);
+            luz.addColorStop(0, 'rgba(255,244,200,0.95)'); luz.addColorStop(1, 'rgba(255,244,200,0)');
+            x.fillStyle = luz; x.fillRect(v.x - v.w / 2, vy0, v.w, ym - vy0);
+            x.fillStyle = 'rgba(255,255,255,0.4)';
+            x.beginPath(); x.moveTo(v.x - v.w * 0.3, vy0 + 6); x.lineTo(v.x - v.w * 0.12, vy0 + 6); x.lineTo(v.x - v.w * 0.42, ym - 6); x.lineTo(v.x - v.w * 0.5 + 4, ym - 6); x.closePath(); x.fill();
+            // Postes con franjas de peligro hasta la cinta.
+            [v.x - v.w / 2 - poste, v.x + v.w / 2].forEach(function (px) {
+                x.fillStyle = '#3d4f5c'; x.fillRect(px, ym, poste, vy1 - ym);
+                x.save(); x.beginPath(); x.rect(px + 2, ym + 4, poste - 4, vy1 - ym - 4); x.clip();
+                x.fillStyle = '#f6b03e'; x.fillRect(px, ym, poste, vy1 - ym);
+                x.fillStyle = '#2b3a46';
+                for (var fy = ym - poste; fy < vy1 + poste; fy += poste * 1.4) { x.beginPath(); x.moveTo(px, fy); x.lineTo(px + poste, fy - poste * 0.7); x.lineTo(px + poste, fy); x.lineTo(px, fy + poste * 0.7); x.closePath(); x.fill(); }
+                x.restore();
+            });
+            // Boca en sombra bajo la bandeja, por donde pasa la cinta.
+            var g2 = x.createLinearGradient(0, ym + 10, 0, L.cinta.y);
+            g2.addColorStop(0, 'rgba(20,32,44,0.55)'); g2.addColorStop(1, 'rgba(20,32,44,0.15)');
+            x.fillStyle = g2; x.fillRect(v.x - v.w / 2, ym + 10, v.w, L.cinta.y - ym - 10);
+            // Letrero con lupa (sin texto) sobre la cabina.
+            x.fillStyle = '#f6b03e'; K.rr(x, v.x - v.w * 0.38, vy0 - poste - 36 * k - 6, v.w * 0.76, 34 * k, 8); x.fill();
+            var ly = vy0 - poste - 19 * k - 6;
+            x.strokeStyle = '#2b3a46'; x.lineWidth = Math.max(3, 4 * k);
+            x.beginPath(); x.arc(v.x - 5 * k, ly - 2 * k, 8 * k, 0, Math.PI * 2); x.stroke();
+            x.beginPath(); x.moveTo(v.x + 1 * k, ly + 4 * k); x.lineTo(v.x + 9 * k, ly + 11 * k); x.stroke();
+            // Bandeja metálica (el objeto que se frena sube aquí).
+            x.fillStyle = '#9fb3c1'; K.rr(x, v.x - v.w / 2 - poste - 6, ym, v.w + poste * 2 + 12, Math.max(8, 12 * k), 3); x.fill();
+            x.fillStyle = 'rgba(255,255,255,0.45)'; x.fillRect(v.x - v.w / 2 - poste - 4, ym + 1, v.w + poste * 2 + 8, 2);
+            // Bocas de la cinta.
+            [L.cinta.x0, L.cinta.x1].forEach(function (bx) {
+                x.fillStyle = '#3d4f5c'; K.rr(x, bx - L.tam * 0.55, L.cinta.y - L.tam * 1.05, L.tam * 1.1, L.tam * 1.1, 10); x.fill();
+                x.fillStyle = '#16222c'; x.fillRect(bx - L.tam * 0.45, L.cinta.y - L.tam * 0.95, L.tam * 0.9, L.tam * 0.95);
+            });
+            // Patas de la cinta hasta el piso y su sombra.
+            var piso = vy1 + L.tam * 0.45;
+            x.fillStyle = 'rgba(6,27,53,0.28)'; x.fillRect(L.cinta.x0, piso - 3, L.cinta.x1 - L.cinta.x0, 8 * k + 3);
+            x.fillStyle = '#5c7484';
+            for (var p = L.cinta.x0 + 40; p < L.cinta.x1; p += 160) x.fillRect(p, vy1, Math.max(6, 9 * k), piso - vy1);
+        },
+
         /* ── Palanca ── */
 
         montarPalanca: function (keep) {
             var P = this.L.palanca;
+            if (P.arte && this.textures.exists('qe_pal_base') && this.textures.exists('qe_pal_brazo')) return this.montarConsola(keep);
+            P.arte = false;   // sin la consola del diseño: palanca dibujada en su sitio
             var c = keep(this.add.container(P.x, P.y).setDepth(40));
             var poste = this.add.rectangle(0, P.largo * 1.2, P.largo * 0.22, P.largo * 1.1, 0x868e96).setStrokeStyle(2, 0x495057);
             var base = this.add.rectangle(0, P.largo * 0.55, P.largo * 0.6, P.largo * 0.34, 0xfcc419).setStrokeStyle(3, 0xe67700);
@@ -162,8 +294,29 @@
             this.palanca = c;
         },
 
+        /** Consola del diseño: el brazo (detrás de la ranura) gira sobre su pivote; luces en los botones. */
+        montarConsola: function (keep) {
+            var self = this;
+            var P = this.L.palanca, s = P.s;
+            var esc = s * PAL.w / 1000;              // la textura se rasterizó a 1000 de ancho
+            var ox = PAL.pivX / PAL.w, oy = PAL.pivY / PAL.h;
+            var c = keep(this.add.container(P.x, P.piv).setDepth(40));
+            var sombra = this.add.ellipse((250 - PAL.pivX) * s, (PAL.pie - PAL.pivY) * s, PAL.util * s * 1.04, 22 * s, 0x061b35, 0.3);
+            var brazo = this.add.container(0, 0);
+            brazo.add(this.add.image(0, 0, 'qe_pal_brazo').setOrigin(ox, oy).setScale(esc));
+            var base = this.add.image(0, 0, 'qe_pal_base').setOrigin(ox, oy).setScale(esc);
+            var luces = PAL.botones.map(function (b, i) {
+                return self.add.ellipse((b[0] - PAL.pivX) * s, (b[1] - PAL.pivY) * s, 34 * s, 22 * s, i ? 0xffe066 : 0xff8787, 0).setBlendMode(Phaser.BlendModes.ADD);
+            });
+            c.add([sombra, brazo, base].concat(luces));
+            c.brazo = brazo; c.luces = luces;
+            brazo.angle = -25;
+            this.palanca = c;
+        },
+
         tocaPalanca: function (p) {
             var P = this.L.palanca;
+            if (P.arte) { var dx = p.x - P.x, dy = p.y - P.piv; return Math.abs(dx) < P.largo * 0.8 && dy > -P.largo * 1.45 && dy < P.largo * 0.45; }
             return Math.abs(p.x - P.x) < P.largo * 0.6 && p.y > P.y - P.largo * 0.7 && p.y < P.y + P.largo * 0.8;
         },
 
@@ -383,6 +536,13 @@
                     t.closePath(); t.fillPath();
                 }
             });
+            // Luces de la consola: la roja late mientras la cinta corre; las amarillas destellan al frenar.
+            var lc = this.palanca && this.palanca.luces;
+            if (lc) {
+                lc[0].setAlpha(this.vel > 5 ? 0.45 + Math.sin(time / 160) * 0.35 : 0.1);
+                var fr = this.frenando ? 0.5 + Math.sin(time / 70) * 0.4 : 0;
+                lc[1].setAlpha(fr); lc[2].setAlpha(this.frenando ? 0.5 - Math.sin(time / 70) * 0.4 : 0);
+            }
             if (this.vel > 5 && time - (this.ultTraq || 0) > 220) { this.ultTraq = time; K.ruido({ f: 160, q: 2, dur: 0.06, vol: 0.025 }); }
         },
 

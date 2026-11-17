@@ -20,9 +20,43 @@
     var tw = Ut.tween;
     var rnd = Ut.rnd;
     var ENFOQUE_MS = 800;
+    // Poses de las fotos: instantáneas de los modelos 3D (AsociaPj3D.foto), las mismas de la portada.
+    var POSES_FOTO = {
+        aplaudiendo: [{ modelo: 'nino', clip: 'Aplaudir', t: 0.5, x: -0.45, alto: 1.5 }, { modelo: 'nina', clip: 'Aplaudir', t: 0.8, x: 0.45, alto: 1.5 }],
+        corriendo: [{ modelo: 'nino', clip: 'Correr', t: 0.3, mira: 'derecha' }],
+        saltando: [{ modelo: 'nina', clip: 'Saltar', t: 1.15, y: -0.5 }],
+        durmiendo: [{ modelo: 'nino', clip: 'Quieto', tumbado: true, alto: 1.3, x: -0.05, y: -0.55 }]
+    };
+    var ACCIONES_3D = ['aplaudiendo', 'corriendo', 'saltando', 'durmiendo'];
+
+    /*
+     * Fondo del diseño (img/diseno/fondo.svg, 1280×720): parque con columpio, tobogán y sube-y-baja
+     * sobre colinas; el pavimento gris donde se para la gente empieza en y 480 (medido por color).
+     * Cielo liso arriba (#d5eff7).
+     */
+    var PARQUE = { fw: 1280, fh: 720, pavimento: 480, cielo: 0xd5eff7 };
 
     var escena = {
-        iniciar: function () { this.gente = []; this.visor = null; this.fotos = []; },
+        preload: function () {
+            if (!this.textures.exists('sa_fondo')) this.load.svg('sa_fondo', 'img/diseno/fondo.svg', { width: 1920, height: 1080 });
+        },
+
+        /** El dibujo cubre la pantalla, centrado y anclado abajo. */
+        mapaFondo: function () {
+            if (!this.textures.exists('sa_fondo')) return null;
+            var W = this.scale.width, H = this.scale.height;
+            var k = Math.max(W / PARQUE.fw, H / PARQUE.fh);
+            var ox = (W - PARQUE.fw * k) / 2, oy = H - PARQUE.fh * k;
+            return { k: k, ox: ox, oy: oy, sy: function (y) { return oy + y * k; } };
+        },
+
+        iniciar: function () {
+            // Las cuatro acciones son Zeus y Zoe en 3D (clips del GLB): se quita la piel plana
+            // que el config registra, para que Act.crear use los modelos del proyecto.
+            ACCIONES_3D.forEach(function (id) { Act.piel(id, null); });
+            this.gente = []; this.visor = null; this.fotos = []; this.fallos = 0;
+            this.prepararFotos();
+        },
 
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
@@ -30,7 +64,8 @@
             var hueco = Math.max(60, H * 0.16);
             L.bocina = { x: W / 2, y: Math.max(60, Math.min(96, 54 + hueco * 0.2)), r: Math.max(28, Math.min(38, hueco * 0.3)) };
             L.pres = null;                                  // aquí los protagonistas 3D ya son Zeus y Zoe
-            L.suelo = H * 0.58;
+            L.m = this.mapaFondo();
+            L.suelo = L.m ? Math.min(H * 0.8, L.m.sy(PARQUE.pavimento)) : H * 0.58;
             L.tam = Math.max(90, Math.min(170, H * 0.27, W / 5));
             var n = 4, x0 = W * 0.1 + L.tam * 0.3, x1 = W * 0.84 - L.tam * 0.3;
             L.sitios = [];
@@ -43,10 +78,17 @@
             var self = this;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
-            // Parque vivo por capas (comun/vida.js): se mueve y responde al dedo.
+            if (L.m) {
+                // Parque del diseño; si no llega arriba, el cielo liso se completa con su color.
+                if (L.m.oy > 0) keep(this.add.rectangle(0, 0, L.W, L.m.oy + 2, PARQUE.cielo).setOrigin(0, 0).setDepth(-1));
+                keep(this.add.image(L.m.ox, L.m.oy, 'sa_fondo').setOrigin(0, 0).setDisplaySize(PARQUE.fw * L.m.k, PARQUE.fh * L.m.k).setDepth(-1));
+            }
+            // Ambiente vivo (comun/vida.js): con el fondo del diseño solo pájaros y mariposas, que
+            // se mueven y responden al dedo sin tapar el dibujo.
             var V = this.montarVida(keep);
-            if (V) V.parque({ horizonte: L.suelo - 30, arboles: [0.05, 0.27, 0.5, 0.74, 0.95], solX: 0.85 });
-            K.textura(this, 'parque_pasto', L.W, L.H - L.suelo + 40, function (x, w, h) {
+            if (V && !L.m) V.parque({ horizonte: L.suelo - 30, arboles: [0.05, 0.27, 0.5, 0.74, 0.95], solX: 0.85 });
+            if (V && L.m) V.pajaros(3, L.m.sy(40), L.m.sy(220));
+            if (!L.m) K.textura(this, 'parque_pasto', L.W, L.H - L.suelo + 40, function (x, w, h) {
                 var g = x.createLinearGradient(0, 0, 0, h);
                 g.addColorStop(0, '#69b84a'); g.addColorStop(1, '#4f9a36');
                 x.fillStyle = g; x.fillRect(0, 0, w, h);
@@ -56,8 +98,8 @@
                 x.beginPath(); x.moveTo(0, h * 0.62); x.bezierCurveTo(w * 0.3, h * 0.42, w * 0.6, h * 0.82, w, h * 0.55); x.lineTo(w, h * 0.72); x.bezierCurveTo(w * 0.6, h * 0.98, w * 0.3, h * 0.58, 0, h * 0.78); x.fill();
                 K.grano(x, 0, h * 0.4, w, h * 0.6, Math.round(w * h / 900), ['#c9a56d', '#f3dcb0'], 1.4, 0.4);
             });
-            keep(this.add.image(0, L.suelo - 40, 'parque_pasto').setOrigin(0, 0).setDepth(1));
-            if (V) V.mariposas(3, { x: 0, y: L.suelo - 20, w: L.W, h: 40, depth: 8 });
+            if (!L.m) keep(this.add.image(0, L.suelo - 40, 'parque_pasto').setOrigin(0, 0).setDepth(1));
+            if (V) V.mariposas(3, L.m ? { x: 0, y: L.m.sy(330), w: L.W, h: 120 * L.m.k, depth: 8 } : { x: 0, y: L.suelo - 20, w: L.W, h: 40, depth: 8 });
             this.visorG = keep(this.add.graphics().setDepth(70));
             this.flash = keep(this.add.rectangle(0, 0, L.W, L.H, 0xffffff, 0).setOrigin(0, 0).setDepth(90));
             if (!this.visor) this.visor = { x: L.W / 2, y: L.suelo - L.tam * 0.6, carga: 0, movido: false };
@@ -81,7 +123,7 @@
                 a.sonido = self.sonidoDe(id);
                 a.cont.setDepth(20 + s.y / 1000).setAlpha(0);
                 self.tweens.add({ targets: a.cont, alpha: 1, duration: 500, delay: k * 120 });
-                self.gente.push({ id: id, actor: a, sitio: sitios[k], hecho: false });
+                self.gente.push({ id: id, actor: a, sitio: sitios[k], hecho: false, base: s.x, fase: Math.random() * 6.28, vel: 1100 + Math.random() * 700 });
                 self.vivos.push(a);
             });
         },
@@ -137,13 +179,30 @@
             var w = r * 2.1, h = r * 1.7;
             var x = v.x - w / 2, y = v.y - h / 2, e = r * 0.35;
             // Esquinas del visor.
-            g.lineStyle(5, 0xffffff, 0.95);
+            var enf = this.enfocada && v.carga > 0;
+            g.lineStyle(5, enf ? 0x51cf66 : 0xffffff, 0.95);
             [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]].forEach(function (q) {
                 g.beginPath(); g.moveTo(q[0] + e * q[2], q[1]); g.lineTo(q[0], q[1]); g.lineTo(q[0], q[1] + e * q[3]); g.strokePath();
             });
             // Cruz central y anillo de enfoque que se llena.
             g.lineStyle(2, 0xffffff, 0.7);
             g.beginPath(); g.moveTo(v.x - 10, v.y); g.lineTo(v.x + 10, v.y); g.moveTo(v.x, v.y - 10); g.lineTo(v.x, v.y + 10); g.strokePath();
+            if (this.ayuda && this.fase === 'jugar') {
+                // Ayuda: flecha que rebota sobre quien suena y un aro dorado en sus pies.
+                var ob = this.gente.filter(function (q) { return q.id === this.objetivo && !q.hecho; }, this)[0];
+                if (ob) {
+                    var co = ob.actor.cont, bb = Math.sin(t / 160) * 8, ay = co.y - this.L.tam * 0.72 + bb;
+                    g.fillStyle(0xffd43b, 1); g.lineStyle(3, 0xe67700, 1);
+                    g.fillTriangle(co.x - 26, ay - 40, co.x + 26, ay - 40, co.x, ay);
+                    g.strokeTriangle(co.x - 26, ay - 40, co.x + 26, ay - 40, co.x, ay);
+                }
+            }
+            if (this.enfocada && this.fase === 'jugar') {
+                // Pie de la persona enfocada: aro que late para que se note a quién apunta.
+                var cc = this.enfocada.actor.cont;
+                g.lineStyle(4, 0xffd43b, 0.55 + Math.sin(t / 120) * 0.3);
+                g.strokeEllipse(cc.x, cc.y + this.L.tam * 0.18, this.L.tam * 0.8, this.L.tam * 0.22);
+            }
             if (v.carga > 0) {
                 g.lineStyle(6, 0x51cf66, 0.95);
                 g.beginPath(); g.arc(v.x, v.y, r * 0.42, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * v.carga); g.strokePath();
@@ -187,6 +246,7 @@
             var foto = this.crearFoto(g.id, a.cont.x, a.cont.y);
             if (g.id === this.objetivo) {
                 g.hecho = true;
+                this.fallos = 0; this.ayuda = false;
                 this.fase = 'jugar';
                 await this.celebrar(a);
                 var p = this.lugarAlbum(this.fotos.length);
@@ -199,6 +259,9 @@
                 await this.seguir();
             } else {
                 this.yaFotografiado = g;
+                // Dos fotos equivocadas seguidas: la ayuda señala a quién es y el enfoque se llena más rápido.
+                this.fallos = (this.fallos || 0) + 1;
+                if (this.fallos >= 2) this.ayuda = true;
                 this.fase = 'jugar';
                 await this.fallar(a);
                 // La foto se arruga y se va.
@@ -206,6 +269,23 @@
                 await tw(this, { targets: foto, y: L.H + 60, alpha: 0, duration: 420, ease: 'Quad.easeIn' });
                 foto.destroy();
             }
+        },
+
+        /** Renderiza una instantánea 3D por acción y la guarda como textura (las fotos las usan al disparar). */
+        prepararFotos: function () {
+            var self = this;
+            var P = global.AsociaPj3D;
+            if (!P || !P.foto) { window.addEventListener('asocia-pj3d-listo', function () { if (self.sys && self.sys.isActive()) self.prepararFotos(); }, { once: true }); return; }
+            ACCIONES_3D.forEach(function (id) {
+                var k = 'sa_foto_' + id;
+                if (self.textures.exists(k) || self['cargando_' + id]) return;
+                self['cargando_' + id] = true;
+                P.foto({ tam: 256, modelos: POSES_FOTO[id] }).then(function (url) {
+                    var im = new Image();
+                    im.onload = function () { if (self.textures && !self.textures.exists(k)) self.textures.addImage(k, im); };
+                    im.src = url;
+                });
+            });
         },
 
         /** Foto instantánea: marco blanco con el fondo del parque y una silueta de la acción. */
@@ -218,7 +298,14 @@
             c.add(this.add.rectangle(0, 0, w, h, 0xffffff).setStrokeStyle(1, 0xdee2e6));
             c.add(this.add.rectangle(0, -h * 0.08, w * 0.86, h * 0.68, 0x8ce99a));
             c.add(this.add.rectangle(0, -h * 0.3, w * 0.86, h * 0.24, 0xa5d8ff));
-            // Pictograma de la acción.
+            if (this.textures.exists('sa_foto_' + id)) {
+                var lado = Math.min(w * 0.86, h * 0.72);
+                if (id === 'durmiendo') c.add(this.add.rectangle(0, h * 0.04, lado * 0.95, lado * 0.22, 0x9c6b3f).setStrokeStyle(2, 0x6f4a28));
+                c.add(this.add.image(0, -h * 0.1, 'sa_foto_' + id).setDisplaySize(lado, lado));
+                this.tweens.add({ targets: c, scale: 1, y: y - L.tam * 0.2, duration: 300, ease: 'Back.easeOut' });
+                return c;
+            }
+            // Pictograma de la acción (respaldo si no hay 3D).
             var col = 0x343a40;
             var g = this.add.graphics();
             var s = w * 0.2;
@@ -267,7 +354,7 @@
         alEmpezarNivel: function (i, nv) {
             var self = this;
             if (this.eventoMezcla) this.eventoMezcla.remove();
-            if (nv.mezcla) this.eventoMezcla = this.time.addEvent({ delay: 7000, loop: true, callback: function () { self.mezclarLugares(); } });
+            // Niveles 3 y 4 (mezcla): la gente PASEA por el pavimento y hay que seguirla con el visor.
         },
 
         alTerminarNivel: function () { if (this.eventoMezcla) { this.eventoMezcla.remove(); this.eventoMezcla = null; } },
@@ -278,14 +365,27 @@
             this.dibujarVisor(time);
             if (this.fase !== 'jugar') { v.carga = 0; return; }
             // Visor quieto sobre alguien: el enfoque se llena y dispara.
+            if (this.nv && this.nv.mezcla) {
+                var rango = this.L.tam * 0.55, xmin = this.L.W * 0.09, xmax = this.L.W * 0.87;
+                this.gente.forEach(function (q) {
+                    if (q.hecho || q.base == null || q.id === 'durmiendo') return;   // quien duerme no pasea (va en su cama)
+                    q.actor.cont.x = Math.max(xmin, Math.min(xmax, q.base + Math.sin(time / q.vel + q.fase) * rango));
+                });
+            }
             var g = this.personaEnVisor();
+            // Imán suave: si el visor queda cerca de alguien, se acomoda sobre esa persona.
+            if (g && this.fase === 'jugar') {
+                var cg = g.actor.cont, k = Math.min(1, delta / 260);
+                v.x += (cg.x - v.x) * k; v.y += (cg.y - this.L.tam * 0.25 - v.y) * k;
+            }
+            this.enfocada = g || null;
             // Después de una foto equivocada hay que mover el visor a otra persona para volver a disparar.
             if (g !== this.yaFotografiado) this.yaFotografiado = null;
             if (g && g === this.yaFotografiado) g = null;
             var quieto = time - (v.quieto || 0) > 120;
             // Solo dispara si el niño movió el visor (no porque alguien quedó debajo al empezar).
             if (g && quieto && v.movido) {
-                v.carga = Math.min(1, v.carga + delta / ENFOQUE_MS);
+                v.carga = Math.min(1, v.carga + delta / (this.ayuda ? ENFOQUE_MS * 0.6 : ENFOQUE_MS));
                 if (time - (this.ultBip || 0) > 260) { this.ultBip = time; K.tono({ f: 1500 + v.carga * 800, dur: 0.04, vol: 0.03 }); }
                 if (v.carga >= 1) this.disparar(g);
             } else v.carga = Math.max(0, v.carga - delta / 400);

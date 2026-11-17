@@ -44,7 +44,7 @@
     var FONDO_H = 720;
     var FONDO_ACERA_Y = 555; // borde superior de la acera = pies de casas/caseta
     var CASA_DISENO_W = 280; // ancho objetivo de cada casa en el lienzo 1280
-    var CASETA_DISENO_W = 100; // más chica que las casas (no al revés)
+    var CASETA_DISENO_W = 140; // más chica que las casas (no al revés)
     function texEscena(parte) { return 'calle:escena:' + parte; }
     var ESCENA_V = "?v=20261113vida2";
     function encolarEscena(load) {
@@ -435,8 +435,8 @@
             var R;
             var x;
             if (m) {
-                // Caseta auxiliar: nunca más ancha que ~16% del viewport.
-                var targetW = Math.min(CASETA_DISENO_W * m.esc, w * 0.16);
+                // Caseta auxiliar: nunca más ancha que ~21% del viewport.
+                var targetW = Math.min(CASETA_DISENO_W * m.esc, w * 0.21);
                 R = targetW / 2;
                 x = Phaser.Math.Clamp(m.sx(110), R * 1.05, w * 0.18);
             } else {
@@ -445,12 +445,17 @@
             }
             if (this.caseta && this.caseta.cont) this.caseta.cont.destroy();
             var c = this.add.container(x, s).setDepth(3);
+            var anchoReal = 0;
+            var altoReal = 0;
             var keyCaseta = texEscena('caseta');
             if (this.textures.exists(keyCaseta)) {
                 var im = this.add.image(0, 0, keyCaseta).setOrigin(0.5, 1);
                 var tw = m ? CASETA_DISENO_W * m.esc : R * 2.4;
                 var th = m ? tw * 0.95 : R * 2.2;
-                im.setScale(Math.min(tw / (im.width || 1), th / (im.height || 1)));
+                var esc = Math.min(tw / (im.width || 1), th / (im.height || 1));
+                im.setScale(esc);
+                anchoReal = im.width * esc;
+                altoReal = im.height * esc;
                 c.add(im);
             } else {
                 var g = this.add.graphics();
@@ -462,7 +467,13 @@
                 g.fillRoundedRect(-R * 0.45, -R * 0.75, R * 0.9, R * 0.75, { tl: R * 0.45, tr: R * 0.45, bl: 0, br: 0 });
                 c.add(g);
             }
-            this.caseta = { cont: c, x: x, y: s, R: R };
+            this.caseta = {
+                cont: c, x: x, y: s, R: R,
+                // Boca del tazón naranja que trae el dibujo de la caseta.
+                tazonX: anchoReal ? x + anchoReal * 0.182 : x + R * 0.36,
+                tazonY: altoReal ? s - altoReal * 0.271 : s - R * 0.5,
+                tazonR: anchoReal ? anchoReal * 0.183 : R * 0.36
+            };
         },
 
         /* ── Casas ─────────────────────────────────────────────────── */
@@ -1355,7 +1366,7 @@
             var k = this.huesos.length;
             var c = this.caseta;
             var v = this.vecinos[this.objetivo];
-            var L = c.R * 0.55;
+            var L = (c.tazonR || c.R * 0.36) * 0.9;
             var keyHueso = texEscena('hueso');
             var g;
             if (this.textures.exists(keyHueso)) {
@@ -1371,20 +1382,46 @@
                     g.strokeCircle(p[0], p[1], L * 0.16);
                 });
             }
+            // Caen dentro del tazón del perro, no sobre el techo.
+            var tx = (c.tazonX != null) ? c.tazonX : c.x;
+            var ty = (c.tazonY != null) ? c.tazonY : c.y - c.R * 0.5;
+            var tr = c.tazonR || c.R * 0.36;
             var col = k % 3;
             var fila = Math.floor(k / 3);
-            var dx = c.x + (col - 1) * L * 0.85;
-            var dy = c.y - c.R * 2.1 - fila * L * 0.45;
-            g.setPosition(v ? v.img.x : c.x, v ? v.img.y - (v.size || 60) : c.y - 100);
+            var dx = tx + (col - 1) * tr * 0.52;
+            var dy = ty - fila * L * 0.3 + (col === 1 ? tr * 0.06 : 0);
+            var ox = v ? v.img.x : c.x;
+            var oy = v ? v.img.y - (v.size || 60) : c.y - 100;
+            g.setPosition(ox, oy);
             g.setAngle(-20 + col * 20);
             this.huesos.push(g);
             return new Promise(function (resolve) {
+                if (reducido()) {
+                    g.setPosition(dx, dy);
+                    sfx('recompensa');
+                    resolve();
+                    return;
+                }
+                // Arco: primero sube y avanza, luego cae en el tazón.
+                var cima = Math.min(oy, dy) - Math.abs(dx - ox) * 0.22 - tr * 1.6;
                 scene.tweens.add({
-                    targets: g, x: dx, y: dy, duration: reducido() ? 1 : 700, ease: 'Cubic.easeInOut',
+                    targets: g, x: dx, duration: 760, ease: 'Sine.easeInOut'
+                });
+                scene.tweens.add({
+                    targets: g, angle: g.angle + 220, duration: 760, ease: 'Linear'
+                });
+                scene.tweens.add({
+                    targets: g, y: cima, duration: 330, ease: 'Sine.easeOut',
                     onComplete: function () {
-                        sfx('recompensa');
-                        scene.estrellas(dx, dy, 8);
-                        resolve();
+                        scene.tweens.add({
+                            targets: g, y: dy, duration: 430, ease: 'Quad.easeIn',
+                            onComplete: function () {
+                                g.setAngle(-14 + col * 14);
+                                sfx('recompensa');
+                                scene.estrellas(dx, dy, 8);
+                                resolve();
+                            }
+                        });
                     }
                 });
             });

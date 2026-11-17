@@ -2,7 +2,7 @@
   "nombre": "Dos Sonidos",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: escucha los sonidos y luego tócalos en el mismo orden.",
+    "demostracion": "¡Mira! Toca los sonidos en el mismo orden que los escuchaste.",
     "demostracionAcierto": "¡Así se repite la secuencia!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
@@ -84,6 +84,77 @@
       "img": "img/gallo.svg",
       "nombre": "Gallo",
       "sonido": "quiquiriqui"
+    },
+    "manos": {
+      "img": "img/manos.svg",
+      "imgAccion": "img/manos_juntas.svg",
+      "nombre": "Manos",
+      "sonido": "aplauso"
+    },
+    "tren": {
+      "img": "img/tren.svg",
+      "nombre": "Tren",
+      "sonido": "tren"
+    },
+    "trompeta": {
+      "img": "img/trompeta.svg",
+      "nombre": "Trompeta",
+      "sonido": "trompeta"
+    },
+    "botella": {
+      "img": "img/botella.svg",
+      "nombre": "Botella con semillas",
+      "sonido": "semillas"
+    },
+    "pollito": {
+      "img": "img/pollito.svg",
+      "nombre": "Pollito",
+      "sonido": "pollito"
+    },
+    "pasos": {
+      "img": "img/pasos.svg",
+      "nombre": "Pasos",
+      "sonido": "pasos"
+    },
+    "caballo": {
+      "img": "img/caballo.svg",
+      "nombre": "Caballo",
+      "sonido": "galope"
+    },
+    "reloj": {
+      "img": "img/reloj.svg",
+      "nombre": "Reloj",
+      "sonido": "reloj"
+    },
+    "burro": {
+      "img": "img/burro.svg",
+      "nombre": "Burro",
+      "sonido": "rebuzno"
+    },
+    "elefante": {
+      "img": "img/elefante.svg",
+      "nombre": "Elefante",
+      "sonido": "barrito"
+    },
+    "pato": {
+      "img": "img/pato.svg",
+      "nombre": "Pato",
+      "sonido": "cuac"
+    },
+    "leon": {
+      "img": "img/leon.svg",
+      "nombre": "León",
+      "sonido": "rugido"
+    },
+    "rana": {
+      "img": "img/rana.svg",
+      "nombre": "Rana",
+      "sonido": "croar"
+    },
+    "gaita": {
+      "img": "img/gaita.svg",
+      "nombre": "Gaita",
+      "sonido": "gaita"
     }
   },
   "niveles": [
@@ -125,7 +196,38 @@
             "voz": "zeus",
             "texto": "¡Escuchemos otra vez!"
           },
-          "iOrigen": 0
+          "iOrigen": 0,
+          "tipo": "secuencia",
+          "reproducciones": [
+            [
+              "perro",
+              "gato"
+            ]
+          ],
+          "dificultad": [
+            {
+              "n": 2,
+              "extra": 0
+            },
+            {
+              "n": 2,
+              "extra": 1
+            },
+            {
+              "n": 3,
+              "extra": 1
+            },
+            {
+              "n": 3,
+              "extra": 2
+            }
+          ],
+          "preguntas": [
+            {
+              "voz": "zeus",
+              "texto": "¡Ahora tócalos en el mismo orden!"
+            }
+          ]
         }
       ],
       "cierre": [

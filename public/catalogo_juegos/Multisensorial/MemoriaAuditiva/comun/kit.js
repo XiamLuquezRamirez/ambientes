@@ -125,6 +125,18 @@
             nv.opciones = mezclar(antes.concat([nuevo]));
             nv.correctas = [antes[iCambio]];   // el que cambió (el de antes); el nuevo también vale
             nv.cambio = { antes: antes[iCambio], despues: nuevo };
+        } else if (tipo === 'secuencia') {
+            // Repite la secuencia: se escucha en un orden y se toca en ESE orden.
+            var seq0 = tomar(d.n);
+            if (d.cambio) {
+                // Con cambio: tras repetirla suena OTRA con distinto orden y hay que repetir la nueva.
+                var seq1 = seq0;
+                for (var q = 0; q < 30 && seq1.join() === seq0.join(); q++) seq1 = mezclar(seq0);
+                nv.segunda = seq1;
+            }
+            nv.reproducciones = [seq0];
+            nv.opciones = mezclar(seq0.concat(tomar(d.extra || 0)));
+            nv.correctas = seq0.slice();
         } else if (tipo === 'desafio') {
             var s5 = tomar(d.n);
             nv.reproducciones = [s5];
@@ -144,15 +156,20 @@
         desaparecio34: [{ n: 3 }, { n: 3 }, { n: 4 }, { n: 4 }],
         desaparecio56: [{ n: 4 }, { n: 4 }, { n: 5 }, { n: 5 }],
         cambio: [{ n: 3 }, { n: 3 }, { n: 4 }, { n: 4 }],
-        desafio: [{ n: 3, extra: 2 }, { n: 4, extra: 2 }, { n: 5, extra: 1 }, { n: 5, extra: 2 }]
+        desafio: [{ n: 3, extra: 2 }, { n: 4, extra: 2 }, { n: 5, extra: 1 }, { n: 5, extra: 2 }],
+        secuencia34: [{ n: 2, extra: 1 }, { n: 3, extra: 1 }, { n: 3, extra: 2 }, { n: 4, extra: 2 }],
+        secuencia56: [{ n: 3, extra: 1 }, { n: 4, extra: 1 }, { n: 4, extra: 2 }, { n: 5, extra: 1 }]
     };
 
     /** Nivel que reproduce el reto del documento tal cual (sus sonidos y sus opciones). */
     function nivelOficial(r) {
+        if (r.tipo === 'secuencia' && r.reproducciones.length === 2) {
+            return { tipo: 'secuencia', reproducciones: [r.reproducciones[0].slice()], segunda: r.reproducciones[1].slice(), opciones: mezclar(r.opciones.slice()), correctas: r.reproducciones[0].slice(), oficial: true, preguntas: r.preguntas };
+        }
         var nv = { tipo: r.tipo, reproducciones: r.reproducciones.map(function (s) { return s.slice(); }), opciones: mezclar(r.opciones.slice()), oficial: true, preguntas: r.preguntas };
         var a = r.reproducciones[0], b = r.reproducciones[1];
         if (r.tipo === 'elegir') nv.correctas = [a[0]];
-        else if (r.tipo === 'varios' || r.tipo === 'desafio') nv.correctas = a.slice();
+        else if (r.tipo === 'varios' || r.tipo === 'desafio' || r.tipo === 'secuencia') nv.correctas = a.slice();
         else if (r.tipo === 'repetido') nv.correctas = a.filter(function (x, i) { return a.indexOf(x) !== i; }).slice(0, 1);
         else if (r.tipo === 'desaparecio') nv.correctas = a.filter(function (x) { return b.indexOf(x) < 0; });
         else if (r.tipo === 'cambio') {
@@ -178,6 +195,8 @@
             ['insignia_logro', 'insignia_guardian'].forEach(function (k) {
                 if (!self.textures.exists(k)) self.load.svg(k, 'img/' + k + '.svg', { width: 420, height: 420 });
             });
+            var ins = this.nivel && this.nivel.insignia && this.nivel.insignia.img;
+            if (ins && /\.svg$/i.test(ins) && !self.textures.exists('insignia_cfg')) self.load.svg('insignia_cfg', ins, { width: 420, height: 420 });
             if (this.precargar) this.precargar();
         },
 
@@ -252,12 +271,14 @@
             this.ondasG = keep(this.add.graphics().setDepth(79));
             // Marcador en la esquina: la bocina vive en el escenario, no en el cielo.
             this.estrellas = [];
-            var tam = Math.max(18, Math.min(26, Math.round(L.H * 0.034)));
-            var x0 = L.W - 18 - 4 * tam - 3 * 8;
-            var anchoEst = 4 * tam + 3 * 8;
-            keep(this.add.rectangle(x0 + anchoEst / 2, 16 + tam / 2, anchoEst + 16, tam + 14, 0x12263f, 0.45).setDepth(79));
+            // Progreso: 4 estrellas arriba al CENTRO (a la derecha las tapaban los botones de reiniciar y salir).
+            var tam = Math.max(28, Math.min(38, Math.round(L.H * 0.05)));
+            var anchoEst = 4 * tam + 3 * 10;
+            var x0 = Math.round((L.W - anchoEst) / 2);
+            var y0 = 14;
+            keep(this.add.rectangle(x0 + anchoEst / 2, y0 + tam / 2, anchoEst + 28, tam + 18, 0x12263f, 0.6).setStrokeStyle(3, 0xffffff, 0.5).setDepth(79));
             for (var i = 0; i < 4; i++) {
-                var e = keep(this.add.image(x0 + i * (tam + 8) + tam / 2, 16 + tam / 2, A.textura(this, 'estrella', 64)).setDisplaySize(tam, tam).setDepth(80));
+                var e = keep(this.add.image(x0 + i * (tam + 10) + tam / 2, y0 + tam / 2, A.textura(this, 'estrella', 64)).setDisplaySize(tam, tam).setDepth(80));
                 if (i >= this.nivelActual) e.setTint(0x8a8f98).setAlpha(0.55);
                 this.estrellas.push(e);
             }
@@ -358,13 +379,15 @@
             var r = this.reto;
             var demo = ((this.config.demo || {}).opciones || []);
             var self = this;
-            var pool = Object.keys(this.config.elementos || {}).filter(function (id) {
-                return demo.indexOf(id) < 0 && self.textures.exists('el_' + id);
-            });
+            var poolBase = Object.keys(this.config.elementos || {}).filter(function (id) { return self.textures.exists('el_' + id); });
             // Cada mundo puede limitar qué elementos tienen sentido en él (en la granja, animales).
-            if (this.filtrarPool) pool = this.filtrarPool(pool);
+            if (this.filtrarPool) poolBase = this.filtrarPool(poolBase);
+            var pool = poolBase.filter(function (id) { return demo.indexOf(id) < 0; });
+            if (pool.length < 5) pool = poolBase.slice();   // con pocos elementos, el ejemplo también puede salir en la partida
             var clave = r.tipo === 'varios' || r.tipo === 'repetido' || r.tipo === 'desaparecio' ? r.tipo + (this.mayor ? '56' : '34') : r.tipo;
             var difs = DIF[clave] || DIF.elegir;
+            if (r.tipo === 'secuencia') difs = r.dificultad || DIF['secuencia' + (this.mayor ? '56' : '34')];
+            else if (r.dificultad) difs = r.dificultad;
             var plan = difs.map(function (d) { return generar(r.tipo, pool, d, self.mayor); });
             // El reto del documento va en uno de los niveles 1-3 (al azar, distinto de la partida anterior).
             var claveLS = 'memoria_oficial_' + (global.location && global.location.pathname);
@@ -424,6 +447,7 @@
         preguntar: function () {
             var nv = this.nv;
             var pr = (nv.preguntas || [])[this.paso];
+            if (nv.tipo === 'secuencia' && this.nivelActual > 0 && !nv.demo) pr = null;
             if (!pr && nv.tipo === 'varios') pr = { voz: 'zoe', texto: nv.correctas.length === 2 ? '¿Cuáles dos escuchaste?' : '¿Cuáles escuchaste?' };
             if (!pr) return Promise.resolve();
             return this.ctx.decir(pr, { minMs: 700 });
@@ -438,13 +462,18 @@
                 return nv.correctas;
             }
             if (nv.tipo === 'cambio') return [nv.cambio.antes, nv.cambio.despues];
+            if (nv.tipo === 'secuencia') {
+                // Solo vale el sonido que toca ahora: el orden es parte del reto.
+                var sig = nv.correctas[this.marcadas.length];
+                return sig == null ? [] : [sig];
+            }
             return nv.correctas;
         },
 
         /** Cuántas respuestas hay que juntar en el paso actual. */
         cuantas: function () {
             var nv = this.nv;
-            if (nv.tipo === 'varios' || (nv.tipo === 'desafio' && this.paso === 0)) return nv.correctas.length;
+            if (nv.tipo === 'varios' || nv.tipo === 'secuencia' || (nv.tipo === 'desafio' && this.paso === 0)) return nv.correctas.length;
             return 1;
         },
 
@@ -465,11 +494,17 @@
         marcar: async function (id, punto) {
             if (this.fase !== 'jugar') return 'mal';
             this.pista.reiniciar();
-            if (this.marcadas.indexOf(id) >= 0) return 'repetido';
-            if (this.respuestas().indexOf(id) < 0) { await this.fallar(id, punto); return 'mal'; }
+            var enOrden = this.nv.tipo === 'secuencia';
+            if (!enOrden && this.marcadas.indexOf(id) >= 0) return 'repetido';
+            if (this.respuestas().indexOf(id) < 0) {
+                await this.fallar(id, punto);
+                if (enOrden) await this.reiniciarSecuencia();
+                return 'mal';
+            }
             this.marcadas.push(id);
             P.tono({ f: 700 + this.marcadas.length * 120, dur: 0.08, vol: 0.05 });
             this.sonar(id, { breve: true, bocina: false });
+            if (enOrden && this.alMarcar) await this.alMarcar(id, this.marcadas.length - 1, punto);
             if (this.marcadas.length < this.cuantas()) return 'bien';
             this.fase = 'premio';
             await this.acertar(this.marcadas.slice(), punto);
@@ -502,7 +537,73 @@
                 this.pista.reiniciar();
                 return;
             }
+            if (nv.tipo === 'secuencia' && nv.segunda) {
+                // Segunda ronda: cambia el orden y el niño debe escuchar de nuevo, sin copiar la anterior.
+                var seg = nv.segunda;
+                nv.segunda = null;
+                nv.reproducciones = [seg];
+                nv.correctas = seg.slice();
+                this.marcadas = [];
+                this.fase = 'escuchando';
+                if (this.alCambioSecuencia) await this.alCambioSecuencia();
+                await this.presentar();
+                if (!this.sigue()) return;
+                this.fase = 'jugar';
+                this.pista.reiniciar();
+                return;
+            }
             if (this.resolverNivel) this.resolverNivel();
+        },
+
+        /**
+         * Repite la secuencia: un error borra lo que llevaba el niño y vuelve a sonar la secuencia
+         * completa («¡Escuchemos otra vez!»). Sin castigo: no hay vidas ni puntos.
+         */
+        reiniciarSecuencia: async function () {
+            this.marcadas = [];
+            if (this.alReiniciar) await this.alReiniciar();
+            var t0 = this.time.now;
+            while (this.sonando && this.sigue() && this.time.now - t0 < 2500) await esperar(this, 100);
+            if (!this.sigue() || this.fase !== 'jugar') return;
+            await esperar(this, 450);
+            await this.repetir();
+        },
+
+        /** El niño toca una cosa de la lista en un mundo de secuencia (o la demo lo hace por él). */
+        tocarOrden: async function (a, punto) {
+            if (!a || this.fase !== 'jugar') return null;
+            this.tocado = a;
+            return this.marcar(a.id, punto || { x: a.cont.x, y: a.cont.y });
+        },
+
+        /** Pasos de la demo: la mano toca cada sonido en el orden de la secuencia. */
+        demoOrden: function (lista) {
+            var self = this;
+            return this.nv.correctas.map(function (id) {
+                return function () {
+                    var a = (lista || []).filter(function (q) { return q.id === id && q.cont && q.cont.active; })[0];
+                    if (!a) return null;
+                    return { desde: { x: a.cont.x, y: a.cont.y }, hacer: function () { return self.tocarOrden(a); } };
+                };
+            });
+        },
+
+        /** El siguiente sonido que falta de la secuencia (para la pista y la ayuda). */
+        siguienteDe: function (lista) {
+            var r = this.respuestas();
+            return (lista || []).filter(function (a) { return a && a.cont && a.cont.active && r.indexOf(a.id) >= 0; })[0];
+        },
+
+        /** Pista: con ayuda la mano toca el que sigue; si no, la bocina invita a escuchar otra vez. */
+        pistaToque: function (cancelada, lista) {
+            var self = this;
+            if (this.fase !== 'jugar' || this.sonando) return Promise.resolve();
+            var sig = this.siguienteDe(lista);
+            if (!sig || !this.ayuda) {
+                if (this.bocina) this.tweens.add({ targets: this.bocina, scale: 1.18, duration: 220, yoyo: true, repeat: 2 });
+                return esperar(this, 900);
+            }
+            return this.ctx.mano({ punto: { x: sig.cont.x, y: sig.cont.y }, holdMs: 500, cancelado: function () { return cancelada() || self.fase !== 'jugar'; } });
         },
 
         /** Error sin castigo: el elegido suena con su propio sonido y se invita a escuchar otra vez. */
@@ -556,6 +657,10 @@
             var x = d.sonido && ops.indexOf(d.sonido) >= 0 ? d.sonido : ops[0];
             var y = ops.filter(function (q) { return q !== x; })[0] || ops[1];
             var tipo = this.reto.tipo;
+            if (tipo === 'secuencia') {
+                var ds = (d.secuencia || ops).slice(0, 2);
+                return { demo: true, tipo: tipo, reproducciones: [ds.slice()], opciones: Ut.mezclar(ds.slice()), correctas: ds.slice(), preguntas: [] };
+            }
             var nv = { demo: true, tipo: tipo, opciones: Ut.mezclar([x, y]), correctas: [x], preguntas: [] };
             if (tipo === 'repetido') nv.reproducciones = [[x, y, x]];
             else if (tipo === 'desaparecio') nv.reproducciones = [[x, y], [y]];
@@ -665,7 +770,7 @@
         /** La insignia del documento («Logro» 3-4 / «Guardián de la memoria auditiva» 5-6) baja girando. */
         insignia: async function () {
             var L = this.L;
-            var k = this.mayor ? 'insignia_guardian' : 'insignia_logro';
+            var k = this.textures.exists('insignia_cfg') ? 'insignia_cfg' : (this.mayor ? 'insignia_guardian' : 'insignia_logro');
             if (!this.textures.exists(k)) return;
             var tam = Math.min(L.W, L.H) * 0.42;
             var brillo = this.add.circle(L.W / 2, L.H * 0.45, tam * 0.75, 0xfff3bf, 0).setDepth(96);

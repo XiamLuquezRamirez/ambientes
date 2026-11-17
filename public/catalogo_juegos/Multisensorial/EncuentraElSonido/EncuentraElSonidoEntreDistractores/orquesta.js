@@ -34,6 +34,47 @@
     var FIESTA = [0xff6b6b, 0xfcc419, 0x51cf66, 0x339af0, 0xcc5de8, 0xff922b];
     var PIEL = [0xf1c27d, 0xe0ac69, 0xc68642, 0x8d5524, 0xffdbac];
 
+    /* ── Arte del diseño ──────────────────────────────────────────
+     * FONDO.svg (1280×720) trae el teatro entero: bambalina, cortinas
+     * laterales, el haz del foco, el escenario y el público en silueta,
+     * y además el pentagrama vacío arriba al centro. Aquí solo se colocan
+     * encima los taburetes, las notas doradas y los telones que barren,
+     * anclados a las coordenadas reales del dibujo.
+     */
+    var ESCENA = {
+        fondo: 'img/fondo.svg',
+        butaca: 'img/butaca.svg',
+        cortinaIzq: 'img/cortina_izq.svg',
+        cortinaDer: 'img/cortina_der.svg',
+        notas: ['img/nota_1.svg', 'img/nota_2.svg', 'img/nota_3.svg', 'img/nota_4.svg']
+    };
+    var FONDO_W = 1280;
+    var FONDO_H = 720;
+    /* Medido sobre el propio FONDO.svg (muestreando sus colores):
+     * la hoja del pentagrama ocupa x 385→878, con sus 5 líneas entre
+     * y 198 y 258; la tabla del escenario va de y 280 a 535 y, abajo
+     * del todo, mide x 250→1046. Los músicos se paran al frente. */
+    var PENTA = { x0: 408, x1: 858, y0: 200, sep: 14 };
+    var ESCENARIO = { y: 528, izq: 345, der: 880 };
+    // La platea en silueta ocupa x 120→1170 desde y 610 hasta abajo.
+    var PUBLICO = { y: 606, alto: 114, izq: 120, der: 1170, tiras: 9 };
+    var ESCENA_V = '?v=20261113teatrob';
+
+    function texEscena(parte) { return 'orquesta:escena:' + parte; }
+
+    function encolarEscena(load) {
+        function add(key, src, esc) {
+            if (!src) return;
+            if (src.indexOf('?') === -1) src += ESCENA_V;
+            load.svg(key, src, esc ? { scale: esc } : undefined);
+        }
+        add(texEscena('fondo'), ESCENA.fondo);
+        add(texEscena('butaca'), ESCENA.butaca, 2);
+        add(texEscena('cortinaIzq'), ESCENA.cortinaIzq);
+        add(texEscena('cortinaDer'), ESCENA.cortinaDer);
+        ESCENA.notas.forEach(function (src, i) { add(texEscena('nota:' + i), src, 2); });
+    }
+
     function elemento(id) {
         return (gameConfig && gameConfig.elementos && gameConfig.elementos[id]) || {};
     }
@@ -126,6 +167,21 @@
             this.demoObj = null;
         },
 
+        /* El arte del teatro se pide aquí, antes de create, para que la
+         * primera imagen que ve el niño ya sea la del diseño y no el
+         * teatro de reserva dibujado a mano. */
+        preload: function () {
+            encolarEscena(this.load);
+            var elems = (gameConfig && gameConfig.elementos) || {};
+            var scene = this;
+            Object.keys(elems).forEach(function (id) {
+                var src = elems[id].img;
+                if (!src || scene.textures.exists(tex(id))) return;
+                if (/\.svg(\?|$)/i.test(src)) scene.load.svg(tex(id), src, { scale: 2 });
+                else scene.load.image(tex(id), src);
+            });
+        },
+
         create: function () {
             this.fondo = this.add.graphics().setDepth(-30);
             this.pentagrama = this.add.graphics().setDepth(-5);
@@ -139,7 +195,8 @@
                 c.fase = Math.random() * 6;
                 this.publico.push(c);
             }
-            this.dibujar();
+            this.aplicarEscena();
+            if (!this.conArte) this.dibujar();
             var scene = this;
             this.scale.on('resize', function () { scene.dibujar(); scene.ubicarAtriles(); });
             sceneRef = this;
@@ -155,7 +212,76 @@
             if (sceneRef === this) sceneRef = null;
         },
 
-        piso: function () { return this.scale.height * 0.74; },
+        piso: function () {
+            var m = this.mapaFondo();
+            if (m) return m.sy(ESCENARIO.y);
+            return this.scale.height * 0.74;
+        },
+
+        /**
+         * Platea viva: se recorta del propio FONDO la franja del público en
+         * varias tiras verticales, que luego saltan con desfase. Así el
+         * público que aplaude es el que dibujó el diseñador.
+         */
+        armarPlatea: function (m) {
+            var key = texEscena('fondo');
+            if (!this.textures.exists(key)) return;
+            var scene = this;
+            var ancho = (PUBLICO.der - PUBLICO.izq) / PUBLICO.tiras;
+            if (!this.platea) this.platea = [];
+            for (var i = 0; i < PUBLICO.tiras; i++) {
+                var t = this.platea[i];
+                if (!t) {
+                    // Un trozo del fondo, recortado con crop sobre su propia textura.
+                    t = this.add.image(0, 0, key).setOrigin(0, 0).setDepth(14);
+                    t.fase = Math.random() * 6;
+                    this.platea.push(t);
+                }
+                /* Las tiras saltan a distinto ritmo, así que entre una y otra
+                 * asomaría el fondo. Cada recorte se ensancha un poco por los
+                 * lados y así siempre se solapan con la vecina. */
+                var x0 = PUBLICO.izq + i * ancho;
+                t.setCrop(x0 - 6, PUBLICO.y, ancho + 12, PUBLICO.alto + 40);
+                t.setScale(m.esc).setPosition(m.ox, m.oy);
+                t.base = m.oy;
+                t.setVisible(true);
+            }
+        },
+
+        /** Mapa cover del FONDO.svg → pantalla. null si aún no hay textura. */
+        mapaFondo: function () {
+            if (!this.textures.exists(texEscena('fondo'))) return null;
+            var w = this.scale.width;
+            var h = this.scale.height;
+            var esc = Math.max(w / FONDO_W, h / FONDO_H);
+            var ox = (w - FONDO_W * esc) / 2;
+            var oy = (h - FONDO_H * esc) / 2;
+            return {
+                esc: esc, ox: ox, oy: oy,
+                sx: function (x) { return ox + x * esc; },
+                sy: function (y) { return oy + y * esc; }
+            };
+        },
+
+        /** Coloca el arte del diseño y apaga el teatro dibujado a mano. */
+        aplicarEscena: function () {
+            var m = this.mapaFondo();
+            if (!m) return;
+            if (!this.fondoImg) this.fondoImg = this.add.image(0, 0, texEscena('fondo')).setOrigin(0).setDepth(-30);
+            this.fondoImg.setVisible(true).setPosition(m.ox, m.oy).setScale(m.esc);
+            // El SVG ya trae pared, escenario, bambalina, foco y público.
+            this.fondo.clear();
+            this.pentagrama.clear();
+            // El foco sigue sirviendo para destacar al que acierta.
+            this.foco.setVisible(true);
+            // La platea la dibuja el propio fondo: se recorta en tiras para
+            // que aplaudan saltando, en vez de poner siluetas ajenas al arte.
+            this.publico.forEach(function (c) { c.setVisible(false); });
+            this.armarPlatea(m);
+            this.conArte = true;
+            this.dibujar();
+            this.ubicarAtriles();
+        },
 
         dibujar: function () {
             var w = this.scale.width;
@@ -163,6 +289,14 @@
             var p = this.piso();
             var g = this.fondo;
             g.clear();
+            if (this.conArte) {
+                // El dibujo del diseño ya trae el teatro: solo recolocarlo.
+                var m = this.mapaFondo();
+                if (m && this.fondoImg) this.fondoImg.setPosition(m.ox, m.oy).setScale(m.esc);
+                this.dibujarTelones(this.telonAbierto === undefined ? 1 : this.telonAbierto);
+                this.dibujarPentagrama();
+                return;
+            }
             // Pared del teatro y piso de madera del escenario.
             g.fillStyle(0x3b1726, 1);
             g.fillRect(0, 0, w, h);
@@ -197,6 +331,10 @@
             this.telonAbierto = t;
             var w = this.scale.width;
             var h = this.scale.height;
+            if (this.textures.exists(texEscena('cortinaIzq'))) {
+                this.ponerCortinas(t);
+                return;
+            }
             var ancho = w * (0.08 + (1 - t) * 0.44);
             [this.telonIzq, this.telonDer].forEach(function (g, k) {
                 g.clear();
@@ -210,12 +348,77 @@
             });
         },
 
+        /**
+         * Cortinas del diseño: cada una es un lienzo 1280×720 cuyo telón ocupa
+         * su mitad y se desplaza fuera de cuadro. t = 1 abiertas, 0 cerradas.
+         */
+        /**
+         * Telón del diseño. Cada SVG es una hoja ENTERA del telón, con sus
+         * pliegues y su curva de recogida ya dibujados: la izquierda cuelga
+         * desde el borde izquierdo y la derecha desde x≈172 de su lienzo.
+         * Cerradas (t = 0) se juntan en el centro y cubren la pantalla;
+         * abiertas (t = 1) cada una sale por su lado dejando ver el escenario.
+         */
+        ponerCortinas: function (t) {
+            var w = this.scale.width;
+            var h = this.scale.height;
+            // Las hojas se estiran para cubrir la pantalla completa, sin recortes.
+            var esc = Math.max(w / FONDO_W, h / FONDO_H);
+            var ancho = FONDO_W * esc;
+            var oy = Math.min((h - FONDO_H * esc) / 2, 0);
+            var scene = this;
+            [['cortinaIzq', this.telonIzq, -1], ['cortinaDer', this.telonDer, 1]].forEach(function (par) {
+                var key = texEscena(par[0]);
+                var lado = par[2];
+                var im = scene.cortinas && scene.cortinas[par[0]];
+                if (!im) {
+                    if (!scene.cortinas) scene.cortinas = {};
+                    im = scene.add.image(0, 0, key).setOrigin(0).setDepth(15);
+                    scene.cortinas[par[0]] = im;
+                    if (par[1]) par[1].clear().setVisible(false);
+                }
+                /* Cerrada: la hoja se apoya en el borde de la pantalla que le
+                 * toca, de modo que las dos se encuentran en el centro.
+                 * Abierta: se corre hacia fuera casi del todo, dejando asomar
+                 * el canto del telón como enmarca un escenario de verdad. */
+                var asoma = Math.max(w * 0.07, 52);
+                var cerrada = lado < 0 ? w - ancho : 0;
+                var abierta = lado < 0 ? asoma - ancho : w - asoma;
+                im.setScale(esc).setPosition(cerrada + (abierta - cerrada) * t, oy);
+                im.lado = lado;
+                im.baseX = im.x;
+            });
+        },
+
+        /** Las cortinas respiran un poco, como tela colgada. */
+        ondearCortinas: function (time) {
+            if (reducido()) return;
+            var scene = this;
+            Object.keys(this.cortinas).forEach(function (k, i) {
+                var im = scene.cortinas[k];
+                if (im.baseX === undefined) return;
+                var d = Math.sin(time / 1500 + i * 2.1) * 3;
+                im.x = im.baseX + d;
+            });
+        },
+
         /** Pentagrama arriba al centro: ahí se ponen las notas doradas. */
         dibujarPentagrama: function () {
             var w = this.scale.width;
             var h = this.scale.height;
             var g = this.pentagrama;
             g.clear();
+            var m = this.mapaFondo();
+            if (m) {
+                // El pentagrama ya está dibujado en el fondo: solo medirlo.
+                this.penta = {
+                    x0: m.sx(PENTA.x0), x1: m.sx(PENTA.x1),
+                    y0: m.sy(PENTA.y0), sep: PENTA.sep * m.esc
+                };
+                var sc = this;
+                this.notas.forEach(function (n, k) { var q = sc.puestoNota(k); n.setPosition(q.x, q.y); });
+                return;
+            }
             var x0 = w * 0.3;
             var x1 = w * 0.7;
             var y0 = h * 0.24;
@@ -232,7 +435,14 @@
         puestoNota: function (k) {
             var p = this.penta;
             var alturas = [3, 1, 2, 0, 2, 4];
-            return { x: p.x0 + (p.x1 - p.x0) * (0.15 + k * 0.22), y: p.y0 + alturas[k % alturas.length] * p.sep };
+            // Repartidas dentro de la hoja, a la derecha de la clave de sol,
+            // y apoyadas sobre su línea (el dibujo de la nota cuelga del palo).
+            var n = Math.max(this.premioTotal || 6, k + 1, 1);
+            var t = n === 1 ? 0.5 : Math.min(k, n - 1) / (n - 1);
+            return {
+                x: p.x0 + (p.x1 - p.x0) * (0.14 + 0.78 * t),
+                y: p.y0 + alturas[k % alturas.length] * p.sep - p.sep * 0.6
+            };
         },
 
         /* ── Atriles e instrumentos ───────────────────────────────── */
@@ -247,10 +457,13 @@
             var n = this.atriles.length;
             var scene = this;
             // En semicírculo: los de los lados un poco más adelante.
+            var m = this.mapaFondo();
+            var izq = m ? m.sx(ESCENARIO.izq) : w * 0.18;
+            var der = m ? m.sx(ESCENARIO.der) : w * 0.82;
             this.atriles.forEach(function (a, i) {
                 var t = n === 1 ? 0.5 : i / (n - 1);
-                a.x = w * (0.18 + 0.64 * t);
-                a.y = p - scene.scale.height * 0.02 - Math.sin(t * Math.PI) * scene.scale.height * 0.07;
+                a.x = izq + (der - izq) * t;
+                a.y = p - scene.scale.height * 0.01 - Math.sin(t * Math.PI) * scene.scale.height * 0.03;
                 scene.dibujarAtril(a);
                 var ins = a.ocupante && scene.instr[a.ocupante];
                 if (ins) scene.ponerEnAtril(ins, a);
@@ -261,6 +474,14 @@
             var g = a.g;
             var t = this.tamInstr();
             g.clear();
+            if (this.textures.exists(texEscena('butaca'))) {
+                // Taburete de madera del diseño: el instrumento se para encima.
+                if (!a.img) a.img = this.add.image(0, 0, texEscena('butaca')).setOrigin(0.5, 1).setDepth(1);
+                var alto = t * 1.05;
+                a.img.setScale(alto / (a.img.height || 1)).setPosition(a.x, a.y);
+                a.top = a.y - alto * 0.66; // el asiento del taburete
+                return;
+            }
             g.fillStyle(0x212529, 1);
             g.fillRect(a.x - 3, a.y - t * 0.55, 6, t * 0.55);
             g.fillRect(a.x - t * 0.25, a.y - 4, t * 0.5, 6);
@@ -278,6 +499,7 @@
             while (this.atriles.length > n) {
                 var b = this.atriles.pop();
                 b.g.destroy();
+                if (b.img) b.img.destroy();
             }
             this.atriles.forEach(function (a) { a.ocupante = null; });
             this.ubicarAtriles();
@@ -313,6 +535,7 @@
             this.jugando = false;
             this.modo = o.modo || 'solo';
             this.ronda = o.ronda || 0;
+            if (o.total) this.premioTotal = o.total; // cuántas notas caben en el pentagrama
             this.objetivo = o.objetivo;
             this.coroIds = (o.coro || []).slice();
             var ids = mezclar(o.elementos);
@@ -395,6 +618,17 @@
             this.publico.forEach(function (c) {
                 c.y = c.base - (scene.fiesta && !reducido() ? Math.abs(Math.sin(time / 180 + c.fase)) * 10 : 0);
             });
+            if (this.platea) {
+                // Aplauden a saltitos en la fiesta y respiran suave el resto del rato.
+                var fuerte = this.fiesta && !reducido();
+                this.platea.forEach(function (t) {
+                    if (reducido()) { t.y = t.base; return; }
+                    var amp = fuerte ? 6 : 1.4;
+                    var vel = fuerte ? 180 : 900;
+                    t.y = t.base - Math.abs(Math.sin(time / vel + t.fase)) * amp;
+                });
+            }
+            if (this.cortinas) this.ondearCortinas(time);
             this.foco.fillAlpha = this.focoEn ? 0.25 : 0.08;
             this.notas.forEach(function (n, k) { n.angle = Math.sin(time / 400 + k) * 6; });
         },
@@ -484,9 +718,18 @@
             var k = this.notas.length;
             var q = this.puestoNota(k);
             var desde = ins ? { x: ins.atril.x, y: ins.atril.top - ins.size / 2 } : { x: this.scale.width / 2, y: this.scale.height / 2 };
-            var n = this.add.text(desde.x, desde.y, '♪', {
-                fontFamily: 'Arial', fontSize: Math.round(this.scale.height * 0.07) + 'px', color: '#f59f00', stroke: '#ffffff', strokeThickness: 4
-            }).setOrigin(0.5, 0.75).setDepth(6);
+            var n;
+            var keyNota = texEscena('nota:' + (k % ESCENA.notas.length));
+            if (this.textures.exists(keyNota)) {
+                // Las notas doradas dibujadas por el diseño.
+                n = this.add.image(desde.x, desde.y, keyNota).setDepth(6);
+                var alto = this.scale.height * 0.085;
+                n.setScale(alto / (n.height || 1));
+            } else {
+                n = this.add.text(desde.x, desde.y, '♪', {
+                    fontFamily: 'Arial', fontSize: Math.round(this.scale.height * 0.07) + 'px', color: '#f59f00', stroke: '#ffffff', strokeThickness: 4
+                }).setOrigin(0.5, 0.75).setDepth(6);
+            }
             return new Promise(function (resolve) {
                 sfx('zas');
                 scene.tweens.add({
@@ -506,9 +749,11 @@
             var scene = this;
             this.jugando = false;
             this.fiesta = true;
+            // Con el telón echado no se vería nada de la fiesta: abrirlo.
+            if (this.telonAbierto !== undefined && this.telonAbierto < 0.99) this.telon(1);
             sfx('aplausos');
             this.notas.forEach(function (n, k) {
-                if (!reducido()) scene.tweens.add({ targets: n, scale: 1.4, duration: 200, yoyo: true, repeat: 3, delay: k * 150 });
+                if (!reducido()) scene.tweens.add({ targets: n, scale: (n.scaleX || 1) * 1.4, duration: 200, yoyo: true, repeat: 3, delay: k * 150 });
             });
             this.confeti();
             return esperar(this, 2600).then(function () {
@@ -608,13 +853,18 @@
             if (elems[id].img) lista.push({ key: tex(id), src: elems[id].img });
         });
         lista = lista.filter(function (t) { return !scene.textures.exists(t.key); });
-        if (!lista.length) return Promise.resolve();
+        var faltaEscena = !scene.textures.exists(texEscena('fondo'));
+        if (!lista.length && !faltaEscena) return Promise.resolve();
         return new Promise(function (resolve) {
             lista.forEach(function (t) {
                 if (/\.svg(\?|$)/i.test(t.src)) scene.load.svg(t.key, t.src, { scale: 2 });
                 else scene.load.image(t.key, t.src);
             });
-            scene.load.once('complete', resolve);
+            if (faltaEscena) encolarEscena(scene.load);
+            scene.load.once('complete', function () {
+                if (scene.aplicarEscena) scene.aplicarEscena();
+                resolve();
+            });
             scene.load.start();
         });
     }

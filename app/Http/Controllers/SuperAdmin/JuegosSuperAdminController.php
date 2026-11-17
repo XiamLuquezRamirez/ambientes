@@ -123,6 +123,9 @@ class JuegosSuperAdminController extends Controller
         return view('superAdmin.catalogo_juegos.juegos.preview', [
             'juego' => $juego,
             'urlPaquete' => $juego->urlPaquete(),
+            // Fecha del index.html: cambia al editar el paquete, así la vista previa
+            // no se queda con una copia vieja guardada en la caché del navegador.
+            'versionPaquete' => (string) @filemtime($rutaAbsoluta),
             'perfilPayload' => [
                 'perfil_id' => 1,
                 'perfil_clave' => 'estandar',

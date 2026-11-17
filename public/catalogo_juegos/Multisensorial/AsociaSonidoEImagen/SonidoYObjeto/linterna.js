@@ -22,17 +22,45 @@
     var EXTRA = ['reloj', 'ventilador', 'aspiradora', 'licuadora'];
     var ALTOS = { ventana: 1, reloj: 1 };
 
+    // Escenario del diseño (img/diseno/fondo.svg, lienzo 1280×720): sala con pared de rayas, zócalo,
+    // piso de madera, alfombra roja y mesita con lámpara en el centro. Medidas tomadas por color.
+    var DISENO = 'img/diseno/';
+    var FONDO_W = 1280, FONDO_H = 720;
+    var SALA = {
+        piso: 527,                 // fin del zócalo (495-526): aquí empieza el piso
+        anchoUtil: 1080,           // ancho del dibujo que siempre debe caber en pantalla
+        tam: 135,                  // alto de cada objeto en unidades del dibujo (la mesita mide 230 de ancho)
+        pared: { y: 330, xs: [250, 640, 1030] },
+        suelo: { y: 615, xs: [150, 420, 860, 1130] },   // 420 y 860 sobre la alfombra, a los lados de la mesa
+        lampara: { x: 633, y: 490, r: 30 },              // pantalla de la lámpara de la mesita
+        mesa: { x: 700, y: 549 }                         // tablero de la mesita (donde duerme el gato)
+    };
+
     var escena = {
         iniciar: function () { this.objs = []; this.luz = null; this.pila = 1; },
+
+        preload: function () {
+            if (!this.textures.exists('so_fondo')) this.load.svg('so_fondo', DISENO + 'fondo.svg', { width: 1920, height: 1080 });
+        },
+
+        /** Encaje del fondo: cubre la pantalla anclado abajo, pero sin recortar el ancho útil. */
+        marcoFondo: function (W, H) {
+            if (!this.textures.exists('so_fondo')) return null;
+            var k = Math.min(Math.max(W / FONDO_W, H / FONDO_H), W / SALA.anchoUtil);
+            var ox = (W - FONDO_W * k) / 2, oy = H - FONDO_H * k;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
 
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
             var L = { W: W, H: H };
-            L.y0 = Math.round(H * 0.66);
+            var F = L.F = this.marcoFondo(W, H);
+            L.y0 = F ? Math.round(F.sy(SALA.piso)) : Math.round(H * 0.66);
             var hueco = Math.max(60, H * 0.16);
             L.bocina = { x: W / 2, y: Math.max(60, Math.min(100, 56 + hueco * 0.2)), r: Math.max(28, Math.min(40, hueco * 0.3)) };
             L.pres = W >= 760 ? { x: W - 72, piso: H - 104, alto: Math.min(160, H * 0.28), modelo: 'nino' } : null;
             var der = L.pres ? W - 150 : W - 20;
+            if (F) return this.calcularConFondo(L, F, der);
             L.tam = Math.max(80, Math.min(150, H * 0.22, (der - 20) / 5.2));
             L.radio = Math.max(90, Math.min(160, L.tam * 1.05));
             // Sitios: tres en la pared (altos) y tres en el piso, alternados.
@@ -43,6 +71,33 @@
                 var alto = i % 2 === 1;
                 L.sitios.push({ x: x, y: alto ? L.y0 - L.tam * 1.05 : L.y0 + (H - L.y0) * 0.42, alto: alto });
             }
+            L.gato = { x: W * 0.5, y: L.y0 - L.tam * 0.25, t: 10 };
+            return L;
+        },
+
+        /** Sitios sobre la sala del diseño: tres en la pared y cuatro en el piso. */
+        calcularConFondo: function (L, F, der) {
+            L.tam = Math.max(70, SALA.tam * F.k);
+            L.radio = Math.max(90, Math.min(170, L.tam * 1.1));
+            var x0 = 20 + L.tam * 0.55, x1 = der - L.tam * 0.55;
+            L.sitios = [];
+            // En pantallas altas sobra pared encima del dibujo: la fila de la pared sube hacia el medio.
+            var techo = L.bocina.y + L.bocina.r + 40;
+            var yPared = Math.min(F.sy(SALA.pared.y), L.y0 - Math.max(L.tam * 1.4, (L.y0 - techo) * 0.4));
+            [[SALA.pared, true], [SALA.suelo, false]].forEach(function (fila) {
+                var ult = -1e9;
+                fila[0].xs.forEach(function (dx) {
+                    var x = Math.max(x0, Math.min(x1, F.sx(dx)));
+                    // Si al acotar quedó encima del anterior (pantalla angosta o presentador), se descarta.
+                    if (x - ult < L.tam * 0.95) return;
+                    ult = x;
+                    L.sitios.push({ x: x, y: fila[1] ? yPared : F.sy(fila[0].y), alto: fila[1] });
+                });
+            });
+            L.lampara = { x: F.sx(SALA.lampara.x), y: F.sy(SALA.lampara.y), r: SALA.lampara.r * F.k };
+            var t = Math.max(7, Math.min(13, 10 * F.k));
+            // El gato duerme sobre la mesita, a la derecha de la lámpara (cabeza = tablero - cuerpo).
+            L.gato = { x: F.sx(SALA.mesa.x), y: F.sy(SALA.mesa.y) - t * 4.8, t: t };
             return L;
         },
 
@@ -50,7 +105,19 @@
             var self = this;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
-            K.textura(this, 'casa_fondo', L.W, L.H, function (x, w, h) {
+            if (L.F) {
+                // Sala del diseño. Si sobra pantalla arriba, la pared sigue con la franja superior del
+                // dibujo estirada hacia arriba (las rayas son verticales, así que empalman sin costura).
+                var F = L.F, fw = FONDO_W * F.k, fh = FONDO_H * F.k;
+                var tex = this.textures.get('so_fondo');
+                if (F.oy > 0) {
+                    var src = tex.getSourceImage();
+                    if (!tex.has('franja')) tex.add('franja', 0, 0, 0, src.width, Math.max(2, Math.round(src.height / 120)));
+                    keep(this.add.image(F.ox, F.oy + 1, 'so_fondo', 'franja').setOrigin(0, 1).setDisplaySize(fw, F.oy + 2).setDepth(0));
+                }
+                // '__BASE' explícito: al añadir 'franja', Phaser la vuelve el primer cuadro de la textura.
+                keep(this.add.image(F.ox, F.oy, 'so_fondo', '__BASE').setOrigin(0, 0).setDisplaySize(fw, fh).setDepth(0));
+            } else K.textura(this, 'casa_fondo', L.W, L.H, function (x, w, h) {
                 K.pared(x, w, L.y0, { arriba: '#b6c4e0', abajo: '#94a6cc', raya: 'rgba(255,255,255,0.12)' });
                 K.piso(x, w, h, L.y0, { lejos: '#8a6a4a', cerca: '#ad855c' });
                 // Zócalo, enchufe, alfombra larga.
@@ -58,7 +125,7 @@
                 x.strokeStyle = '#e8c99a'; x.lineWidth = 3; x.setLineDash([10, 8]);
                 K.rr(x, w * 0.13, h * 0.87, w * 0.58, h * 0.06, 16); x.stroke(); x.setLineDash([]);
             });
-            keep(this.add.image(0, 0, 'casa_fondo').setOrigin(0, 0).setDepth(0));
+            if (!L.F) keep(this.add.image(0, 0, 'casa_fondo').setOrigin(0, 0).setDepth(0));
             // Oscuridad: capa FIJA del tamaño de la pantalla. Lo único que se mueve es el foco,
             // que se usa para borrar el agujero; así la capa nunca se desplaza ni asoma su borde.
             var fd = Math.ceil(L.radio * 2.2);
@@ -98,7 +165,7 @@
             this.relampago = keep(this.add.rectangle(0, 0, L.W, L.H, 0xe7f5ff, 0).setOrigin(0, 0).setDepth(52));
             this.lamparasG = keep(this.add.graphics().setDepth(49));
             var V = this.montarVida(keep);
-            if (V) V.gato(L.W * 0.5, L.y0 - L.tam * 0.25, { t: 10, depth: 56 });
+            if (V) V.gato(L.gato.x, L.gato.y, { t: L.gato.t, depth: 56 });
             this.montarHud(keep);
             if (reubicar) {
                 this.objs.forEach(function (o) {
@@ -385,7 +452,8 @@
             // Tres lámparas de techo (la del medio cuelga detrás de la bocina).
             var yl = L.bocina.y + L.bocina.r + 30;
             var xs = [W * 0.17, W * 0.5, W * 0.83];
-            var lamparas = xs.map(function (x) {
+            var lamparas = xs.map(function (x, n) {
+                if (n === 1 && L.lampara) return self.lamparaMesa();
                 var c = self.add.container(x, yl).setDepth(53);
                 var cable = self.add.rectangle(0, -yl / 2, 2, yl, 0x343a40);
                 var halo = self.add.circle(0, 10, L.tam * 0.9, 0xffe8a3, 0).setBlendMode(Phaser.BlendModes.ADD);
@@ -430,9 +498,23 @@
             await esperar(this, 400);
         },
 
+        /** La lámpara de la mesita (dibujada en el fondo): solo se le pone la luz encima. */
+        lamparaMesa: function () {
+            var lp = this.L.lampara;
+            var c = this.add.container(lp.x, lp.y).setDepth(53);
+            var halo = this.add.circle(0, lp.r * 0.6, lp.r * 4.2, 0xffe8a3, 0).setBlendMode(Phaser.BlendModes.ADD);
+            // La tulipa brilla: elipse cálida del tamaño de la pantalla del dibujo.
+            var foco = this.add.ellipse(0, 0, lp.r * 1.7, lp.r * 1.35, 0xfff3bf, 0).setBlendMode(Phaser.BlendModes.ADD);
+            c.add([halo, foco]);
+            c.halo = halo;
+            // Misma interfaz que el foco de las lámparas de techo (encendido = 0xfff3bf).
+            c.foco = { setFillStyle: function (col) { foco.setFillStyle(0xfff3bf, col === 0xfff3bf ? 0.7 : 0); return foco; } };
+            return c;
+        },
+
         saltaGato: async function () {
             var L = this.L;
-            var gx = L.W * 0.5, gy = L.y0 - L.tam * 0.25, t0 = 10;
+            var gx = L.gato.x, gy = L.gato.y, t0 = L.gato.t;
             var V = this.vidaAmb;
             var ojos = V && V.buscar ? V.buscar('gato') : [];
             ojos.forEach(function (m) { m.g.setVisible(false); });
@@ -472,6 +554,26 @@
             var altoLibre = L.y0 - L.tam * 1.6 - techo;
             var w = Math.min(L.tam * 1.3, L.W * 0.26), h = Math.max(60, Math.min(altoLibre, w * 0.8));
             var x = L.W * 0.17, y = techo + Math.max(0, (altoLibre - h) / 2) + h / 2;
+            if (L.F) {
+                // En la sala del diseño: un hueco de la pared sin objeto; si están todos ocupados,
+                // en el mayor espacio entre dos objetos de la pared (sin taparlos).
+                var ocupados = this.objs.map(function (o) { return o.sitio; });
+                var pared = L.sitios.filter(function (s) { return s.alto; });
+                var libre = L.sitios.filter(function (s, i) { return s.alto && ocupados.indexOf(i) < 0; })[0];
+                w = Math.min(L.tam * 1.25, L.W * 0.26); h = w * 0.8;
+                if (libre) { x = libre.x; y = libre.y; }
+                else {
+                    var bordes = [0].concat(pared.map(function (s) { return s.x; }), [L.W - (L.pres ? 150 : 0)]);
+                    var mejor = { gap: 0, x: L.W * 0.5 };
+                    for (var b = 1; b < bordes.length; b++) {
+                        // En los extremos solo estorba medio objeto; entre dos, uno entero.
+                        var gap = bordes[b] - bordes[b - 1] - L.tam * ((b === 1 || b === bordes.length - 1) ? 0.6 : 1.2);
+                        if (gap > mejor.gap) mejor = { gap: gap, x: (bordes[b] + bordes[b - 1]) / 2 + (b === 1 ? L.tam * 0.3 : (b === bordes.length - 1 ? -L.tam * 0.3 : 0)) };
+                    }
+                    w = Math.max(50, Math.min(w, mejor.gap - 16)); h = w * 0.8;
+                    x = mejor.x; y = pared.length ? pared[0].y : L.y0 - h * 1.2;
+                }
+            }
             var c = this.add.container(x, y).setDepth(3).setAlpha(0);
             var g = this.add.graphics();
             g.fillStyle(0xffffff, 1); g.fillRoundedRect(-w / 2 - 6, -h / 2 - 6, w + 12, h + 12, 6);
@@ -515,7 +617,10 @@
             await ctx.decir({ voz: 'zeus', texto: t.demostracion || '¡Mira cómo se juega!' }, { minMs: 1600 });
             if (!ctx.vivo() || !ctx.enDemo()) return limpiar();
             // Gallo y vaca en los dos primeros sitios del piso (a la izquierda).
-            var sitios = [0, 2];
+            // Con la sala del diseño los primeros sitios son de pared: se usan dos del piso, bien separados.
+            var piso = [];
+            L.sitios.forEach(function (s, i) { if (!s.alto) piso.push(i); });
+            var sitios = L.F ? [piso[0], piso[Math.min(2, piso.length - 1)]] : [0, 2];
             d.opciones.forEach(function (id, k) {
                 var s = L.sitios[sitios[k]];
                 var a = Act.crear(self, id, s.x, s.y, L.tam);
