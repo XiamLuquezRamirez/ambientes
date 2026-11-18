@@ -48,7 +48,7 @@
 
     /** Muestra la imagen cuando ya cargó (hasta entonces queda oculta para no ver el dibujo viejo del HTML). */
     function ver(img) {
-        var mostrar = function () { img.style.visibility = ''; };
+        var mostrar = function () { img.style.visibility = 'visible'; };
         if (img.complete && img.naturalWidth) mostrar();
         else { img.addEventListener('load', mostrar, { once: true }); img.addEventListener('error', mostrar, { once: true }); }
     }
@@ -103,7 +103,7 @@
             if (!pose || !img) return;
             var spec = { tam: 220, modelos: pose.modelos };
             if (pose.cama && window.PedniaArte) spec.fondo = window.PedniaArte.dataURL('cama', 220);
-            window.AsociaPj3D.foto(spec).then(function (url) { img.src = url; img.style.visibility = ''; }).catch(function () { img.style.visibility = ''; /* queda el dibujo */ });
+            window.AsociaPj3D.foto(spec).then(function (url) { img.src = url; img.style.visibility = 'visible'; }).catch(function () { img.style.visibility = 'visible'; /* queda el dibujo */ });
         });
     }
 
@@ -119,7 +119,7 @@
             var img = sp.querySelector('img');
             if (img) { img.style.visibility = 'hidden'; ocultos.push(img); }
         });
-        setTimeout(function () { ocultos.forEach(function (im) { im.style.visibility = ''; }); }, 8000);
+        setTimeout(function () { ocultos.forEach(function (im) { im.style.visibility = 'visible'; }); }, 8000);
     })();
 
     if (window.AsociaPj3D) fotos3d();

@@ -22,7 +22,7 @@
     // Hasta cambiar la imagen la casilla queda oculta (si no, se ve un instante la ilustración vieja del HTML).
     var ocultas = [];
     Array.prototype.forEach.call(document.querySelectorAll('.inicio-elementos .inicio-el img'), function (im) { im.style.visibility = 'hidden'; ocultas.push(im); });
-    function verTodas() { ocultas.forEach(function (im) { im.style.visibility = ''; }); }
+    function verTodas() { ocultas.forEach(function (im) { im.style.visibility = 'visible'; }); }
     setTimeout(verTodas, 4000);
 
     function aplicar() {
