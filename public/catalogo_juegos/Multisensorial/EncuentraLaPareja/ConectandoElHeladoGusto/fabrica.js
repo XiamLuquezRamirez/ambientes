@@ -290,21 +290,23 @@
 
         /* ── Ronda 2: la cinta transportadora ──────────────────── */
 
-        rondaCinta: async function () {
+        rondaCinta: async function (meta, vel, intro, cierre) {
             var scene = this;
             var m = this.m();
             this.modo = 'cinta';
             this.cablesLab.forEach(function (c) { c.destruir(); });
             this.cablesLab = [];
             this.est.orden.forEach(function (id) { scene.est.encender(id, false); });
-            await this.ctx.decir({ voz: 'zeus', texto: '¡La cinta de la fábrica! Arrastra cada cosa a la estación del sentido que la percibe.' });
+            await this.ctx.decir({ voz: 'zeus', texto: intro || '¡La cinta de la fábrica! Arrastra cada cosa a la estación del sentido que la percibe.' });
             this.cintaActiva = true;
             this.clasificadas = 0;
-            this.meta = 6;
+            this.meta = meta || 6;
+            this.velCinta = vel || 1;
+            this.finCintaTexto = cierre || '¡La fábrica clasificó todo! Cada cosa con su sentido.';
             var cola = [];
             var rellenar = function () { cola = cola.concat(U.mezclar(Object.keys(COSAS))); };
             this.salida = this.time.addEvent({
-                delay: 2600, loop: true, callback: function () {
+                delay: 2600 / (vel || 1), loop: true, callback: function () {
                     if (scene.enCinta.length >= 4) return;
                     if (!cola.length) rellenar();
                     scene.ponerEnCinta(cola.shift());
@@ -395,7 +397,7 @@
                 if (this.clasificadas >= this.meta && this.finCinta) {
                     var fin = this.finCinta;
                     this.finCinta = null;
-                    this.ctx.decir({ voz: 'zoe', texto: '¡La fábrica clasificó todo! Cada cosa con su sentido.' }, { estado: 'acierto' });
+                    this.ctx.decir({ voz: 'zoe', texto: this.finCintaTexto }, { estado: 'acierto' });
                     this.time.delayedCall(1400, fin);
                 }
                 return;
@@ -438,11 +440,151 @@
             var scene = this;
             this.enCinta.forEach(function (c) {
                 if (c.arrastre || c.volando) return;
-                c.cont.x += 60 * dt;
+                c.cont.x += 60 * (this.velCinta || 1) * dt;
                 c.cont.y = m.cinta - c.tam * 0.42 + Math.sin(time / 120 + c.cont.x) * 0.6;
                 if (c.cont.x > m.w + c.tam) c.cont.x = -c.tam;
             });
             void scene;
+        },
+
+        /* ── Ronda 4: llenar los conos con la llave del sabor ──── */
+
+        rondaValvulas: async function () {
+            var scene = this;
+            var m = this.m();
+            this.modo = 'valvulas';
+            this.cintaActiva = true;
+            this.cablesLab.forEach(function (c) { c.destruir(); });
+            this.cablesLab = [];
+            this.est.orden.forEach(function (id) { scene.est.encender(id, false); });
+            this.tweens.add({ targets: this.maquinaG, alpha: 0, duration: 500 });
+            var SAB = [{ s: 'fresa', color: 0xf783ac }, { s: 'choco', color: 0x8a5a2b }, { s: 'limon', color: 0xfcc419 }];
+            var ancho = Math.min(m.w * 0.2, 170);
+            var yv = m.cinta - m.obj * 1.55;
+            this.valvulas = SAB.map(function (v, i) {
+                var x = m.w * 0.5 + (i - 1) * ancho * 1.25;
+                var c = scene.add.container(x, yv).setDepth(18);
+                var g = scene.add.graphics();
+                g.fillStyle(0x868e96, 1); g.fillRoundedRect(-ancho * 0.18, 0, ancho * 0.36, m.obj * 0.45, 8);
+                g.fillStyle(v.color, 1); g.fillRoundedRect(-ancho * 0.32, -m.obj * 0.32, ancho * 0.64, m.obj * 0.4, 14);
+                g.lineStyle(4, 0xffffff, 0.7); g.strokeRoundedRect(-ancho * 0.32, -m.obj * 0.32, ancho * 0.64, m.obj * 0.4, 14);
+                g.fillStyle(0xffffff, 0.35); g.fillRoundedRect(-ancho * 0.26, -m.obj * 0.27, ancho * 0.14, m.obj * 0.22, 6);
+                g.fillStyle(0x495057, 1); g.fillTriangle(-ancho * 0.12, m.obj * 0.45, ancho * 0.12, m.obj * 0.45, 0, m.obj * 0.62);
+                var bola = scene.add.image(0, -m.obj * 0.12, A().textura(scene, 'bola_' + v.s, 128)).setDisplaySize(m.obj * 0.36, m.obj * 0.36);
+                c.add([g, bola]);
+                c.s = v.s; c.ancho = ancho;
+                c.boquilla = { x: x, y: yv + m.obj * 0.62 };
+                c.setAlpha(0);
+                scene.tweens.add({ targets: c, alpha: 1, duration: 500, delay: 200 * i });
+                return c;
+            });
+            this.conos = [];
+            this.clasificadas = 0;
+            this.meta = 6;
+            this.pintarContador();
+            await this.ctx.decir({ voz: 'zeus', texto: '¡Hora de llenar los conos! Cada cono pide un sabor. Toca la llave del mismo sabor cuando el cono pase debajo.' });
+            var tam = Math.min(m.obj * 0.62, 96);
+            var turno = [];
+            var siguiente = function () {
+                if (!turno.length) turno = U.mezclar(['fresa', 'choco', 'limon']);
+                return turno.shift();
+            };
+            this.salidaC = this.time.addEvent({
+                delay: 2200, loop: true, callback: function () {
+                    if (scene.conos.length >= 3) return;
+                    var pide = siguiente();
+                    var c = scene.add.container(-tam, m.cinta - tam * 0.42).setDepth(15);
+                    c.add(scene.add.ellipse(0, tam * 0.42, tam * 0.7, 10, 0x000000, 0.2));
+                    c.add(scene.add.image(0, 0, A().textura(scene, 'cono', 200)).setDisplaySize(tam * 0.9, tam * 0.9));
+                    var globo = scene.add.container(0, -tam * 0.95);
+                    globo.add(scene.add.circle(0, 0, tam * 0.3, 0xffffff, 0.95).setStrokeStyle(3, 0xadb5bd));
+                    globo.add(scene.add.image(0, 0, A().textura(scene, 'bola_' + pide, 128)).setDisplaySize(tam * 0.46, tam * 0.46));
+                    c.add(globo);
+                    c.pide = pide; c.tam = tam; c.llena = false; c.globo = globo;
+                    scene.conos.push(c);
+                }
+            });
+            this.salidaC.callback();
+            var tapadas = 0;
+            this.pista = U.crearPista(this, 8000, function (cancelado) {
+                var c = scene.conos.find(function (k) { return !k.llena && k.x > m.w * 0.2 && k.x < m.w * 0.8; });
+                if (!c) return Promise.resolve();
+                var v = scene.valvulas.find(function (q) { return q.s === c.pide; });
+                return scene.ctx.mano({ punto: { x: v.x, y: v.y }, holdMs: 350, cancelado: cancelado });
+            });
+            this.pista.reiniciar();
+            var tocar = function (p) {
+                scene.pista.reiniciar();
+                scene.ctx.quitarMano();
+                var v = scene.valvulas.find(function (q) { return Math.abs(p.x - q.x) < q.ancho * 0.4 && Math.abs(p.y - q.y) < m.obj * 0.55; });
+                if (v) scene.llenar(v);
+            };
+            this.input.on('pointerdown', tocar);
+            await new Promise(function (r) { scene.finValvulas = r; });
+            this.input.off('pointerdown', tocar);
+            this.salidaC.remove();
+            this.pista.parar();
+            this.ctx.quitarMano();
+            this.conos.forEach(function (c) { scene.tweens.add({ targets: c, alpha: 0, duration: 300, onComplete: function () { c.destroy(); } }); });
+            this.conos = [];
+            this.valvulas.forEach(function (v) { scene.tweens.add({ targets: v, alpha: 0, duration: 300, onComplete: function () { v.destroy(); } }); });
+            this.valvulas = [];
+            this.cintaActiva = false;
+            this.modo = '';
+            void tapadas;
+        },
+
+        llenar: async function (v) {
+            var scene = this;
+            var m = this.m();
+            this.tweens.add({ targets: v, scaleY: { from: 0.9, to: 1 }, duration: 200, ease: 'Back.easeOut' });
+            var bola = this.add.image(v.boquilla.x, v.boquilla.y, A().textura(this, 'bola_' + v.s, 128)).setDisplaySize(40, 40).setDepth(17);
+            U.sfx('pop');
+            // el cono que está justo debajo de esa llave (si lo hay)
+            var c = this.conos.find(function (k) { return !k.llena && !k.volando && Math.abs(k.x - v.x) < k.tam * 0.75; });
+            var yFin = c ? c.y - c.tam * 0.25 : m.cinta - 12;
+            await U.tween(this, { targets: bola, y: yFin, duration: 260, ease: 'Quad.easeIn' });
+            if (!c || !c.active) {
+                var charco = this.add.ellipse(bola.x, m.cinta - 12, 10, 5, 0xffffff, 0.8).setDepth(14);
+                this.tweens.add({ targets: charco, scaleX: 3, alpha: 0, duration: 700, onComplete: function () { charco.destroy(); } });
+                bola.destroy();
+                return;
+            }
+            if (c.pide === v.s) {
+                c.llena = true;
+                c.volando = true;
+                c.add(bola);
+                bola.setPosition(0, -c.tam * 0.38).setDepth(0);
+                this.tweens.add({ targets: c.globo, alpha: 0, duration: 200 });
+                U.sfx('miamMiam');
+                this.clasificadas += 1;
+                this.pintarContador();
+                this.conos = this.conos.filter(function (k) { return k !== c; });
+                var h = this.est.enchufe('lengua');
+                await U.esperar(this, 350);
+                this.est.encender('lengua', true);
+                await U.tween(this, { targets: c, x: h.x, y: h.y + 20, scale: 0.3, alpha: 0, duration: 450, ease: 'Quad.easeIn' });
+                c.destroy();
+                this.organos.lengua.reaccion('acierto');
+                this.time.delayedCall(600, function () { scene.est.encender('lengua', false); });
+                if (this.clasificadas === 3) this.ctx.decir({ voz: 'zoe', texto: '¡Muy bien! La lengua saborea el dulce de la fresa y el chocolate, y lo ácido del limón.' }, { estado: 'acierto' });
+                if (this.clasificadas >= this.meta && this.finValvulas) {
+                    var fin = this.finValvulas;
+                    this.finValvulas = null;
+                    await this.ctx.decir({ voz: 'zeus', texto: '¡Todos los conos tienen su sabor! La lengua los saborea.' }, { estado: 'acierto' });
+                    fin();
+                }
+                return;
+            }
+            // sabor equivocado: el cono se sacude y Zeus recuerda lo que pedía
+            bola.destroy();
+            U.sfx('boing');
+            this.tweens.add({ targets: c, angle: { from: -12, to: 12 }, duration: 80, yoyo: true, repeat: 3, onComplete: function () { c.angle = 0; } });
+            if (this.time.now - (this.ultAviso || -99999) > 6000) {
+                this.ultAviso = this.time.now;
+                var nombre = { fresa: 'fresa', choco: 'chocolate', limon: 'limón' }[c.pide];
+                this.ctx.decir({ voz: 'zeus', texto: 'Ese cono pide ' + nombre + '. ¡Busca la llave de su sabor!' });
+            }
         },
 
         /* ── API ───────────────────────────────────────────────── */
@@ -457,7 +599,16 @@
         jugar: async function () {
             await this.rondaHelado();
             if (!this.ctx.vivo()) return;
-            await this.rondaCinta();
+            if (this.ganarNivel) await this.ganarNivel(0);
+            await this.rondaCinta(4, 1);
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(1);
+            await this.rondaCinta(5, 1.6, '¡Más rápido! La cinta se acelera. Lleva cada cosa a la estación de su sentido.', '¡La fábrica clasificó todo! Cada cosa con su sentido.');
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(2);
+            await this.rondaValvulas();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(3);
         },
 
         fiestaFinal: async function () {
@@ -471,6 +622,15 @@
             var dt = Math.min(delta || 16, 50) / 1000;
             if (!U.reducido()) this.engranajes.forEach(function (g) { g.rotation += g.vel * dt; });
             this.moverCinta(time, dt);
+            if (this.modo === 'valvulas' && this.conos) {
+                var scene = this, mw = this.m().w;
+                var vel = 58 * (1 + (this.clasificadas || 0) * 0.08);
+                this.conos.forEach(function (c) {
+                    if (c.volando || !c.active) return;
+                    c.x += vel * dt;
+                    if (c.x > mw + c.tam) { c.destroy(); scene.conos = scene.conos.filter(function (k) { return k !== c; }); }
+                });
+            }
             L().dibujarCables(this, time);
             var foco = this.enCinta.length ? { x: this.enCinta[0].cont.x, y: this.enCinta[0].cont.y } : (this.helado ? { x: this.helado.x, y: this.helado.y } : null);
             this.est.actualizar(time, foco);
@@ -488,5 +648,5 @@
         }
     };
 
-    global.PedniaFabrica = B.crearMotor({ id: 'fabrica', fondo: '#ffe3ec', escena: escena });
+    global.PedniaFabrica = B.crearMotor({ id: 'fabrica', extras: true, fondo: '#ffe3ec', escena: escena });
 })(typeof window !== 'undefined' ? window : this);

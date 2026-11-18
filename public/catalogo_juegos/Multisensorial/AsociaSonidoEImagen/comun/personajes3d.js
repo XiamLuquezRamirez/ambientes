@@ -65,6 +65,8 @@ function bucle() {
         if (p.raiz && p.raiz.visible) algo = true;
     });
     renderer.render(escena, camara);
+    // En la demostración solo se ve el personaje del tutorial (uno solo): el presentador se esconde.
+    if (document.body.classList.contains("demo-activa")) algo = false;
     renderer.domElement.style.visibility = algo ? "visible" : "hidden";
 }
 
@@ -202,6 +204,13 @@ async function foto(spec) {
 function capa(visible) {
     if (renderer) renderer.domElement.style.display = visible ? "" : "none";
 }
+
+// El personaje del tutorial, mediano (el de la plantilla general ocupa el 72 % de la altura).
+(function () {
+    const st = document.createElement("style");
+    st.textContent = ".tutorial-3d{width:min(24vw,210px);height:min(50vh,390px)}";
+    document.head.appendChild(st);
+})();
 
 window.AsociaPj3D = { crear: crear, foto: foto, capa: capa };
 window.dispatchEvent(new CustomEvent("asocia-pj3d-listo"));

@@ -28,12 +28,61 @@
         regadera: { piso: '#d3f9d8', pared: '#a5d8ff', az: null }
     };
 
+    /**
+     * Diseño del equipo (img/diseno/fondo_sin_valvulas.svg, 1280×720): pared, cañería principal y 5 cuartos
+     * con su tubo; las 5 ruedas rojas se quitaron del dibujo y se animan aparte (valvula.svg).
+     * Cada aparato vive en SU cuarto: jardín con cerca (regadera), baño turquesa (ducha), baño con espejo
+     * (lavamanos = «pluma»), parque con ciudad (fuente) y lavadero (lavadora). Medidas en unidades del dibujo.
+     * `b` = borde inferior del contenido dentro del lienzo de 500 del SVG (para apoyarlo en el piso).
+     */
+    var ARTE = {
+        fw: 1280, fh: 720,
+        vx: [117.06, 383.49, 640, 896.81, 1159.89], vy: 232.75, rueda: 102.1,
+        tubo: 157, capa: 425, piso: 682, sala: { regadera: 0, ducha: 1, pluma: 2, fuente: 3, lavadora: 4 },
+        apar: {
+            regadera: { S: 256, b: 446.5 }, ducha: { S: 250, b: 490.5 }, pluma: { S: 256, b: 468 },
+            fuente: { S: 256, b: 428 }, lavadora: { S: 256, b: 472 }
+        },
+        tinaco: { x: 62, y: 146 }
+    };
+
     var escena = {
         iniciar: function () { this.cosas = []; this.tanque = 0; },
+
+        preload: function () {
+            this.load.svg('agua_fondo', 'img/diseno/fondo_sin_valvulas.svg', { width: 1920, height: 1080 });
+            this.load.svg('agua_valvula', 'img/diseno/valvula.svg', { width: 256, height: 256 });
+        },
+
+        /** Lleva el dibujo (1280×720) a la pantalla entero y apoyado abajo; lo que sobra se rellena. */
+        mapaFondo: function () {
+            if (!this.textures.exists('agua_fondo') || !this.textures.exists('agua_valvula')) return null;
+            var W = this.scale.width, H = this.scale.height;
+            var k = Math.min(W / ARTE.fw, H / ARTE.fh);
+            var ox = (W - ARTE.fw * k) / 2, oy = H - ARTE.fh * k;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
 
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
             var L = { W: W, H: H };
+            var F = this.mapaFondo();
+            if (F) {
+                var k = F.k;
+                L.arte = true; L.F = F;
+                L.valvula = ARTE.rueda * k / 2;
+                var r = Math.max(28, Math.min(38, 40 * k));
+                L.bocina = { x: W / 2, y: Math.max(r + 14, Math.min(96, F.sy(150) * 0.5)), r: r };
+                // El presentador 3D se para en la pared de arriba (los cuartos de abajo quedan libres).
+                var libre = F.sy(150) - 20;
+                L.pres = W >= 820 && libre >= 100 ? { x: W - 70, piso: F.sy(150) - 6, alto: Math.min(150, libre), modelo: 'nino' } : null;
+                L.tubo = F.sy(ARTE.tubo);
+                L.cuartos = { x0: F.sx(0), x1: F.sx(ARTE.fw), y0: F.sy(190), y1: F.sy(ARTE.fh) };
+                L.ancho = (L.cuartos.x1 - L.cuartos.x0) / 5;
+                L.tam = 256 * k;
+                L.tanque = { x: F.sx(ARTE.tinaco.x), y: F.sy(ARTE.tinaco.y) };
+                return L;
+            }
             var hueco = Math.max(60, H * 0.16);
             L.bocina = { x: W / 2, y: Math.max(60, Math.min(96, 54 + hueco * 0.2)), r: Math.max(28, Math.min(38, hueco * 0.3)) };
             L.pres = W >= 820 ? { x: W - 64, piso: H - 104, alto: Math.min(150, H * 0.26), modelo: 'nino' } : null;
@@ -52,6 +101,39 @@
             var self = this;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            if (L.arte) {
+                var F = L.F;
+                // Pared de arriba hasta el borde (el dibujo empieza con ese color) y el dibujo entero.
+                keep(this.add.rectangle(0, 0, L.W, L.H, 0xffd0a5).setOrigin(0, 0).setDepth(0));
+                keep(this.add.image(F.ox, F.oy, 'agua_fondo').setOrigin(0, 0).setDisplaySize(ARTE.fw * F.k, ARTE.fh * F.k).setDepth(1));
+                // Si sobran franjas a los lados, se continúan con el borde del dibujo reflejado (el jardín y el lavadero siguen).
+                if (F.ox > 1) {
+                    var tex = this.textures.get('agua_fondo');
+                    var iw = tex.getSourceImage().width, ih = tex.getSourceImage().height;
+                    var wd = Math.min(100, F.ox / F.k + 1);   // hasta 100 u: más allá se reflejaría el tubo
+                    var px = Math.min(iw / 2, Math.ceil(wd * iw / ARTE.fw));
+                    var ki = 'mi' + px, kd = 'md' + px;
+                    if (!tex.has(ki)) { tex.add(ki, 0, 0, 0, px, ih); tex.add(kd, 0, iw - px, 0, px, ih); tex.add('ei' + px, 0, px - 2, 0, 2, ih); tex.add('ed' + px, 0, iw - px, 0, 2, ih); }
+                    var wp = px * ARTE.fw / iw * F.k;
+                    if (F.ox - wp > 1) {   // ventanas muy anchas: el resto se estira desde la última columna reflejada
+                        keep(this.add.image(0, F.oy, 'agua_fondo', 'ei' + px).setOrigin(0, 0).setDisplaySize(F.ox - wp + 1, ARTE.fh * F.k).setDepth(1));
+                        keep(this.add.image(L.W - F.ox + wp - 1, F.oy, 'agua_fondo', 'ed' + px).setOrigin(0, 0).setDisplaySize(F.ox - wp + 1, ARTE.fh * F.k).setDepth(1));
+                    }
+                    keep(this.add.image(F.ox - wp, F.oy, 'agua_fondo', ki).setOrigin(0, 0).setFlipX(true).setDisplaySize(wp, ARTE.fh * F.k).setDepth(1));
+                    keep(this.add.image(L.W - F.ox, F.oy, 'agua_fondo', kd).setOrigin(0, 0).setFlipX(true).setDisplaySize(wp, ARTE.fh * F.k).setDepth(1));
+                }
+                this.tuberiaG = keep(this.add.graphics().setDepth(12));
+                this.tanqueG = keep(this.add.graphics().setDepth(13));
+                var Va = this.montarVida(keep);
+                if (Va) {
+                    if (Va.pajaros) Va.pajaros(2, F.sy(60), F.sy(150));
+                    for (var ga = 0; ga < 5; ga++) Va.gotas(F.sx(ARTE.vx[ga]), F.sy(ARTE.capa));
+                }
+                this.montarHud(keep);
+                this.valvulas = [];
+                if (this.cosas.length) this.pintarCuartos(keep);
+                return;
+            }
             K.textura(this, 'agua_fondo', L.W, L.H, function (x, w, h) {
                 var g = x.createLinearGradient(0, 0, 0, h);
                 g.addColorStop(0, '#dee2e6'); g.addColorStop(1, '#ced4da');
@@ -74,6 +156,30 @@
             var self = this;
             var L = this.L;
             keep = keep || function (o) { (self.estaticos || []).push(o); return o; };
+            if (L.arte) {
+                // Cada aparato en su cuarto, con su válvula sobre el tubo del diseño.
+                var F = L.F, usadas = {};
+                (this.valvulas || []).forEach(function (v) { v.destroy(); });
+                this.valvulas = [];
+                this.cosas.forEach(function (c) {
+                    var sala = ARTE.sala[c.id];
+                    if (sala == null || usadas[sala]) { sala = 0; while (usadas[sala]) sala++; }
+                    usadas[sala] = true;
+                    c.sala = sala;
+                    c.vx = F.sx(ARTE.vx[sala]);
+                    c.vy = F.sy(ARTE.vy);
+                    var v = keep(self.crearValvula(c.vx, c.vy));
+                    c.valv = v;
+                    self.valvulas.push(v);
+                    var E = ARTE.apar[c.id] || ARTE.apar.regadera;
+                    var S = E.S * F.k;
+                    var arriba = F.sy(ARTE.piso) - E.b / 500 * S;
+                    c.cap = F.sy(ARTE.capa);
+                    c.tope = arriba + S * 0.06;
+                    c.actor.cont.setPosition(c.vx, arriba + S / 2).setScale(S / 0.96 / c.actor.tam);
+                });
+                return;
+            }
             if (this.cuartosImg) this.cuartosImg.destroy();
             var ids = this.cosas.map(function (c) { return c.id; });
             K.textura(this, 'agua_cuartos', L.W, L.H, function (x, w, h) {
@@ -124,6 +230,20 @@
         crearValvula: function (x, y) {
             var r = this.L.valvula;
             var c = this.add.container(x, y).setDepth(30);
+            if (this.L.arte) {
+                // La rueda roja del diseño; el aro verde aparece al acertar.
+                var aro = this.add.circle(0, 0, r * 1.14, 0x000000, 0).setStrokeStyle(Math.max(3, r * 0.12), 0x2f9e44).setVisible(false);
+                var rd = this.add.image(0, 0, 'agua_valvula').setDisplaySize(r * 2, r * 2);
+                var fl = this.add.graphics();
+                var R = r * 1.4;
+                fl.lineStyle(Math.max(3, r * 0.07), 0xffffff, 0.85);
+                fl.beginPath(); fl.arc(0, 0, R, -2.4, -0.7); fl.strokePath();
+                fl.fillStyle(0xffffff, 0.85);
+                fl.fillTriangle(R * Math.cos(-0.7) - 6, R * Math.sin(-0.7) - 2, R * Math.cos(-0.7) + 6, R * Math.sin(-0.7) + 2, R * Math.cos(-0.5), R * Math.sin(-0.5) + 8);
+                c.add([aro, fl, rd]);
+                c.rueda = rd; c.aro = aro; c.flecha = fl;
+                return c;
+            }
             var rueda = this.add.container(0, 0);
             var aro = this.add.circle(0, 0, r, 0x000000, 0).setStrokeStyle(r * 0.28, 0xe03131);
             rueda.add(aro);
@@ -149,6 +269,18 @@
             g.clear();
             var L = this.L;
             var x1 = L.cuartos.x0 + this.cosas.length * L.ancho;
+            if (L.arte) {
+                // El diseño ya trae las cañerías: solo se dibuja el agua que corre al abrir la válvula.
+                this.cosas.forEach(function (c) {
+                    if (c.vx == null || !(c.abierto > 0.05)) return;
+                    g.fillStyle(0x4dabf7, 0.95);
+                    for (var y = L.F.sy(188) + ((t / 6) % 14); y < c.cap - 6; y += 14) g.fillCircle(c.vx, y, Math.max(2.5, 3 * L.F.k));
+                    g.lineStyle(Math.max(3, 5 * L.F.k), 0x4dabf7, 0.85);
+                    g.beginPath(); g.moveTo(c.vx, c.cap); g.lineTo(c.vx, c.tope); g.strokePath();
+                });
+                this.dibujarTinaco();
+                return;
+            }
             // Cañería principal y bajadas a cada válvula y aparato.
             g.lineStyle(12, 0x868e96, 1); g.beginPath(); g.moveTo(L.tanque.x, L.tubo); g.lineTo(x1, L.tubo); g.strokePath();
             g.lineStyle(4, 0xdee2e6, 0.8); g.beginPath(); g.moveTo(L.tanque.x, L.tubo - 3); g.lineTo(x1, L.tubo - 3); g.strokePath();
@@ -164,6 +296,11 @@
                     for (var y = L.tubo + ((t / 6) % 14); y < a.y - L.tam * 0.45; y += 14) g.fillCircle(c.vx, y, 2.5);
                 }
             });
+            this.dibujarTinaco();
+        },
+
+        dibujarTinaco: function () {
+            var L = this.L;
             // Tanque de la casa (se llena con cada acierto).
             var tg = this.tanqueG;
             tg.clear();
@@ -275,7 +412,7 @@
                 var o = { v: this.tanque };
                 this.tweens.add({ targets: o, v: Math.min(1, this.tanque + 0.125), duration: 600, onUpdate: function () { self.tanque = o.v; } });
                 this.brillo(c.vx, c.vy, 8);
-                c.valv.rueda.list[0].setStrokeStyle(this.L.valvula * 0.28, 0x2f9e44);
+                this.marcarListo(c);
                 this.coleccion.push(a);
                 await this.cerrarValvula(c, true);
                 await this.seguir();
@@ -285,6 +422,12 @@
                 await this.cerrarValvula(c, false);
                 c.estado = 'cerrado';
             }
+        },
+
+        marcarListo: function (c) {
+            var v = c.valv;
+            if (v.aro) v.aro.setVisible(true);
+            else v.rueda.list[0].setStrokeStyle(this.L.valvula * 0.28, 0x2f9e44);
         },
 
         cerrarValvula: function (c, quedaVerde) {
@@ -371,7 +514,7 @@
                         targets: q, g: tope, duration: 450, ease: 'Sine.easeOut',
                         onUpdate: function () { var d = q.g - c.giro; c.giro = q.g; c.valv.rueda.rotation -= d; c.abierto = Math.min(1, c.giro / tope); }
                     });
-                    c.valv.rueda.list[0].setStrokeStyle(L.valvula * 0.28, 0x2f9e44);
+                    self.marcarListo(c);
                     self.escuchar(c.actor.sonido, { breve: true, bocina: false, vol: 0.6 });
                     if (c.actor.acierto) c.actor.acierto(1800);
                 });

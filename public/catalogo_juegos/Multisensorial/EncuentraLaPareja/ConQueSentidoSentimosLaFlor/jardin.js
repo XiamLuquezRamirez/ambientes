@@ -318,19 +318,34 @@
         },
 
         crearMariposas: function () {
+            // Mariposas del diseño (img/mariposa1-5.svg): SVG de Illustrator, se cargan con tamaño.
+            var scene = this;
+            var tam = Math.max(34, Math.min(54, this.scale.width * 0.05));
             for (var i = 0; i < 3; i++) {
                 var c = this.add.container(0, 0).setDepth(30);
-                var tam = 34;
-                var izq = this.add.image(0, 0, A().textura(this, 'ala', 96)).setOrigin(0.05, 0.5).setDisplaySize(tam, tam);
-                var der = this.add.image(0, 0, A().textura(this, 'ala', 96)).setOrigin(0.05, 0.5).setDisplaySize(tam, tam);
-                var cuerpo = this.add.ellipse(0, 0, 5, 20, 0x3b2412);
-                if (i === 1) { izq.setTint(0xb197fc); der.setTint(0xb197fc); }
-                if (i === 2) { izq.setTint(0x74c0fc); der.setTint(0x74c0fc); }
-                c.add([izq, der, cuerpo]);
-                c.alas = [izq, der];
+                var img = this.add.image(0, 0, A().textura(this, 'ala', 8)).setVisible(false);
+                c.add(img);
+                c.img = img;
+                c.tam = tam;
+                c.k = i;
+                c.base = 1;
                 c.fase = Math.random() * 10;
                 this.mariposas.push(c);
             }
+            var pend = [];
+            for (var k = 1; k <= 5; k++) {
+                if (!this.textures.exists('mariposa' + k)) { this.load.svg('mariposa' + k, 'img/mariposa' + k + '.svg?v=20261118', { width: 160, height: 160 }); pend.push(k); }
+            }
+            var poner = function () {
+                scene.mariposas.forEach(function (mm) {
+                    var clave = 'mariposa' + ((mm.k * 2) % 5 + 1);
+                    if (!scene.textures.exists(clave)) return;
+                    mm.img.setTexture(clave).setVisible(true);
+                    mm.base = mm.tam / mm.img.width;
+                    mm.img.setScale(mm.base);
+                });
+            };
+            if (pend.length) { this.load.once('complete', poner); this.load.start(); } else poner();
         },
 
         /* ── Maceta con flor ────────────────────────────────────── */
@@ -377,6 +392,17 @@
         alTocar: function (p) {
             if (this.pista) this.pista.reiniciar();
             this.ctx.quitarMano();
+            if (this.modo === 'brisa') {
+                // un toque sobre el aroma lo empuja hacia la nariz
+                var n = this.organos.nariz.cont;
+                var q = this.puffs.find(function (c) { return !c.dentro && Phaser.Math.Distance.Between(p.x, p.y, c.x, c.y) < c.tam * 0.9; });
+                if (q) {
+                    var d = Phaser.Math.Distance.Between(q.x, q.y, n.x, n.y) || 1;
+                    q.vx += (n.x - q.x) / d * 260; q.vy += (n.y - q.y) / d * 260;
+                    U.sfx('pop');
+                }
+                return;
+            }
             if (this.modo === 'flor' && this.esperando && !this.ocupado) {
                 var c = this.maceta;
                 if (c && Phaser.Math.Distance.Between(p.x, p.y, c.x, c.y - c.tam * 0.3) < c.tam * 0.55) {
@@ -401,6 +427,15 @@
         },
 
         alMover: function (p) {
+            if (this.modo === 'brisa' && p.isDown) {
+                var dx = p.x - p.prevPosition.x, dy = p.y - p.prevPosition.y;
+                var R = this.m().obj * 0.75;
+                this.puffs.forEach(function (c) {
+                    if (c.dentro) return;
+                    if (Phaser.Math.Distance.Between(p.x, p.y, c.x, c.y) < R) { c.vx = Phaser.Math.Clamp(c.vx + dx * 9, -520, 520); c.vy = Phaser.Math.Clamp(c.vy + dy * 9, -520, 520); }
+                });
+                return;
+            }
             if (this.arr.cont && p.isDown) {
                 this.arr.mover(p);
                 var sobre = this.fila.en(p.x, p.y);
@@ -779,6 +814,91 @@
 
         /* ── API ───────────────────────────────────────────────── */
 
+        /* ── Ronda 4: la brisa lleva el aroma hasta la nariz ──── */
+
+        soplarPuff: function () {
+            var m = this.m();
+            var x = this.jarron.x + U.rnd(-20, 20), y = this.jarron.y - m.obj * 0.5;
+            var tam = m.obj * 0.62;
+            var c = this.add.container(x, y).setDepth(30);
+            var nube = this.add.image(0, 0, A().textura(this, 'humo', 128)).setTint(0xe64980).setDisplaySize(tam * 1.5, tam * 1.5).setAlpha(0.8);
+            var flor = this.add.image(0, 0, A().textura(this, 'flor_roja', 128)).setDisplaySize(tam * 0.55, tam * 0.55);
+            c.add([nube, flor]);
+            c.tam = tam; c.vx = U.rnd(-40, 40); c.vy = -30; c.fase = Math.random() * 6; c.dentro = false;
+            c.setScale(0.2);
+            this.tweens.add({ targets: c, scale: 1, duration: 400, ease: 'Back.easeOut' });
+            U.sfx('pop');
+            this.puffs.push(c);
+        },
+
+        moverBrisa: function (time, dt) {
+            var scene = this;
+            var m = this.m();
+            var nariz = this.organos.nariz;
+            var meta = 5;
+            this.puffs.forEach(function (c) {
+                if (c.dentro || !c.active) return;
+                var f = Math.exp(-dt * 1.7);
+                c.vx *= f; c.vy *= f;
+                c.vy -= 10 * dt;                                   // flota hacia arriba muy despacio
+                c.x += (c.vx + Math.sin(time / 600 + c.fase) * 14) * dt;
+                c.y += c.vy * dt;
+                c.x = Phaser.Math.Clamp(c.x, c.tam * 0.6, m.w - c.tam * 0.6);
+                c.y = Phaser.Math.Clamp(c.y, m.h * 0.14, m.h - c.tam * 0.5);
+                if (Phaser.Math.Distance.Between(c.x, c.y, nariz.cont.x, nariz.cont.y) < m.r * 1.25) scene.absorber(c);
+            });
+            if (this.fase4 && this.sopladas + this.puffs.filter(function (c) { return !c.dentro; }).length < meta && this.puffs.filter(function (c) { return !c.dentro; }).length < 2 && time > this.proxPuff) {
+                this.proxPuff = time + 1300;
+                this.soplarPuff();
+            }
+        },
+
+        absorber: async function (c) {
+            if (c.dentro) return;
+            c.dentro = true;
+            var nariz = this.organos.nariz;
+            this.sopladas += 1;
+            U.sfx('sorber');
+            this.tweens.add({ targets: c, x: nariz.cont.x, y: nariz.cont.y, scale: 0.2, alpha: 0, duration: 380, onComplete: function () { c.destroy(); } });
+            nariz.reaccion('acierto');
+            U.estallido(this, nariz.cont.x, nariz.cont.y - nariz.radio, { n: 6, tex: 'corazon', dist: 90, colores: [0xf783ac] });
+            this.puffs = this.puffs.filter(function (q) { return q !== c; });
+            if (this.sopladas < 5) {
+                if (this.sopladas === 2) this.ctx.decir({ voz: 'zoe', texto: '¡Mmm! La nariz huele el perfume de la flor.' }, { estado: 'acierto' });
+            } else if (this.finBrisa) {
+                var fin = this.finBrisa;
+                this.finBrisa = null;
+                this.fase4 = false;
+                await U.esperar(this, 500);
+                await this.ctx.decir({ voz: 'zeus', texto: '¡Muy bien! Con la brisa, la nariz huele el perfume de las flores.' }, { estado: 'acierto' });
+                fin();
+            }
+        },
+
+        rondaBrisa: async function () {
+            var scene = this;
+            var m = this.m();
+            this.modo = 'brisa';
+            this.puffs = [];
+            this.sopladas = 0;
+            this.proxPuff = 0;
+            this.fase4 = true;
+            await this.ctx.decir({ voz: 'zoe', texto: '¡Llegó la brisa! Empuja con el dedo el aroma de la flor hasta la nariz.' });
+            this.pista = U.crearPista(this, 8000, function (cancelado) {
+                var c = scene.puffs.find(function (q) { return !q.dentro; });
+                var n = scene.organos.nariz.cont;
+                if (!c) return Promise.resolve();
+                return scene.ctx.mano({ punto: { x: c.x - m.obj * 0.3, y: c.y }, holdMs: 250, cancelado: cancelado, arrastre: { dx: n.x - c.x + m.obj * 0.3, dy: n.y - c.y, durMs: 1100 } });
+            });
+            this.pista.reiniciar();
+            await new Promise(function (r) { scene.finBrisa = r; });
+            this.pista.parar();
+            this.ctx.quitarMano();
+            this.puffs.forEach(function (c) { if (c.active) c.destroy(); });
+            this.puffs = [];
+            this.modo = '';
+        },
+
         demo: async function () {
             var m = this.m();
             this.modo = 'demo';
@@ -789,9 +909,16 @@
         jugar: async function () {
             await this.rondaFlor();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(0);
             await this.rondaAtrapa();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(1);
             await this.rondaArbustos();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(2);
+            await this.rondaBrisa();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(3);
         },
 
         fiestaFinal: async function () {
@@ -833,10 +960,10 @@
                 mm.x = nx;
                 mm.y = ny;
                 var ab = quieto ? 1 : 0.25 + 0.75 * Math.abs(Math.sin(t * 10));
-                mm.alas[0].scaleX = -Math.abs(mm.alas[0].scaleY) * ab;
-                mm.alas[1].scaleX = Math.abs(mm.alas[1].scaleY) * ab;
+                mm.img.scaleX = mm.base * ab;
             });
             if (this.cayendo.length || this.modo === 'atrapa') this.moverCayendo(time, dt);
+            if (this.modo === 'brisa') this.moverBrisa(time, dt);
             var foco = null;
             if (this.maceta) foco = this.cabezaFlor(this.maceta);
             else if (this.cayendo.length) foco = { x: this.cayendo[0].img.x, y: this.cayendo[0].img.y };
@@ -859,5 +986,5 @@
         }
     };
 
-    global.PedniaJardin = B.crearMotor({ id: 'jardin', fondo: '#cfe9fb', escena: escena });
+    global.PedniaJardin = B.crearMotor({ id: 'jardin', fondo: '#cfe9fb', extras: true, escena: escena });
 })(typeof window !== 'undefined' ? window : this);

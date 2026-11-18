@@ -586,6 +586,126 @@
 
         /* ── API ───────────────────────────────────────────────── */
 
+        /* ── Ronda 4: ¿dónde suena? (buscar campanas con el oído) ── */
+
+        rondaBuscar: async function () {
+            var scene = this;
+            var m = this.m();
+            this.modo = 'buscar';
+            this.cablesLab.forEach(function (c) { c.destruir(); });
+            this.cablesLab = [];
+            this.est.orden.forEach(function (id) { scene.est.encender(id, false); });
+            (this.pantallas || []).forEach(function (q) { if (q.cont && q.cont.active) q.cont.destroy(); });
+            this.tweens.add({ targets: [this.cabinaG, this.aire].filter(Boolean), alpha: 0, duration: 400 });
+            var R = Math.max(52, m.obj * 0.45);
+            var yMin = 135, yMax = m.mesa + 10;
+            var pts = [];
+            for (var i = 0; i < 300 && pts.length < 4; i++) {
+                var q = { x: U.rnd(m.w * 0.1, m.w * 0.9), y: U.rnd(yMin, yMax) };
+                if (pts.every(function (o) { return Phaser.Math.Distance.Between(o.x, o.y, q.x, q.y) > m.w * 0.2; })) pts.push(q);
+            }
+            this.campanasB = pts.map(function (q) {
+                var c = scene.add.container(q.x, q.y).setDepth(8);
+                var img = scene.add.image(0, 0, A().textura(scene, 'campana', 200)).setDisplaySize(m.obj * 0.62, m.obj * 0.62).setAlpha(0);
+                c.add(img);
+                c.img = img; c.hecha = false; c.oye = 0; c.R = R;
+                return c;
+            });
+            this.mic = this.add.container(m.w * 0.5, (yMin + yMax) / 2).setDepth(19);
+            var mg = this.add.graphics();
+            mg.fillStyle(0x343a40, 1); mg.fillRoundedRect(-14, 8, 28, 56, 10);
+            mg.fillStyle(0xadb5bd, 1); mg.fillCircle(0, 0, 30);
+            mg.lineStyle(4, 0x495057, 1); mg.strokeCircle(0, 0, 30);
+            mg.lineStyle(2, 0x495057, 0.8);
+            for (var k = -2; k <= 2; k++) mg.lineBetween(-24, k * 9, 24, k * 9);
+            mg.fillStyle(0xff6b6b, 1); mg.fillCircle(0, 76, 6);
+            this.mic.add(mg);
+            this.mic.R = R;
+            this.mic.setAlpha(0);
+            this.tweens.add({ targets: this.mic, alpha: 1, duration: 400 });
+            this.medidor = this.add.graphics().setDepth(19);
+            this.hallazgos = 0;
+            this.proxTic = 0;
+            await this.ctx.decir({ voz: 'zoe', texto: '¡Hay cuatro campanas escondidas en el estudio! Mueve el micrófono y escucha: suena más fuerte cuando estás cerca.' });
+            var cv = function (p) { scene.mic.setPosition(Phaser.Math.Clamp(p.x, 40, m.w - 40), Phaser.Math.Clamp(p.y, 120, m.mesa + 40)); };
+            var abajo = function (p) { scene.pista.reiniciar(); scene.ctx.quitarMano(); cv(p); };
+            var mover = function (p) { if (p.isDown) { scene.pista.reiniciar(); cv(p); } };
+            this.input.on('pointerdown', abajo);
+            this.input.on('pointermove', mover);
+            this.pista = U.crearPista(this, 9000, function (cancelado) {
+                var b = scene.campanasB.find(function (k) { return !k.hecha; });
+                if (!b) return Promise.resolve();
+                return scene.ctx.mano({ punto: { x: scene.mic.x, y: scene.mic.y }, holdMs: 250, cancelado: cancelado, arrastre: { dx: b.x - scene.mic.x, dy: b.y - scene.mic.y, durMs: 1300 } });
+            });
+            this.pista.reiniciar();
+            await new Promise(function (r) { scene.finBuscar = r; });
+            this.input.off('pointerdown', abajo);
+            this.input.off('pointermove', mover);
+            this.pista.parar();
+            this.ctx.quitarMano();
+            this.medidor.destroy();
+            this.tweens.add({ targets: this.mic, alpha: 0, duration: 400, onComplete: function () { scene.mic.destroy(); } });
+            this.modo = '';
+        },
+
+        oirBuscar: function (time, dt) {
+            var scene = this;
+            var m = this.m();
+            var restantes = this.campanasB.filter(function (k) { return !k.hecha; });
+            if (!restantes.length) return;
+            var cerca = null, dmin = 1e9;
+            restantes.forEach(function (k) {
+                var d = Phaser.Math.Distance.Between(k.x, k.y, scene.mic.x, scene.mic.y);
+                if (d < dmin) { dmin = d; cerca = k; }
+                var dentro = d < scene.mic.R * 0.9;
+                k.oye = Math.max(0, Math.min(1, k.oye + (dentro ? dt / 1.0 : -dt * 1.2)));
+                k.img.setAlpha(k.oye * 0.9);
+                if (k.oye >= 1) scene.hallar(k);
+            });
+            // el sonido de la campana más cercana: más fuerte y más rápido cuanto más cerca, y del lado donde está
+            var alcance = m.w * 0.55;
+            var fuerza = Math.max(0, 1 - dmin / alcance);
+            if (time > this.proxTic && cerca) {
+                this.proxTic = time + 1500 - fuerza * 1000;
+                var S = global.EncuentraSonidoSfx;
+                if (S) S.reproducir('campana', { breve: true, vol: 0.12 + fuerza * 0.88, pan: Phaser.Math.Clamp((cerca.x - this.mic.x) / (m.w * 0.5), -1, 1) });
+                this.ondaDesde(this.mic.x, this.mic.y, 0xffd43b);
+            }
+            // medidor de oído: cinco barras que suben al acercarse
+            var g = this.medidor;
+            g.clear();
+            var bx = m.w - 160, by = 150;
+            for (var i = 0; i < 5; i++) {
+                var on = fuerza * 5 > i + 0.2;
+                g.fillStyle(on ? [0x51cf66, 0x94d82d, 0xfcc419, 0xff922b, 0xff6b6b][i] : 0x343a40, 1);
+                g.fillRoundedRect(bx + i * 22, by - (i + 1) * 9, 16, (i + 1) * 9, 3);
+            }
+        },
+
+        hallar: async function (k) {
+            if (k.hecha) return;
+            k.hecha = true;
+            this.hallazgos += 1;
+            var S = global.EncuentraSonidoSfx;
+            if (S) S.reproducir('campana', { breve: true });
+            U.sfx('recompensa');
+            this.tweens.add({ targets: k.img, alpha: 1, scale: 1.25, duration: 250, yoyo: true });
+            this.tweens.add({ targets: k.cont, angle: { from: -16, to: 16 }, duration: 110, yoyo: true, repeat: 4 });
+            var h = this.est.enchufe('oido');
+            U.notas(this, k.x, k.y - 20, 4, { x: h.x, y: h.y });
+            this.est.encender('oido', true);
+            this.organos.oido.reaccion('acierto');
+            var scene = this;
+            this.time.delayedCall(700, function () { scene.est.encender('oido', false); });
+            if (this.hallazgos === 2) this.ctx.decir({ voz: 'zoe', texto: '¡Muy bien! Los oídos escuchan dónde suena la campana.' }, { estado: 'acierto' });
+            if (this.hallazgos >= 4 && this.finBuscar) {
+                var fin = this.finBuscar;
+                this.finBuscar = null;
+                await this.ctx.decir({ voz: 'zeus', texto: '¡Las encontraste todas! Los oídos nos ayudan a saber de dónde viene el sonido.' }, { estado: 'acierto' });
+                fin();
+            }
+        },
+
         demo: async function () {
             var c = this.m().cabina;
             this.modo = 'demo';
@@ -596,9 +716,16 @@
         jugar: async function () {
             await this.rondaCampana();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(0);
             await this.rondaCentralita();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(1);
             await this.rondaEscucha();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(2);
+            await this.rondaBuscar();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(3);
         },
 
         fiestaFinal: async function () {
@@ -608,7 +735,8 @@
             ]);
         },
 
-        update: function (time) {
+        update: function (time, delta) {
+            if (this.modo === 'buscar' && this.mic && this.mic.active) this.oirBuscar(time, Math.min(delta || 16, 50) / 1000);
             var scene = this;
             var m = this.m();
             // Medidores y faders que bailan con el sonido.
@@ -658,5 +786,5 @@
         }
     };
 
-    global.PedniaEstudio = B.crearMotor({ id: 'estudio', fondo: '#1b2440', escena: escena });
+    global.PedniaEstudio = B.crearMotor({ id: 'estudio', fondo: '#1b2440', extras: true, escena: escena });
 })(typeof window !== 'undefined' ? window : this);

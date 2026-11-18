@@ -19,12 +19,18 @@
         ConectandoElSolVista: ['sol_completo', 'ojo_completo', 'estrella', 'farol']
     };
 
+    // Hasta cambiar la imagen la casilla queda oculta (si no, se ve un instante la ilustración vieja del HTML).
+    var ocultas = [];
+    Array.prototype.forEach.call(document.querySelectorAll('.inicio-elementos .inicio-el img'), function (im) { im.style.visibility = 'hidden'; ocultas.push(im); });
+    function verTodas() { ocultas.forEach(function (im) { im.style.visibility = 'visible'; }); }
+    setTimeout(verTodas, 4000);
+
     function aplicar() {
-        if (!window.PedniaArte) return;
+        if (!window.PedniaArte) { verTodas(); return; }
         var partes = window.location.pathname.split('/');
         var carpeta = partes[partes.length - 2] || '';
         var lista = ITEMS[carpeta];
-        if (!lista) return;
+        if (!lista) { verTodas(); return; }
         var spans = document.querySelectorAll('.inicio-elementos .inicio-el');
         Array.prototype.forEach.call(spans, function (s, i) {
             var img = s.querySelector('img');
@@ -35,6 +41,7 @@
             img.removeAttribute('data-laboratorio');
             img.src = url;
         });
+        verTodas();
     }
 
     if (window.jQuery) window.jQuery(aplicar);

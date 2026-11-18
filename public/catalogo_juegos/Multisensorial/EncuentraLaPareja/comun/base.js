@@ -434,6 +434,8 @@
                 if (k === 'create') {
                     proto.create = function () {
                         def.escena.create.apply(this, arguments);
+                        // Estilo nuevo (marcador de estrellas, presentador 3D, insignia): solo si el juego lo pide.
+                        if (def.extras && global.PedniaParejaExtras) global.PedniaParejaExtras.montar(this, def);
                         if (readyResolve) readyResolve(this);
                     };
                 } else if (k === 'update') {

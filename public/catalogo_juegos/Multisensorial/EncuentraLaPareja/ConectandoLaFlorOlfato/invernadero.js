@@ -408,8 +408,13 @@
             return { llenas: llenas, llega: false };
         },
 
-        rondaTubos: async function () {
+        rondaTubos: async function (parte) {
             var scene = this;
+            if (parte === 2) {
+                await this.ctx.decir({ voz: 'zeus', texto: '¡Perfecto! Ahora un tablero más grande.' }, { estado: 'acierto' });
+                await this.jugarTablero(3, 4);
+                return;
+            }
             this.modo = 'tubos';
             // El cable del primer reto se recoge; la campana de vidrio se queda arriba como fuente.
             this.cablesLab.forEach(function (c) { c.destruir(); });
@@ -422,8 +427,137 @@
             this.flor.setVisible(false);
             await this.ctx.decir({ voz: 'zoe', texto: '¡Los tubos de aroma están desordenados! Toca las piezas para girarlas y lleva el perfume hasta la nariz.' });
             await this.jugarTablero(3, 3);
-            await this.ctx.decir({ voz: 'zeus', texto: '¡Perfecto! Ahora un tablero más grande.' }, { estado: 'acierto' });
-            await this.jugarTablero(3, 4);
+        },
+
+        /* ── Ronda 4: el ventilador lleva el aroma a la nariz ─── */
+
+        rondaVentilador: async function () {
+            var scene = this;
+            var m = this.m();
+            this.modo = 'ventilador';
+            this.cablesLab.forEach(function (c) { c.destruir(); });
+            this.cablesLab = [];
+            this.est.orden.forEach(function (id) { scene.est.encender(id, false); });
+            // vuelve la flor bajo la campana de vidrio
+            this.flor.setVisible(true);
+            this.tweens.add({ targets: [this.frascoG, this.vidrioG, this.flor], alpha: 1, duration: 500 });
+            var R = Math.max(58, m.obj * 0.5);
+            this.vent = { x: m.w * 0.17, y: m.h * 0.4, R: R, ang: 0, giro: 0, activo: false, ult: 0, acum: 0 };
+            var vg = this.ventG = this.add.graphics().setDepth(15);
+            this.puffs = [];
+            this.llevados = 0;
+            this.proxPuff = 0;
+            await this.ctx.decir({ voz: 'zoe', texto: '¡El aroma de la flor se queda quieto! Gira la rueda del ventilador con el dedo para llevarlo hasta la nariz.' });
+            var V = this.vent;
+            var abajo = function (p) {
+                scene.pista.reiniciar();
+                scene.ctx.quitarMano();
+                if (Phaser.Math.Distance.Between(p.x, p.y, V.x, V.y) < V.R * 1.7) { V.activo = true; V.ult = Math.atan2(p.y - V.y, p.x - V.x); }
+            };
+            var mover = function (p) {
+                if (!V.activo || !p.isDown) return;
+                var a = Math.atan2(p.y - V.y, p.x - V.x);
+                var d = Phaser.Math.Angle.Wrap(a - V.ult);
+                V.ult = a;
+                V.ang += d;
+                V.acum += Math.abs(d);
+                V.giro = Phaser.Math.Clamp(V.giro + d * 12, -40, 40);   // velocidad angular que se suaviza en update
+            };
+            var arriba = function () { V.activo = false; };
+            this.input.on('pointerdown', abajo);
+            this.input.on('pointermove', mover);
+            this.input.on('pointerup', arriba);
+            this.pista = U.crearPista(this, 8000, function (cancelado) {
+                var steps = 10, R2 = V.R * 1.1;
+                return scene.ctx.mano({ punto: { x: V.x + R2, y: V.y }, holdMs: 250, cancelado: cancelado, arrastre: { dx: 0, dy: R2, durMs: 900 } });
+            });
+            this.pista.reiniciar();
+            await new Promise(function (r) { scene.finVent = r; });
+            this.input.off('pointerdown', abajo);
+            this.input.off('pointermove', mover);
+            this.input.off('pointerup', arriba);
+            this.pista.parar();
+            this.ctx.quitarMano();
+            this.puffs.forEach(function (q) { if (q.active) q.destroy(); });
+            this.puffs = [];
+            vg.destroy();
+            this.modo = '';
+        },
+
+        moverVentilador: function (time, dt) {
+            var scene = this;
+            var m = this.m();
+            var V = this.vent;
+            if (!V) return;
+            // la rueda sigue girando por inercia y se frena sola
+            V.giro *= Math.exp(-dt * 2.2);
+            if (!V.activo) V.ang += V.giro * dt;
+            var viento = Math.min(1.6, Math.abs(V.giro) / 6);
+            var g = this.ventG;
+            g.clear();
+            g.fillStyle(0x000000, 0.2); g.fillCircle(V.x + 5, V.y + 7, V.R * 1.05);
+            g.fillStyle(0xe9ecef, 1); g.fillCircle(V.x, V.y, V.R * 1.05);
+            g.lineStyle(6, 0x868e96, 1); g.strokeCircle(V.x, V.y, V.R * 1.05);
+            for (var i = 0; i < 4; i++) {
+                var a = V.ang + i * Math.PI / 2;
+                g.fillStyle(i % 2 ? 0x74c0fc : 0x4dabf7, 1);
+                g.fillTriangle(V.x, V.y, V.x + Math.cos(a - 0.5) * V.R * 0.95, V.y + Math.sin(a - 0.5) * V.R * 0.95, V.x + Math.cos(a + 0.35) * V.R * 0.95, V.y + Math.sin(a + 0.35) * V.R * 0.95);
+            }
+            g.fillStyle(0x495057, 1); g.fillCircle(V.x, V.y, V.R * 0.16);
+            // asa para girar
+            var hx = V.x + Math.cos(V.ang) * V.R * 1.35, hy = V.y + Math.sin(V.ang) * V.R * 1.35;
+            g.lineStyle(7, 0xfcc419, 1); g.lineBetween(V.x + Math.cos(V.ang) * V.R * 1.05, V.y + Math.sin(V.ang) * V.R * 1.05, hx, hy);
+            g.fillStyle(0xff922b, 1); g.fillCircle(hx, hy, 11);
+            // rayas de viento hacia la nariz
+            if (viento > 0.15) {
+                g.lineStyle(3, 0xffffff, Math.min(0.7, viento * 0.5));
+                for (var k = 0; k < 4; k++) {
+                    var ox = V.x + V.R * 1.6 + ((time * 0.4 * viento + k * 70) % 180), oy = V.y + (k - 1.5) * 20;
+                    g.lineBetween(ox, oy, ox + 26, oy);
+                }
+            }
+            var nariz = this.est.enchufe('nariz');
+            var cab = this.cabeza();
+            if (time > this.proxPuff && this.puffs.length < 3) {
+                this.proxPuff = time + 1400;
+                var c = this.add.container(cab.x, cab.y).setDepth(16);
+                var tam = m.obj * 0.5;
+                c.add(this.add.image(0, 0, A().textura(this, 'humo', 128)).setTint(0xcc5de8).setDisplaySize(tam * 1.4, tam * 1.4).setAlpha(0.85));
+                c.add(this.add.image(0, 0, A().textura(this, 'flor_morada', 128)).setDisplaySize(tam * 0.5, tam * 0.5));
+                c.p = 0; c.x0 = cab.x; c.y0 = cab.y; c.fase = Math.random() * 6;
+                c.setScale(0.3);
+                this.tweens.add({ targets: c, scale: 1, duration: 350, ease: 'Back.easeOut' });
+                this.puffs.push(c);
+            }
+            this.puffs.forEach(function (c) {
+                if (c.llego || !c.active) return;
+                c.p = Math.min(1, c.p + (0.012 + viento * 0.16) * dt);
+                var t = c.p;
+                var cx = c.x0 + (nariz.x - c.x0) * 0.5 + 90, cy = Math.min(c.y0, nariz.y) - 40;
+                c.x = (1 - t) * (1 - t) * c.x0 + 2 * (1 - t) * t * cx + t * t * nariz.x + Math.sin(time / 500 + c.fase) * 6;
+                c.y = (1 - t) * (1 - t) * c.y0 + 2 * (1 - t) * t * cy + t * t * nariz.y;
+                if (c.p >= 1) scene.olerPuff(c);
+            });
+        },
+
+        olerPuff: async function (c) {
+            if (c.llego) return;
+            c.llego = true;
+            this.llevados += 1;
+            U.sfx('sorber');
+            this.est.encender('nariz', true);
+            this.organos.nariz.reaccion('acierto');
+            var scene = this;
+            this.tweens.add({ targets: c, alpha: 0, scale: 0.2, duration: 300, onComplete: function () { c.destroy(); } });
+            this.puffs = this.puffs.filter(function (q) { return q !== c; });
+            this.time.delayedCall(500, function () { scene.est.encender('nariz', false); });
+            if (this.llevados === 3) this.ctx.decir({ voz: 'zoe', texto: '¡Muy bien! La nariz huele el perfume que lleva el viento.' }, { estado: 'acierto' });
+            if (this.llevados >= 6 && this.finVent) {
+                var fin = this.finVent;
+                this.finVent = null;
+                await this.ctx.decir({ voz: 'zeus', texto: '¡Qué rico perfume! La nariz huele los aromas que viajan por el aire.' }, { estado: 'acierto' });
+                fin();
+            }
         },
 
         jugarTablero: async function (filas, cols) {
@@ -587,7 +721,16 @@
         jugar: async function () {
             await this.rondaFlor();
             if (!this.ctx.vivo()) return;
-            await this.rondaTubos();
+            if (this.ganarNivel) await this.ganarNivel(0);
+            await this.rondaTubos(1);
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(1);
+            await this.rondaTubos(2);
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(2);
+            await this.rondaVentilador();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(3);
         },
 
         fiestaFinal: async function () {
@@ -599,6 +742,7 @@
 
         update: function (time, delta) {
             var dt = Math.min(delta || 16, 50) / 1000;
+            if (this.modo === 'ventilador') this.moverVentilador(time, dt);
             if (this.flor && !U.reducido()) this.flor.flor.rotation = Math.sin(time / 800) * 0.06;
             this.moverParticulas(time, dt);
             L().dibujarCables(this, time);
@@ -632,5 +776,5 @@
         }
     };
 
-    global.PedniaInvernadero = B.crearMotor({ id: 'invernadero', fondo: '#bfe6c9', escena: escena });
+    global.PedniaInvernadero = B.crearMotor({ id: 'invernadero', fondo: '#bfe6c9', extras: true, escena: escena });
 })(typeof window !== 'undefined' ? window : this);

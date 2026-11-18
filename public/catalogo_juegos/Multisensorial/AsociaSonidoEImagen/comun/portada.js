@@ -34,7 +34,7 @@
         QueSuena: ['avion', 'bicicleta', 'gallo', 'reloj', 'telefono', 'tren', 'vaca'],
         SonidoDeTransporte: ['ambulancia', 'avion', 'camion', 'gallo', 'motocicleta', 'tren', 'vaca'],
         SonidoDeUnaMaquina: ['aspiradora', 'gallo', 'lavadora', 'licuadora', 'secador', 'vaca', 'ventilador'],
-        SonidoDelAgua: ['lavadora'],
+        SonidoDelAgua: ['ducha', 'fuente', 'lavadora', 'pluma', 'regadera'],
         SonidoYObjeto: ['aspiradora', 'cajon', 'gallo', 'licuadora', 'puerta', 'reloj', 'telefono', 'vaca', 'ventana', 'ventilador'],
         UnSonidoDeViaje: ['ambulancia', 'avion', 'bicicleta', 'camion', 'gallo', 'motocicleta', 'tren', 'vaca']
     };
@@ -44,6 +44,13 @@
         if (A.existe('portada_' + id)) return 'portada_' + id;
         if (id === 'fuente') return 'fuente_piedra';
         return id;
+    }
+
+    /** Muestra la imagen cuando ya cargó (hasta entonces queda oculta para no ver el dibujo viejo del HTML). */
+    function ver(img) {
+        var mostrar = function () { img.style.visibility = 'visible'; };
+        if (img.complete && img.naturalWidth) mostrar();
+        else { img.addEventListener('load', mostrar, { once: true }); img.addEventListener('error', mostrar, { once: true }); }
     }
 
     function aplicar() {
@@ -69,9 +76,11 @@
             if (disenos.indexOf(id) >= 0) {
                 img.onerror = function () { img.onerror = null; if (url) img.src = url; };
                 img.src = 'img/' + id + '.svg';
+                ver(img);
                 return;
             }
             if (url) img.src = url;
+            ver(img);
         });
     }
 
@@ -94,9 +103,24 @@
             if (!pose || !img) return;
             var spec = { tam: 220, modelos: pose.modelos };
             if (pose.cama && window.PedniaArte) spec.fondo = window.PedniaArte.dataURL('cama', 220);
-            window.AsociaPj3D.foto(spec).then(function (url) { img.src = url; }).catch(function () { /* queda el dibujo */ });
+            window.AsociaPj3D.foto(spec).then(function (url) { img.src = url; img.style.visibility = 'visible'; }).catch(function () { img.style.visibility = 'visible'; /* queda el dibujo */ });
         });
     }
+
+    // Las imágenes se cambian después de pintar la página (y las fotos 3D tardan en armarse): hasta
+    // entonces la casilla queda vacía para no ver un instante el dibujo viejo del HTML. Tope de 8 s.
+    (function ocultarHastaFoto() {
+        var partes = window.location.pathname.split('/');
+        var lista = ITEMS[partes[partes.length - 2] || ''];
+        if (!lista || !document.querySelector('script[src*="personajes3d"]')) return;
+        var spans = document.querySelectorAll('.inicio-elementos .inicio-el');
+        var ocultos = [];
+        Array.prototype.forEach.call(spans, function (sp, i) {
+            var img = sp.querySelector('img');
+            if (img) { img.style.visibility = 'hidden'; ocultos.push(img); }
+        });
+        setTimeout(function () { ocultos.forEach(function (im) { im.style.visibility = 'visible'; }); }, 8000);
+    })();
 
     if (window.AsociaPj3D) fotos3d();
     else window.addEventListener('asocia-pj3d-listo', fotos3d, { once: true });

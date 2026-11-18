@@ -30,7 +30,7 @@
             L.tam = Math.max(74, Math.min(104, H * 0.14));
             L.yPiso = Math.round(H * 0.5);
             L.canasta = { x: Math.round(L.der - 92), y: Math.round(H * 0.7), w: Math.round(Math.max(130, Math.min(190, W * 0.14))) };
-            L.area = { x0: 20 + L.tam * 0.5, x1: L.canasta.x - L.canasta.w * 0.35, y0: L.yPiso + L.tam * 0.6, y1: H - L.tam * 0.55 };
+            L.area = { x0: L.tam * 0.95, x1: L.canasta.x - L.canasta.w * 0.35, y0: L.yPiso + L.tam * 0.75, y1: H - L.tam * 1.0 };
             L.bocina = { x: -99, y: -99, r: 1 };
             return L;
         },
@@ -79,7 +79,7 @@
         lugarLibre: function () {
             var A = this.L.area, mejor = null, dm = -1, self = this;
             for (var k = 0; k < 10; k++) {
-                var p = { x: A.x0 + Math.random() * (A.x1 - A.x0 - this.L.tam * 1.2), y: A.y0 + Math.random() * (A.y1 - A.y0) };
+                var p = { x: A.x0 + Math.random() * (A.x1 - A.x0 - this.L.tam * 0.8), y: A.y0 + Math.random() * (A.y1 - A.y0) };
                 var d = Math.min.apply(null, [9999].concat(this.suelo.filter(function (a) { return a.cont.active; }).map(function (a) { return Math.hypot(a.cont.x - p.x, a.cont.y - p.y); })));
                 if (d > dm) { dm = d; mejor = p; }
             }
@@ -270,10 +270,18 @@
                 if (a.cont.x < A.x0) { a.cont.x = A.x0; a.vx = Math.abs(a.vx) * 0.5; }
                 if (a.cont.y < A.y0) { a.cont.y = A.y0; a.vy = Math.abs(a.vy) * 0.5; }
                 if (a.cont.y > A.y1) { a.cont.y = A.y1; a.vy = -Math.abs(a.vy) * 0.5; }
+                if (a.cont.x > A.x1) { a.cont.x = A.x1; a.vx = -Math.abs(a.vx) * 0.5; }
+                // rescate: si se queda pegado a una pared (donde el dedo no llega), se desliza hacia el centro
+                var cerca = a.cont.x - A.x0 < 14 || a.cont.y - A.y0 < 14 || A.y1 - a.cont.y < 14 || A.x1 - a.cont.x < 14;
+                a.pared = cerca && Math.hypot(a.vx, a.vy) < 30 ? (a.pared || 0) + sec : 0;
+                if (a.pared > 2.2) {
+                    var cx = (A.x0 + A.x1) / 2, cy = (A.y0 + A.y1) / 2, dd = Math.hypot(cx - a.cont.x, cy - a.cont.y) || 1;
+                    a.vx = (cx - a.cont.x) / dd * 260; a.vy = (cy - a.cont.y) / dd * 260; a.pared = 0;
+                }
                 a.cont.angle = Math.max(-25, Math.min(25, a.vx * 0.04));
                 var c = self.cana;
                 if (self.fase === 'jugar' && time > a.inmune && Math.hypot(a.cont.x - c.x, a.cont.y - c.y) < c.w * 0.5) self.entra(a);
-                else if (a.cont.x > A.x1 + 10 && time <= a.inmune) { a.cont.x = A.x1 + 10; a.vx = -Math.abs(a.vx); }
+
             });
             // separación suave entre objetos
             for (var i = 0; i < this.suelo.length; i++) for (var j = i + 1; j < this.suelo.length; j++) {
