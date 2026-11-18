@@ -279,8 +279,13 @@
 
         /* ── Ronda 2: espejos ──────────────────────────────────── */
 
-        rondaEspejos: async function () {
+        rondaEspejos: async function (parte) {
             var scene = this;
+            if (parte === 2) {
+                await this.ctx.decir({ voz: 'zeus', texto: '¡Excelente! Ahora con más espejos.' }, { estado: 'acierto' });
+                await this.tableroEspejos(2);
+                return;
+            }
             this.modo = 'espejos';
             this.cablesLab.forEach(function (c) { c.destruir(); });
             this.cablesLab = [];
@@ -290,8 +295,105 @@
             this.tweens.add({ targets: this.sol, alpha: 0, duration: 400 });
             await this.ctx.decir({ voz: 'zoe', texto: '¡Un rayo de sol entra al observatorio! Toca los espejos para girarlos y lleva la luz hasta el ojo.' });
             await this.tableroEspejos(1);
-            await this.ctx.decir({ voz: 'zeus', texto: '¡Excelente! Ahora con más espejos.' }, { estado: 'acierto' });
-            await this.tableroEspejos(2);
+        },
+
+        /* ── Ronda 4: cazador de estrellas con el telescopio ──── */
+
+        rondaTelescopio: async function () {
+            var scene = this;
+            var m = this.m();
+            this.modo = 'telescopio';
+            this.cablesLab.forEach(function (c) { c.destruir(); });
+            this.cablesLab = [];
+            this.est.orden.forEach(function (id) { scene.est.encender(id, false); });
+            var R = Math.max(70, m.obj * 0.62);
+            // cuatro estrellas escondidas en la cúpula, bien separadas
+            var yMin = 125, yMax = m.piso - 50;
+            var pts = [];
+            for (var intento = 0; intento < 200 && pts.length < 4; intento++) {
+                var q = { x: U.rnd(m.w * 0.12, m.w * 0.88), y: U.rnd(yMin, yMax) };
+                if (q.x < m.w * 0.22 && q.y > m.h * 0.3) continue;      // el telescopio ocupa esa esquina
+                if (pts.every(function (o) { return Phaser.Math.Distance.Between(o.x, o.y, q.x, q.y) > R * 1.9; })) pts.push(q);
+            }
+            this.estrellasT = pts.map(function (q) {
+                var c = scene.add.container(q.x, q.y).setDepth(9);
+                var halo = scene.add.image(0, 0, A().textura(scene, 'humo', 128)).setTint(0xfff3bf).setDisplaySize(R * 0.9, R * 0.9).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0);
+                var est = scene.add.image(0, 0, A().textura(scene, 'estrella', 64)).setDisplaySize(10, 10).setAlpha(0.28);
+                c.add([halo, est]);
+                c.halo = halo; c.est = est; c.luz = 0; c.hecha = false;
+                return c;
+            });
+            this.lente = this.add.container(m.w * 0.5, (yMin + yMax) / 2).setDepth(19);
+            var lg = this.add.graphics();
+            lg.fillStyle(0xa5d8ff, 0.12); lg.fillCircle(0, 0, R);
+            lg.lineStyle(8, 0x74c0fc, 1); lg.strokeCircle(0, 0, R);
+            lg.lineStyle(3, 0xffffff, 0.7); lg.strokeCircle(0, 0, R - 8);
+            lg.lineStyle(5, 0xffffff, 0.8); lg.beginPath(); lg.arc(0, 0, R * 0.78, Math.PI * 1.1, Math.PI * 1.5); lg.strokePath();
+            this.lente.add(lg);
+            this.lente.R = R;
+            this.lente.setAlpha(0);
+            this.tweens.add({ targets: this.lente, alpha: 1, duration: 500 });
+            this.encontradas = 0;
+            await this.ctx.decir({ voz: 'zoe', texto: '¡Hay estrellas escondidas en el cielo! Mueve el telescopio con el dedo: cuando pase sobre una, brillará para los ojos.' });
+            var cv = function (p) { scene.lente.setPosition(Phaser.Math.Clamp(p.x, R * 0.4, m.w - R * 0.4), Phaser.Math.Clamp(p.y, 110, m.piso)); };
+            var abajo = function (p) { scene.pista.reiniciar(); scene.ctx.quitarMano(); cv(p); };
+            var mover = function (p) { if (p.isDown) { scene.pista.reiniciar(); cv(p); } };
+            this.input.on('pointerdown', abajo);
+            this.input.on('pointermove', mover);
+            this.pista = U.crearPista(this, 8000, function (cancelado) {
+                var e = scene.estrellasT.find(function (k) { return !k.hecha; });
+                if (!e) return Promise.resolve();
+                return scene.ctx.mano({ punto: { x: scene.lente.x, y: scene.lente.y }, holdMs: 250, cancelado: cancelado, arrastre: { dx: e.x - scene.lente.x, dy: e.y - scene.lente.y, durMs: 1200 }, onDuranteArrastre: function () { } });
+            });
+            this.pista.reiniciar();
+            await new Promise(function (r) { scene.finTele = r; });
+            this.input.off('pointerdown', abajo);
+            this.input.off('pointermove', mover);
+            this.pista.parar();
+            this.ctx.quitarMano();
+            this.tweens.add({ targets: this.lente, alpha: 0, duration: 400, onComplete: function () { scene.lente.destroy(); } });
+            this.modo = '';
+        },
+
+        luzTelescopio: function (dt) {
+            var scene = this;
+            var R = this.lente.R;
+            this.estrellasT.forEach(function (e) {
+                if (e.hecha) return;
+                var d = Phaser.Math.Distance.Between(e.x, e.y, scene.lente.x, scene.lente.y);
+                var dentro = d < R * 0.85;
+                e.luz = Math.max(0, Math.min(1, e.luz + (dentro ? dt / 0.9 : -dt * 0.8)));
+                e.est.setDisplaySize(10 + e.luz * 46, 10 + e.luz * 46).setAlpha(0.28 + e.luz * 0.72);
+                e.halo.setAlpha(e.luz * 0.9);
+                e.est.angle = e.luz * 25;
+                if (e.luz >= 1) scene.cazar(e);
+            });
+        },
+
+        cazar: async function (e) {
+            if (e.hecha) return;
+            e.hecha = true;
+            this.encontradas += 1;
+            var ojo = this.organos.ojo;
+            var h = this.est.enchufe('ojo');
+            U.sfx('shineGlimmer');
+            U.estallido(this, e.x, e.y, { n: 10, dist: 90, colores: [0xffe066, 0xfff3bf, 0xffffff] });
+            this.est.encender('ojo', true);
+            var scene = this;
+            await U.tween(this, { targets: e, x: h.x, y: h.y, scale: 0.4, duration: 650, ease: 'Sine.easeIn' });
+            ojo.parpadear();
+            ojo.reaccion('acierto');
+            e.destroy();
+            this.time.delayedCall(500, function () { scene.est.encender('ojo', false); });
+            if (this.encontradas === 2) this.ctx.decir({ voz: 'zoe', texto: '¡Muy bien! Los ojos ven las estrellas que brillan.' }, { estado: 'acierto' });
+            if (this.encontradas >= 4 && this.finTele) {
+                var fin = this.finTele;
+                this.finTele = null;
+                ojo.gafas(true);
+                await this.ctx.decir({ voz: 'zeus', texto: '¡Encontraste todas las estrellas! La luz se capta con los ojos.' }, { estado: 'acierto' });
+                ojo.gafas(false);
+                fin();
+            }
         },
 
         tableroEspejos: async function (nivel) {
@@ -505,7 +607,16 @@
         jugar: async function () {
             await this.rondaSol();
             if (!this.ctx.vivo()) return;
-            await this.rondaEspejos();
+            if (this.ganarNivel) await this.ganarNivel(0);
+            await this.rondaEspejos(1);
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(1);
+            await this.rondaEspejos(2);
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(2);
+            await this.rondaTelescopio();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(3);
         },
 
         fiestaFinal: async function () {
@@ -522,6 +633,7 @@
                 this.sol.halo.alpha = 0.55 + 0.15 * Math.sin(time / 300);
             }
             if (this.dibujarRayo) this.dibujarRayo(time);
+            if (this.modo === 'telescopio' && this.lente && this.lente.active) this.luzTelescopio(dt);
             L().dibujarCables(this, time);
             this.est.actualizar(time, this.sol && this.sol.alpha > 0.5 ? { x: this.sol.x, y: this.sol.y } : null);
         },
@@ -536,5 +648,5 @@
         }
     };
 
-    global.PedniaObservatorio = B.crearMotor({ id: 'observatorio', fondo: '#0b1533', escena: escena });
+    global.PedniaObservatorio = B.crearMotor({ id: 'observatorio', fondo: '#0b1533', extras: true, escena: escena });
 })(typeof window !== 'undefined' ? window : this);

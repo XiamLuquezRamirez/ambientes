@@ -23,8 +23,52 @@
     var rnd = Ut.rnd;
     var EXTRA = ['ventilador', 'tren', 'avion'];
 
+    // Escenario del diseño (img/diseno/fondo.svg, lienzo 1280×720): escenario de feria con cortinas
+    // abiertas, letrero de luces arriba, mostrador a cuadros, noria, fuegos y pasto. La cuerda del
+    // telón se quitó del dibujo: la dibuja el juego en el mismo sitio. Medidas tomadas por color.
+    var DISENO = 'img/diseno/';
+    var FONDO_W = 1280, FONDO_H = 720;
+    var SALA = {
+        anchoUtil: 1240,
+        esc: { x0: 75, x1: 1207, y0: 131, y1: 491 },     // hueco del escenario entre postes, barra azul y mostrador
+        cuerda: { x: 1192, y0: 131, y1: 330 },
+        aro: { x: 640, y: 612 },                         // sobre el pasto, bajo el mostrador
+        letrero: { x: 640, y: 72, r: 34 },               // el cartel de luces: ahí va la bocina
+        tam: 135,
+        // Bombillas del dibujo (letrero y postes): se les superpone un destello que corre en cadena.
+        bombillas: [[487, 116], [480, 96], [498, 74], [516, 53], [544, 45], [575, 48], [608, 22], [641, 15], [672, 22], [704, 48], [737, 45], [765, 53], [783, 74], [800, 96], [793, 116]]
+    };
+    for (var by = 189, bi = 0; bi < 12; bi++, by += 21.4) { SALA.bombillas.push([59, by], [1223, by]); }
+    SALA.bombillas.push([57, 121], [1223, 121]);
+
     var escena = {
         iniciar: function () { this.postes = []; this.abierto = 0; this.giro = 0; },
+
+        preload: function () {
+            if (!this.textures.exists('feria_diseno')) this.load.svg('feria_diseno', DISENO + 'fondo.svg', { width: 1920, height: 1080 });
+        },
+
+        /** Encaje del fondo: cubre la pantalla anclado abajo, sin recortar el escenario por los lados. */
+        marcoFondo: function (W, H) {
+            if (!this.textures.exists('feria_diseno')) return null;
+            var k = Math.min(Math.max(W / FONDO_W, H / FONDO_H), W / SALA.anchoUtil);
+            var ox = (W - FONDO_W * k) / 2, oy = H - FONDO_H * k;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
+
+        /** Medidas sobre el escenario del diseño (todo en píxeles de pantalla). */
+        calcularConFondo: function (L, F) {
+            var W = L.W, H = L.H, S = SALA;
+            L.F = F;
+            L.esc = { x0: F.sx(S.esc.x0), x1: F.sx(S.esc.x1), y0: F.sy(S.esc.y0), y1: F.sy(S.esc.y1) };
+            L.tam = Math.max(64, Math.min(S.tam * F.k, (L.esc.x1 - L.esc.x0) / 6.2, (L.esc.y1 - L.esc.y0) * 0.5));
+            L.bocina = { x: F.sx(S.letrero.x), y: F.sy(S.letrero.y), r: Math.max(26, Math.min(40, S.letrero.r * F.k)) };
+            L.cuerda = { x: F.sx(S.cuerda.x), y0: F.sy(S.cuerda.y0), y1: F.sy(S.cuerda.y1) };
+            L.aro = { x: F.sx(S.aro.x), y: F.sy(S.aro.y), r: Math.max(26, L.tam * 0.3) };
+            L.tiroMax = Math.max(60, Math.min(150, H - L.aro.y - 18));
+            L.bombillas = S.bombillas.map(function (b, i) { return { x: F.sx(b[0]), y: F.sy(b[1]), ord: i }; });
+            return L;
+        },
 
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
@@ -32,6 +76,8 @@
             var hueco = Math.max(60, H * 0.16);
             L.bocina = { x: W / 2, y: Math.max(60, Math.min(96, 54 + hueco * 0.2)), r: Math.max(28, Math.min(38, hueco * 0.3)) };
             L.pres = W >= 820 ? { x: W - 64, piso: H - 104, alto: Math.min(150, H * 0.26), modelo: 'nina' } : null;
+            var F = this.marcoFondo(W, H);
+            if (F) return this.calcularConFondo(L, F);
             var der = L.pres ? W - 130 : W - 16;
             L.esc = { x0: 24, x1: der - 50, y0: L.bocina.y + L.bocina.r + 34, y1: H * 0.66 };   // escenario
             L.tam = Math.max(64, Math.min(120, (L.esc.x1 - L.esc.x0) / 6.2, (L.esc.y1 - L.esc.y0) * 0.5));
@@ -46,6 +92,7 @@
             var self = this;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            if (L.F) return this.armarConFondo(L, keep);
             // Capas: cielo de atardecer → noria y globos (vivos) → el puesto.
             K.textura(this, 'feria_cielo', L.W, L.H, function (x, w, h) {
                 var g = x.createLinearGradient(0, 0, 0, h);
@@ -71,6 +118,79 @@
             this.focosG = keep(this.add.graphics().setDepth(42));
             this.montarHud(keep);
             this.ubicarPostes();
+        },
+
+        /** Escenario del diseño: el dibujo entero, con telón, cuerda, aros y luces del juego encima. */
+        armarConFondo: function (L, keep) {
+            var F = L.F;
+            var fw = FONDO_W * F.k, fh = FONDO_H * F.k;
+            var tex = this.textures.get('feria_diseno');
+            // Si sobra pantalla arriba o a los lados se estiran los bordes del propio dibujo (morado del cielo y pasto).
+            var src = tex.getSourceImage();
+            if (F.oy > 1 && !tex.has('f_arriba')) tex.add('f_arriba', 0, 0, 0, src.width, Math.max(2, Math.round(src.height / 120)));
+            if (F.ox > 1 && !tex.has('f_izq')) { tex.add('f_izq', 0, 0, 0, 3, src.height); tex.add('f_der', 0, src.width - 3, 0, 3, src.height); }
+            if (F.ox > 1) {
+                keep(this.add.image(F.ox + 1, 0, 'feria_diseno', 'f_izq').setOrigin(1, 0).setDisplaySize(F.ox + 2, L.H).setDepth(0));
+                keep(this.add.image(F.ox + fw - 1, 0, 'feria_diseno', 'f_der').setOrigin(0, 0).setDisplaySize(F.ox + 2, L.H).setDepth(0));
+            }
+            if (F.oy > 1) keep(this.add.image(F.ox, F.oy + 1, 'feria_diseno', 'f_arriba').setOrigin(0, 1).setDisplaySize(fw, F.oy + 2).setDepth(0));
+            // '__BASE': al añadir recortes Phaser vuelve "primer cuadro" al último; el dibujo entero se pide por nombre.
+            keep(this.add.image(F.ox, F.oy, 'feria_diseno', '__BASE').setOrigin(0, 0).setDisplaySize(fw, fh).setDepth(0));
+            var V = this.montarVida(keep);
+            if (V) {
+                // Estrellas en el cielo libre a los lados del letrero; el dibujo ya trae noria y fuegos.
+                V.estrellas({ x: F.sx(90), y: F.sy(8), w: (440 - 90) * F.k, h: 92 * F.k, depth: 0.9 }, 7);
+                V.estrellas({ x: F.sx(1090), y: F.sy(8), w: (1190 - 1090) * F.k, h: 92 * F.k, depth: 0.9 }, 3);
+                // Globos que suben por el pasto de abajo no estorban al juego: solo a los lados del cielo.
+                V.globos({ x: F.sx(90), y: 0, w: (440 - 90) * F.k, h: F.sy(100), n: 2, depth: 0.6 });
+            }
+            this.telonG = keep(this.add.graphics().setDepth(40));
+            this.cuerdaG = keep(this.add.graphics().setDepth(41));
+            this.aroG = keep(this.add.graphics().setDepth(60));
+            this.focos = L.bombillas;
+            this.focosG = keep(this.add.graphics().setDepth(42));
+            // Canasta de aros junto a donde se lanzan.
+            var cs = keep(this.add.graphics().setDepth(5)), c = L.aro;
+            cs.fillStyle(0x000000, 0.18); cs.fillEllipse(c.x - c.r * 1.7, c.y + c.r * 1.4, c.r * 1.9, c.r * 0.4);
+            cs.fillStyle(0xa5672b, 1); cs.fillRoundedRect(c.x - c.r * 2.4, c.y + c.r * 0.2, c.r * 1.4, c.r * 1.2, 8);
+            [0x4dabf7, 0xffd43b, 0x69db7c].forEach(function (col, i) {
+                cs.lineStyle(6, col, 1); cs.strokeEllipse(c.x - c.r * 1.7, c.y + c.r * 0.1 - i * 5, c.r * 1.1, c.r * 0.4);
+            });
+            this.montarHud(keep);
+            this.montarPlacaEstrellas(keep);
+            this.ubicarPostes();
+            // Fuegos artificiales de fondo, sobre el cielo libre.
+            var self = this;
+            if (this.fuegosEv) this.fuegosEv.remove();
+            this.fuegosEv = this.time.addEvent({
+                delay: 2600, loop: true, callback: function () {
+                    if (!self.L || !self.L.F || self.detenido) return;
+                    var f = self.L.F;
+                    var x = f.sx(Math.random() < 0.5 ? rnd(110, 420) : rnd(860, 1170)), y = f.sy(rnd(30, 80));
+                    var col = [0xff6b6b, 0xffd43b, 0x74c0fc, 0x8ce99a, 0xe599f7][(Math.random() * 5) | 0];
+                    Ut.estallido(self, x, y, { n: 14, tex: 'chispa', tam: 14, dist: 55 * f.k, colores: [col, 0xffffff], depth: 0.8, ms: 1000 });
+                }
+            });
+        },
+
+        /** Las estrellas del avance van en una placa propia (colores del escenario), en el cielo de la derecha. */
+        montarPlacaEstrellas: function (keep) {
+            var L = this.L, F = L.F;
+            var est = this.estrellas || [];
+            if (!est.length) return;
+            var tam = Math.max(24, Math.min(40, 34 * F.k));
+            var gap = tam * 0.3, pad = tam * 0.5;
+            var pw = est.length * tam + (est.length - 1) * gap + pad * 2, ph = tam + pad * 1.2;
+            var cx = F.sx(975), cy = F.sy(60);
+            var x0 = cx - pw / 2, y0 = cy - ph / 2, r = ph * 0.38;
+            var g = keep(this.add.graphics().setDepth(79));
+            g.fillStyle(0x000000, 0.28); g.fillRoundedRect(x0 + 3, y0 + 5, pw, ph, r);
+            g.fillStyle(0x3a1325, 0.94); g.fillRoundedRect(x0, y0, pw, ph, r);
+            g.lineStyle(4, 0xf7b32c, 1); g.strokeRoundedRect(x0, y0, pw, ph, r);
+            g.lineStyle(2, 0xffffff, 0.25); g.strokeRoundedRect(x0 + 5, y0 + 5, pw - 10, ph - 10, Math.max(4, r - 5));
+            est.forEach(function (e, i) {
+                e.setDisplaySize(tam, tam).setPosition(x0 + pad + tam / 2 + i * (tam + gap), cy).setDepth(80);
+            });
         },
 
         pintarFeria: function (x, w, h) {
@@ -118,29 +238,36 @@
             var g = this.telonG;
             g.clear();
             var mitad = (e.x1 - e.x0) / 2;
-            var ancho = mitad * (1 - this.abierto * 0.88);
-            [[e.x0, 1], [e.x1, -1]].forEach(function (q) {
+            var dis = !!L.F;
+            var ancho = mitad * (1 - this.abierto * (dis ? 1 : 0.88));
+            // Con el diseño, abierto del todo no se dibuja nada: quedan las cortinas del dibujo.
+            if (dis && ancho < 2) ancho = 0;
+            if (!ancho) {
+                // (nada que dibujar del telón)
+            } else [[e.x0, 1], [e.x1, -1]].forEach(function (q) {
                 var x0 = q[0], dir = q[1];
                 var pliegues = 6;
                 for (var k = 0; k < pliegues; k++) {
                     var a = x0 + dir * ancho * k / pliegues, b = x0 + dir * ancho * (k + 1) / pliegues;
-                    g.fillStyle(k % 2 ? 0xb3001b : 0xd6002a, 1);
+                    g.fillStyle(dis ? (k % 2 ? 0xbc270a : 0xe33000) : (k % 2 ? 0xb3001b : 0xd6002a), 1);
                     g.fillRect(Math.min(a, b), e.y0, Math.abs(b - a) + 1, e.y1 - e.y0);
                 }
                 g.fillStyle(0x000000, 0.18);
                 g.fillRect(dir > 0 ? x0 + ancho - 6 : x0 - ancho, e.y0, 6, e.y1 - e.y0);
             });
             // Bambalina arriba.
-            g.fillStyle(0x8f0016, 1); g.fillRect(e.x0, e.y0, e.x1 - e.x0, 18);
-            g.fillStyle(0xffd43b, 1); for (var x = e.x0; x < e.x1; x += 22) g.fillCircle(x + 11, e.y0 + 18, 4);
+            if (ancho) {
+                g.fillStyle(dis ? 0xbc270a : 0x8f0016, 1); g.fillRect(e.x0, e.y0, e.x1 - e.x0, 18);
+                g.fillStyle(0xffd43b, 1); for (var x = e.x0; x < e.x1; x += 22) g.fillCircle(x + 11, e.y0 + 18, 4);
+            }
             // Cuerda con borla.
             var c = this.cuerdaG;
             c.clear();
             var tir = this.tiro || 0;
-            c.lineStyle(5, 0xf4d03f, 1);
+            c.lineStyle(dis ? 4 : 5, dis ? 0xfaa72f : 0xf4d03f, 1);
             c.beginPath(); c.moveTo(L.cuerda.x, L.cuerda.y0); c.lineTo(L.cuerda.x, L.cuerda.y1 + tir); c.strokePath();
-            c.fillStyle(0xf59f00, 1); c.fillCircle(L.cuerda.x, L.cuerda.y1 + tir, 13);
-            c.fillStyle(0xffd43b, 1); c.fillTriangle(L.cuerda.x - 11, L.cuerda.y1 + tir + 6, L.cuerda.x + 11, L.cuerda.y1 + tir + 6, L.cuerda.x, L.cuerda.y1 + tir + 30);
+            c.fillStyle(dis ? 0xfaa72f : 0xf59f00, 1); c.fillCircle(L.cuerda.x, L.cuerda.y1 + tir, dis ? 9 * L.F.k : 13);
+            c.fillStyle(dis ? 0xfdd9a6 : 0xffd43b, 1); c.fillTriangle(L.cuerda.x - 11, L.cuerda.y1 + tir + 6, L.cuerda.x + 11, L.cuerda.y1 + tir + 6, L.cuerda.x, L.cuerda.y1 + tir + 30);
             if (this.abierto < 0.5 && this.fase === 'jugar' && !this.sonando) {
                 c.lineStyle(3, 0xffffff, 0.5 + Math.sin(t / 220) * 0.4);
                 c.strokeCircle(L.cuerda.x, L.cuerda.y1 + tir, 22);
@@ -149,6 +276,15 @@
             var f = this.focosG;
             f.clear();
             this.focos.forEach(function (q, i) {
+                if (dis) {
+                    // Destello que corre en cadena por las bombillas del dibujo (letrero y postes).
+                    var v = Math.sin(t / 240 - q.ord * 0.5);
+                    if (v > 0.1) {
+                        f.fillStyle(0xfff3bf, 0.18 + 0.32 * v); f.fillCircle(q.x, q.y, 10 * L.F.k);
+                        f.fillStyle(0xffffff, 0.85 * v); f.fillCircle(q.x, q.y, 3.6 * L.F.k);
+                    }
+                    return;
+                }
                 var on = Math.sin(t / 200 + i * 1.3) > -0.3;
                 f.fillStyle(on ? 0xfff3bf : 0x8a6d00, 1);
                 f.fillCircle(q.x, q.y, 6);
@@ -199,7 +335,7 @@
                 var x = e.x0 + 30 + (e.x1 - e.x0 - 60) * u;
                 // Carrusel: los de atrás un poco más arriba y más chicos.
                 var prof = self.nv && self.nv.carrusel ? Math.sin(u * Math.PI * 2) * 0.12 : 0;
-                p.actor.cont.setPosition(x, e.y1 - L.tam * 0.55 - prof * L.tam).setScale((1 - prof) * L.tam / p.actor.tam);
+                p.actor.cont.setPosition(x, e.y1 - L.tam * (L.F ? 0.42 : 0.55) - prof * L.tam).setScale((1 - prof) * L.tam / p.actor.tam);
                 p.cuello = { x: x, y: e.y1 - L.tam * 0.2 };
             });
         },

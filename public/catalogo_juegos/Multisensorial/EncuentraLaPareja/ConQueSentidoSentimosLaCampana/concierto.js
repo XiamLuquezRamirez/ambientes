@@ -1095,11 +1095,16 @@
             this.errores = 0;
             await this.rondaCampana();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(0);
             await this.rondaGlobos();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(1);
             await this.rondaQuien();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(2);
             await this.rondaConcierto();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(3);
         },
 
         fiestaFinal: async function () {
@@ -1170,5 +1175,5 @@
         }
     };
 
-    global.PedniaConcierto = B.crearMotor({ id: 'concierto', fondo: '#bfe3ff', escena: escena });
+    global.PedniaConcierto = B.crearMotor({ id: 'concierto', fondo: '#bfe3ff', extras: true, escena: escena });
 })(typeof window !== 'undefined' ? window : this);

@@ -1375,6 +1375,7 @@
                 img.src = img.dataset.archivo;
             });
         }
+        document.querySelectorAll(".inicio-el img[data-archivo]").forEach(function (img) { img.style.visibility = "visible"; });
 
         const errores = L.validarConfig(gameConfig);
         if (errores.length) console.warn("[MemoriaAuditiva] config:", errores);

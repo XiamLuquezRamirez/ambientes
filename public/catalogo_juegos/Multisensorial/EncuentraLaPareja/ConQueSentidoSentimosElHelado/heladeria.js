@@ -393,6 +393,11 @@
         alTocar: function (p) {
             if (this.pista) this.pista.reiniciar();
             this.ctx.quitarMano();
+            if (this.modo === 'lengua') {
+                var gt = this.gotas.find(function (g) { return !g.atrapada && Phaser.Math.Distance.Between(p.x, p.y, g.x, g.y) < 70; });
+                if (gt) this.lamerGota(gt);
+                return;
+            }
             if (!this.esperando || this.ocupado) return;
             var c = this.enMano;
             if (c && Phaser.Math.Distance.Between(p.x, p.y, c.x, c.y) < c.tam * 0.55) {
@@ -627,6 +632,85 @@
             }
         },
 
+        /* ── Ronda 4: lengüetazos a las gotas ─────────────────── */
+
+        soltarGota: function () {
+            var scene = this;
+            var m = this.m();
+            var cono = this.conoL;
+            var color = SABOR[cono.sabor].color;
+            var x = cono.x + U.rnd(-0.22, 0.22) * cono.tam;
+            var g = this.add.image(x, cono.y + cono.tam * 0.18, A().textura(this, 'gota', 64)).setDisplaySize(38, 50).setTint(color).setDepth(17);
+            g.y0 = cono.y;
+            g.color = color;
+            g.cae = this.tweens.add({
+                targets: g, y: this.mostrador + 4, duration: 2600 / (1 + this.lamidas * 0.06), ease: 'Quad.easeIn',
+                onComplete: function () {
+                    if (g.atrapada) return;
+                    var charco = scene.add.ellipse(g.x, scene.mostrador + 4, 8, 4, color, 0.85).setDepth(-9);
+                    scene.tweens.add({ targets: charco, scaleX: 3.5, scaleY: 2, duration: 500 });
+                    scene.tweens.add({ targets: charco, alpha: 0, delay: 3000, duration: 800, onComplete: function () { charco.destroy(); } });
+                    g.destroy();
+                    scene.gotas = scene.gotas.filter(function (q) { return q !== g; });
+                }
+            });
+            this.gotas.push(g);
+        },
+
+        lamerGota: async function (g) {
+            if (g.atrapada) return;
+            g.atrapada = true;
+            if (g.cae) g.cae.stop();
+            var boca = this.organos.lengua;
+            this.gotas = this.gotas.filter(function (q) { return q !== g; });
+            this.lamidas += 1;
+            U.sfx('miamMiam');
+            this.tweens.add({ targets: g, x: boca.cont.x, y: boca.cont.y - boca.radio * 0.4, scale: 0.5, alpha: 0.4, duration: 420, ease: 'Sine.easeIn', onComplete: function () { g.destroy(); } });
+            await U.esperar(this, 380);
+            boca.lamer(1);
+            U.estallido(this, boca.cont.x, boca.cont.y - boca.radio, { n: 6, tex: 'corazon', dist: 90, colores: [0xf783ac] });
+            if (this.lamidas === 3) this.ctx.decir({ voz: 'zoe', texto: '¡Ñam! La lengua saborea el helado dulce.' }, { estado: 'acierto' });
+            if (this.lamidas >= 6 && this.finLengua) {
+                var fin = this.finLengua;
+                this.finLengua = null;
+                this.lluviaG.remove();
+                await U.esperar(this, 500);
+                await boca.reaccion('acierto');
+                await this.ctx.decir({ voz: 'zeus', texto: '¡Muy bien! La lengua saborea el helado.' }, { estado: 'acierto' });
+                fin();
+            }
+        },
+
+        rondaLengua: async function () {
+            var scene = this;
+            var m = this.m();
+            this.modo = 'lengua';
+            this.gotas = [];
+            this.lamidas = 0;
+            this.tinas.forEach(function (tn) { scene.tweens.add({ targets: tn, alpha: 0, duration: 300, onComplete: function () { tn.setVisible(false); } }); });
+            var tam = m.obj * 1.4;
+            this.conoL = this.crearHelado(m.cx, this.mostrador - tam * 1.0, tam, ['fresa', 'choco', 'limon'][Math.floor(Math.random() * 3)]);
+            this.conoL.setScale(0.2).setAlpha(0);
+            this.tweens.add({ targets: this.conoL, scale: 1, alpha: 1, duration: 500, ease: 'Back.easeOut' });
+            await U.esperar(this, 600);
+            await this.ctx.decir({ voz: 'zeus', texto: '¡El helado se derrite! Toca las gotitas antes de que caigan para que la lengua las saboree.' });
+            this.lluviaG = this.time.addEvent({ delay: 1100, loop: true, callback: function () { if (scene.gotas.length < 3 && scene.lamidas < 6) scene.soltarGota(); } });
+            this.lluviaG.callback();
+            this.pista = U.crearPista(this, 7000, function (cancelado) {
+                var g = scene.gotas[0];
+                if (!g) return Promise.resolve();
+                return scene.ctx.mano({ punto: { x: g.x, y: g.y }, holdMs: 300, cancelado: cancelado });
+            });
+            this.pista.reiniciar();
+            await new Promise(function (r) { scene.finLengua = r; });
+            this.pista.parar();
+            this.ctx.quitarMano();
+            this.gotas.forEach(function (g) { if (g.cae) g.cae.stop(); g.destroy(); });
+            this.gotas = [];
+            this.tweens.add({ targets: this.conoL, alpha: 0, y: this.conoL.y - 30, duration: 400, onComplete: function () { scene.conoL.destroy(); } });
+            this.modo = '';
+        },
+
         elegirCosa: async function (c) {
             var scene = this;
             if (this.ocupado) return;
@@ -673,9 +757,16 @@
         jugar: async function () {
             await this.rondaHelado();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(0);
             await this.rondaSabores();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(1);
             await this.rondaQue();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(2);
+            await this.rondaLengua();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(3);
         },
 
         fiestaFinal: async function () {
@@ -758,5 +849,5 @@
         }
     };
 
-    global.PedniaHeladeria = B.crearMotor({ id: 'heladeria', fondo: '#a5d8ff', escena: escena });
+    global.PedniaHeladeria = B.crearMotor({ id: 'heladeria', fondo: '#a5d8ff', extras: true, escena: escena });
 })(typeof window !== 'undefined' ? window : this);

@@ -231,6 +231,10 @@
         alTocar: function (p) {
             if (this.pista) this.pista.reiniciar();
             this.ctx.quitarMano();
+            if (this.modo === 'girasoles') {
+                if (this.sol && Phaser.Math.Distance.Between(p.x, p.y, this.sol.x, this.sol.y) < this.sol.tam * 0.6) this.arr.empezar(this.sol, p);
+                return;
+            }
             if (this.modo === 'sol' && this.esperando && !this.ocupado) {
                 if (this.sol && Phaser.Math.Distance.Between(p.x, p.y, this.sol.x, this.sol.y) < this.sol.tam * 0.55) {
                     this.arr.empezar(this.sol, p);
@@ -271,6 +275,7 @@
         alSoltar: function (p) {
             var r = this.arr.soltar(p);
             if (!r) return;
+            if (this.modo === 'girasoles') return;
             var scene = this;
             this.fila.orden.forEach(function (id) { scene.organos[id].cont.setScale(1); });
             var sobre = this.fila.en(p.x, p.y);
@@ -562,6 +567,113 @@
             this.ocupado = false;
         },
 
+        /* ── Ronda 4: los girasoles despiertan con la luz ─────── */
+
+        crearGirasol: function (x, y, tam) {
+            var c = this.add.container(x, y).setDepth(7);
+            var g = this.add.graphics();
+            g.lineStyle(Math.max(5, tam * 0.08), 0x2f9e44, 1);
+            g.lineBetween(0, 0, 0, tam * 0.95);
+            g.fillStyle(0x40c057, 1);
+            g.fillEllipse(-tam * 0.2, tam * 0.55, tam * 0.34, tam * 0.15);
+            g.fillEllipse(tam * 0.2, tam * 0.72, tam * 0.34, tam * 0.15);
+            var bud = this.add.circle(0, 0, tam * 0.22, 0x40c057);
+            var petalos = this.add.graphics();
+            for (var i = 0; i < 14; i++) {
+                var a = i * Math.PI / 7;
+                petalos.fillStyle(i % 2 ? 0xffd43b : 0xfab005, 1);
+                petalos.fillTriangle(Math.cos(a - 0.22) * tam * 0.2, Math.sin(a - 0.22) * tam * 0.2, Math.cos(a) * tam * 0.52, Math.sin(a) * tam * 0.52, Math.cos(a + 0.22) * tam * 0.2, Math.sin(a + 0.22) * tam * 0.2);
+            }
+            petalos.setScale(0.001);
+            var centro = this.add.circle(0, 0, tam * 0.2, 0x7b4a1e).setAlpha(0);
+            c.add([g, bud, petalos, centro]);
+            c.bud = bud; c.petalos = petalos; c.centro = centro;
+            c.tam = tam; c.luz = 0; c.abierta = false; c.fase = Math.random() * 6;
+            return c;
+        },
+
+        luzGirasoles: function (dt) {
+            var scene = this;
+            var m = this.m();
+            var R = m.obj * 1.3;
+            (this.girasoles || []).forEach(function (f) {
+                if (f.abierta) return;
+                var d = Phaser.Math.Distance.Between(scene.sol.x, scene.sol.y, f.x, f.y);
+                var lit = scene.sol.visible && d < R;
+                f.luz = Math.max(0, Math.min(1, f.luz + (lit ? dt / 0.9 : -dt * 0.5)));
+                var k = f.luz * f.luz * (3 - 2 * f.luz);
+                f.petalos.setScale(Math.max(0.001, k));
+                f.centro.setAlpha(k);
+                f.bud.setScale(1 - k * 0.6);
+                if (lit) f.angle = Phaser.Math.Clamp((scene.sol.x - f.x) * 0.03, -10, 10);
+                if (f.luz >= 1) scene.abrirGirasol(f);
+            });
+        },
+
+        abrirGirasol: async function (f) {
+            if (f.abierta) return;
+            f.abierta = true;
+            this.abiertos = (this.abiertos || 0) + 1;
+            U.sfx('shineGlimmer');
+            this.tweens.add({ targets: f, scale: 1.2, duration: 220, yoyo: true, ease: 'Back.easeOut' });
+            U.estallido(this, f.x, f.y, { n: 12, dist: 110, colores: [0xffe066, 0xffd43b, 0xfff3bf] });
+            this.organos.ojo.parpadear();
+            this.organos.ojo.mirar(f.x, f.y);
+            var frases = ['¡Se abrió el primero! Los ojos ven su color amarillo.', '¡Otro girasol abre sus pétalos con la luz!', '¡Ya van tres! Mira cuántos colores.'];
+            if (this.abiertos < 4) this.ctx.decir({ voz: this.abiertos === 2 ? 'zeus' : 'zoe', texto: frases[this.abiertos - 1] }, { estado: 'acierto' });
+            if (this.abiertos >= 4 && this.finGiras) {
+                var fin = this.finGiras;
+                this.finGiras = null;
+                await U.esperar(this, 500);
+                await this.organos.ojo.reaccion('acierto');
+                await this.ctx.decir({ voz: 'zeus', texto: '¡Con la luz del sol, los ojos ven los colores de las flores!' }, { estado: 'acierto' });
+                fin();
+            }
+        },
+
+        rondaGirasoles: async function () {
+            var scene = this;
+            var m = this.m();
+            this.modo = 'girasoles';
+            // Amanece otra vez: las luces de la noche se apagan y el sol sale detrás de las montañas.
+            (this.cosasNoche || []).forEach(function (k) {
+                k.encendida = false;   // si no, update() vuelve a encender el brillo
+                scene.tweens.add({ targets: [k.cont, k.glow].filter(Boolean), alpha: 0, duration: 800 });
+                (k.bichos || []).forEach(function (b) { scene.tweens.add({ targets: b, alpha: 0, duration: 800 }); });
+            });
+            this.ventanaLuz.setAlpha(0);
+            this.casaSol = { x: m.cx, y: m.h * 0.3 };
+            this.sol.setVisible(true).setPosition(m.cx, m.horizonte + 60).setDepth(-27);
+            this.tweens.add({ targets: this.organos.ojo, sueno: 0.25, duration: 1200 });
+            this.ponerLuz(0.7, 1800);
+            await U.tween(this, { targets: this.sol, y: this.casaSol.y, duration: 1800, ease: 'Sine.easeOut' });
+            this.sol.setDepth(12);
+            var tam = m.obj * 0.85;
+            var xs = [0.13, 0.36, 0.64, 0.87];
+            this.girasoles = xs.map(function (fx, i) {
+                var f = scene.crearGirasol(m.w * fx, m.orilla + tam * 0.05 + (i % 2) * tam * 0.12, tam);
+                f.setScale(0.01);
+                scene.tweens.add({ targets: f, scale: 1, duration: 500, delay: 250 * i, ease: 'Back.easeOut' });
+                return f;
+            });
+            this.abiertos = 0;
+            await U.esperar(this, 1200);
+            await this.ctx.decir({ voz: 'zeus', texto: '¡Amaneció! Las flores duermen. Lleva el sol cerquita de cada flor para que abra con su luz.' });
+            this.pista = U.crearPista(this, 9000, function (cancelado) {
+                var f = scene.girasoles.find(function (g) { return !g.abierta; });
+                if (!f) return Promise.resolve();
+                return scene.ctx.mano({ punto: { x: scene.sol.x, y: scene.sol.y }, holdMs: 300, cancelado: cancelado, arrastre: { dx: f.x - scene.sol.x, dy: f.y - m.obj * 0.7 - scene.sol.y, durMs: 1100 }, onDuranteArrastre: function () { } });
+            });
+            this.pista.reiniciar();
+            this.esperando = true;
+            this.ocupado = false;
+            await new Promise(function (r) { scene.finGiras = r; });
+            this.pista.parar();
+            this.ctx.quitarMano();
+            this.arr.cont = null;
+            this.modo = '';
+        },
+
         /* ── API ───────────────────────────────────────────────── */
 
         demo: async function () {
@@ -576,9 +688,16 @@
         jugar: async function () {
             await this.rondaSol();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(0);
             await this.rondaNubes();
             if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(1);
             await this.rondaNoche();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(2);
+            await this.rondaGirasoles();
+            if (!this.ctx.vivo()) return;
+            if (this.ganarNivel) await this.ganarNivel(3);
         },
 
         fiestaFinal: async function () {
@@ -586,6 +705,7 @@
             var m = this.m();
             // Amanece otra vez: el sol sale con el arcoíris completo.
             (this.cosasNoche || []).forEach(function (k) {
+                k.encendida = false;   // si no, update() vuelve a encender el brillo
                 scene.tweens.add({ targets: [k.cont, k.glow].filter(Boolean), alpha: 0, duration: 800 });
                 (k.bichos || []).forEach(function (b) { scene.tweens.add({ targets: b, alpha: 0, duration: 800 }); });
             });
@@ -617,6 +737,7 @@
                 this.sol.halo.alpha = 0.45 + 0.1 * Math.sin(time / 400);
             }
             this.moverNubes(dt);
+            if (this.modo === 'girasoles') this.luzGirasoles(dt);
             this.dibujarRayos(time);
             // Brillos del agua.
             var b = this.brillosLago;
@@ -653,6 +774,7 @@
                 ocupado: !!this.ocupado,
                 tapado: !!this.solTapado,
                 arco: this.arco,
+                girasoles: (this.girasoles || []).map(function (f) { return { x: Math.round(f.x), y: Math.round(f.y), on: !!f.abierta }; }),
                 sol: this.sol ? { x: Math.round(this.sol.x), y: Math.round(this.sol.y) } : null,
                 nubes: this.nubes.map(function (n) { return { x: Math.round(n.img.x), y: Math.round(n.img.y) }; }),
                 noche: (this.cosasNoche || []).map(function (k) { return { id: k.id, x: Math.round(k.cont.x), y: Math.round(k.cont.y), on: !!k.encendida }; }),
@@ -661,5 +783,5 @@
         }
     };
 
-    global.PedniaAmanecer = B.crearMotor({ id: 'amanecer', fondo: '#3b8fe0', escena: escena });
+    global.PedniaAmanecer = B.crearMotor({ id: 'amanecer', fondo: '#3b8fe0', extras: true, escena: escena });
 })(typeof window !== 'undefined' ? window : this);
