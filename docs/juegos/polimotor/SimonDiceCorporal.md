@@ -23,7 +23,7 @@ en el centro; Zoe 3D abajo a la izquierda con su nube; a la derecha la **marques
 (¡OBSERVA! / ¡REPITE LA SECUENCIA!) y las ranuras numeradas (una por movimiento). Abajo, los **tres botones
 redondos visibles**, que `script.js` vuelve a armar en cada ítem (`ponerBotones(ids)`; el `<footer id="botonera">`
 sale vacío del HTML).
-Arriba: Inicio, reiniciar, "3-4 años", título y la franja de progreso (RONDA n DE 3 · ÍTEM n DE 4 · 3 × 4 puntos ·
+Arriba a la derecha: reiniciar y volver. Abajo a la derecha: volumen (en la esquina) y accesibilidad. En el centro el título, y debajo la franja de progreso (RONDA n DE 3 · ÍTEM n DE 4 · 3 × 4 puntos ·
 barra n/12).
 
 **Pedidos del enunciado** (2026-11-13): HTML/CSS/JS vanilla + Phaser 4; reutilizar personajes (sin SVG nuevos de
@@ -132,7 +132,7 @@ Zeus sube ~58 px en el pico y vuelve exactamente al piso al terminar.
 | Archivo | Global | Qué hace |
 |---|---|---|
 | `reglas.js` | `ReglasSimon` | Puro (también `module.exports`): estados y transiciones, `sortearVisibles` (los tres movimientos a la vista en cada ítem), `generarSecuencias` (sorteo repetido hasta cumplir `problemasSecuencias`: el largo que pide el ítem, solo movimientos visibles, sin seguidas iguales, el primero ≠ demo, sin ítems repetidos), `visiblesActuales`, `tocar`, `comparar` (por id y en orden), `avanzar`, `siguienteRonda`, `reintentar`, `progreso`, `revisarJuego`. |
-| `iconos.js` | `IconosSimon` | Ilustraciones propias de los seis botones (SVG 200 × 200), el mismo niño en cada pose: tocándose la cabeza, manos aplaudiendo, piernas zapateando, saltando, tocándose los pies y con los brazos abiertos. Ayudas `carita(cx, cy, r)` y `miembro(d, grosor)` para que las seis se dibujen igual. |
+| `iconos.js` | `IconosSimon` | Los seis dibujos del niño (PNG en `img/iconos`): tocar la cabeza, aplaudir, zapatear, saltar, tocar los pies y abrir los brazos. `svg(id)` devuelve el `<img>`; `dataUri(id)` la ruta, para las ranuras de la secuencia. |
 | `sonidos.js` | `SonidosSimon` | Web Audio sin archivos: `seleccion`, `brillo`, `aplauso`, `zapateo`, `nota(f)` (marimba), `suave`, `fanfarria`, `redoble`. Se apagan con "Efectos" en el menú de sonido. |
 | `escenario-phaser.js` | `EscenarioSimon` | Capa Phaser 4 transparente a pantalla completa (sin toques): `estrellas`, `destello`, `ondas`, `notas`, `chispas`, `confeti`, `lluviaEstrellas`, `limpiar`. Tweens con respaldo por tiempo. |
 | `zeus-3d.js` | `Zeus3D` | Zeus 3D en la tarima, con el modelo propio del juego: `hacer(id, {ms, alGolpe})` reproduce el clip del movimiento, `gesto`, `hablar`, `detener`, `punto`. |

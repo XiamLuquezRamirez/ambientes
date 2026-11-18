@@ -148,12 +148,10 @@ body.esperando-inicio #principal,
 body.esperando-inicio #guia,
 body.esperando-inicio #menu-vol,
 body.esperando-inicio #menu-acc,
-body.esperando-inicio #menu-pantalla,
 body.intro3d-activa #principal,
 body.intro3d-activa #guia,
 body.intro3d-activa #menu-vol,
-body.intro3d-activa #menu-acc,
-body.intro3d-activa #menu-pantalla {
+body.intro3d-activa #menu-acc {
   visibility: hidden;
 }
 
@@ -231,12 +229,12 @@ body.intro3d-activa #menu-pantalla {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 220px 2px 16px;
+  padding: 10px 16px 2px;
   flex: 0 0 auto;
   min-height: 72px;
 }
 
-.hud-nav { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; z-index: 1; }
+.hud-nav { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; margin-left: auto; z-index: 1; }
 
 .btn-inicio {
   display: inline-flex;
@@ -264,60 +262,6 @@ body.intro3d-activa #menu-pantalla {
   display: inline-grid;
   place-items: center;
   border: 4px solid #fff;
-}
-
-.hud-edad {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 70px;
-  height: 64px;
-  padding: 4px 10px 8px;
-  background: #1971c2;
-  color: #fff;
-  font-size: 15px;
-  line-height: 1;
-  font-weight: 700;
-  clip-path: polygon(0 0, 100% 0, 100% 84%, 50% 100%, 0 84%);
-  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.6);
-}
-
-.hud-edad strong { font-size: 26px; }
-
-/* Título "¿DÓNDE LO USO?": letras de colores con borde blanco, centrado respecto a la pantalla. */
-.hud-titulo {
-  position: absolute;
-  left: 50%;
-  top: 6px;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-.hud-titulo h1 {
-  margin: 0;
-  font-size: clamp(30px, 4vw, 54px);
-  font-weight: 700;
-  line-height: 1.05;
-  white-space: nowrap;
-  letter-spacing: 1px;
-}
-
-.hud-titulo h1 span {
-  display: inline-block;
-  color: var(--c);
-  -webkit-text-stroke: 7px #fff;
-  paint-order: stroke fill;
-  text-shadow: 0 5px 0 rgba(92, 59, 30, 0.25);
-  animation: tituloSalta 3.2s ease-in-out infinite;
-}
-
-.hud-titulo h1 span:nth-child(odd) { animation-delay: -1.6s; }
-.hud-titulo h1 .hud-espacio { width: 0.3em; }
-
-@keyframes tituloSalta {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
 }
 
 .escena {
@@ -503,8 +447,8 @@ body.alto-contraste .zoe-nube::after { border-top-color: #000; }
 .progreso-box {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 8px 22px;
+  gap: 10px;
+  padding: 6px 12px 6px 8px;
   border-radius: 999px;
   background: var(--tc-panel);
   border: 4px solid #ffc94d;
@@ -543,7 +487,7 @@ body.alto-contraste .zoe-nube::after { border-top-color: #000; }
 
 .progreso-barra {
   position: relative;
-  width: clamp(160px, 22vw, 320px);
+  width: clamp(72px, 8vw, 110px);
   height: 22px;
   border-radius: 999px;
   background: #fff1d6;
@@ -616,32 +560,34 @@ body.alto-contraste .zoe-nube::after { border-top-color: #000; }
   margin: 8px 0;
 }
 
-/* ---------------------------------------------------------------- menús redondos (arriba a la derecha) */
+/* ---------------------------------------------------------------- menús redondos (abajo a la derecha) */
 
+/* Volumen en la esquina; accesibilidad a su izquierda. El panel abre hacia arriba. */
 .menu-acc {
   position: fixed;
-  top: 10px;
-  right: 16px;
+  top: auto;
+  bottom: 14px;
+  right: 14px;
   z-index: 1500;
+  display: flex;
+  align-items: flex-end;
 }
 
-#menu-acc { right: 84px; }
-#menu-pantalla { right: 152px; }
+#menu-acc { right: 70px; }
 
 .menu-acc-fab {
-  width: 58px;
-  height: 58px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 4px solid #fff;
+  border: 3px solid #fff;
   background: linear-gradient(180deg, #ffa94d, #f76707);
   color: #fff;
-  font-size: 25px;
+  font-size: 20px;
   cursor: pointer;
-  box-shadow: 0 5px 0 #d9480f, 0 8px 16px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 4px 0 #d9480f, 0 6px 12px rgba(0, 0, 0, 0.18);
 }
 
-#menu-acc .menu-acc-fab,
-#menu-pantalla .menu-acc-fab {
+#menu-acc .menu-acc-fab {
   background: linear-gradient(180deg, #4dabf7, #1971c2);
   box-shadow: 0 5px 0 #1864ab, 0 8px 16px rgba(0, 0, 0, 0.18);
 }
@@ -651,7 +597,8 @@ body.alto-contraste .zoe-nube::after { border-top-color: #000; }
 .menu-acc-panel {
   position: absolute;
   right: 0;
-  top: 70px;
+  top: auto;
+  bottom: 58px;
   width: min(320px, calc(100vw - 32px));
   max-height: min(70vh, 480px);
   overflow: auto;
@@ -719,25 +666,15 @@ body.alto-contraste .uso-fondo { filter: brightness(0.35) saturate(0.6); }
   .hud-top { min-height: 62px; padding-top: 6px; }
   .btn-inicio { height: 48px; font-size: 19px; padding: 0 14px; }
   .btn-round { width: 48px; height: 48px; font-size: 20px; }
-  .hud-edad { height: 54px; min-width: 60px; }
-  .hud-edad strong { font-size: 22px; }
-  .menu-acc-fab { width: 50px; height: 50px; font-size: 21px; }
-  #menu-acc { right: 74px; }
-  #menu-pantalla { right: 132px; }
-  .menu-acc-panel { top: 60px; }
+  .menu-acc-fab { width: 42px; height: 42px; font-size: 18px; }
+  #menu-acc { right: 58px; }
+  .menu-acc-panel { bottom: 52px; }
   .barra-abajo { height: 62px; }
 }
 
-/* Tabletas (hasta 1100 px de ancho): el título se achica para no chocar con los botones. */
-@media (max-width: 1100px) {
-  .hud-top { padding-right: 196px; }
-  .hud-titulo h1 { font-size: clamp(26px, 3.4vw, 40px); }
-}
-
-/* Tableta en vertical: el título pasa debajo de los botones. */
+/* Tableta en vertical: la ronda queda en su propia fila. */
 @media (max-aspect-ratio: 1/1) {
   .hud-top { flex-wrap: wrap; padding-right: 16px; min-height: 0; }
-  .hud-titulo { position: static; transform: none; flex: 1 1 100%; text-align: center; }
   .progreso-box { gap: 10px; padding: 6px 14px; }
 }
 
@@ -753,7 +690,6 @@ body.alto-contraste .uso-fondo { filter: brightness(0.35) saturate(0.6); }
   .uso-percha,
   .uso-reflejo,
   .uso-estrella,
-  .hud-titulo h1 span,
   .btn-comenzar { animation: none !important; }
 }
 

@@ -84,6 +84,45 @@
       ],
       "port": 8021,
       "autoPort": false
+    },
+    {
+      "name": "juegos-mapa",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8029",
+        "--directory",
+        "public"
+      ],
+      "port": 8029,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-burbujas",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8037",
+        "--directory",
+        "public"
+      ],
+      "port": 8037,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-gravedad",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8033",
+        "--directory",
+        "public"
+      ],
+      "port": 8033,
+      "autoPort": false
     }
   ]
 }

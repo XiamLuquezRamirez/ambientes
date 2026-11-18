@@ -615,13 +615,10 @@ body.fiesta .pr-cono { animation-duration: 0.4s; }
   padding: clamp(6px, 0.9vw, 12px);
   border: 5px solid #fff;
   border-radius: clamp(18px, 2vw, 28px);
-  background:
-    radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.45), transparent 62%),
-    linear-gradient(180deg, var(--col-claro, #fff), var(--col, #888));
+  background: var(--col, #888);
   box-shadow:
     0 8px 0 rgba(0, 0, 0, 0.3),
-    0 14px 26px rgba(0, 0, 0, 0.35),
-    inset 0 -8px 16px rgba(0, 0, 0, 0.18);
+    0 14px 26px rgba(0, 0, 0, 0.35);
   color: #fff;
   cursor: pointer;
   overflow: hidden;

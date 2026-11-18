@@ -235,8 +235,8 @@ body.intro3d-activa .menu-acc {
   display: flex;
   align-items: center;
   gap: 12px;
-  /* a la derecha quedan los dos botones redondos (accesibilidad y sonido) */
-  padding: 10px 150px 6px 16px;
+  /* a la derecha: reloj, progreso, reiniciar y volver. Accesibilidad y sonido van abajo. */
+  padding: 10px 16px 6px;
   flex: 0 0 auto;
   position: relative;
   z-index: 3;
@@ -839,24 +839,25 @@ body.en-final .guia { position: relative; z-index: 3; }
 
 /* ---------------------------------------------------------------- botones redondos (abajo a la derecha) */
 
-/* Arriba a la derecha, en la fila del reloj: abajo la colina usa toda la altura. */
+/* Volumen en la esquina; accesibilidad justo a su izquierda. El panel abre hacia arriba. */
 .menu-acc {
   position: fixed;
   right: 14px;
-  top: 12px;
+  bottom: 14px;
+  top: auto;
   z-index: 1500;
 }
 
-#menu-acc { right: 80px; }
+#menu-acc { right: 70px; }
 
 .menu-acc-fab {
-  width: 58px;
-  height: 58px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 4px solid #fff;
+  border: 3px solid #fff;
   background: #1565c0;
   color: #fff;
-  font-size: 28px;
+  font-size: 22px;
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
 }
@@ -866,7 +867,8 @@ body.en-final .guia { position: relative; z-index: 3; }
 .menu-acc-panel {
   position: absolute;
   right: 0;
-  top: 68px;
+  top: auto;
+  bottom: 58px;
   width: min(320px, calc(100vw - 32px));
   max-height: min(70vh, 480px);
   overflow: auto;
@@ -947,11 +949,10 @@ body.alto-contraste .topos-cielo { background: #0b1d33; }
   .letrero { padding: 8px 30px; }
   .hud-reloj { min-width: 100px; padding: 6px 12px; }
   .hud-progreso { width: clamp(130px, 18vw, 190px); }
-  .hud-top { padding-right: 130px; }
-  .menu-acc { right: 10px; top: 12px; }
-  .menu-acc-fab { width: 52px; height: 52px; font-size: 22px; }
-  #menu-acc { right: 68px; }
-  .menu-acc-panel { top: 62px; }
+  .menu-acc { right: 10px; bottom: 10px; }
+  .menu-acc-fab { width: 42px; height: 42px; font-size: 18px; }
+  #menu-acc { right: 58px; }
+  .menu-acc-panel { bottom: 52px; }
 }
 
 /* Tableta en vertical: el letrero pasa a su propia fila, debajo de los botones y el reloj. */

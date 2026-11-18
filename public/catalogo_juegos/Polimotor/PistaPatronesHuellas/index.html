@@ -102,9 +102,9 @@
 	</div>
 
 	<div id="principal">
-		<!-- Zona superior: título a la izquierda; Inicio y reiniciar a la derecha. El centro queda libre para el letrero del gimnasio. -->
-		<!-- Cabecera en una sola fila: ronda y estrellas a la izquierda, los cajones del patrón centrados arriba e
-		     Inicio y reiniciar a la derecha. Sin título, sin barra 0/9 y sin botón de fase (pedido del usuario): la fase
+		<!-- Zona superior: título a la izquierda; reiniciar y volver a la derecha. El centro queda libre para el letrero del gimnasio. -->
+		<!-- Cabecera en una sola fila: ronda y estrellas a la izquierda, los cajones del patrón centrados arriba y
+		     reiniciar y volver a la derecha. Sin título, sin barra 0/9 y sin botón de fase (pedido del usuario): la fase
 		     se nota por el color del marco de los cajones (dorado = mira, verde = repite). -->
 		<header class="hud-top">
 			<div id="progreso-box" class="progreso-box" aria-live="polite">
@@ -130,8 +130,8 @@
 				</div>
 			</aside>
 			<div class="hud-nav hud-nav-der">
-				<button type="button" onclick="history.back()" class="btn-inicio" title="Volver al menú"><i class="fa-solid fa-house" aria-hidden="true"></i> <span>Inicio</span></button>
 				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round btn-recargar" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</header>
 
@@ -241,11 +241,11 @@
 	<script src="../../shared/pednia-audio.js?v=20261028t"></script>
 	<script src="../../shared/pednia-fx.js?v=20261107d"></script>
 	<script src="reglas.js?v=20261114b"></script>
-	<script src="iconos.js?v=20261114a"></script>
+	<script src="iconos.js?v=20261118a"></script>
 	<script src="sonidos.js?v=20261117b"></script>
 	<script src="escenario-phaser.js?v=20261114a"></script>
 	<script src="demo.js?v=20261114a"></script>
 	<script src="script.js?v=20261117a"></script>
-	<script type="module" src="aula-pista.js?v=20261114j"></script>
+	<script type="module" src="aula-pista.js?v=20261118d"></script>
 </body>
 </html>

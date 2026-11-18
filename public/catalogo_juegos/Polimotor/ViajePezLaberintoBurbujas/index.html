@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="../../../assets/css/sweetalert2.min.css">
 	<script src="../../../assets/js/jquery-4.0.0.min.js"></script>
 	<script src="../../../assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css?v=20261117b">
+	<link rel="stylesheet" href="style.css?v=20261118a">
 	<link rel="stylesheet" href="../comun/inicio-fondo.css?v=20261030d">
 	<link rel="stylesheet" href="../comun/interfaz.css?v=20261022o">
 	<script src="../comun/inicio-fondo.js?v=20261030d"></script>
@@ -74,15 +74,12 @@
 	<div style="display: none; background-color: rgba(255, 255, 255, 0.664); width: 100%; height: 100%; position: fixed; z-index: 100;" id="fondo_blanco"></div>
 
 	<div id="principal">
-		<!-- Arriba: edad a la izquierda, título centrado; Inicio y reiniciar a la derecha. -->
+		<!-- Arriba: reiniciar y volver a la derecha (sin título). -->
 		<header class="hud-top">
-			<div class="hud-hueco"><span class="hud-edad" title="Edad"><strong>3-4</strong> años</span></div>
-			<div class="hud-titulo">
-				<h1 aria-label="¡El Laberinto de Burbujas!"><span class="hud-titulo-pre">El viaje del pez por</span><span class="hud-titulo-linea"><span style="--c:#66d9e8">¡</span><span style="--c:#3bc9db">E</span><span style="--c:#4dabf7">L</span><span class="hud-espacio"> </span><span style="--c:#74c0fc">L</span><span style="--c:#63e6be">A</span><span style="--c:#38d9a9">B</span><span style="--c:#ff8787">E</span><span style="--c:#99e9f2">R</span><span style="--c:#22b8cf">I</span><span style="--c:#a5d8ff">N</span><span style="--c:#96f2d7">T</span><span style="--c:#ffa8a8">O</span><span class="hud-espacio"> </span><span style="--c:#66d9e8">D</span><span style="--c:#3bc9db">E</span><span class="hud-espacio"> </span><span style="--c:#4dabf7">B</span><span style="--c:#74c0fc">U</span><span style="--c:#63e6be">R</span><span style="--c:#38d9a9">B</span><span style="--c:#ff8787">U</span><span style="--c:#99e9f2">J</span><span style="--c:#22b8cf">A</span><span style="--c:#a5d8ff">S</span><span style="--c:#96f2d7">!</span></span></h1>
-			</div>
+			<div class="hud-hueco"></div>
 			<div class="hud-nav hud-nav-der">
-				<button type="button" onclick="history.back()" class="btn-inicio" title="Volver al menú"><i class="fa-solid fa-house" aria-hidden="true"></i> <span>Inicio</span></button>
 				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round btn-recargar" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</header>
 

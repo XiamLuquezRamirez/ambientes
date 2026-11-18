@@ -333,14 +333,16 @@ body.intro3d-activa #menu-acc {
 
 /* Zona superior */
 .hud-top {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 12px;
   padding: 10px 16px 4px;
   flex: 0 0 auto;
 }
 
-.hud-nav { display: flex; align-items: center; gap: 8px; }
+.hud-nav { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 
 .btn-round {
   width: 62px;
@@ -352,13 +354,14 @@ body.intro3d-activa #menu-acc {
 }
 
 .hud-titulo {
-  flex: 1 1 auto;
-  min-width: 0;
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  pointer-events: none;
 }
 
 .hud-titulo h1 {
@@ -375,22 +378,6 @@ body.intro3d-activa #menu-acc {
   box-shadow: 0 5px 0 rgba(142, 79, 196, 0.25);
 }
 
-.hud-edad {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 16px;
-  border-radius: 999px;
-  background: var(--tc-oro);
-  border: 3px solid #fff;
-  color: #6b3b00;
-  font-size: clamp(15px, 1.6vw, 21px);
-  font-weight: 700;
-  white-space: nowrap;
-  box-shadow: 0 4px 0 rgba(180, 120, 0, 0.3);
-}
-
-/* Progreso: una burbuja por parte del cuerpo; se llena con una estrella al acertar. */
 .progreso-partes {
   display: flex;
   align-items: center;
@@ -865,8 +852,8 @@ body.alto-contraste .progreso-ronda { color: #fff; }
 
 /* Tabletas en vertical y celulares: la guía pasa abajo, en una fila, y el vestidor gana todo el ancho. */
 @media (max-aspect-ratio: 1/1), (max-width: 760px) {
-  .hud-top { flex-wrap: wrap; justify-content: center; }
-  .hud-titulo { order: 3; flex-basis: 100%; }
+  .hud-top { flex-wrap: wrap; justify-content: flex-start; }
+  .hud-titulo { position: static; top: auto; left: auto; transform: none; order: 3; flex-basis: 100%; }
   .escena { flex-direction: column; padding: 0 10px 8px; }
   .escenario-zona { order: 1; }
   .guia {
@@ -903,9 +890,7 @@ body.alto-contraste .progreso-ronda { color: #fff; }
 @media (max-width: 560px) {
   .hud-top { gap: 6px; padding: 6px 8px 2px; }
   .btn-round { width: 46px; height: 46px; font-size: 20px; }
-  .hud-titulo { flex-wrap: nowrap; gap: 6px; }
   .hud-titulo h1 { min-width: 0; font-size: 14px; padding: 4px 10px; border-width: 3px; box-shadow: none; }
-  .hud-edad { font-size: 12px; padding: 3px 8px; border-width: 2px; box-shadow: none; }
   .progreso-partes { gap: 6px; padding: 3px 8px; border-width: 3px; box-shadow: none; }
   .progreso-ronda { font-size: 12px; }
   .progreso-iconos { gap: 4px; }
