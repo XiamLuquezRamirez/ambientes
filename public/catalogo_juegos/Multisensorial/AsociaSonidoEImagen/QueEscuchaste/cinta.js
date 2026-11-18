@@ -17,6 +17,7 @@
     var K = global.AsociaKit;
     var Ut = global.PedniaParejaBase.util;
     var Act = global.AsociaActores;
+    var A = global.PedniaArte;
     var esperar = Ut.esperar;
     var tw = Ut.tween;
     var rnd = Ut.rnd;
@@ -35,7 +36,6 @@
         vent: 660,                                   // pórtico de inspección
         cornisa: { y: 472, x0: 790, x1: 1050 },      // donde quedan los entregados
         consola: { x: 400, ancho: 220, base: 710 },  // centro y piso de la consola
-        palomas: 688,
         arriba: '#7491a2'
     };
     var PAL = { w: 500, h: 341.44, pivX: 310, pivY: 225, bola: 67, bolaR: 49, util: 406, pie: 323.65,
@@ -82,7 +82,6 @@
             L.palanca = { x: piv.x, y: piv.y - largo * 0.5, largo: largo, piv: piv.y, s: s, arte: true };
             var rx0 = m.sx(NAVE.cornisa.x0);
             L.repisa = { x: rx0, y: m.sy(NAVE.cornisa.y), w: Math.min(m.sx(NAVE.cornisa.x1), W - 12) - rx0, arte: true };
-            L.yPalomas = Math.min(H - 20, m.sy(NAVE.palomas));
             return L;
         },
 
@@ -132,8 +131,6 @@
                 g.bx = bx; g.lado = k;
                 self.tiras.push(g);
             });
-            var V = this.montarVida(keep);
-            if (V) V.palomas(3, L.yPalomas || Math.min(L.H - 30, L.cinta.y + L.cinta.alto + L.tam * 0.55 + 40), L.W * 0.05, Math.max(L.W * 0.1, L.palanca.x - (L.palanca.arte ? L.palanca.largo * 1.7 : 80)));
             this.montarPalanca(keep);
             this.montarHud(keep);
             this.coleccion.forEach(function (a, k) { var p = self.sitioRepisa(k); a.cont.setPosition(p.x, p.y).setScale(p.esc); });
@@ -141,6 +138,47 @@
         },
 
         yObj: function () { return this.L.cinta.y - this.L.tam * 0.42; },
+
+        /**
+         * HUD propio: la bocina del kit y las estrellas en una placa (como ¿Qué suena? /
+         * ¿Qué objeto suena?), con más separación y lejos de las ondas de la bocina.
+         */
+        montarHud: function (keep) {
+            var L = this.L;
+            var b = keep(this.add.container(L.bocina.x, L.bocina.y).setDepth(80));
+            var halo = this.add.circle(0, 0, L.bocina.r * 1.25, 0xffffff, 0.35);
+            var plato = this.add.circle(0, 0, L.bocina.r, 0xff922b).setStrokeStyle(5, 0xffffff);
+            var luz = this.add.circle(-L.bocina.r * 0.3, -L.bocina.r * 0.35, L.bocina.r * 0.35, 0xffffff, 0.3);
+            var icono = this.add.image(0, 0, A.textura(this, 'bocina', 128)).setDisplaySize(L.bocina.r * 1.35, L.bocina.r * 1.35);
+            b.add([halo, plato, luz, icono]);
+            b.halo = halo;
+            this.bocina = b;
+            this.ondasG = keep(this.add.graphics().setDepth(79));
+            this.estrellas = [];
+            var n = 4;
+            // Las ondas llegan a ~2× el radio; la placa empieza más allá.
+            var x0 = L.bocina.x + L.bocina.r * 2.15;
+            var libre = Math.max(80, L.W - x0 - 12);
+            var tam = Math.max(22, Math.min(40, L.bocina.r * 0.85, (libre - 16) / (n + 0.35 * (n - 1) + 0.7)));
+            var gap = tam * 0.35;
+            var pad = tam * 0.32;
+            var radio = tam * 0.34;
+            var w = tam * n + gap * (n - 1) + pad * 2;
+            var h = tam + pad * 1.15;
+            var cy = L.bocina.y;
+            if (x0 + w > L.W - 8) x0 = Math.max(8, L.W - 8 - w);
+            var g = keep(this.add.graphics().setDepth(79.5));
+            g.fillStyle(0xd62a7f, 1);
+            g.fillRoundedRect(x0, cy - h / 2, w, h, radio);
+            g.fillStyle(0xf74d9c, 1);
+            g.fillRoundedRect(x0 + tam * 0.11, cy - h / 2 + tam * 0.11, w - tam * 0.22, h - tam * 0.22, radio * 0.82);
+            for (var i = 0; i < n; i++) {
+                var e = keep(this.add.image(x0 + pad + tam / 2 + i * (tam + gap), cy, A.textura(this, 'estrella', 128)).setDisplaySize(tam, tam).setDepth(80));
+                if (i >= this.nivelActual) e.setTint(0x9b6f86).setAlpha(0.5);
+                this.estrellas.push(e);
+            }
+            this.montarPresentador();
+        },
 
         pintarEstacion: function (x, w, h) {
             var L = this.L;
