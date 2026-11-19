@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="../../../assets/css/sweetalert2.min.css">
 	<script src="../../../assets/js/jquery-4.0.0.min.js"></script>
 	<script src="../../../assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css?v=20261112g">
+	<link rel="stylesheet" href="style.css?v=20261118c">
 	<link rel="stylesheet" href="../comun/inicio-fondo.css?v=20261030d">
 	<link rel="stylesheet" href="../comun/interfaz.css?v=20261022o">
 	<script src="../comun/inicio-fondo.js?v=20261030d"></script>
@@ -109,12 +109,8 @@
 	</div>
 
 	<div id="principal">
-		<!-- Zona superior: regreso, letrero de madera, cuenta regresiva y progreso. -->
+		<!-- Zona superior: letrero al centro; reloj, progreso, reiniciar y volver a la derecha. -->
 		<header class="hud-top">
-			<div class="hud-nav">
-				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
-				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
-			</div>
 			<div id="letrero" class="letrero" aria-live="polite">
 				<span class="letrero-clavo letrero-clavo-i" aria-hidden="true"></span>
 				<span id="letrero-texto" class="letrero-texto"></span>
@@ -129,6 +125,10 @@
 					<span class="hud-progreso-rotulo"><i class="fa-solid fa-star" aria-hidden="true"></i> <span id="progreso-rotulo">PARTES</span> <strong id="progreso-num">0 / 12</strong></span>
 					<span class="hud-progreso-barra"><span id="progreso-relleno" class="hud-progreso-relleno"></span></span>
 				</div>
+			</div>
+			<div class="hud-nav">
+				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</header>
 

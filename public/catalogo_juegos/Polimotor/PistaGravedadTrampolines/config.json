@@ -1,0 +1,454 @@
+{
+  "nombre": "La Pista de Gravedad y Trampolines",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "radioEsfera": 0.45,
+    "velocidadMax": 4.2,
+    "aceleracionMax": 7.5,
+    "respuesta": 3.4,
+    "ganancia": 2.2,
+    "freno": 2.4,
+    "gravedad": 5.5,
+    "toleranciaAltura": 0.35,
+    "sonda": 0.3,
+    "margenCaida": 0.22,
+    "distanciaAlerta": 0.85,
+    "radioSeguro": 1.7,
+    "radioMeta": 1.5,
+    "radioTrampolin": 0.95,
+    "duracionSalto": 1.25,
+    "alturaSalto": 2.4,
+    "ayudaMs": 10000,
+    "ayudaRepetirMs": 14000,
+    "orientacionMs": 9000,
+    "vozAgujeroMs": 14000,
+    "vozTrampolinMs": 16000,
+    "vozParedMs": 12000,
+    "distanciaVozTrampolin": 5.5
+  },
+  "pistas": [
+    {
+      "id": "pista1",
+      "titulo": "RECORRIDO 1",
+      "nombre": "El primer descenso",
+      "ancho": 3.4,
+      "aleatorio": {
+        "bloques": 5,
+        "agujeros": 1,
+        "trampolines": 0,
+        "cambiosNivel": 0,
+        "puentes": 0,
+        "postes": 0,
+        "rampas": 2,
+        "curvas": 0.55,
+        "curvasRampa": 0
+      },
+      "inicio": {
+        "x": -14,
+        "z": 3,
+        "h": 3,
+        "rumbo": 0
+      },
+      "tramos": [
+        {
+          "t": "recto",
+          "largo": 5,
+          "ancho": 5
+        },
+        {
+          "t": "recto",
+          "largo": 5,
+          "dh": -1.4
+        },
+        {
+          "t": "recto",
+          "largo": 6,
+          "ancho": 4.4,
+          "seguro": true,
+          "agujeros": [
+            {
+              "t": 0.5,
+              "lado": 1.0,
+              "r": 0.9
+            }
+          ]
+        },
+        {
+          "t": "curva",
+          "radio": 3.6,
+          "angulo": 90
+        },
+        {
+          "t": "recto",
+          "largo": 4,
+          "dh": 0.9,
+          "seguro": true
+        },
+        {
+          "t": "curva",
+          "radio": 3.6,
+          "angulo": -90
+        },
+        {
+          "t": "recto",
+          "largo": 3
+        },
+        {
+          "t": "meta",
+          "radio": 2.8
+        }
+      ]
+    },
+    {
+      "id": "pista2",
+      "titulo": "RECORRIDO 2",
+      "nombre": "El muro de energía",
+      "ancho": 3.4,
+      "aleatorio": {
+        "bloques": 7,
+        "agujeros": 1,
+        "trampolines": 1,
+        "cambiosNivel": 0,
+        "puentes": 1,
+        "postes": 0,
+        "rampas": 2,
+        "curvas": 0.6,
+        "curvasRampa": 0
+      },
+      "inicio": {
+        "x": -16,
+        "z": 4,
+        "h": 3,
+        "rumbo": 0
+      },
+      "tramos": [
+        {
+          "t": "recto",
+          "largo": 5,
+          "ancho": 5
+        },
+        {
+          "t": "recto",
+          "largo": 4,
+          "dh": -1.2
+        },
+        {
+          "t": "curva",
+          "radio": 3.6,
+          "angulo": 90
+        },
+        {
+          "t": "recto",
+          "largo": 5,
+          "ancho": 4.4,
+          "seguro": true,
+          "agujeros": [
+            {
+              "t": 0.5,
+              "lado": -1.0,
+              "r": 0.9
+            }
+          ]
+        },
+        {
+          "t": "curva",
+          "radio": 3.6,
+          "angulo": -90
+        },
+        {
+          "t": "recto",
+          "largo": 5.5,
+          "ancho": 4,
+          "seguro": true
+        },
+        {
+          "t": "salto",
+          "largo": 2.6,
+          "muro": true
+        },
+        {
+          "t": "recto",
+          "largo": 4
+        },
+        {
+          "t": "recto",
+          "largo": 5,
+          "ancho": 1.9,
+          "puente": true
+        },
+        {
+          "t": "recto",
+          "largo": 2.5
+        },
+        {
+          "t": "meta",
+          "radio": 2.8
+        }
+      ]
+    },
+    {
+      "id": "pista3",
+      "titulo": "RECORRIDO 3",
+      "nombre": "El gran laberinto de gravedad",
+      "ancho": 3.4,
+      "aleatorio": {
+        "bloques": 9,
+        "agujeros": 2,
+        "trampolines": 1,
+        "cambiosNivel": 1,
+        "puentes": 1,
+        "postes": 1,
+        "rampas": 3,
+        "curvas": 0.65,
+        "curvasRampa": 1
+      },
+      "inicio": {
+        "x": -20,
+        "z": 2,
+        "h": 3,
+        "rumbo": 0
+      },
+      "tramos": [
+        {
+          "t": "recto",
+          "largo": 5,
+          "ancho": 5
+        },
+        {
+          "t": "recto",
+          "largo": 5,
+          "dh": -1.5
+        },
+        {
+          "t": "curva",
+          "radio": 3.6,
+          "angulo": 90
+        },
+        {
+          "t": "recto",
+          "largo": 6,
+          "ancho": 4.4,
+          "seguro": true,
+          "agujeros": [
+            {
+              "t": 0.45,
+              "lado": 1.0,
+              "r": 0.9
+            }
+          ]
+        },
+        {
+          "t": "curva",
+          "radio": 3.6,
+          "angulo": -90
+        },
+        {
+          "t": "recto",
+          "largo": 5.5,
+          "ancho": 4,
+          "seguro": true
+        },
+        {
+          "t": "salto",
+          "largo": 2.6,
+          "muro": true
+        },
+        {
+          "t": "recto",
+          "largo": 4.5,
+          "postes": [
+            {
+              "t": 0.6,
+              "lado": 0,
+              "r": 0.45
+            }
+          ]
+        },
+        {
+          "t": "curva",
+          "radio": 3.4,
+          "angulo": -90
+        },
+        {
+          "t": "recto",
+          "largo": 4,
+          "dh": 1.0,
+          "seguro": true
+        },
+        {
+          "t": "curva",
+          "radio": 3.4,
+          "angulo": 90
+        },
+        {
+          "t": "recto",
+          "largo": 6,
+          "ancho": 4.4,
+          "agujeros": [
+            {
+              "t": 0.45,
+              "lado": -1.0,
+              "r": 0.9
+            }
+          ]
+        },
+        {
+          "t": "recto",
+          "largo": 3.5,
+          "ancho": 4,
+          "seguro": true
+        },
+        {
+          "t": "salto",
+          "largo": 2.4,
+          "dh": 1.6,
+          "muro": true
+        },
+        {
+          "t": "recto",
+          "largo": 3
+        },
+        {
+          "t": "recto",
+          "largo": 5,
+          "ancho": 1.9,
+          "puente": true
+        },
+        {
+          "t": "curva",
+          "radio": 3.2,
+          "angulo": 60
+        },
+        {
+          "t": "recto",
+          "largo": 2.5
+        },
+        {
+          "t": "meta",
+          "radio": 3
+        }
+      ]
+    }
+  ],
+  "demoPista": {
+    "id": "demo",
+    "nombre": "Pista de práctica",
+    "ancho": 3.4,
+    "inicio": {
+      "x": -9,
+      "z": 2,
+      "h": 2,
+      "rumbo": 0
+    },
+    "tramos": [
+      {
+        "t": "recto",
+        "largo": 4,
+        "ancho": 4.4
+      },
+      {
+        "t": "recto",
+        "largo": 5.5,
+        "ancho": 4.4,
+        "agujeros": [
+          {
+            "t": 0.5,
+            "lado": 1.0,
+            "r": 0.9
+          }
+        ]
+      },
+      {
+        "t": "recto",
+        "largo": 4,
+        "ancho": 4
+      },
+      {
+        "t": "salto",
+        "largo": 2.6,
+        "muro": true
+      },
+      {
+        "t": "recto",
+        "largo": 3.5
+      },
+      {
+        "t": "meta",
+        "radio": 2.4
+      }
+    ]
+  },
+  "textos": {
+    "introZeus": "¡Siente la gravedad cero! Dirige la esfera por las rampas del laberinto, esquiva los agujeros del suelo y usa los trampolines para saltar por encima de los muros hasta la base de meta.",
+    "introNube": "¡Esquiva los agujeros y usa los trampolines!",
+    "demoMover": "¡Mira! Pon tu dedo en la pista y la esfera rueda hacia tu dedo.",
+    "demoAgujero": "¡Mueve la esfera suavemente para no caer en los agujeros!",
+    "demoTrampolin": "¡Apunta al trampolín amarillo para volar sobre la pared!",
+    "demoFin": "¡Ahora es tu turno! ¡Lleva la esfera hasta la meta!",
+    "demostracionBien": "¡Así se hace!",
+    "botonComenzar": "¡COMENZAR!",
+    "pistaArrastra": "Pon tu dedo sobre la pista, cerca de la esfera, y muévelo despacio: la esfera rueda hacia tu dedo.",
+    "agujero": "¡Mueve la esfera suavemente para no caer en los agujeros!",
+    "trampolin": "¡Apunta al trampolín amarillo para volar sobre la pared!",
+    "caida": "¡Uy, se cayó! ¡El rayo mágico la rescata! Sigue desde aquí.",
+    "pared": "¡La pared no se puede cruzar caminando! Busca el trampolín amarillo.",
+    "orientacion": "¡Mira los destellos! Te muestran el camino que sigue.",
+    "rampaBaja": "¡Rampa abajo! La esfera va más rápido, ¡con cuidado!",
+    "rampaSube": "¡Rampa arriba! Empuja con calma para subir.",
+    "progreso": "RECORRIDO",
+    "recorridoBien": "¡Recorrido superado! ¡Vamos por el siguiente!",
+    "recorridoNuevo": "¡Un recorrido nuevo, con más curvas y saltos! ¡Tú puedes!",
+    "cierre": "¡GENIALIDAD POLIMOTORA! Dominaste la gravedad, la aceleración y los saltos para superar el gran laberinto de coordinación.",
+    "finalTitulo": "¡GENIALIDAD POLIMOTORA!",
+    "finalSub": "Superaste el gran laberinto de coordinación",
+    "finalNube": "¡GENIALIDAD POLIMOTORA!",
+    "finalZeus": "¡Qué saltos tan geniales! ¡Eres campeón de la gravedad!",
+    "resumenTitulo": "¡LABERINTO SUPERADO!",
+    "resumenSub": "Dominaste la gravedad y los trampolines",
+    "resumenRecorridos": "Recorridos completados",
+    "resumenSaltos": "Saltos en trampolín",
+    "resumenRescates": "Rescates del rayo mágico",
+    "resumenTiempo": "Tiempo total",
+    "botonOtraVez": "VOLVER A JUGAR",
+    "botonInicio": "INICIO",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe, mira esta pista flotante en el espacio! Tiene rampas, curvas y trampolines."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Y hay agujeros en el suelo! Hay que mover la esfera con mucho cuidado."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Siente la gravedad cero! En las rampas la esfera baja rápido y sube despacio."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Usemos los trampolines amarillos para saltar los muros y llegar a la meta!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Laberintos de coordinación"
+    }
+  ]
+}

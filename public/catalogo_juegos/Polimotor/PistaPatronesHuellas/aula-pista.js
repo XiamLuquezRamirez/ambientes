@@ -51,7 +51,7 @@ const PLAT = {
     manoDerecha: { x: 3.75, z: -1.9, w: 3.3, d: 2.7 },
     pieIzquierdo: { x: -3.75, z: 2.2, w: 3.3, d: 2.7 },
     pieDerecho: { x: 3.75, z: 2.2, w: 3.3, d: 2.7 },
-    ambosPies: { x: 0, z: 6.3, w: 3.0, d: 1.8 }
+    ambosPies: { x: 0, z: 6.52, w: 3.4, d: 2.2 }
 };
 const CARRIL = { ancho: 1.9, zSalida: 4.95, zMeta: -6.55 };
 const ESCALA_ZEUS = 1.7;
@@ -160,32 +160,29 @@ async function texturaTapa(a, w, d) {
     const H = Math.round(512 * d / w);
     const t = lienzo(W, H);
     const x = t.x;
-    // fondo de la tapa con su color y borde blanco
-    const g = x.createLinearGradient(0, 0, W, H);
-    g.addColorStop(0, a.colorClaro || a.color);
-    g.addColorStop(0.75, a.color);
     rectRedondo(x, 8, 8, W - 16, H - 16, 46);
-    x.fillStyle = g;
+    x.fillStyle = a.color || "#888";
     x.fill();
     x.lineWidth = 16;
     x.strokeStyle = "#ffffff";
     x.stroke();
-    // brillo interior
-    rectRedondo(x, 30, 30, W - 60, H * 0.42, 34);
-    x.fillStyle = "rgba(255,255,255,0.14)";
-    x.fill();
-    // huella
     const img = await cargarImagen(window.IconosHuellas ? window.IconosHuellas.dataUri(a.id) : "");
-    const lado = Math.min(W * 0.5, H * 0.62);
+    const tam = Math.round(Math.min(58, W * 0.105));
     if (img) {
+        const ambos = a.id === "ambosPies";
+        const tope = H - tam * 1.7;
+        const caja = ambos ? Math.min(W * 0.74, tope * 0.78) : Math.min(W * 0.52, H * 0.62);
+        const aspecto = img.width / img.height;
+        let dw = caja * aspecto;
+        let dh = caja;
+        if (dw > (ambos ? W * 0.74 : caja)) { dw = ambos ? W * 0.74 : caja; dh = dw / aspecto; }
+        const y = ambos ? Math.max(6, tope - dh - 8) : H * 0.05;
         x.save();
-        x.shadowColor = "rgba(0,0,0,0.3)";
-        x.shadowOffsetY = 8;
-        x.drawImage(img, (W - lado) / 2, H * 0.06, lado, lado);
+        x.shadowColor = "rgba(0,0,0,0.28)";
+        x.shadowOffsetY = 6;
+        x.drawImage(img, (W - dw) / 2, y, dw, dh);
         x.restore();
     }
-    // nombre
-    const tam = Math.round(Math.min(58, W * 0.105));
     x.font = "700 " + tam + "px Fredoka, sans-serif";
     x.textAlign = "center";
     x.textBaseline = "middle";

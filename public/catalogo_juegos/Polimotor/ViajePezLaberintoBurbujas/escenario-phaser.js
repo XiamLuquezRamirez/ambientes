@@ -48,7 +48,7 @@
     var decor = [];            // decoración del recorrido que reacciona al pez
     var rojo = 0;              // 0..1 cuánto se ve el camino rojo
 
-    var fondo = { degradado: null, rayos: [], burbujas: [], motas: [], peces: [], cardumenes: [], algas: [], suelo: [], arena: null, velo: null, luz: 0, luzObj: 0 };
+    var fondo = { degradado: null, rayos: [], burbujas: [], motas: [], peces: [], cardumenes: [], algas: [], suelo: [], lejanos: [], medusas: [], arena: null, velo: null, luz: 0, luzObj: 0 };
     var pez = null;            // { cont, cuerpo, cola, aleta, halo, sacudir, extraY, extraEsc }
     var burbujasPez = null, chispas = null, hojitas = null;
     var base = null;           // escena final
@@ -204,15 +204,17 @@
             ctx.fillStyle = "#ffffff";
             ctx.fill();
         });
-        // burbujita para partículas: anillo blanco con brillo
+        // burbujita para partículas: cuerpo claro que se aclara hacia el filo, sin aro
         texturaCanvas("fx-burbuja", 32, 32, function (ctx, s) {
+            var gb = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2 - 1);
+            gb.addColorStop(0, "rgba(200,245,255,0.12)");
+            gb.addColorStop(0.68, "rgba(200,245,255,0.3)");
+            gb.addColorStop(0.9, "rgba(255,255,255,0.9)");
+            gb.addColorStop(1, "rgba(255,255,255,0.2)");
             ctx.beginPath();
-            ctx.arc(s / 2, s / 2, s / 2 - 2, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(200,245,255,0.25)";
+            ctx.arc(s / 2, s / 2, s / 2 - 1, 0, Math.PI * 2);
+            ctx.fillStyle = gb;
             ctx.fill();
-            ctx.lineWidth = 2.4;
-            ctx.strokeStyle = "rgba(255,255,255,0.95)";
-            ctx.stroke();
             ctx.beginPath();
             ctx.arc(s * 0.36, s * 0.34, s * 0.1, 0, Math.PI * 2);
             ctx.fillStyle = "#fff";
@@ -297,13 +299,16 @@
             ctx.beginPath();
             ctx.arc(0, 0, s / 2, 0, Math.PI * 2);
             ctx.fill();
+            // disco blanco con un halo turquesa relleno (sin aro trazado)
             ctx.beginPath();
-            ctx.arc(0, 0, s * 0.3, 0, Math.PI * 2);
+            ctx.arc(0, 0, s * 0.3 + 4.5, 0, Math.PI * 2);
+            ctx.fillStyle = "#15aabf";
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(0, 0, s * 0.3 - 3, 0, Math.PI * 2);
             ctx.fillStyle = "#ffffff";
             ctx.fill();
-            ctx.lineWidth = 9;
             ctx.strokeStyle = "#0c8599";
-            ctx.stroke();
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
             ctx.lineWidth = 10;
@@ -422,6 +427,13 @@
             o.s.x = -300 + o.u * (dims.W + 600);
             o.s.y = dims.H + 6 + o.u2 * 26;
         });
+        // silueta del arrecife lejano: tramos seguidos a lo ancho, apoyados un poco sobre la arena
+        var tramo = (dims.W + 1400) / 5;
+        fondo.lejanos.forEach(function (l) {
+            l.s.setDisplaySize(tramo * 1.15, l.alto);
+            l.s.x = -700 + l.k * tramo - (l.k % 2 ? tramo * 0.45 : 0);
+            l.s.y = dims.H + 4;
+        });
     }
 
     /** Un alga del fondo: lejana (oscura, detrás de todo) o cercana (color, sobre la arena). */
@@ -490,24 +502,51 @@
             algaFondo(r, "alga", r.entre(240, 360), false, r(), ab % 2 ? 1 : -1);
         }
         // rocas, estrellas de mar y caracoles sobre la arena
-        ["roca", "rocaPlana", "estrellaMar", "caracol", "rocaPlana", "estrellaMar", "roca", "caracol", "estrellaMar", "rocaPlana"].forEach(function (tipo, k) {
+        // rocas, corales, anémonas, estrellas de mar y caracoles sobre la arena
+        var adornosSuelo = ["roca", "coralAbanico", "estrellaMar", "anemona", "rocaPlana", "coralTubos", "caracol", "roca", "anemona",
+            "coralAbanico", "estrellaMar", "rocaPlana", "coralTubos", "caracol", "anemona", "roca", "coralAbanico", "estrellaMar"];
+        adornosSuelo.forEach(function (tipo, k) {
             var o = origen(I.SVG[tipo]);
-            var tamS = tipo === "estrellaMar" || tipo === "caracol" ? r.entre(36, 52) : r.entre(90, 140);
-            var s = sc.add.image(0, 0, "ico-" + tipo).setOrigin(0.5, 0.85).setDepth(-34);
+            var chico = tipo === "estrellaMar" || tipo === "caracol";
+            var coralito = tipo === "coralAbanico" || tipo === "coralTubos" || tipo === "anemona";
+            var tamS = chico ? r.entre(36, 52) : coralito ? r.entre(80, 130) : r.entre(90, 140);
+            var s = sc.add.image(0, 0, "ico-" + tipo).setOrigin(0.5, coralito ? 0.97 : 0.85).setDepth(coralito ? -35 : -34);
             s.setScale(tamS / Math.max(o.w, o.h) / RES);
             if (tipo === "estrellaMar") s.setRotation(r.entre(-0.6, 0.6));
-            fondo.suelo.push({ s: s, u: (k + r.entre(0.15, 0.85)) / 10, u2: r() });
+            if (r() < 0.5 && !chico) s.setFlipX(true);
+            fondo.suelo.push({ s: s, u: (k + r.entre(0.15, 0.85)) / adornosSuelo.length, u2: r(), mece: coralito ? r() * 6.28 : null });
         });
-        // peces de adorno que pasan nadando, en dos planos (huyen un poco del pez)
-        for (var p = 0; p < 12; p++) {
+        // silueta del arrecife lejano: da profundidad detrás del bosque de algas
+        for (var sl = 0; sl < 6; sl++) {
+            var sil = sc.add.image(0, 0, "ico-arrecifeLejano").setOrigin(0, 1).setDepth(-95);
+            sil.setTint(sl % 2 ? 0x1c6f99 : 0x175d85).setAlpha(sl % 2 ? 0.55 : 0.4).setFlipX(sl % 2 === 1);
+            fondo.lejanos.push({ s: sil, k: sl, alto: sl % 2 ? 210 : 260 });
+        }
+        // medusas translúcidas que suben despacio latiendo
+        for (var md = 0; md < 5; md++) {
+            var me = sc.add.image(r.entre(-200, 1800), r.entre(-100, 1200), "ico-medusa");
+            var tamM = r.entre(46, 84);
+            me.setScale(tamM / 80 / RES).setAlpha(r.entre(0.55, 0.8)).setDepth(md % 2 ? -62 : -31);
+            fondo.medusas.push({ s: me, x: me.x, y: me.y, v: r.entre(8, 16), f: r() * 6.28, esc: tamM / 80 / RES, dx: 0 });
+        }
+        // peces de adorno a todo color que pasan nadando, en dos planos (huyen un poco del pez)
+        var especies = ["pezCirujano", "pezAngel", "pezGlobo", "pezMariposa", "pececito"];
+        for (var p = 0; p < 14; p++) {
             var lejos = p % 3 === 0;
-            var pc = sc.add.image(r.entre(0, 1600), 0, "ico-pececito");
-            var esc = lejos ? r.entre(0.35, 0.5) : r.entre(0.5, 0.9);
-            pc.setScale(esc / RES).setTint(COLORES_AMIGOS[p % COLORES_AMIGOS.length]).setAlpha(lejos ? 0.4 : 0.75).setDepth(lejos ? -84 : -28);
+            var esp = especies[p % especies.length];
+            var oe = origen(I.SVG[esp]);
+            var pc = sc.add.image(r.entre(0, 1600), 0, "ico-" + esp);
+            var ancho = lejos ? r.entre(38, 52) : r.entre(58, 96);
+            pc.setScale(ancho / oe.w / RES).setAlpha(lejos ? 0.5 : 0.92).setDepth(lejos ? -84 : -28);
+            if (esp === "pececito") pc.setTint(COLORES_AMIGOS[p % COLORES_AMIGOS.length]);
+            else if (lejos) pc.setTint(0x8fc9e6);
             var dir = r() < 0.5 ? 1 : -1;
             pc.setFlipX(dir < 0);
-            fondo.peces.push({ s: pc, x: pc.x, yu: r.entre(0.08, 0.92), v: r.entre(lejos ? 18 : 30, lejos ? 34 : 70) * dir, f: r() * 6.28, dy: 0 });
+            fondo.peces.push({ s: pc, x: pc.x, yu: r.entre(0.08, 0.86), v: r.entre(lejos ? 18 : 30, lejos ? 34 : 64) * dir, f: r() * 6.28, dy: 0 });
         }
+        // una tortuga marina que cruza tranquila
+        var tor = sc.add.image(r.entre(0, 1600), 0, "ico-tortuga").setScale(130 / 160 / RES).setDepth(-27);
+        fondo.peces.push({ s: tor, x: tor.x, yu: 0.32, v: 16, f: r() * 6.28, dy: 0, tortuga: true });
         // cardúmenes: grupos de pececitos que nadan juntos
         [[0xffe066, 8], [0x74c0fc, 9], [0xff8fa3, 7]].forEach(function (cd, k) {
             var dir = k % 2 ? -1 : 1;
@@ -579,6 +618,33 @@
             pc.dy = lerp(pc.dy, huye, 0.06);
             pc.s.x = pc.x;
             pc.s.y = py + Math.sin(t * 0.0015 + pc.f) * 10 + pc.dy;
+            // la tortuga planea: se inclina un poco al subir y bajar
+            if (pc.tortuga && !reducido) pc.s.rotation = Math.cos(t * 0.0015 + pc.f) * 0.08 * (pc.v < 0 ? -1 : 1);
+        }
+        // medusas: suben despacio latiendo y se apartan del pez
+        for (var mj = 0; mj < fondo.medusas.length; mj++) {
+            var mu = fondo.medusas[mj];
+            if (!reducido) {
+                var late = Math.sin(t * 0.003 + mu.f);
+                mu.y -= mu.v * (1 + Math.max(0, late) * 1.2) * s;
+                if (mu.y < -300) { mu.y = Hm + 250; mu.x = Math.random() * Wm; }
+                mu.s.setScale(mu.esc * (1 + late * 0.05), mu.esc * (1 - late * 0.07));
+            }
+            var aparta = 0;
+            if (hay) {
+                var mdx = mu.x - pil.x, mdd = Math.hypot(mdx, mu.y - pil.y);
+                if (mdd < 240) aparta = (mdx >= 0 ? 1 : -1) * (1 - mdd / 240) * 80;
+            }
+            mu.dx = lerp(mu.dx, aparta, 0.05);
+            mu.s.x = mu.x + Math.sin(t * 0.0005 + mu.f) * 20 + mu.dx;
+            mu.s.y = mu.y;
+        }
+        // corales y anémonas de la arena: se mecen apenas con la corriente
+        if (!reducido) {
+            for (var so = 0; so < fondo.suelo.length; so++) {
+                var su = fondo.suelo[so];
+                if (su.mece != null) su.s.rotation = Math.sin(t * 0.0009 + su.mece) * 0.04;
+            }
         }
         // cardúmenes: el grupo avanza junto y se abre para dejar pasar al pez
         for (var g = 0; g < fondo.cardumenes.length; g++) {
@@ -722,16 +788,15 @@
     /** Una burbuja del borde del camino (canvas 2D): cuerpo transparente, aro y brillo. */
     function dibujarBurbuja(x, b, pal) {
         var g = x.createRadialGradient(b.x - b.r * 0.2, b.y - b.r * 0.2, b.r * 0.1, b.x, b.y, b.r);
+        // sin aro: el color del borde se funde en el propio degradado
         g.addColorStop(0, pal.bur[0]);
-        g.addColorStop(0.7, pal.bur[1]);
+        g.addColorStop(0.62, pal.bur[1]);
+        g.addColorStop(0.86, pal.burBorde);
         g.addColorStop(1, pal.bur[2]);
         x.fillStyle = g;
         x.beginPath();
         x.arc(b.x, b.y, b.r, 0, Math.PI * 2);
         x.fill();
-        x.lineWidth = Math.max(1.2, b.r * 0.12);
-        x.strokeStyle = pal.burBorde;
-        x.stroke();
         x.fillStyle = "rgba(255,255,255,0.95)";
         x.beginPath();
         x.ellipse(b.x - b.r * 0.35, b.y - b.r * 0.38, b.r * 0.28, b.r * 0.16, -0.6, 0, Math.PI * 2);
@@ -840,7 +905,11 @@
         return o;
     }
 
-    /** Decoración en celdas libres: rocas, algas, estrellas de mar y caracoles (más variedad en los recorridos altos). */
+    /**
+     * Decoración en celdas libres. Lo que vive en el fondo (rocas, algas, estrellas de mar y caracoles) solo va
+     * en las celdas libres de la fila de abajo, apoyado sobre la arena; nunca flota en el agua.
+     * En las celdas libres de agua abierta solo hay cosas que sí flotan: racimos de burbujas que suben y bajan.
+     */
     function decorar(r) {
         var rnd = R.azar((r.semilla ^ 0x5bd1e995) >>> 0);
         var libres = celdasLibres(r);
@@ -850,45 +919,63 @@
         }
         var g = r.rejilla;
         var lado = Math.min(g.cx, g.cy);
+        var suelo = r.H + 14;   // línea de la arena (igual que las algas cercanas del fondo)
+        var deFondo = libres.filter(function (c) { return c[1] === g.filas - 1; });
+        var deAgua = libres.filter(function (c) { return c[1] !== g.filas - 1; });
+
+        // sobre la arena: rocas, algas, estrellas de mar y caracoles
         var tipos = ["roca", "alga", "estrellaMar", "rocaPlana", "algaLarga", "caracol"];
-        libres.forEach(function (c, k) {
+        deFondo.forEach(function (c, k) {
             var p = celdaCentro(r, c);
-            p.x += rnd.entre(-0.1, 0.1) * g.cx;
-            p.y += rnd.entre(-0.1, 0.1) * g.cy;
+            p.x += rnd.entre(-0.12, 0.12) * g.cx;
             var tipo = tipos[(k + (r.semilla % 6)) % tipos.length];
             var o = origen(I.SVG[tipo]);
             if (tipo === "alga" || tipo === "algaLarga") {
-                // un manojo de 2-3 algas que se mecen (origen abajo)
+                // un manojo de 2-3 algas plantadas en la arena que se mecen (origen abajo)
                 var n = 2 + (k % 2);
                 for (var a = 0; a < n; a++) {
-                    var alto = lado * rnd.entre(0.55, 0.8);
+                    var alto = lado * rnd.entre(0.6, 0.85);
                     var ax = p.x + (a - (n - 1) / 2) * lado * 0.18;
-                    var ay = p.y + lado * 0.36;
-                    var s = guardar(sc.add.image(ax, ay, "ico-" + tipo).setOrigin(0.5, 1));
+                    var s = guardar(sc.add.image(ax, suelo, "ico-" + tipo).setOrigin(0.5, 1));
                     s.setScale(alto / o.h / RES).setDepth(-5);
-                    agregarDecor(s, ax, ay, { alga: true, alto: alto, radio: r.ancho * 2 });
+                    agregarDecor(s, ax, suelo, { alga: true, alto: alto, radio: r.ancho * 2 });
                 }
             } else {
-                var tam = tipo === "estrellaMar" || tipo === "caracol" ? lado * rnd.entre(0.26, 0.34) : lado * rnd.entre(0.5, 0.66);
-                var s2 = guardar(sc.add.image(p.x, p.y, "ico-" + tipo));
+                var chico = tipo === "estrellaMar" || tipo === "caracol";
+                var tam = chico ? lado * rnd.entre(0.26, 0.34) : lado * rnd.entre(0.5, 0.66);
+                // apoyado: la base del dibujo toca la arena (las rocas se hunden un poquito)
+                var s2 = guardar(sc.add.image(p.x, suelo + (chico ? -4 : 6), "ico-" + tipo).setOrigin(0.5, 1));
                 s2.setScale(tam / Math.max(o.w, o.h) / RES).setDepth(-5);
-                if (tipo === "estrellaMar") s2.setRotation(rnd.entre(-0.5, 0.5));
-                if (!reducido && tipo !== "roca" && tipo !== "rocaPlana") sc.tweens.add({ targets: s2, y: s2.y - 6, duration: rnd.entre(2200, 3600), yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
-                agregarDecor(s2, p.x, p.y);
+                if (tipo === "estrellaMar") s2.setRotation(rnd.entre(-0.3, 0.3));
+                agregarDecor(s2, p.x, s2.y, { desplaza: chico ? rec.ancho * 0.08 : 0 });
             }
         });
-        // algas sueltas al borde de algunos tramos (enriquecen sin tapar el camino)
+        // algas sueltas en la arena a los lados de algunas celdas del fondo
         var nAlgas = Math.min(3, Math.max(1, (r.id || 1)));
-        for (var q = 0; q < nAlgas && libres.length; q++) {
-            var cc = libres[(q * 3) % libres.length];
-            var pc = celdaCentro(r, cc);
+        for (var q = 0; q < nAlgas && deFondo.length; q++) {
+            var pc = celdaCentro(r, deFondo[(q * 3) % deFondo.length]);
             var x0 = pc.x + (q % 2 ? 1 : -1) * g.cx * 0.34;
-            var y0 = pc.y + g.cy * 0.44;
             var o2 = origen(I.SVG.alga);
-            var s3 = guardar(sc.add.image(x0, y0, "ico-alga").setOrigin(0.5, 1).setDepth(-6));
+            var s3 = guardar(sc.add.image(x0, suelo, "ico-alga").setOrigin(0.5, 1).setDepth(-6));
             s3.setScale(lado * 0.42 / o2.h / RES).setTint(0x8ce99a);
-            agregarDecor(s3, x0, y0, { alga: true, alto: lado * 0.42, radio: r.ancho * 2 });
+            agregarDecor(s3, x0, suelo, { alga: true, alto: lado * 0.42, radio: r.ancho * 2 });
         }
+
+        // agua abierta: racimos de burbujas que flotan (en una de cada dos celdas, para no recargar)
+        deAgua.forEach(function (c, k) {
+            if (k % 2) return;
+            var p = celdaCentro(r, c);
+            var n = 3 + (k % 3);
+            for (var b = 0; b < n; b++) {
+                var bx = p.x + rnd.entre(-0.22, 0.22) * g.cx;
+                var by = p.y + rnd.entre(-0.22, 0.22) * g.cy;
+                var tamB = lado * rnd.entre(0.07, 0.16);
+                var sb = guardar(sc.add.image(bx, by, "ico-burbuja"));
+                sb.setScale(tamB / 100 / RES).setAlpha(rnd.entre(0.55, 0.9)).setDepth(-5);
+                if (!reducido) sc.tweens.add({ targets: sb, y: by - lado * 0.08, duration: rnd.entre(2200, 3800), yoyo: true, repeat: -1, ease: "Sine.easeInOut", delay: rnd.entre(0, 1200) });
+                agregarDecor(sb, bx, by, { desplaza: rec.ancho * 0.15 });
+            }
+        });
     }
 
     // ------------------------------------------------------------------ burbujas del borde (se revientan)
@@ -1654,9 +1741,14 @@
         var cuerpo = sc.add.image(bx, by, "ico-arrecife").setScale(esc / RES).setDepth(6);
         var nido = { x: bx, y: by + (225 - 180) * esc };
         var amigos = [];
+        // amigos del arrecife: una especie distinta cada uno (el pececito va teñido)
+        var especiesAmigas = ["pezCirujano", "pezAngel", "pezGlobo", "pezMariposa", "pececito", "pezCirujano"];
         for (var i = 0; i < 6; i++) {
-            var a = sc.add.image(bx + (i - 2.5) * 110, by - 120 - (i % 2) * 70, "ico-pececito").setDepth(7);
-            a.setScale(1.1 / RES).setTint(COLORES_AMIGOS[i]).setFlipX(i % 2 === 1);
+            var espA = especiesAmigas[i];
+            var oa = origen(I.SVG[espA]);
+            var a = sc.add.image(bx + (i - 2.5) * 110, by - 120 - (i % 2) * 70, "ico-" + espA).setDepth(7);
+            a.setScale(92 / oa.w / RES).setFlipX(i % 2 === 1);
+            if (espA === "pececito") a.setTint(COLORES_AMIGOS[i]);
             amigos.push(a);
         }
         base = { cuerpo: cuerpo, halo: halo, amigos: amigos, nido: nido, esc: esc };

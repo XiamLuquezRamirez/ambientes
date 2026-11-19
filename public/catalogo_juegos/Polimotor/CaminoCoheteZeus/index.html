@@ -74,15 +74,15 @@
 	<div style="display: none; background-color: rgba(255, 255, 255, 0.664); width: 100%; height: 100%; position: fixed; z-index: 100;" id="fondo_blanco"></div>
 
 	<div id="principal">
-		<!-- Arriba: título centrado; Inicio y reiniciar a la derecha. -->
+		<!-- Arriba: título centrado; reiniciar y volver a la derecha. -->
 		<header class="hud-top">
 			<div class="hud-hueco" aria-hidden="true"></div>
 			<div class="hud-titulo">
 				<h1 aria-label="¡El Camino del Cohete de Zeus!"><span style="--c:#ffd43b">¡</span><span style="--c:#74e7fe">E</span><span style="--c:#6cdbfc">L</span><span class="hud-espacio"> </span><span style="--c:#64cffb">C</span><span style="--c:#5dc3fa">A</span><span style="--c:#55b7f8">M</span><span style="--c:#4dabf7">I</span><span style="--c:#569ef7">N</span><span style="--c:#5f91f7">O</span><span class="hud-espacio"> </span><span style="--c:#6884f7">D</span><span style="--c:#7278f7">E</span><span style="--c:#7b6bf7">L</span><span class="hud-espacio"> </span><span style="--c:#845ef7">C</span><span style="--c:#9066f8">O</span><span style="--c:#9c6dfa">H</span><span style="--c:#a875fb">E</span><span style="--c:#b47dfc">T</span><span style="--c:#c084fe">E</span><span class="hud-espacio"> </span><span style="--c:#cc8cff">D</span><span style="--c:#c699ff">E</span><span class="hud-espacio"> </span><span style="--c:#bfa5ff">Z</span><span style="--c:#b8b2ff">E</span><span style="--c:#b2bfff">U</span><span style="--c:#accbff">S</span><span style="--c:#ffd43b">!</span></h1>
 			</div>
 			<div class="hud-nav hud-nav-der">
-				<button type="button" onclick="history.back()" class="btn-inicio" title="Volver al menú"><i class="fa-solid fa-house" aria-hidden="true"></i> <span>Inicio</span></button>
 				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round btn-recargar" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</header>
 

@@ -552,34 +552,6 @@ async function zoeSale() {
     document.body.classList.remove("zoe-grande");
 }
 
-// ------------------------------------------------------------------ pantalla completa
-
-function enlazarPantallaCompleta() {
-    const btn = document.getElementById("btn-pantalla");
-    if (!btn) return;
-    const doc = document.documentElement;
-    const puede = !!(doc.requestFullscreen || doc.webkitRequestFullscreen);
-    if (!puede) {
-        btn.hidden = true;
-        return;
-    }
-    const pintar = function () {
-        const dentro = !!(document.fullscreenElement || document.webkitFullscreenElement);
-        btn.querySelector("i").className = dentro ? "fa-solid fa-compress" : "fa-solid fa-expand";
-        btn.title = dentro ? "Salir de pantalla completa" : "Pantalla completa";
-    };
-    btn.addEventListener("click", function () {
-        const dentro = !!(document.fullscreenElement || document.webkitFullscreenElement);
-        try {
-            if (dentro) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-            else (doc.requestFullscreen || doc.webkitRequestFullscreen).call(doc);
-        } catch (e) { /* noop */ }
-    });
-    document.addEventListener("fullscreenchange", pintar);
-    document.addEventListener("webkitfullscreenchange", pintar);
-    pintar();
-}
-
 // ------------------------------------------------------------------ progreso (barra de abajo)
 
 function pintarProgreso() {
@@ -1094,7 +1066,6 @@ $(document).ready(function () {
         volumenFondo: volumenFondoPct() / 100
     });
     enlazarMenus();
-    enlazarPantallaCompleta();
     window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
 
     nubeZoe("");

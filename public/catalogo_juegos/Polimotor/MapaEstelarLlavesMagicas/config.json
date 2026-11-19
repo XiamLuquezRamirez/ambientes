@@ -1,0 +1,284 @@
+{
+  "nombre": "El Mapa Estelar y las Llaves Mágicas",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "ayudaMs": 11000,
+    "ayudaRepetirMs": 13000,
+    "pistaCruceMs": 6500,
+    "anchoMundo": 1600,
+    "altoMundo": 1000,
+    "radioNave": 0.22,
+    "anchoCamino": 1.3,
+    "velocidadMax": 8,
+    "frenoCruce": 0.62,
+    "radioCruce": 0.62,
+    "radioLlave": 0.5,
+    "radioPortal": 0.6,
+    "radioSinSalida": 0.55,
+    "distanciaAlerta": 0.6,
+    "vozSinSalidaMs": 8000,
+    "vozDormidaMs": 7000
+  },
+  "llaves": [
+    {
+      "id": "roja",
+      "nodo": "R",
+      "color": "#ff3b5c",
+      "nombre": "roja"
+    },
+    {
+      "id": "verde",
+      "nodo": "G",
+      "color": "#3ddc84",
+      "nombre": "verde"
+    },
+    {
+      "id": "azul",
+      "nodo": "BL",
+      "color": "#38a8ff",
+      "nombre": "azul"
+    }
+  ],
+  "mapas": [
+    {
+      "id": "nivel1",
+      "titulo": "NIVEL 1",
+      "nombre": "El cinturón de asteroides",
+      "columnas": 11,
+      "filas": 9,
+      "cobertura": 0.75,
+      "ciclos": 1,
+      "crucesMin": 3,
+      "sinSalidaMin": 2
+    },
+    {
+      "id": "nivel2",
+      "titulo": "NIVEL 2",
+      "nombre": "La nebulosa de cristal",
+      "columnas": 13,
+      "filas": 9,
+      "cobertura": 0.88,
+      "ciclos": 2,
+      "crucesMin": 5,
+      "sinSalidaMin": 3
+    }
+  ],
+  "demoLaberinto": {
+    "id": "demo",
+    "columnas": 8,
+    "filas": 6,
+    "inicio": "S",
+    "portal": "P",
+    "nodos": {
+      "S": [
+        0,
+        5
+      ],
+      "J1": [
+        2,
+        5
+      ],
+      "D": [
+        2,
+        3
+      ],
+      "J2": [
+        5,
+        5
+      ],
+      "R": [
+        7,
+        5
+      ],
+      "J3": [
+        5,
+        3
+      ],
+      "G": [
+        7,
+        3
+      ],
+      "J4": [
+        5,
+        1
+      ],
+      "BL": [
+        2,
+        1
+      ],
+      "P": [
+        7,
+        1
+      ]
+    },
+    "tramos": [
+      [
+        "S",
+        "J1"
+      ],
+      [
+        "J1",
+        "D"
+      ],
+      [
+        "J1",
+        "J2"
+      ],
+      [
+        "J2",
+        "R"
+      ],
+      [
+        "J2",
+        "J3"
+      ],
+      [
+        "J3",
+        "G"
+      ],
+      [
+        "J3",
+        "J4"
+      ],
+      [
+        "J4",
+        "BL"
+      ],
+      [
+        "J4",
+        "P"
+      ]
+    ],
+    "llaves": [
+      {
+        "id": "roja",
+        "nodo": "R",
+        "color": "#ff3b5c",
+        "nombre": "roja"
+      },
+      {
+        "id": "verde",
+        "nodo": "G",
+        "color": "#3ddc84",
+        "nombre": "verde"
+      },
+      {
+        "id": "azul",
+        "nodo": "BL",
+        "color": "#38a8ff",
+        "nombre": "azul"
+      }
+    ],
+    "ruta": [
+      "S",
+      "J1",
+      "D",
+      "J1",
+      "J2",
+      "R",
+      "J2",
+      "J3",
+      "G",
+      "J3",
+      "J4",
+      "BL",
+      "J4",
+      "P"
+    ]
+  },
+  "misiones": [
+    {
+      "llave": "roja",
+      "titulo": "PRIMERA MISIÓN",
+      "nombre": "La llave roja",
+      "instruccion": "¡Primera misión! Busca el camino que te lleva hasta la llave roja. ¡Conduce tu nave con cuidado!",
+      "logro": "¡Muy bien! Encontraste la llave roja. ¡Vamos por la siguiente!",
+      "resumen": "Primera misión: llave roja conseguida"
+    },
+    {
+      "llave": "verde",
+      "titulo": "SEGUNDA MISIÓN",
+      "nombre": "La llave verde",
+      "instruccion": "¡Ahora vamos por la llave verde! Observa los caminos y encuentra la ruta correcta.",
+      "logro": "¡Excelente explorador! Ya tienes dos llaves. ¡Solo falta una!",
+      "resumen": "Segunda misión: llave verde conseguida"
+    },
+    {
+      "llave": "azul",
+      "titulo": "TERCERA MISIÓN",
+      "nombre": "La llave azul",
+      "instruccion": "¡La última llave es azul! ¡Busca su camino y completa la misión!",
+      "logro": "¡Lo lograste! ¡Ya tienes las tres llaves estelares!",
+      "resumen": "Tercera misión: llave azul conseguida"
+    }
+  ],
+  "textos": {
+    "introZeus": "¡Viajero del espacio! El portal galáctico está cerrado. Debes navegar por el laberinto, recoger las tres llaves estelares y llegar al portal para abrirlo.",
+    "introNube": "¡Recoge las tres llaves y llega al portal!",
+    "demoRuta": "¡Mira los caminos! Elige el que te lleva directo a la llave.",
+    "demoFin": "¡Ahora es tu turno, viajero del espacio!",
+    "demostracionBien": "¡Así se hace!",
+    "botonComenzar": "¡COMENZAR!",
+    "pistaArrastra": "Pon tu dedo sobre la nave, mantenlo presionado y deslízala por el camino de luz.",
+    "sinSalida": "¡Camino cerrado! Volvamos al cruce anterior para encontrar otra ruta.",
+    "cruce": "¡Observa los caminos! ¿Cuál crees que nos llevará a la siguiente llave?",
+    "llaveDormida": "¡Esa llave todavía está dormida! Primero busca la llave {color}.",
+    "portalCerrado": "¡El portal sigue cerrado! Primero recoge las tres llaves estelares.",
+    "portalListo": "¡El portal se está activando! Lleva la nave hasta el portal.",
+    "progreso": "MISIÓN",
+    "progresoPortal": "¡AL PORTAL!",
+    "cierre": "¡ESPECTACULAR PLANIFICACIÓN! Supiste elegir los caminos correctos, recoger las tres llaves y resolver el laberinto estelar. ¡Eres un verdadero explorador espacial!",
+    "finalTitulo": "¡MISIÓN COMPLETADA!",
+    "finalSub": "Llegaste a la base espacial del nuevo planeta",
+    "finalNube": "¡ESPECTACULAR PLANIFICACIÓN!",
+    "finalZeus": "¡Aterrizaje perfecto! ¡Gracias por guiar mi nave, explorador!",
+    "resumenTitulo": "¡MISIÓN COMPLETADA!",
+    "resumenSub": "Resolviste el laberinto estelar",
+    "resumenPortal": "Portal galáctico desbloqueado",
+    "resumenMision": "Misión completada",
+    "botonOtraVez": "VOLVER A JUGAR",
+    "botonInicio": "INICIO",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Zeus, mira el mapa estelar! El portal galáctico está cerrado con tres candados."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Necesitamos tres llaves estelares: una roja, una verde y una azul!"
+      },
+      {
+        "personaje": 1,
+        "texto": "Las llaves están escondidas en el laberinto. Hay cruces y caminos sin salida."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Subamos a la nave! Hay que elegir bien los caminos para llegar al portal."
+      }
+    ],
+    "nivelSuperado": "¡Nivel superado! El portal te lleva a un nuevo mapa estelar.",
+    "nivelNuevo": "¡Un nuevo laberinto! Hay más cruces y más caminos. ¡Recoge otra vez las tres llaves!",
+    "resumenNiveles": "Dos mapas estelares resueltos"
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Laberintos de coordinación"
+    }
+  ]
+}

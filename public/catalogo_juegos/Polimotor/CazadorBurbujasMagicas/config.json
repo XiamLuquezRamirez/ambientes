@@ -1,0 +1,281 @@
+{
+  "nombre": "El Cazador de Burbujas Mágicas",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "vozPausaMs": 2800,
+    "vozEscapeCadaMs": 9000,
+    "vozAciertoCada": 2,
+    "ayudaMs": 10000,
+    "ayudaRepetirMs": 14000
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "titulo": "RONDA 1",
+      "nombre": "Descubrimiento",
+      "objetivos": 4,
+      "subidaSeg": [
+        11,
+        12.5
+      ],
+      "radio": [
+        0.118,
+        0.118
+      ],
+      "maxEnPantalla": 2,
+      "intervaloMs": [
+        2600,
+        3200
+      ],
+      "vaiven": [
+        0.01,
+        0.016
+      ],
+      "alturas": [
+        1
+      ],
+      "primero": "estrella",
+      "objetos": [
+        "estrella",
+        "pelota",
+        "oso",
+        "carro"
+      ]
+    },
+    {
+      "id": 2,
+      "titulo": "RONDA 2",
+      "nombre": "Exploración",
+      "objetivos": 4,
+      "subidaSeg": [
+        9.4,
+        10.6
+      ],
+      "radio": [
+        0.106,
+        0.114
+      ],
+      "maxEnPantalla": 2,
+      "intervaloMs": [
+        2200,
+        2800
+      ],
+      "vaiven": [
+        0.02,
+        0.032
+      ],
+      "alturas": [
+        1,
+        1,
+        0.82
+      ],
+      "objetos": [
+        "estrella",
+        "pelota",
+        "oso",
+        "carro",
+        "pato",
+        "cubo"
+      ],
+      "multitoque": {
+        "prob": 0.25,
+        "toques": [
+          2,
+          2
+        ],
+        "radio": 1.12,
+        "lentitud": 1.3
+      }
+    },
+    {
+      "id": 3,
+      "titulo": "RONDA 3",
+      "nombre": "Cazador mágico",
+      "objetivos": 4,
+      "subidaSeg": [
+        8,
+        9.4
+      ],
+      "radio": [
+        0.094,
+        0.112
+      ],
+      "maxEnPantalla": 3,
+      "intervaloMs": [
+        1800,
+        2400
+      ],
+      "vaiven": [
+        0.03,
+        0.045
+      ],
+      "alturas": [
+        1,
+        0.86,
+        0.74
+      ],
+      "objetos": [
+        "estrella",
+        "pelota",
+        "oso",
+        "carro",
+        "pato",
+        "cubo",
+        "balon",
+        "avion",
+        "cometa",
+        "tambor"
+      ],
+      "multitoque": {
+        "prob": 0.3,
+        "toques": [
+          2,
+          3
+        ],
+        "radio": 1.12,
+        "lentitud": 1.3
+      }
+    }
+  ],
+  "objetos": [
+    {
+      "id": "estrella",
+      "nombre": "una estrella",
+      "icono": "estrella"
+    },
+    {
+      "id": "pelota",
+      "nombre": "una pelota",
+      "imagen": "img/pelota.svg"
+    },
+    {
+      "id": "oso",
+      "nombre": "un osito",
+      "imagen": "img/oso.png"
+    },
+    {
+      "id": "carro",
+      "nombre": "un carrito",
+      "imagen": "img/carro.svg"
+    },
+    {
+      "id": "pato",
+      "nombre": "un patito",
+      "imagen": "img/pato.png"
+    },
+    {
+      "id": "cubo",
+      "nombre": "un cubo",
+      "imagen": "img/cubo.svg"
+    },
+    {
+      "id": "balon",
+      "nombre": "un balón",
+      "imagen": "img/balon.png"
+    },
+    {
+      "id": "avion",
+      "nombre": "un avión",
+      "imagen": "img/avion.svg"
+    },
+    {
+      "id": "cometa",
+      "nombre": "una cometa",
+      "imagen": "img/cometa.svg"
+    },
+    {
+      "id": "tambor",
+      "nombre": "un tambor",
+      "imagen": "img/tambor.svg"
+    }
+  ],
+  "presentacion": {
+    "objetos": [
+      "oso",
+      "estrella",
+      "pato"
+    ]
+  },
+  "demo": {
+    "objeto": "estrella",
+    "x": 0.5,
+    "subidaSeg": 10
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "titulo": "El Cazador de Burbujas Mágicas",
+    "subtitulo": "¡Toca las burbujas!",
+    "bienvenida": "¡Mira cuántas burbujas mágicas flotan en el aire! Sigue las burbujas con tus ojos y tócalas con tu dedo para reventarlas.",
+    "saludoCorto": "¡Mira cuántas burbujas mágicas flotan en el aire!",
+    "explicaCanasta": "Cuando revientes una burbuja, el juguete caerá en mi canasta.",
+    "instruccionZeus": "¡Síguela con la vista y toca la burbuja que lleva la estrella!",
+    "demoToca": "¡Pop! ¡Mira cómo cae la estrella en la canasta!",
+    "demostracionBien": "¡Así se hace!",
+    "demoFin": "¡Muy bien! Ahora te toca a ti.",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "instruccionRonda": [
+      "¡Toca las burbujas antes de que suban hasta arriba!",
+      "¡Ahora suben un poquito más rápido! ¡Síguelas con los ojos!",
+      "¡Eres un cazador mágico! ¡Atrapa cuatro burbujas más!"
+    ],
+    "aciertoVoz": [
+      "¡Muy bien, atrapaste una!",
+      "¡Pop! ¡Atrapaste {nombre}!",
+      "¡Qué buena vista!",
+      "¡A la canasta!"
+    ],
+    "escapeVoz": [
+      "¡Esa se nos escapó! Vamos a atrapar la siguiente.",
+      "¡Vamos por otra!",
+      "¡Mira esa burbuja!"
+    ],
+    "ayuda": [
+      "¡Mira esa burbuja! Tócala con tu dedo.",
+      "¡Sigue la burbuja con los ojos y tócala!"
+    ],
+    "rondaListaTitulo": "¡RONDA {n} LISTA!",
+    "rondaLista": [
+      "¡Lo hiciste muy bien! ¡Cuatro juguetes en la canasta!",
+      "¡Genial! ¡La canasta se está llenando!"
+    ],
+    "rondaSiguienteTitulo": "¡RONDA {n}!",
+    "finalTitulo": "¡SÚPER VISTA!",
+    "finalSub": "¡Llenaste la canasta de estrellas!",
+    "finalZoe": "¡Reventaste todas las burbujas mágicas! ¡Lo hiciste fantástico!",
+    "final": "¡SÚPER VISTA! Reventaste todas las burbujas mágicas y llenaste la canasta de estrellas. ¡Lo hiciste fantástico!",
+    "cierre": "¡SÚPER VISTA! Reventaste todas las burbujas mágicas y llenaste la canasta de estrellas.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Mira cuántas burbujas mágicas flotan en el aire! Sigue las burbujas con tus ojos y tócalas con tu dedo para reventarlas."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Síguela con la vista y toca la burbuja que lleva la estrella!"
+      }
+    ],
+    "multitoque": "¡Mira, una burbuja fuerte! ¡Tócala varias veces!"
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Coordinación visual: seguir y tocar"
+    }
+  ]
+}

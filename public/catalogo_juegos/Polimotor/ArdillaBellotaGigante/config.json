@@ -1,0 +1,155 @@
+{
+  "nombre": "La Ardilla y la Bellota Gigante",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "acierto": "../../sounds/ok.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "ayudaMs": 9000,
+    "ayudaRepetirMs": 12000,
+    "anchoMundo": 1600,
+    "altoMinimo": 800,
+    "altoMaximo": 1500,
+    "paso": 8,
+    "toleranciaPista": 0.1,
+    "holguraFuera": 0.5,
+    "radioBellota": 0.2,
+    "alejarseParaRegresar": 1.4,
+    "msFueraParaRegresar": 900,
+    "velocidadMax": 1500,
+    "regresoSuave": 0.05
+  },
+  "recorridos": [
+    {
+      "id": 1,
+      "nombre": "El camino del bosque",
+      "titulo": "NIVEL 1",
+      "ancho": 132,
+      "tramo": 1,
+      "ondas": [0, 0],
+      "amplitud": [0.05, 0.15],
+      "obstaculos": [1, 1],
+      "tipos": ["tronco"],
+      "voz": "zoe",
+      "instruccion": "¡Ayuda a la ardillita! Lleva la bellota hasta su cesta siguiendo el caminito.",
+      "vozExtra": "¡Mira! Puedes pasar por cualquiera de los dos caminos.",
+      "vozExtraPj": "zeus",
+      "logro": "¡El camino del bosque!"
+    },
+    {
+      "id": 2,
+      "nombre": "Las hojas del otoño",
+      "titulo": "NIVEL 2",
+      "ancho": 126,
+      "tramo": 1,
+      "ondas": [1, 1],
+      "amplitud": [0.25, 0.4],
+      "obstaculos": [2, 2],
+      "tipos": ["piedra", "rama"],
+      "voz": "zoe",
+      "instruccion": "¡Vamos otra vez! Desliza la bellota por el bosque hasta llegar a la cesta.",
+      "logro": "¡Las hojas del otoño!"
+    },
+    {
+      "id": 3,
+      "nombre": "Los troncos del bosque",
+      "titulo": "NIVEL 3",
+      "ancho": 120,
+      "tramo": 1,
+      "ondas": [1, 2],
+      "amplitud": [0.45, 0.6],
+      "obstaculos": [2, 3],
+      "tipos": ["tronquito", "piedra", "tronquito"],
+      "voz": "zeus",
+      "instruccion": "¡Muy bien! Mira los tronquitos y mueve la bellota para pasar alrededor de ellos.",
+      "logro": "¡Los troncos del bosque!"
+    },
+    {
+      "id": 4,
+      "nombre": "La gran aventura de la ardilla",
+      "titulo": "NIVEL 4",
+      "ancho": 114,
+      "tramo": 1,
+      "ondas": [2, 3],
+      "amplitud": [0.5, 0.7],
+      "obstaculos": [3, 3],
+      "tipos": ["tronco", "piedra", "hongos", "rama"],
+      "voz": "zoe",
+      "instruccion": "¡Última aventura! Lleva la bellota hasta la cesta. ¡Tú puedes!",
+      "logro": "¡La gran aventura!"
+    }
+  ],
+  "demoRecorrido": {
+    "id": 0,
+    "nombre": "Demostración",
+    "ancho": 132,
+    "tramo": 1,
+    "ondas": [0, 0],
+    "amplitud": [0.05, 0.12],
+    "obstaculos": [1, 1],
+    "tipos": ["tronco"]
+  },
+  "textos": {
+    "tituloIntro": "¡LA ARDILLA Y LA BELLOTA GIGANTE!",
+    "subtituloIntro": "Lleva la bellota hasta la cesta por el bosque de otoño",
+    "introZoe": "¡Hola! La ardillita necesita llevar su bellota hasta la cesta. ¿La ayudamos?",
+    "demoZeus": "¡Mira cómo lo hago! Mueve la bellota por el camino y rodea los obstáculos.",
+    "demostracionBien": "¡Así se hace!",
+    "demoFin": "¡Ahora es tu turno!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "pista": "¡Sigue el caminito de tierra!",
+    "pistaArrastra": "Pon tu dedo sobre la bellota y deslízala por el camino.",
+    "fuera": [
+      "¡Uy! Vuelve al caminito.",
+      "¡Por aquí! Regresa al camino."
+    ],
+    "regreso": "¡La bellota vuelve al camino!",
+    "obstaculo": "¡Rodéalo por un ladito!",
+    "cierreRecorrido": "¡Muy bien! ¡Llevaste la bellota hasta su cesta!",
+    "progreso": "NIVEL",
+    "finalTitulo": "¡AVENTURA COMPLETADA!",
+    "finalSub": "¡SUPEREXPLORADOR DEL BOSQUE!",
+    "finalNube": "¡LO LOGRASTE!",
+    "finalZoe": "¡LO LOGRASTE! Ayudaste a la ardillita a recorrer los cuatro caminos y llevar todas sus bellotas a casa. ¡Eres un campeón de la coordinación y la orientación!",
+    "finalZeus": "¡Excelente trabajo! ¡Misión cumplida!",
+    "resumenTitulo": "Cuatro bellotas en casa",
+    "completado": "¡completado!",
+    "botonOtraVez": "¡JUGAR OTRA VEZ!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Zeus, mira! Una ardillita encontró una bellota gigante en el bosque."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Es muy grande! Hay que llevarla hasta su cesta."
+      },
+      {
+        "personaje": 1,
+        "texto": "Hay dos caminitos y los dos llegan a la cesta. ¡Podemos elegir!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Y si hay un tronco o una piedra, pasamos por un ladito!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "3-4 años",
+      "titulo": "Laberintos de coordinación"
+    }
+  ]
+}
