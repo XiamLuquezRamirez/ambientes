@@ -11,7 +11,7 @@ no se repite en ninguna otra temática (Asocia, Encuentra el sonido, Memoria aud
 | SonidosDeObjetos | 3-4 | Tirachinas: estirar la liga y soltar (guía de puntos) | `tirachinas.js` |
 | QueSonidoEscuchas | 3-4 | Canicas: girar palancas de bifurcaciones y soltar la canica | `canicas.js` |
 | OtrosSonidosDeLaNaturaleza | 3-4 | Cometa pilotada con el dedo hasta la nube (elige al quedarse) | `cometa.js` |
-| SonidosSimilares | 5-6 | Atrapar al vuelo con una canasta que se desliza | `atrapar.js` |
+| SonidosSimilares | 5-6 | **«El doctor de los juguetes»** (rehecho 2026-11-19; antes atrapar con canasta en un parque genérico y con el mismo verbo que Memoria auditiva): el niño desliza un estetoscopio sobre juguetes dormidos (campana, triángulo, tambor…), los oye y compara con el sonido misterioso (monitor repetible), y toca la curita del que coincide. Error = el juguete niega con la cabeza. 4 consultorios (tinte), final: desfile con globos | `doctor.js` |
 | QueSonidoEs | 5-6 | Piñatas: golpes repetidos hasta romperla | `pinatas.js` |
 | QueSonidoFalta | 5-6 | Caja de música: girar la manivela (gesto circular) hasta dejar el sonido bajo la flecha | `manivela.js` |
 | EscuchaYRecuerda | 5-6 | Vasos que se mezclan: seguir y tocar el correcto | `vasos.js` |
