@@ -7,7 +7,7 @@
     "use strict";
 
     var ctx = null;
-    var VOL = 0.32;
+    var VOL = 1.3;
 
     function audio() {
         if (ctx) {

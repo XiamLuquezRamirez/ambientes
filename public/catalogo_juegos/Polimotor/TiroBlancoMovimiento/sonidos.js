@@ -8,7 +8,7 @@
     "use strict";
 
     var ctx = null, maestro = null, efectos = null, amb = null;
-    var vol = 0.45, mudo = false;
+    var vol = 0.9, mudo = false;
     var ambienteOn = false, tBrillo = null, nodosAmb = [];
     var musicaOn = false, tMusica = null;
     var ultimoTic = 0;
@@ -24,10 +24,10 @@
         maestro = ctx.createGain();
         maestro.connect(comp);
         efectos = ctx.createGain();
-        efectos.gain.value = 0.9;
+        efectos.gain.value = 3;
         efectos.connect(maestro);
         amb = ctx.createGain();
-        amb.gain.value = 0.5;
+        amb.gain.value = 0.9;
         amb.connect(maestro);
         aplicarVolumen();
         return ctx;
@@ -112,7 +112,7 @@
         filtro.type = "lowpass";
         filtro.frequency.value = 380;
         var g = ctx.createGain();
-        g.gain.value = 0.05;
+        g.gain.value = 0.5;
         filtro.connect(g);
         g.connect(amb);
         [55, 55.6, 82.4].forEach(function (f, i) {
@@ -283,7 +283,7 @@
         /** Baja el ambiente mientras hablan Zoe o Zeus. */
         agachar: function (on) {
             if (!amb) return;
-            amb.gain.setTargetAtTime(on ? 0.18 : 0.5, ctx.currentTime, 0.2);
+            amb.gain.setTargetAtTime(on ? 0.25 : 0.9, ctx.currentTime, 0.2);
         },
         detenerTodo: function () {
             ambiente(false);

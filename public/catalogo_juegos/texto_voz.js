@@ -5,8 +5,8 @@
         var m = new URL(src, window.location.href).pathname.match(/^(.*?)\/catalogo_juegos\//);
         return m ? m[1] : "";
     })();
-    var VOLUMEN_FONDO = 0.2;
-    var VOLUMEN_DUCK = 0.05;
+    var VOLUMEN_FONDO = 0.8;
+    var VOLUMEN_DUCK = 0.3;
     var URL_TTS = PEDNIA_BASE + "/juegos/tts";
 
     var config = {};

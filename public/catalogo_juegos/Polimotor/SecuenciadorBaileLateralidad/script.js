@@ -1547,7 +1547,7 @@ function continuar() {
 let fxListo = Promise.resolve(false);
 
 $(document).ready(function () {
-    gameConfig = JSON.parse(readText("config.json?v=20261114a"));
+    gameConfig = JSON.parse(readText("config.json?v=20261119vol"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = textos().conversacion || [];
     const problemas = ReglasSimon.revisarJuego(gameConfig);

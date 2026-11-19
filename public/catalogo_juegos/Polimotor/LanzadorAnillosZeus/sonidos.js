@@ -22,7 +22,7 @@
 
     var ctx = null;
     var salida = null;
-    var VOL = 0.55;
+    var VOL = 1.8;
     var ruido = null;
     var ultArrastre = 0;
     var vueloActivo = null;

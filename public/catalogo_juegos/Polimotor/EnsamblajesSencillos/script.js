@@ -1766,7 +1766,7 @@ function mostrarVictoria(cierre) {
 }
 
 $(document).ready(function () {
-    gameConfig = JSON.parse(readText("config.json"));
+    gameConfig = JSON.parse(readText("config.json?v=20261119vol"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
     sincronizarDialogoIntro3d();

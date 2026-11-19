@@ -1116,7 +1116,7 @@ function continuar() {
 let escenario_listo = Promise.resolve(false);
 
 $(document).ready(function () {
-    gameConfig = JSON.parse(readText("config.json?v=20261114g"));
+    gameConfig = JSON.parse(readText("config.json?v=20261119vol"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = textos().conversacion || [];
     const problemas = ReglasMemoPosturas.revisarJuego(gameConfig,

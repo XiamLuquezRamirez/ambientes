@@ -1,0 +1,409 @@
+{
+  "nombre": "¡Atrapa la Esfera Veloz!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "menosEfectos": false,
+    "letterSpacing": 2,
+    "volumenFondo": 85,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "capturasPorRonda": 4,
+    "radioAnillo": 2.05,
+    "radioCaptura": 1.45,
+    "zCruce": 2.0,
+    "preparacionS": 1.3,
+    "esperaTardeS": 1.4,
+    "pausaTempranoS": 0.45,
+    "ayudaPorFallo": {
+      "velocidad": 0.12,
+      "ventana": 0.08,
+      "maxFallos": 3
+    },
+    "vozPausaMs": 2400,
+    "tension": 0.4,
+    "velocidadAntes": 2.0,
+    "arco": [
+      4.3,
+      -1.0
+    ]
+  },
+  "tubos": [
+    {
+      "id": "izq",
+      "boca": [
+        -4.9,
+        -0.9,
+        1.4
+      ],
+      "dir": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "der",
+      "boca": [
+        4.9,
+        -0.9,
+        1.4
+      ],
+      "dir": [
+        -1,
+        0,
+        0
+      ]
+    }
+  ],
+  "espejos": [
+    {
+      "id": "izq",
+      "x": -6.15,
+      "y0": 0.9,
+      "y1": 3.7,
+      "z0": -2.2,
+      "z1": 0.8
+    },
+    {
+      "id": "der",
+      "x": 6.15,
+      "y0": 0.9,
+      "y1": 3.7,
+      "z0": -2.2,
+      "z1": 0.8
+    }
+  ],
+  "colores": {
+    "azul": "#4dabf7",
+    "turquesa": "#3bc9db",
+    "violeta": "#b197fc",
+    "amarillo": "#ffd43b",
+    "rosa": "#f783ac"
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "nombre": "Aprende a capturar",
+      "radioAnillo": 2.05,
+      "velocidad": 2.3,
+      "radioEsfera": 0.56,
+      "tolerancia": 0.14,
+      "esferas": [
+        {
+          "tubo": "izq",
+          "color": "azul",
+          "altura": 0.1,
+          "elevacion": 0.15,
+          "rebotes": [],
+          "pausa": 1.6
+        },
+        {
+          "tubo": "der",
+          "color": "turquesa",
+          "altura": 0.1,
+          "elevacion": 0.15,
+          "rebotes": [],
+          "pausa": 1.8
+        },
+        {
+          "tubo": "izq",
+          "color": "violeta",
+          "altura": 0.0,
+          "elevacion": 1.4,
+          "rebotes": [
+            {
+              "espejo": "der",
+              "y": 3.3,
+              "z": -0.2
+            }
+          ],
+          "pausa": 1.8
+        },
+        {
+          "tubo": "der",
+          "color": "amarillo",
+          "altura": 0.0,
+          "elevacion": 1.4,
+          "rebotes": [
+            {
+              "espejo": "izq",
+              "y": 3.3,
+              "z": -0.2
+            }
+          ],
+          "pausa": 1.8
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nombre": "Reflejos en acción",
+      "radioAnillo": 1.8,
+      "velocidad": 3.0,
+      "radioEsfera": 0.5,
+      "tolerancia": 0.13,
+      "esferas": [
+        {
+          "tubo": "der",
+          "color": "rosa",
+          "altura": 0.2,
+          "elevacion": 0.6,
+          "rebotes": [
+            {
+              "espejo": "izq",
+              "y": 3.4,
+              "z": -0.5
+            }
+          ],
+          "pausa": 1.3
+        },
+        {
+          "tubo": "izq",
+          "color": "azul",
+          "altura": -0.2,
+          "elevacion": 0.6,
+          "rebotes": [
+            {
+              "espejo": "der",
+              "y": 2.2,
+              "z": -0.2
+            }
+          ],
+          "pausa": 1.0
+        },
+        {
+          "tubo": "izq",
+          "color": "turquesa",
+          "altura": 0.3,
+          "elevacion": 0.6,
+          "rebotes": [
+            {
+              "espejo": "der",
+              "y": 3.5,
+              "z": -0.4
+            }
+          ],
+          "pausa": 1.5
+        },
+        {
+          "tubo": "der",
+          "color": "amarillo",
+          "altura": 0.0,
+          "elevacion": 0.6,
+          "rebotes": [
+            {
+              "espejo": "izq",
+              "y": 2.3,
+              "z": 0.0
+            }
+          ],
+          "pausa": 1.1
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "nombre": "Maestro de la energía",
+      "radioAnillo": 1.6,
+      "velocidad": 3.7,
+      "radioEsfera": 0.46,
+      "tolerancia": 0.15,
+      "esferas": [
+        {
+          "tubo": "izq",
+          "color": "violeta",
+          "altura": 0.45,
+          "elevacion": 0.6,
+          "rebotes": [
+            {
+              "espejo": "der",
+              "y": 2.4,
+              "z": -1.2
+            },
+            {
+              "espejo": "izq",
+              "y": 3.0,
+              "z": -0.6
+            }
+          ],
+          "pausa": 1.2
+        },
+        {
+          "tubo": "der",
+          "color": "rosa",
+          "altura": -0.45,
+          "elevacion": 0.6,
+          "rebotes": [
+            {
+              "espejo": "izq",
+              "y": 2.6,
+              "z": -0.4
+            }
+          ],
+          "pausa": 0.9
+        },
+        {
+          "tubo": "der",
+          "color": "amarillo",
+          "altura": 0.4,
+          "elevacion": 0.6,
+          "rebotes": [
+            {
+              "espejo": "izq",
+              "y": 2.4,
+              "z": -1.2
+            },
+            {
+              "espejo": "der",
+              "y": 3.0,
+              "z": -0.6
+            }
+          ],
+          "pausa": 1.3
+        },
+        {
+          "tubo": "izq",
+          "color": "turquesa",
+          "altura": -0.4,
+          "elevacion": 0.6,
+          "rebotes": [
+            {
+              "espejo": "der",
+              "y": 2.9,
+              "z": -1.0
+            }
+          ],
+          "pausa": 1.0
+        }
+      ]
+    }
+  ],
+  "presentacion": {
+    "esfera": {
+      "tubo": "izq",
+      "color": "turquesa",
+      "altura": 0.1,
+      "elevacion": 1.4,
+      "rebotes": [
+        {
+          "espejo": "der",
+          "y": 3.3,
+          "z": -0.2
+        }
+      ]
+    },
+    "velocidad": 2.1,
+    "radioEsfera": 0.6
+  },
+  "demo": {
+    "esfera": {
+      "tubo": "der",
+      "color": "rosa",
+      "altura": 0.1,
+      "elevacion": 1.4,
+      "rebotes": [
+        {
+          "espejo": "izq",
+          "y": 3.3,
+          "z": -0.2
+        }
+      ]
+    },
+    "velocidad": 2.2,
+    "radioEsfera": 0.58,
+    "tolerancia": 0.14
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡Atrapa la Esfera Veloz!",
+    "subtituloIntro": "¡Prueba de reflejos en la central de energía!",
+    "introZoe": "¡Prueba de reflejos veloces! Mira las esferas que cruzan el túnel. Toca cuando una pase por el anillo brillante.",
+    "demoZeus": "¡Ojos muy abiertos! Toca cuando la esfera llegue al anillo.",
+    "instruccionZoe": "¡Prueba de reflejos veloces! Mantén tus ojos en el centro y toca cuando la esfera pase dentro del anillo brillante.",
+    "demoMuyBien": "¡Así se atrapa!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "acierto": [
+      "¡Velocidad pura!",
+      "¡Muy bien!",
+      "¡La atrapaste!",
+      "¡Qué reflejos!",
+      "¡Excelente!",
+      "¡Energía capturada!"
+    ],
+    "temprano": [
+      "¡Espera a que llegue la esfera!",
+      "¡Espera a que llegue!",
+      "¡Mira el anillo!",
+      "¡Ya casi!"
+    ],
+    "tarde": [
+      "¡Casi! Vamos con la siguiente.",
+      "¡Casi! Vamos otra vez.",
+      "¡Sigue la esfera!",
+      "¡La próxima será tuya!"
+    ],
+    "pasa": [
+      "¡La próxima será tuya!",
+      "¡Sigue la esfera!",
+      "¡Casi! Vamos con la siguiente."
+    ],
+    "ayuda": [
+      "¡Mira el anillo!",
+      "¡Toca cuando el anillo se ponga verde!",
+      "¡Sigue la esfera con tus ojos!"
+    ],
+    "pistaToca": "¡Toca cuando el anillo se ponga verde!",
+    "rondaInicio": [
+      {
+        "pj": "zoe",
+        "texto": "¡Prueba de reflejos veloces! Mantén tus ojos en el centro y toca cuando la esfera pase dentro del anillo brillante."
+      },
+      {
+        "pj": "zeus",
+        "texto": "¡Reflejos en acción! Ahora las esferas salen de otras tuberías."
+      },
+      {
+        "pj": "zoe",
+        "texto": "¡Maestro de la energía! Las esferas van más rápido. ¡Ojos muy abiertos!"
+      }
+    ],
+    "rondaLista": "¡Muy bien! ¡Tus reflejos son cada vez más rápidos!",
+    "rondaListaTitulo": "¡RONDA {n} LISTA!",
+    "rondaListaSub": "¡{c} esferas de energía capturadas!",
+    "rondaSiguienteTitulo": "¡RONDA {n}!",
+    "rondaDe": "Ronda {n} de {t}",
+    "capturasDe": "Capturas: {n} de {t}",
+    "finalTitulo": "¡REFLEJOS DE SÚPER HÉROE!",
+    "finalSub": "Tu coordinación ojo-mano es tan rápida como la luz.",
+    "final": "¡REFLEJOS DE SÚPER HÉROE! Tu coordinación ojo-mano es tan rápida como la luz.",
+    "finalZoe": "¡REFLEJOS DE SÚPER HÉROE!",
+    "finalZeus": "Tu coordinación ojo-mano es tan rápida como la luz.",
+    "botonOtraVez": "Jugar nuevamente",
+    "botonMenu": "Volver al menú",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Bienvenidos a la central de energía! Aquí viajan esferas de luz muy veloces."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Vamos a atraparlas cuando pasen por el anillo brillante!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Coordinación visual: seguir, anticipar y tocar a tiempo"
+    }
+  ]
+}

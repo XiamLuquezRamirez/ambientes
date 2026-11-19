@@ -102,7 +102,7 @@ function sonidoBaldosa(id, corto) {
 // ------------------------------------------------------------------ la música baja mientras suenan los efectos
 
 /** Cuánto queda la música de fondo mientras suena un efecto (fracción de su volumen). */
-const FACTOR_FONDO_EFECTOS = 0.25;
+const FACTOR_FONDO_EFECTOS = 0.6;
 /** Nivel al que vuelve la música (1; en el cierre queda más baja). */
 let factorFondoBase = 1;
 let fondoAgachado = false;
@@ -1763,7 +1763,7 @@ function continuar() {
 let fxListo = Promise.resolve(false);
 
 $(document).ready(function () {
-    gameConfig = JSON.parse(readText("config.json?v=20261114b"));
+    gameConfig = JSON.parse(readText("config.json?v=20261119vol"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = textos().conversacion || [];
     const problemas = ReglasHuellas.revisarJuego(gameConfig);

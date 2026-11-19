@@ -1052,7 +1052,7 @@ function apiDemo() {
 let escenario_listo = Promise.resolve(false);
 
 $(document).ready(function () {
-    gameConfig = JSON.parse(readText("config.json?v=20261112e"));
+    gameConfig = JSON.parse(readText("config.json?v=20261119vol"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = textos().conversacion || [];
     sincronizarDialogoIntro3d();
