@@ -2,17 +2,17 @@
   "nombre": "Dos Sonidos",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Toca los sonidos en el mismo orden que los escuchaste.",
-    "demostracionAcierto": "¡Así se repite la secuencia!",
+    "demostracion": "¡Mira! Arrastra el barco hasta la boya que sigue la canción.",
+    "demostracionAcierto": "¡Así se arma la canción!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "Escucha atentamente."
+        "texto": "¡Ahoy! Tú eres el capitán del barco."
       },
       {
         "personaje": 0,
-        "texto": "Ahora vamos a repetir."
+        "texto": "Recoge las boyas que siguen la canción del loro."
       }
     ]
   },
@@ -165,11 +165,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "Escucha atentamente."
+          "texto": "¡Ahoy! Tú eres el capitán del barco."
         },
         {
           "personaje": 0,
-          "texto": "Ahora vamos a repetir."
+          "texto": "Recoge las boyas que siguen la canción del loro."
         }
       ],
       "retos": [
@@ -225,7 +225,7 @@
           "preguntas": [
             {
               "voz": "zeus",
-              "texto": "¡Ahora tócalos en el mismo orden!"
+              "texto": "¡Maneja el barco con tu dedo y recoge las boyas que siguen la canción!"
             }
           ]
         }

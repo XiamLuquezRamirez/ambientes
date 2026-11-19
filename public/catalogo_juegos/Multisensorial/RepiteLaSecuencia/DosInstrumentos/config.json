@@ -2,17 +2,17 @@
   "nombre": "Dos Instrumentos",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Toca los instrumentos en el mismo orden que sonaron.",
-    "demostracionAcierto": "¡Así se repite la secuencia!",
+    "demostracion": "¡Mira! Sube y baja el globo con tu dedo y atrapa el instrumento que sigue la canción.",
+    "demostracionAcierto": "¡Así crece la orquesta!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "Escucha atentamente."
+        "texto": "¡Sube al globo de la orquesta!"
       },
       {
         "personaje": 0,
-        "texto": "Ahora vamos a repetir."
+        "texto": "Atrapa los instrumentos que siguen la canción."
       }
     ]
   },
@@ -165,11 +165,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "Escucha atentamente."
+          "texto": "¡Sube al globo de la orquesta!"
         },
         {
           "personaje": 0,
-          "texto": "Ahora vamos a repetir."
+          "texto": "Atrapa los instrumentos que siguen la canción."
         }
       ],
       "retos": [
@@ -226,7 +226,7 @@
           "preguntas": [
             {
               "voz": "zeus",
-              "texto": "¡Ahora tócalos en el mismo orden!"
+              "texto": "¡Sube y baja el globo con tu dedo! Atrapa el instrumento que sigue la canción."
             }
           ]
         }

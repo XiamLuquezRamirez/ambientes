@@ -2,17 +2,17 @@
   "nombre": "Tres Sonidos",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Lleva la carta a las casitas en el mismo orden que sonaron.",
-    "demostracionAcierto": "¡Así se repite la secuencia!",
+    "demostracion": "¡Mira! Apila los bloques en el orden de la canción, de abajo hacia arriba.",
+    "demostracionAcierto": "¡Así se construye la torre sonora!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "Escucha atentamente."
+        "texto": "¡Bienvenido al taller del duende!"
       },
       {
         "personaje": 0,
-        "texto": "Ahora vamos a repetir."
+        "texto": "Construye la torre en el orden de la canción."
       }
     ]
   },
@@ -165,11 +165,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "Escucha atentamente."
+          "texto": "¡Bienvenido al taller del duende!"
         },
         {
           "personaje": 0,
-          "texto": "Ahora vamos a repetir."
+          "texto": "Construye la torre en el orden de la canción."
         }
       ],
       "retos": [
@@ -228,7 +228,7 @@
           "preguntas": [
             {
               "voz": "zeus",
-              "texto": "¡Ahora tócalos en el mismo orden!"
+              "texto": "¡Apila los bloques en el mismo orden de la canción, de abajo hacia arriba!"
             }
           ]
         }

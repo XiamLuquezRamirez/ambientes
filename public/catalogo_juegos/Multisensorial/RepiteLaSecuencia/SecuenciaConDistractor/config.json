@@ -2,17 +2,17 @@
   "nombre": "Secuencia Con Distractor",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Sube al cohete solo los sonidos que escuchaste, en orden.",
-    "demostracionAcierto": "¡Así se repite la secuencia!",
+    "demostracion": "¡Mira! Mueve el visor hasta el intruso y mantenlo quieto para tomarle la foto.",
+    "demostracionAcierto": "¡Así se fotografía al intruso!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "Escucha atentamente."
+        "texto": "¡Eres el fotógrafo del safari!"
       },
       {
         "personaje": 0,
-        "texto": "Ahora vamos a repetir."
+        "texto": "Fotografía al animal que no está en la lista."
       }
     ]
   },
@@ -165,11 +165,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "Escucha atentamente."
+          "texto": "¡Eres el fotógrafo del safari!"
         },
         {
           "personaje": 0,
-          "texto": "Ahora vamos a repetir."
+          "texto": "Fotografía al animal que no está en la lista."
         }
       ],
       "retos": [
@@ -224,7 +224,7 @@
           "preguntas": [
             {
               "voz": "zeus",
-              "texto": "¡Ahora tócalos en el mismo orden!"
+              "texto": "¡Fotografía al intruso! Es el animal que no está en la lista de invitados."
             }
           ]
         }
