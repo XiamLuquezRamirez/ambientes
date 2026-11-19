@@ -118,12 +118,15 @@
         ctx.closePath();
     }
 
-    function cargarImagen(svg) {
+    function cargarImagen(src) {
         return new Promise(function (resolve) {
+            if (!src) { resolve(null); return; }
             var img = new Image();
             img.onload = function () { resolve(img); };
             img.onerror = function () { resolve(null); };
-            img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+            img.src = src.charAt(0) === "<"
+                ? "data:image/svg+xml;charset=utf-8," + encodeURIComponent(src)
+                : src;
         });
     }
 
@@ -260,12 +263,22 @@
         });
         ctx.globalAlpha = 1;
         if (img) {
-            var s = TW * 0.74;
+            var iw = img.naturalWidth || img.width || 1;
+            var ih = img.naturalHeight || img.height || 1;
+            var maxW = TW * 0.78;
+            var maxH = TH * 0.50;
+            var sc = Math.min(maxW / iw, maxH / ih);
+            var dw = iw * sc;
+            var dh = ih * sc;
+            var dx = (TW - dw) / 2;
+            var dy = cy - dh / 2;
+            if (dy < 40) dy = 40;
+            if (dy + dh > TH * 0.72) dy = TH * 0.72 - dh;
             ctx.save();
             ctx.shadowColor = "rgba(92,59,30,0.25)";
             ctx.shadowBlur = 14;
             ctx.shadowOffsetY = 8;
-            ctx.drawImage(img, (TW - s) / 2, cy - s / 2, s, s);
+            ctx.drawImage(img, dx, dy, dw, dh);
             ctx.restore();
         }
         // nombre en una cinta

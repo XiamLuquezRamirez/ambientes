@@ -1,0 +1,118 @@
+{
+  "nombre": "El Tiro al Blanco en Movimiento",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 45,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "lanzamientosPorRonda": 4,
+    "gravedad": 300,
+    "velDisco": 1300,
+    "radioDisco": 12,
+    "arrastreMin": 30,
+    "radioMira": 140,
+    "alcanceMin": 150,
+    "margenMira": 24,
+    "anguloMin": 12,
+    "anguloMax": 168,
+    "zona": { "x0": 360, "x1": 1240, "y0": 215, "y1": 445 },
+    "zonas": [
+      { "id": "centro", "hasta": 0.34, "puntos": 50 },
+      { "id": "medio", "hasta": 0.67, "puntos": 20 },
+      { "id": "exterior", "hasta": 1, "puntos": 10 }
+    ],
+    "anticipoS": 0.35,
+    "fallosParaSombra": 2,
+    "ayudaMs": 12000,
+    "ayudaRepetirMs": 15000,
+    "vozPausaMs": 2600
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "nombre": "Aprende a apuntar",
+      "radio": 120,
+      "velocidad": 115,
+      "patrones": ["horizontal-der", "horizontal-izq"],
+      "sombra": { "lanzamientos": 4, "ms": 2600, "alApuntar": true }
+    },
+    {
+      "id": 2,
+      "nombre": "Anticipa el movimiento",
+      "radio": 102,
+      "velocidad": 150,
+      "patrones": ["horizontal-der", "horizontal-izq", "diagonal-sube", "diagonal-baja"],
+      "sombra": { "lanzamientos": 2, "ms": 1500, "alApuntar": false }
+    },
+    {
+      "id": 3,
+      "nombre": "Desafío estelar",
+      "radio": 96,
+      "velocidad": 180,
+      "patrones": ["diagonal-sube", "vertical", "ondulatorio", "combinado"],
+      "sombra": { "lanzamientos": 1, "ms": 1200, "alApuntar": false }
+    }
+  ],
+  "demo": {
+    "patron": "horizontal-der",
+    "velocidad": 120,
+    "radio": 120,
+    "velDisco": 1350
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡El Tiro al Blanco!",
+    "subtituloIntro": "¡Lanza tu disco de luz!",
+    "introZeus": "¡Alerta de puntería, súper atleta! La diana se mueve en el aire. Ajusta tu mira y lanza tu disco de luz para intentar acertar.",
+    "demoZoe": "¡Apunta un poquito adelante de la diana para que el disco la encuentre en el aire!",
+    "zoeMira": "¡Mira dónde se mueve!",
+    "zoeAdelante": "¡Apunta un poquito más adelante!",
+    "zoeLanza": "¡Ahora puedes lanzar!",
+    "zoeSigue": "¡Sigue la diana con tus ojos!",
+    "zeusCarga": "¡Carga tu disco!",
+    "zeusApunta": "¡Apunta y dispara!",
+    "zeusBien": "¡Muy buen lanzamiento!",
+    "zeusSigue": "¡Intenta seguir su camino!",
+    "fallo": "¡Casi! Lánzalo un instante antes para que se encuentren en el camino.",
+    "rondaLista": "¡Muy bien! ¡Tu puntería está mejorando!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "rondaListaTitulo": "¡RONDA {n} LISTA!",
+    "rondaListaSub": "+{p} puntos en esta ronda",
+    "rondaSiguienteTitulo": "¡RONDA {n}!",
+    "pistaArrastra": "Toca el disco y arrastra dentro de la esfera",
+    "pistaMasLargo": "Arrastra hacia donde quieres lanzar",
+    "lanzamientoDe": "Lanzamiento {n} de {t}",
+    "instruccionRonda": [
+      { "pj": "zeus", "texto": "¡Apunta y dispara!" },
+      { "pj": "zoe", "texto": "¡Sigue la diana con tus ojos!" },
+      { "pj": "zoe", "texto": "¡Mira dónde se mueve!" }
+    ],
+    "ayuda": [
+      "¡Ahora puedes lanzar!",
+      "¡Mira dónde se mueve!",
+      "¡Apunta un poquito más adelante!"
+    ],
+    "final": "¡Qué gran vista y precisión! Seguiste la diana, calculaste su movimiento y lograste lanzamientos increíbles. ¡Eres un campeón de la puntería espacial!",
+    "finalZoe": "¡Qué gran vista y precisión! Seguiste la diana, calculaste su movimiento y lograste lanzamientos increíbles.",
+    "finalZeus": "¡Eres un campeón de la puntería espacial!",
+    "finalTitulo": "¡QUÉ GRAN VISTA Y PRECISIÓN!",
+    "botonOtraVez": "Jugar nuevamente",
+    "botonMenu": "Volver al menú",
+    "conversacion": [
+      { "personaje": 0, "texto": "¡Hola, amigos! Hoy entrenamos en la arena espacial de puntería." },
+      { "personaje": 1, "texto": "¡Vamos a lanzar discos de luz a una diana que vuela!" }
+    ]
+  },
+  "niveles": [
+    { "id": "5", "edad": "5-6 años", "titulo": "Coordinación visual: seguir, anticipar y lanzar" }
+  ]
+}

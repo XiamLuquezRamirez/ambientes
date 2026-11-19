@@ -1,0 +1,127 @@
+{
+  "nombre": "¡La Hora de Comer!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 45,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "abreMs": 320,
+    "cierraMs": 260,
+    "umbralApertura": 0.6,
+    "radioBoca": 92,
+    "radioBocaPorFallo": 12,
+    "radioBocaMax": 140,
+    "ayudaMs": 10000,
+    "ayudaRepetirMs": 14000,
+    "vozPausaMs": 2600
+  },
+  "frutas": [
+    { "id": "manzana", "nombre": "la manzana" },
+    { "id": "pera", "nombre": "la pera" },
+    { "id": "banano", "nombre": "el banano" },
+    { "id": "naranja", "nombre": "la naranja" },
+    { "id": "fresa", "nombre": "la fresa" },
+    { "id": "uvas", "nombre": "las uvas" }
+  ],
+  "objetos": [
+    { "id": "cuchara", "nombre": "la cuchara" },
+    { "id": "tenedor", "nombre": "el tenedor" },
+    { "id": "cuchillo", "nombre": "el cuchillo" },
+    { "id": "salero", "nombre": "el salero" },
+    { "id": "taza", "nombre": "la taza" }
+  ],
+  "rondas": [
+    {
+      "id": 1,
+      "titulo": "RONDA 1",
+      "nombre": "Despacito",
+      "frutas": ["manzana", "pera", "banano", "naranja"],
+      "objetos": ["cuchara"],
+      "velocidad": 0.55,
+      "rango": 110,
+      "variacion": 0,
+      "cerradaMs": 1900,
+      "abiertaMs": 3400,
+      "frenaAlAbrir": 1
+    },
+    {
+      "id": 2,
+      "titulo": "RONDA 2",
+      "nombre": "Más rápido",
+      "frutas": ["fresa", "manzana", "uvas", "pera"],
+      "objetos": ["tenedor", "salero"],
+      "velocidad": 0.8,
+      "rango": 210,
+      "variacion": 0.15,
+      "cerradaMs": 2300,
+      "abiertaMs": 2600,
+      "frenaAlAbrir": 0.5
+    },
+    {
+      "id": 3,
+      "titulo": "RONDA 3",
+      "nombre": "¡A toda velocidad!",
+      "frutas": ["naranja", "banano", "fresa", "uvas"],
+      "objetos": ["cuchillo", "taza"],
+      "velocidad": 1.0,
+      "rango": 290,
+      "variacion": 0.3,
+      "cerradaMs": 2600,
+      "abiertaMs": 2000,
+      "frenaAlAbrir": 0
+    }
+  ],
+  "demo": {
+    "fruta": "manzana"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡La Hora de Comer!",
+    "subtituloIntro": "¡Alimenta al osito!",
+    "introZoe": "¡Hola! ¡Nuestro osito tiene mucha hambre! Ayúdalo a comer sus frutas favoritas. Observa cuándo abre su boquita y lleva la fruta hasta ella.",
+    "demoZeus": "¡Mira! Espera a que abra la boca, toma una fruta y llévala hasta él.",
+    "zoeMira": "¡Mira cómo se mueve el osito!",
+    "zoeEspera": "¡Espera a que abra su boquita!",
+    "zoeBien": "¡Muy bien! ¡Ya tiene su fruta!",
+    "zeusDespacito": "¡Acércala despacito!",
+    "zeusFeliz": "¡Eso es! ¡El osito está feliz!",
+    "zoeOtraVez": "¡Inténtalo otra vez!",
+    "noSeCome": "¡Eso no se come! Dale una fruta al osito.",
+    "rondaLista": "¡Muy bien! ¡El osito está muy contento!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "rondaListaTitulo": "¡RONDA {n} LISTA!",
+    "rondaSiguienteTitulo": "¡RONDA {n}!",
+    "instruccionRonda": [
+      { "pj": "zoe", "texto": "¡Mira cómo se mueve el osito!" },
+      { "pj": "zoe", "texto": "¡Espera a que abra su boquita!" },
+      { "pj": "zeus", "texto": "¡Acércala despacito!" }
+    ],
+    "ayuda": [
+      "¡Espera a que abra su boquita!",
+      "¡Mira cómo se mueve el osito!"
+    ],
+    "final": "¡ESPECTACULAR COORDINACIÓN VISUAL! Alimentaste al osito y completaste todos los desafíos. ¡Aprendiste a observar, esperar y coordinar tus movimientos para ayudar a nuestro amigo!",
+    "finalZoe": "¡ESPECTACULAR COORDINACIÓN VISUAL! Alimentaste al osito y completaste todos los desafíos.",
+    "finalZeus": "¡Aprendiste a observar, esperar y coordinar tus movimientos para ayudar a nuestro amigo!",
+    "finalTitulo": "¡ESPECTACULAR COORDINACIÓN VISUAL!",
+    "finalResultado": "¡{n} FRUTAS ENTREGADAS!",
+    "botonOtraVez": "Jugar nuevamente",
+    "botonMenu": "Volver al menú",
+    "conversacion": [
+      { "personaje": 0, "texto": "¡Hola, amigos! Hoy vamos de picnic al bosque con nuestro amigo el osito." },
+      { "personaje": 1, "texto": "¡Vamos a darle sus frutas favoritas!" }
+    ]
+  },
+  "niveles": [
+    { "id": "3", "edad": "3-4 años", "titulo": "Coordinación visual: esperar y alimentar" }
+  ]
+}

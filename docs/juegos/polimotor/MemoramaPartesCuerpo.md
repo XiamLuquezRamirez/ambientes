@@ -20,9 +20,7 @@ sin diseño para teléfonos.
   ronda 1 mano y pie · ronda 2 dos de ojos/nariz/boca · ronda 3 dos de oreja/cabeza/brazo/pierna.
 - **Ronda final de 6 tarjetas** (2026-11-13): `resto: true`, `parejas: 3`. No sortea un grupo nuevo: juega las tres
   partes de los grupos anteriores que esa partida no usó. Así se ven las nueve partes, sin repetir dibujos.
-- **Más partes del cuerpo reutilizando dibujos de Polimotor**: ojos, nariz, boca, oreja (`orejas`), cabeza, brazo,
-  pierna (y cuello, sin usar) copiados de `UnePartesCuerpo/iconos.js` a un bloque propio de `iconos.js` (con sus
-  colores). Mano y pie son los dibujos propios de este juego.
+- **Ilustraciones de las nueve partes** (2026-11-19): PNG con fondo transparente en `iconos/` (mano, pie, ojos, nariz, boca, oreja como `orejas`, cabeza, brazo, pierna). `iconos.js` solo apunta a esos archivos. No usa los SVG de `UnePartesCuerpo` ni `comun/partes-cuerpo.js`.
 - **"Faltaba la intro" y la dice Zeus**: presentación y demostración narradas por Zeus, con **Zeus 3D** (`guia-3d.js`,
   copia del de "¿Dónde lo uso?" con `nino.glb`) que entra caminando, se para a la izquierda de las tarjetas con su
   nube de texto y se va caminando antes de "¡A jugar!". En la partida no está.
@@ -66,7 +64,7 @@ partida → "¡RONDA n LISTA!" con confeti → las tarjetas se cierran (`reinici
 | Archivo | Global | Qué hace |
 |---|---|---|
 | `reglas.js` | `ReglasMemorama` | Puro (también `module.exports`): estados `preview → waiting → firstCard → secondCard → checking/matched → waiting/completed`; `rondas`, `ronda(cfg, i, rnd)` (sortea 2 partes del grupo), `crear` (reparte 2 + 2 al azar, distinto del orden anterior), `iniciar`, `tocar`, `comparar` (por `id`, nunca por el texto), `terminarTurno`, `progreso`, `cerradas`, `plantilla`, `listaPartes`, `revisarConfig`, `revisarJuego`. |
-| `iconos.js` | `IconosMemorama` | Mano y pie propios (SVG 200 × 200, contorno de calcomanía) + copia de las partes de "Une" (SVG 120 × 120). `dataUri(id)` para la barra y la felicitación. |
+| `iconos.js` | `IconosMemorama` | Rutas a los PNG de `iconos/` (la oreja va como `orejas.png`, que es el `dibujo` de config). `dataUri(id)` para la barra y la felicitación. |
 | `sonidos.js` | `SonidosMemorama` | Web Audio sin archivos: `volteo`, `acorde`, `suave`, `aplauso`, `paso`. |
 | `escenario-phaser.js` | `EscenarioMemorama` | Tablero, tarjetas (contenedores `ext` → `cuerpo` → `volteo`), entrada, `voltear`, `cuenta`, `pareja`, `aplausos`/`huellas`, `celebrarFinal`, `reiniciar`, resaltado con el cursor, `puntoCarta(i)`. |
 | `demo.js` | `MemoramaDemo` | Demostración con la mano (pareja distinta y luego pareja igual), narrada por Zeus. |
@@ -80,7 +78,7 @@ dibujo en `iconos.js` + entrada en `partes` + su id en el grupo de una ronda.
 ## Probar
 
 - `node scripts/probar-memorama-partes-cuerpo.js` (19 pruebas: 3 rondas de 4 tarjetas, sorteo dentro del grupo y
-  que salgan todas las partes, dibujos copiados de Une, siempre 2 + 2, las 6 posiciones, reinicio con orden
+  que salgan todas las partes, PNG de cada parte, siempre 2 + 2, las 6 posiciones, reinicio con orden
   distinto, bloqueos, pareja correcta/incorrecta, ronda completa, textos pedidos).
 - En el navegador: `EscenarioMemorama.puntoCarta(i)` da el centro de la tarjeta en pantalla; `mousedown` en el canvas
   y `mouseup` en `window`. `st` (estado) y `ReglasMemorama.orden(st)` dicen dónde está cada tarjeta.

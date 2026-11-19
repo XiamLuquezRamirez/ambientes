@@ -1,0 +1,155 @@
+{
+  "nombre": "El Lanzador de Anillos de Zeus",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "ayudaMs": 9000,
+    "ayudaRepetirMs": 12000,
+    "vozPausaMs": 2600,
+    "guiaLanzamientos": 3,
+    "minSubida": 0.05,
+    "fuerzaMin": 0.4,
+    "fuerzaMax": 1.8,
+    "radioCaptura": 1.0,
+    "radioCapturaPorFallo": 0.16,
+    "radioCapturaMax": 1.5,
+    "correccionAngulo": 0.4
+  },
+  "anillos": [
+    {
+      "id": "rojo",
+      "nombre": "el anillo rojo",
+      "color": "#ef2b3c",
+      "brillo": "#ff7b86",
+      "dibujo": "rayas",
+      "voz": "¡El anillo rojo quedó ensartado!"
+    },
+    {
+      "id": "azul",
+      "nombre": "el anillo azul",
+      "color": "#1f6fff",
+      "brillo": "#7fb0ff",
+      "dibujo": "puntos",
+      "voz": "¡Muy bien! ¡El anillo azul está en el cono!"
+    },
+    {
+      "id": "amarillo",
+      "nombre": "el anillo amarillo",
+      "color": "#ffc21a",
+      "brillo": "#ffe27a",
+      "dibujo": "zigzag",
+      "voz": "¡Bravo! ¡El anillo amarillo entró!"
+    }
+  ],
+  "rondas": [
+    {
+      "id": 1,
+      "nombre": "Nivel 1",
+      "cono": {
+        "x": 0,
+        "z": -1.15
+      },
+      "zeus": {
+        "x": 1.6,
+        "z": -1.45
+      }
+    },
+    {
+      "id": 2,
+      "nombre": "Nivel 2",
+      "cono": {
+        "x": 0,
+        "z": -2.7
+      },
+      "zeus": {
+        "x": 1.8,
+        "z": -3.0
+      },
+      "voz": "¡Ahora mi cono está más lejos! Apunta bien y desliza tu dedo hacia arriba."
+    },
+    {
+      "id": 3,
+      "nombre": "Nivel 3",
+      "cono": {
+        "x": 0,
+        "z": -4.2
+      },
+      "zeus": {
+        "x": 2.0,
+        "z": -4.5
+      },
+      "voz": "¡Mi cono se fue todavía más lejos! Mira bien el cono y desliza tu dedo hacia arriba con fuerza."
+    }
+  ],
+  "demo": {
+    "anillo": "rojo"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "titulo": "¡El Lanzador de Anillos de Zeus!",
+    "subtitulo": "Parque de puntería mágica",
+    "instruccionZeus": "¡Juguemos a la puntería! Toma un anillo con tu dedo, deslízalo hacia arriba apuntando a mi cono y suéltalo para ensartarlo.",
+    "instruccionZoe": "¡Apunta al cono y desliza tu dedo hacia arriba!",
+    "saludoCorto": "¡Bienvenido a mi parque de puntería mágica!",
+    "demoToma": "Mira: tomo el anillo rojo con el dedo.",
+    "demoDesliza": "Lo deslizo hacia arriba, apuntando al cono… ¡y lo suelto!",
+    "demoBien": "¡Así se hace!",
+    "demoFin": "¡Ahora te toca a ti! Ensarta los tres anillos.",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "turnoZoe": "¡Toma un anillo y lánzalo al cono!",
+    "acierto": [
+      "¡Lo ensartaste!",
+      "¡Qué puntería!",
+      "¡Excelente lanzamiento!"
+    ],
+    "casi": "¡Casi lo lograste! ¡Inténtalo otra vez!",
+    "casiOtras": [
+      "¡Casi! ¡Apunta al cono e inténtalo otra vez!",
+      "¡Uy, por poquito! ¡Otra vez!"
+    ],
+    "corto": "¡Desliza tu dedo hacia arriba, hacia el cono!",
+    "ayuda": [
+      "¡Toma un anillo y deslízalo hacia arriba, hacia el cono!",
+      "¡Sigue la flechita de luz hasta el cono!"
+    ],
+    "faltan": "¡Ya casi! ¡Falta un anillo!",
+    "final": "¡QUÉ GRAN PUNTERÍA! Ensartaste todos los anillos de colores en el cono mágico. ¡Tienes una coordinación increíble!",
+    "finalZoe": "¡QUÉ GRAN PUNTERÍA! Ensartaste todos los anillos de colores en el cono mágico.",
+    "finalZeus": "¡Tienes una coordinación increíble!",
+    "cierre": "¡QUÉ GRAN PUNTERÍA! ¡Tienes una coordinación increíble!",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Juguemos a la puntería! Toma un anillo con tu dedo, deslízalo hacia arriba apuntando a mi cono y suéltalo para ensartarlo."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Apunta al cono y desliza tu dedo hacia arriba!"
+      }
+    ],
+    "nivelListoTitulo": "¡NIVEL {n} LISTO!",
+    "nivelListo": "¡Muy bien! ¡Los tres anillos están en el cono! Ahora, un reto más difícil.",
+    "nivelSiguienteTitulo": "¡NIVEL {n}!",
+    "nivelSiguienteSub": "El cono está más lejos"
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Coordinación visual: puntería y lanzamiento"
+    }
+  ]
+}
