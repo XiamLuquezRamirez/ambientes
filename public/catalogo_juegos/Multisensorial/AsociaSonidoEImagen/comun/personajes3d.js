@@ -11,6 +11,7 @@
 import * as THREE from "three";
 import { crearCargadorGltf } from "../../../intro3d/js/cargador-gltf.js";
 import { agregarLucesModelo } from "../../../intro3d/js/luces-modelo.js";
+import { ponerCareta } from "../../../intro3d/js/accesorios-modelo.js";
 
 const BASE = new URL("../../../intro3d/models/", import.meta.url);
 const URLS = { nino: new URL("nino.glb", BASE).href, nina: new URL("nina.glb", BASE).href };
@@ -96,6 +97,7 @@ function crear(modelo, o) {
         p.malla = malla;
         p.altoModelo = altoModelo;
         raiz.add(malla);
+        if (o.accesorio === "careta") { try { ponerCareta(THREE, malla); } catch (e) { console.warn("[AsociaPj3D] careta", e); } }
         p.mixer = new THREE.AnimationMixer(malla);
         (gltf.animations || []).forEach(function (clip) { p.acciones[clip.name.toLowerCase()] = p.mixer.clipAction(clip); });
         p.listo = true;
@@ -130,6 +132,7 @@ function crear(modelo, o) {
     };
     return p;
 }
+
 
 /** Píxeles de pantalla → mundo: los pies al pie de la caja de alto `alto` centrada en (x, y). */
 function aplicar(p) {

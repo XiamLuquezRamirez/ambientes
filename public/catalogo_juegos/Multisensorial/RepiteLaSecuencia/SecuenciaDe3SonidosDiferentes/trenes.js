@@ -23,7 +23,7 @@
     var C = Phaser.Display.Color;
 
     var VELOCIDAD = [92, 104, 116, 128];
-    var ESPERA = [3.4, 3.0, 2.6, 2.4];
+    var ESPERA = [2.4, 2.2, 2.0, 1.8];
     var COL_E = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8, 0xff922b];
     var COL_VAGON = [0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8];
     var BIOMAS = [
@@ -186,10 +186,12 @@
             f.lineTo(L.W + 20, L.H); f.closePath(); f.fillPath();
             f.fillStyle(B.suelo, 1); f.fillRect(0, hor + 90, L.W, L.H - hor - 90);
             for (var t = 0; t < 36; t++) { var tx = (t * 97 + hash(t) * 60) % L.W, ty = hor + 80 + (t * 53) % (L.H - hor - 90), th = 30 + hash(t + 9) * 26; if (tx > L.tunel - 20 && tx < L.xFin + 150 && ty > L.yTop - 40 && ty < L.yBot + 30) continue; f.fillStyle(0x5c3b1e, 1); f.fillRect(tx - 3, ty - th * 0.25, 6, th * 0.5); f.fillStyle(B.arbol, 1); f.fillTriangle(tx - th * 0.4, ty, tx + th * 0.4, ty, tx, ty - th); f.fillTriangle(tx - th * 0.32, ty - th * 0.4, tx + th * 0.32, ty - th * 0.4, tx, ty - th * 1.2); if (B.nieve) { f.fillStyle(0xffffff, 0.9); f.fillTriangle(tx - th * 0.14, ty - th * 0.95, tx + th * 0.14, ty - th * 0.95, tx, ty - th * 1.2); } }
-            // Río con puente de piedra al fondo y casitas.
-            f.fillStyle(B.rio, 1); f.beginPath(); f.moveTo(L.W * 0.1, L.H); f.lineTo(L.W * 0.2, hor + 100);
-            for (var q = 0; q <= 8; q++) f.lineTo(L.W * (0.2 + q * 0.05), hor + 100 + Math.sin(q * 1.3) * 8);
-            f.lineTo(L.W * 0.6, hor + 100); f.lineTo(L.W * 0.7, L.H); f.closePath(); f.fillPath();
+            // Laguna con juncos y flores, fuera del trazado de las vías.
+            var lx = L.W * 0.2, ly = L.H * 0.95;
+            f.fillStyle(mezcla(B.rio, 0x000000, 0.18), 1); f.fillEllipse(lx, ly, 330, 62);
+            f.fillStyle(B.rio, 1); f.fillEllipse(lx, ly - 3, 316, 52);
+            f.fillStyle(0xffffff, 0.35); f.fillEllipse(lx - 60, ly - 8, 80, 8);
+            for (var fl = 0; fl < 26; fl++) { var fx = (fl * 53 + 17) % L.W, fy = L.yBot + 46 + (fl * 37) % Math.max(10, L.H - L.yBot - 54); f.fillStyle([0xff6b6b, 0xffd43b, 0xffffff, 0xcc5de8][fl % 4], B.nieve ? 0.4 : 1); f.fillCircle(fx, fy, 3.2); }
             [0.08, 0.9].forEach(function (cx, i) { var x = L.W * cx, y = hor + 120 + i * 40; f.fillStyle(B.noche ? 0x1a2552 : 0xffe3b0, 1); f.fillRect(x - 30, y - 30, 60, 30); f.fillStyle(B.noche ? 0x0e1530 : 0xc92a2a, 1); f.fillTriangle(x - 38, y - 30, x + 38, y - 30, x, y - 62); f.fillStyle(B.noche ? 0xffe066 : 0x74c0fc, 1); f.fillRect(x - 8, y - 22, 14, 14); });
         },
 
@@ -211,19 +213,30 @@
                     g.strokePath();
                 });
             });
-            // Montaña con túneles: a la izquierda (entrada del tren) y a la derecha (salida de cada estación).
-            var B = BIOMAS[this.nivelV % 4];
-            tg.fillStyle(mezcla(B.lejos, 0x000000, 0.25), 1);
-            tg.fillRect(0, L.yTop - 80, L.tunel + 10, L.yBot - L.yTop + 160);
-            tg.fillTriangle(0, L.yTop - 80, L.tunel + 10, L.yTop - 80, 0, L.yTop - 150);
-            tg.fillStyle(0x111418, 1); tg.fillRoundedRect(L.tunel - 6, this.raiz.y - 30, 30, 60, { tl: 18, tr: 18, bl: 0, br: 0 });
-            tg.lineStyle(6, 0x6c757d, 1); tg.strokeRoundedRect(L.tunel - 6, this.raiz.y - 30, 30, 60, { tl: 18, tr: 18, bl: 0, br: 0 });
+            // Montañas con bocas de túnel: la del tren a la izquierda y la de las salidas a la derecha.
+            var B = BIOMAS[this.nivelV % 4], roca = mezcla(B.lejos, 0x3a2f2a, 0.45), rocaClara = mezcla(roca, 0xffffff, 0.18), self = this;
+            var montana = function (x0, x1, yTop, yBase) {
+                var pts = [{ x: x0, y: yBase }], n = 18;
+                for (var i = 0; i <= n; i++) { var u = i / n, x = x0 + (x1 - x0) * u; pts.push({ x: x, y: yTop + Math.abs(Math.sin(u * Math.PI * 1.5 + 0.4)) * -26 + 60 * Math.pow(Math.abs(u - 0.5) * 2, 2.2) + hash(i + x0) * 10 }); }
+                pts.push({ x: x1, y: yBase });
+                tg.fillStyle(roca, 1); tg.fillPoints(pts, true);
+                var cara = pts.slice(1, Math.ceil(pts.length / 2)).concat([{ x: x0 + (x1 - x0) * 0.5, y: yBase }, { x: x0, y: yBase }]);
+                tg.fillStyle(rocaClara, 0.55); tg.fillPoints(cara, true);
+                tg.lineStyle(3, mezcla(roca, 0x000000, 0.35), 0.6);
+                for (var k = 0; k < 9; k++) { var rx = x0 + (x1 - x0) * hash(k + x0 * 0.3), ry = yTop + 50 + hash(k + 33) * (yBase - yTop - 60); tg.lineBetween(rx, ry, rx + 16, ry + 9); tg.lineBetween(rx + 16, ry + 9, rx + 10, ry + 22); }
+                tg.fillStyle(B.nieve ? 0xffffff : B.medio, 1);
+                tg.fillPoints(pts.slice(1, -1).map(function (p) { return { x: p.x, y: p.y }; }).concat(pts.slice(1, -1).reverse().map(function (p) { return { x: p.x, y: p.y + 16 + hash(p.x) * 8 }; })), true);
+            };
+            montana(-10, L.tunel + 60, L.yTop - 120, L.yBot + 70);
             var xs = L.xFin + 80;
-            tg.fillStyle(mezcla(B.lejos, 0x000000, 0.25), 1);
-            tg.fillRect(xs, L.yTop - 80, L.W - xs, L.yBot - L.yTop + 160);
-            tg.fillTriangle(xs, L.yTop - 80, L.W, L.yTop - 80, L.W, L.yTop - 160);
-            this.estaciones.forEach(function (e) { tg.fillStyle(0x111418, 1); tg.fillRoundedRect(xs - 6, e.y - 28, 30, 56, { tl: 16, tr: 16, bl: 0, br: 0 }); tg.lineStyle(6, 0x6c757d, 1); tg.strokeRoundedRect(xs - 6, e.y - 28, 30, 56, { tl: 16, tr: 16, bl: 0, br: 0 }); });
-            if (B.nieve) { tg.fillStyle(0xffffff, 0.95); tg.fillRect(0, L.yTop - 82, L.tunel + 10, 8); tg.fillRect(xs, L.yTop - 82, L.W - xs, 8); }
+            montana(xs + 6, L.W + 10, L.yTop - 150, L.yBot + 70);
+            var portal = function (x, y) {
+                tg.fillStyle(0x6c757d, 1); tg.fillRoundedRect(x - 12, y - 40, 52, 70, { tl: 26, tr: 26, bl: 0, br: 0 });
+                tg.fillStyle(0x0b0d10, 1); tg.fillRoundedRect(x - 4, y - 32, 36, 62, { tl: 20, tr: 20, bl: 0, br: 0 });
+                tg.lineStyle(3, 0xadb5bd, 0.8); for (var q = -2; q <= 2; q++) tg.lineBetween(x + 14 + q * 11, y - 40, x + 14 + q * 8, y - 34);
+            };
+            portal(L.tunel - 4, this.raiz.y);
+            this.estaciones.forEach(function (e) { portal(xs + 18, e.y); });
         },
 
         /** Estaciones (andén, techo y cartel con el instrumento) y palancas de los cambiavías. */
@@ -237,16 +250,15 @@
                 g.fillStyle(e.col, 1); g.fillRoundedRect(-40, -78, 104, 16, 8);
                 g.fillStyle(0x7a4419, 1); g.fillRect(-26, -62, 6, 34); g.fillRect(50, -62, 6, 34);
                 g.fillStyle(0xadb5bd, 1); g.fillRoundedRect(-36, -34, 96, 10, 4);
-                var cart = self.add.container(24, -108);
+                e.sx = L.xFin + 80 + Math.min(120, (L.W - L.xFin - 80) * 0.5); e.sy = e.y; var cart = self.add.container(e.sx, e.sy).setDepth(36);
                 var cg = self.add.graphics();
                 cg.fillStyle(0x000000, 0.22); cg.fillCircle(3, 5, 30);
                 cg.fillStyle(0xffffff, 1); cg.fillCircle(0, 0, 30);
                 cg.lineStyle(5, e.col, 1); cg.strokeCircle(0, 0, 30);
                 var im = self.add.image(0, 0, 'el_' + e.id); im.setScale(40 / Math.max(im.width, im.height));
                 cart.add([cg, im]);
-                var poste = self.add.graphics(); poste.fillStyle(0x7a4419, 1); poste.fillRect(22, -80, 4, 20);
-                c.add([g, poste, cart]);
-                e.cont = c; e.cart = cart;
+                c.add([g]);
+                e.cont = c; e.cart = cart; self.objs.push(cart);
                 self.objs.push(c);
             });
             this.nodos.forEach(function (n) {
@@ -366,7 +378,7 @@
                 this.prog += 1;
                 this.efectos.push({ x: e.x, y: e.y - 40, t0: this.time.now, col: 0xffd43b });
                 K.tono({ f: 660 + this.prog * 110, f2: 990 + this.prog * 110, dur: 0.22, vol: 0.05 });
-                Ut.estallido(this, e.x + 24, e.y - 108, { n: 12, tex: 'estrella', tam: 26, dist: 120, depth: 71, sinTinte: true });
+                Ut.estallido(this, e.sx, e.sy, { n: 12, tex: 'estrella', tam: 26, dist: 120, depth: 71, sinTinte: true });
                 this.pista.reiniciar();
                 if (this.prog >= this.song.length) this.llegar();
             } else {
@@ -400,7 +412,7 @@
                 if (e) {
                     this.reunidos.push(e.id); e.pulso = this.time.now;
                     this.tweens.add({ targets: e.cart, scale: 1.3, duration: 150, yoyo: true });
-                    Ut.estallido(this, e.x + 24, e.y - 108, { n: 12, tex: 'estrella', tam: 26, dist: 120, depth: 71, sinTinte: true });
+                    Ut.estallido(this, e.sx, e.sy, { n: 12, tex: 'estrella', tam: 26, dist: 120, depth: 71, sinTinte: true });
                 }
                 await this.sonar(this.song[k], { breve: true, bocina: false });
             }
@@ -447,9 +459,9 @@
             if (this.fase !== 'jugar' && this.fase !== 'demo') return;
             var self = this, L = this.L;
             this.pista.reiniciar();
-            var nodo = this.nodos.filter(function (n) { return Math.hypot(p.x - n.x, p.y - (n.y + 44)) < 48; })[0];
+            var nodo = this.nodos.filter(function (n) { return (Math.hypot(p.x - n.x, p.y - (n.y + 44)) < 52 || Math.hypot(p.x - n.x, p.y - n.y) < 40); })[0];
             if (nodo) { this.girar(nodo); return; }
-            var est = this.estaciones.filter(function (e) { return Math.hypot(p.x - (e.x + 24), p.y - (e.y - 108)) < 40; })[0];
+            var est = this.estaciones.filter(function (e) { return Math.hypot(p.x - e.sx, p.y - e.sy) < 40; })[0];
             if (est) { est.pulso = this.time.now; this.tweens.add({ targets: est.cart, scale: 1.25, duration: 120, yoyo: true }); if (!this.sonando) this.sonar(est.id, { breve: true, bocina: false }); return; }
             if (this.tren && this.tren.estado === 'espera' && p.x < L.xRaiz + 40 && Math.abs(p.y - this.raiz.y) < 90) this.tren.t = this.espera;
         },
@@ -514,7 +526,8 @@
             var self = this, L = this.L;
             this.fiesta = true; this.spawnOn = false; this.tren = null;
             this.nivelV = 3; this.pintarEscenario();
-            this.objs.forEach(function (o) { if (o && o.active) tw(self, { targets: o, alpha: 0, duration: 300 }); });
+            this.objs.forEach(function (o) { if (o && o.active) o.setVisible(false); });
+            this.objs = [];
             this.viasG.clear(); this.rutaG.clear(); this.tunelG.clear();
             // Vía recta de lado a lado y tren de fiesta con los personajes saludando.
             var y = L.H * 0.62;
@@ -580,7 +593,7 @@
                     rg.lineStyle(30, 0xffe066, 0.22 + 0.1 * Math.sin(s * 5)); rg.beginPath(); a.pts.forEach(function (p, i) { if (!i) rg.moveTo(p.x, p.y); else rg.lineTo(p.x, p.y); }); rg.strokePath();
                     for (var i = 4; i < a.pts.length; i += 6) { var f = ((i / 6) - (s * 6)) % 3; if (Math.abs(f) < 0.5) { var p = a.pts[i]; rg.fillStyle(0xffffff, 0.8); rg.fillCircle(p.x, p.y, 3); } }
                 });
-                if (ruta.destino) { var d = ruta.destino; rg.lineStyle(5, 0xffe066, 0.6 + 0.4 * Math.sin(s * 6)); rg.strokeCircle(d.x + 24, d.y - 108, 38); }
+                if (ruta.destino) { var d = ruta.destino; rg.lineStyle(5, 0xffe066, 0.6 + 0.4 * Math.sin(s * 6)); rg.strokeCircle(d.sx, d.sy, 38); }
                 // Palancas: la flecha indica el lado que está activo (arriba / abajo).
                 this.nodos.forEach(function (n) {
                     var pf = n.palanca.flecha; pf.clear();
@@ -626,8 +639,8 @@
             this.humo.forEach(function (h) { h.t += dt; h.x += h.vx * dt; h.y += h.vy * dt; h.r += dt * 16; tg.fillStyle(B.noche ? 0x8a93b0 : 0xffffff, 0.55 * (1 - h.t / 1.6)); tg.fillCircle(h.x, h.y, h.r); });
             // Estaciones: la señal parpadea al llegar el tren.
             this.estaciones.forEach(function (e) {
-                if (e.pulso && time - e.pulso < 800) { var f = (time - e.pulso) / 800; lz.lineStyle(5 * (1 - f) + 1, e.col, 0.9 * (1 - f)); lz.strokeCircle(e.x + 24, e.y - 108, 32 + f * 40); }
-                if (e.cart && e.cart.active && !self.tweens.isTweening(e.cart)) e.cart.y = -108 + Math.sin(s * 2 + e.y) * 1.5;
+                if (e.pulso && time - e.pulso < 800) { var f = (time - e.pulso) / 800; lz.lineStyle(5 * (1 - f) + 1, e.col, 0.9 * (1 - f)); lz.strokeCircle(e.sx, e.sy, 32 + f * 40); }
+                if (e.cart && e.cart.active && !self.tweens.isTweening(e.cart)) e.cart.y = e.sy + Math.sin(s * 2 + e.y) * 1.5;
             });
             // Bombillas del programa (arriba a la izquierda).
             var n = this.song ? this.song.length : 0;
