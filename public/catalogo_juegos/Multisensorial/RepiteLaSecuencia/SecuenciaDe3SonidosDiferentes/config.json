@@ -2,17 +2,17 @@
   "nombre": "Secuencia De 3 Sonidos Diferentes",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Toca cada cabina cuando pase, en el mismo orden en que sonó.",
-    "demostracionAcierto": "¡Así se repite la secuencia!",
+    "demostracion": "¡Mira! Escucha el ritmo y tócalo igual en el tambor.",
+    "demostracionAcierto": "¡Así se repite un ritmo!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "Escucha el sonido secreto."
+        "texto": "Escucha el ritmo con mucha atención."
       },
       {
         "personaje": 0,
-        "texto": "Y repítelo en el mismo orden."
+        "texto": "Y tócalo igual: rápido, lento y con silencios."
       }
     ]
   },
@@ -165,11 +165,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "Escucha el sonido secreto."
+          "texto": "Escucha el ritmo con mucha atención."
         },
         {
           "personaje": 0,
-          "texto": "Y repítelo en el mismo orden."
+          "texto": "Y tócalo igual: rápido, lento y con silencios."
         }
       ],
       "retos": [
@@ -225,7 +225,7 @@
           "preguntas": [
             {
               "voz": "zeus",
-              "texto": "¡Ahora repite el código en el mismo orden!"
+              "texto": "¡Ahora tócalo igual, al mismo ritmo!"
             }
           ]
         }

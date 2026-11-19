@@ -2,17 +2,17 @@
   "nombre": "Secuencia De 4 Sonidos",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Manda cada sonido a la caja en el mismo orden en que sonó.",
-    "demostracionAcierto": "¡Así se repite la secuencia!",
+    "demostracion": "¡Mira! Cada sonido mueve al robot. Toca la casilla donde llegará.",
+    "demostracionAcierto": "¡Así se programa al robot!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "Escucha el sonido secreto."
+        "texto": "Cada sonido es una orden para el robot."
       },
       {
         "personaje": 0,
-        "texto": "Y repítelo en el mismo orden."
+        "texto": "Escucha el programa y toca dónde llegará."
       }
     ]
   },
@@ -165,11 +165,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "Escucha el sonido secreto."
+          "texto": "Cada sonido es una orden para el robot."
         },
         {
           "personaje": 0,
-          "texto": "Y repítelo en el mismo orden."
+          "texto": "Escucha el programa y toca dónde llegará."
         }
       ],
       "retos": [
@@ -228,7 +228,7 @@
           "preguntas": [
             {
               "voz": "zeus",
-              "texto": "¡Ahora repite el código en el mismo orden!"
+              "texto": "¿A dónde llegará el robot?"
             }
           ]
         }
