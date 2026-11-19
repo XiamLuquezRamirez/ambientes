@@ -123,6 +123,45 @@
       ],
       "port": 8033,
       "autoPort": false
+    },
+    {
+      "name": "juegos-lanzador",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8038",
+        "--directory",
+        "public"
+      ],
+      "port": 8038,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-comer",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8039",
+        "--directory",
+        "public"
+      ],
+      "port": 8039,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-tiro",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8040",
+        "--directory",
+        "public"
+      ],
+      "port": 8040,
+      "autoPort": false
     }
   ]
 }

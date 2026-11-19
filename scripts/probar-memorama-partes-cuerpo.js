@@ -12,7 +12,7 @@ const dir = path.join(__dirname, "..", "public", "catalogo_juegos", "Polimotor",
 const R = require(path.join(dir, "reglas.js"));
 const config = JSON.parse(fs.readFileSync(path.join(dir, "config.json"), "utf8"));
 const iconosJs = fs.readFileSync(path.join(dir, "iconos.js"), "utf8");
-const dibujos = [...iconosJs.matchAll(/SVG\.(\w+) = /g)].map(function (m) { return m[1]; });
+const dibujos = [...iconosJs.matchAll(/(\w+): "iconos\/\1\.png"/g)].map(function (m) { return m[1]; });
 const r1 = R.ronda(config, 0);
 
 let ok = 0;
@@ -108,11 +108,13 @@ prueba("lista de partes para las voces", function () {
         "¡Nuevas partes de la cara! Busca los ojos y la nariz.");
 });
 
-prueba("las partes nuevas reutilizan dibujos de otro juego Polimotor (Une las Partes del Cuerpo)", function () {
-    const une = fs.readFileSync(path.join(dir, "..", "UnePartesCuerpo", "iconos.js"), "utf8");
-    ["ojos", "nariz", "boca", "orejas", "cabeza", "brazo", "pierna"].forEach(function (d) {
-        assert.ok(une.includes("SVG." + d + " = "), d + " no está en Une");
-        assert.ok(dibujos.includes(d), d + " no está copiado");
+prueba("cada parte tiene su PNG en iconos/", function () {
+    ["mano", "pie", "ojos", "nariz", "boca", "orejas", "cabeza", "brazo", "pierna"].forEach(function (d) {
+        assert.ok(dibujos.includes(d), d + " no está en iconos.js");
+        assert.ok(fs.existsSync(path.join(dir, "iconos", d + ".png")), "falta iconos/" + d + ".png");
+    });
+    config.partes.forEach(function (p) {
+        assert.ok(dibujos.includes(p.dibujo), p.id + " no tiene archivo");
     });
 });
 

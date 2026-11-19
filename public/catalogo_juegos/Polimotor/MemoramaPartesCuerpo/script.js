@@ -18,7 +18,7 @@
  * avanza y pide a la escena las animaciones. Cada ronda lleva un número (partidaId): una animación que termina
  * después de un reinicio no toca la ronda nueva.
  *
- * Módulos: ReglasMemorama (estados y rondas, puro) · IconosMemorama (dibujos; los nuevos, copiados de "Une") ·
+ * Módulos: ReglasMemorama (estados y rondas, puro) · IconosMemorama (PNG de iconos/) ·
  * SonidosMemorama (efectos Web Audio) · EscenarioMemorama (Phaser: tablero, tarjetas, volteo y efectos) ·
  * MemoramaDemo (demostración) · Guia3D (Zeus 3D de la presentación y la demo)
  */
