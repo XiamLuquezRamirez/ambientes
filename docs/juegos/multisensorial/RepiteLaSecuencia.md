@@ -9,10 +9,10 @@ Fecha: 2026-11-17. Mismo estándar que Memoria auditiva: motor Phaser propio por
 | DosInstrumentos | 3-4 | **«El globo de la orquesta»**: globo aerostático que sube/baja con el dedo por 4 paisajes (aldea al amanecer, montañas nevadas, cañón al atardecer, noche con aurora). Se atrapan globos-regalo con instrumentos en el orden de la canción; cada acierto suma un músico a la orquesta del escenario, que toca la melodía. Tormentas y aves, aterrizaje en pista, final con fuegos | `globo.js` |
 | TresSonidos | 3-4 | **«El taller del duende»**: construir con física real (Matter). Una cinta trae bloques de madera con animal/instrumento; se apilan en el pedestal en el orden de la canción (de abajo hacia arriba). Los bloques se tambalean y caen; cada piso bien puesto se ilumina (bombillas de progreso), el equivocado se marca en rojo y se puede sacar. 4 niveles con formas más difíciles (cubos, tablones, altos, pequeños). Final: la torre toca como xilófono | `taller.js` |
 | SecuenciaConDistractor | 3-4 | **«Safari fotográfico»**: el niño maneja el visor de una cámara (con lente de aumento real: segunda cámara de Phaser) por un desfile de animales; un letrero muestra los INVITADOS y hay que fotografiar al INTRUSO (enfoque automático al mantener el visor quieto o disparo al levantar el dedo). Álbum de polaroids con estrellas. 4 lugares: sabana, selva, laguna, noche con luciérnagas. Final: foto de grupo con cuenta atrás | `safari.js` |
-| GranSecuenciaFinal | 3-4 | «Arcoíris»: atrapar nubes que derivan, cada acierto pinta una banda | `arcoiris.js` |
+| GranSecuenciaFinal | 3-4 | **«La fábrica de caramelos»**: verbo = DIBUJAR RAMPAS. Una máquina de chicles suelta una bola; el niño dibuja caminos de crayón (cada trazo es un tobogán de física Matter) para que la bola toque las teclas-caramelo del xilófono en el orden de la canción; tecla equivocada reinicia la melodía; goma para borrar. 4 niveles (más teclas, donas rebotadoras, decoración distinta). Final: lluvia de chicles que rebotan | `caramelos.js` |
 | SecuenciaDe3Sonidos | 5-6 | «Caja fuerte»: marcar el código en un teclado, la puerta se abre | `cajafuerte.js` |
 
-| SecuenciaDe3SonidosDiferentes | 5-6 | **PILOTO nuevo** «Concierto de luciérnagas»: repetir un RITMO en tiempo real (golpes, silencios; tambor y campana). Se compara la forma, no el tempo | `ritmo.js` |
+| SecuenciaDe3SonidosDiferentes | 5-6 | **«El gran pinball del circo»**: verbo = REFLEJOS con flippers (Matter: flippers articulados, plunger, bumpers). Los bumpers son tambores-instrumento; la bola debe golpearlos EN EL ORDEN de la canción (marquesina de bombillas); uno equivocado reinicia la melodía. 4 niveles (más bumpers, distractores, aspas giratorias). Final: se abre el telón y llueven pelotas de circo | `pinball.js` |
 | SecuenciaDe4Sonidos | 5-6 | **PILOTO nuevo** «Robot programado»: cada sonido es una ORDEN (↑→↓←); se oye el programa y se toca A DÓNDE llegará el robot | `robot.js` |
 | SecuenciaConCambio | 5-6 | «Mesa del DJ»: tras acertar la mesa se mezcla y suena otra secuencia | `dj.js` |
 | ElGranCodigoSecreto | 5-6 | «Torre»: arrastrar bloques, la torre se tambalea y sube la bandera | `torre.js` |
@@ -50,3 +50,7 @@ Grupo 1 de 3-4 años hecho (2026-11-18): rio, musicos, cine. Pendientes: Secuenc
 2026-11-19: TresSonidos rehecho como taller.js, primer juego con verbo distinto de «manejar y recoger»: construir con física. Matter está disponible sin tocar base.js: `Phaser.Physics.Matter.Matter` (v0.20) se usa con su propio Engine y se sincroniza a mano en `paso`.
 
 2026-11-19: SecuenciaConDistractor rehecho como safari.js: verbo = apuntar/enfocar/disparar (lente con `this.cameras.add` + `ignore` de la interfaz). Pendientes: GranFinal, 3Sonidos, 3Diferentes, ConCambio, CodigoSecreto.
+
+2026-11-19: GranSecuenciaFinal rehecho como caramelos.js (dibujar rampas con física). Pendientes: 3Sonidos, 3Diferentes, ConCambio, CodigoSecreto.
+
+2026-11-19: SecuenciaDe3SonidosDiferentes rehecho como pinball.js. Notas de física: en Matter 0.20 la velocidad de lanzamiento necesaria es ~26 (el divisor del carril debe terminar más abajo que el arco). Pendientes: 3Sonidos (5-6), ConCambio, CodigoSecreto.
