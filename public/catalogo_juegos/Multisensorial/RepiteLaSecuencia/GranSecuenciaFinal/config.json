@@ -2,17 +2,17 @@
   "nombre": "Gran Secuencia Final",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Toca las notas en el mismo orden para armar el arcoíris.",
-    "demostracionAcierto": "¡Así se repite la secuencia!",
+    "demostracion": "¡Mira! Dibuja una rampa y la bola toca las teclas en el orden de la canción.",
+    "demostracionAcierto": "¡Así se arma la gran canción!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "Escucha atentamente."
+        "texto": "¡Bienvenido a la fábrica de caramelos!"
       },
       {
         "personaje": 0,
-        "texto": "Ahora vamos a repetir."
+        "texto": "Dibuja rampas para que la bola toque las teclas en orden."
       }
     ]
   },
@@ -165,11 +165,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "Escucha atentamente."
+          "texto": "¡Bienvenido a la fábrica de caramelos!"
         },
         {
           "personaje": 0,
-          "texto": "Ahora vamos a repetir."
+          "texto": "Dibuja rampas para que la bola toque las teclas en orden."
         }
       ],
       "retos": [
@@ -228,7 +228,7 @@
           "preguntas": [
             {
               "voz": "zeus",
-              "texto": "¡Ahora tócalos en el mismo orden!"
+              "texto": "¡Dibuja rampas para que la bola toque las teclas en el orden de la canción!"
             }
           ]
         }

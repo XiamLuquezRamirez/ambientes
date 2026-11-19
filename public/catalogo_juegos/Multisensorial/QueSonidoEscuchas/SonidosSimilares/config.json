@@ -2,17 +2,17 @@
   "nombre": "Sonidos Similares",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Mueve la canasta y atrapa solo el objeto que suena.",
+    "demostracion": "¡Mira! Apoyo el estetoscopio en un juguete, lo escucho y le pongo la curita al que suena igual.",
     "demostracionAcierto": "¡Así se descubre el sonido!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "¡Hola! Bienvenidos, hoy tenemos una misión."
+        "texto": "¡Bienvenidos al consultorio de juguetes!"
       },
       {
         "personaje": 0,
-        "texto": "Escucha con mucha atención."
+        "texto": "Escucha con mucha atención y encuentra al paciente."
       }
     ]
   },
@@ -110,11 +110,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "¡Hola! Bienvenidos, hoy tenemos una misión."
+          "texto": "¡Bienvenidos al consultorio de juguetes!"
         },
         {
           "personaje": 0,
-          "texto": "Escucha con mucha atención."
+          "texto": "Escucha con mucha atención y encuentra al paciente."
         }
       ],
       "retos": [
@@ -137,6 +137,12 @@
             [
               "campana"
             ]
+          ],
+          "preguntas": [
+            {
+              "voz": "zeus",
+              "texto": "Desliza el estetoscopio por los juguetes, escucha y pon la curita al que suena igual."
+            }
           ]
         }
       ],

@@ -2,17 +2,17 @@
   "nombre": "Secuencia Con Cambio",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Toca los botones en orden. ¡Y cuando cambie la secuencia, escucha otra vez!",
+    "demostracion": "¡Mira! Jalo la lengüeta de cada ventanita en orden. ¡Y cuando pase la página, escucha otra vez!",
     "demostracionAcierto": "¡Así se repite la secuencia!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "Escucha el sonido secreto."
+        "texto": "¡Este es el cuento desplegable!"
       },
       {
         "personaje": 0,
-        "texto": "Y repítelo en el mismo orden."
+        "texto": "Jala las lengüetas en el mismo orden que escuchaste."
       }
     ]
   },
@@ -165,11 +165,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "Escucha el sonido secreto."
+          "texto": "¡Este es el cuento desplegable!"
         },
         {
           "personaje": 0,
-          "texto": "Y repítelo en el mismo orden."
+          "texto": "Jala las lengüetas en el mismo orden que escuchaste."
         }
       ],
       "retos": [
@@ -237,7 +237,7 @@
           "preguntas": [
             {
               "voz": "zeus",
-              "texto": "¡Ahora repite el código en el mismo orden!"
+              "texto": "¡Jala las lengüetas en el mismo orden! Si cambia la página, escucha otra vez."
             }
           ]
         }

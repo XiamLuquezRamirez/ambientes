@@ -2,17 +2,17 @@
   "nombre": "El Gran Codigo Secreto",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Sube cada bloque a la torre en el mismo orden en que sonó.",
-    "demostracionAcierto": "¡Así se repite la secuencia!",
+    "demostracion": "¡Mira! Llevo cada gema al templo en el mismo orden en que sonó.",
+    "demostracionAcierto": "¡Así se abre la puerta del templo!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "Escucha el sonido secreto."
+        "texto": "¡Este es el templo sumergido!"
       },
       {
         "personaje": 0,
-        "texto": "Y repítelo en el mismo orden."
+        "texto": "Escucha el código secreto y repítelo con las gemas."
       }
     ]
   },
@@ -165,11 +165,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "Escucha el sonido secreto."
+          "texto": "¡Este es el templo sumergido!"
         },
         {
           "personaje": 0,
-          "texto": "Y repítelo en el mismo orden."
+          "texto": "Escucha el código secreto y repítelo con las gemas."
         }
       ],
       "retos": [
@@ -229,7 +229,7 @@
           "preguntas": [
             {
               "voz": "zeus",
-              "texto": "¡Ahora repite el código en el mismo orden!"
+              "texto": "¡Lleva las gemas al templo en el mismo orden para abrir la puerta!"
             }
           ]
         }

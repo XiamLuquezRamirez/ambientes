@@ -314,7 +314,7 @@
                 return;
             }
             if (!this.pres || this.pres.falso) {
-                this.pres = global.AsociaPj3D.crear(Pr.modelo || (this.mayor ? 'nino' : 'nina'), { alto: Pr.alto, clip: 'Saludar', giro: Pr.giro != null ? Pr.giro : -0.5 });
+                this.pres = global.AsociaPj3D.crear(Pr.modelo || (this.mayor ? 'nino' : 'nina'), { alto: Pr.alto, clip: 'Saludar', giro: Pr.giro != null ? Pr.giro : -0.5, accesorio: Pr.accesorio });
                 this.reaccion('Saludar', 2600);
             }
             this.pres.visible(true);

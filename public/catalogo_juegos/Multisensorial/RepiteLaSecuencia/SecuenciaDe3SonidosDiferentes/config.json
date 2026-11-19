@@ -2,17 +2,17 @@
   "nombre": "Secuencia De 3 Sonidos Diferentes",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Mira! Escucha el ritmo y tócalo igual en el tambor.",
-    "demostracionAcierto": "¡Así se repite un ritmo!",
+    "demostracion": "¡Mira! Toco los cambiavías para llevar el tren a la estación que toca.",
+    "demostracionAcierto": "¡Así se arma el programa del tren!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "Escucha el ritmo con mucha atención."
+        "texto": "¡Este es el valle de los cambiavías!"
       },
       {
         "personaje": 0,
-        "texto": "Y tócalo igual: rápido, lento y con silencios."
+        "texto": "Lleva el tren a las estaciones en el orden del programa."
       }
     ]
   },
@@ -165,11 +165,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "Escucha el ritmo con mucha atención."
+          "texto": "¡Este es el valle de los cambiavías!"
         },
         {
           "personaje": 0,
-          "texto": "Y tócalo igual: rápido, lento y con silencios."
+          "texto": "Lleva el tren a las estaciones en el orden del programa."
         }
       ],
       "retos": [
@@ -225,7 +225,7 @@
           "preguntas": [
             {
               "voz": "zeus",
-              "texto": "¡Ahora tócalo igual, al mismo ritmo!"
+              "texto": "¡Toca los cambiavías para llevar el tren a cada estación en el orden del programa!"
             }
           ]
         }

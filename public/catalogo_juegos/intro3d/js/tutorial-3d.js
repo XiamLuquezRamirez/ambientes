@@ -4,6 +4,7 @@
  */
 import * as THREE from "three";
 import { crearCargadorGltf } from "./cargador-gltf.js";
+import { ponerCareta } from "./accesorios-modelo.js";
 import { agregarLucesModelo } from "./luces-modelo.js";
 
 const MODELOS_BASE = new URL("../models/", import.meta.url);
@@ -192,6 +193,7 @@ function montarPersonaje(gltf, id) {
 
     // Reusar la scene del GLTF cacheado (un solo personaje a la vez).
     mesh = gltf.scene;
+    if (window.PedniaAccesorioPj === "careta") { try { ponerCareta(THREE, mesh); } catch (e) { console.warn("[careta]", e); } }
     mesh.scale.setScalar(def.escala);
     mesh.position.set(START_X, POS_Y, POS_Z);
     mesh.rotation.y = YAW_LEFT;

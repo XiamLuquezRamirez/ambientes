@@ -6,6 +6,7 @@
  */
 import * as THREE from "three";
 import { crearCargadorGltf } from "./cargador-gltf.js";
+import { ponerCareta } from "./accesorios-modelo.js";
 import { agregarLucesModelo } from "./luces-modelo.js";
 
 const MODELOS_BASE = new URL("../models/", import.meta.url);
@@ -168,6 +169,7 @@ function cargarPersonaje(def) {
             resolverModelo(def.archivo),
             function (gltf) {
                 const mesh = gltf.scene;
+            if (window.PedniaAccesorioPj === "careta") { try { ponerCareta(THREE, mesh); } catch (e) { console.warn("[careta]", e); } }
                 mesh.traverse(function (obj) {
                     if (obj.isMesh) {
                         obj.castShadow = true;

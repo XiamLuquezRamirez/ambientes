@@ -13,6 +13,7 @@
  */
 import * as THREE from "three";
 import { crearCargadorGltf } from "./cargador-gltf.js";
+import { ponerCareta } from "./accesorios-modelo.js";
 import { agregarLucesModelo } from "./luces-modelo.js";
 
 const BASE = new URL("../models/", import.meta.url);
@@ -244,6 +245,7 @@ async function crearVista(host, id, encuadre) {
         if (vistas.indexOf(vista) < 0) return;
         const mesh = escenaUsada[def.url] ? gltf.scene.clone(true) : gltf.scene;
         escenaUsada[def.url] = true;
+        if (window.PedniaAccesorioPj === "careta") { try { ponerCareta(THREE, mesh); } catch (e) { console.warn("[careta]", e); } }
         encuadrar(camera, mesh, encuadre, def);
         mesh.visible = false;
         scene.add(mesh);
