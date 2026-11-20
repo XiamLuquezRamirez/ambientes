@@ -697,7 +697,8 @@
             '<path d="M70 236 C 90 244, 150 244, 170 236" stroke="' + PAJ.osc + '" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.5"/>'),
         // cabeza 150 × 135 (dibujada a 200 × 180 y escalada 0,75, ancho ~62 % del cuerpo), centro (75, 67.5), SIN ojos:
         // ojos hacia (±24, -10,5); solo la mandíbula SUPERIOR del pico; la inferior la dibuja animales.js
-        // (línea de apertura en y = +30 desde el centro, de x = -26 a +26, en píxeles de esta textura)
+        // (la mandíbula superior baja hasta y interno 122; escalado 0,75 son 91,5, o sea +24 desde el
+        //  centro. La inferior arranca ahí: línea de apertura en y = +24, de x = -28,5 a +28,5)
         cabeza: svg(150, 135,
             "<defs>" + rg("pj", [[0, PAJ.luz], [0.5, PAJ.med], [1, PAJ.osc]], 0.38, 0.28, 0.85) +
             rg("pp", [[0, "#ffd9a8"], [0.5, PAJ.pico], [1, PAJ.pico2]], 0.4, 0.25, 0.9) + "</defs>" +
