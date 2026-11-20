@@ -72,11 +72,6 @@
       "nombre": "Perro",
       "sonido": "ladrido"
     },
-    "pasos": {
-      "img": "img/pasos.svg",
-      "nombre": "Pasos",
-      "sonido": "pasos"
-    },
     "caballo": {
       "img": "img/caballo.svg",
       "nombre": "Caballo",
@@ -180,17 +175,17 @@
           "tipo": "desaparecio",
           "reproducciones": [
             [
-              "pasos",
+              "perro",
               "caballo",
               "reloj"
             ],
             [
-              "pasos",
+              "perro",
               "reloj"
             ]
           ],
           "opciones": [
-            "pasos",
+            "perro",
             "caballo",
             "reloj"
           ],

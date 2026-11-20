@@ -31,6 +31,8 @@
     function actx() {
         var C = global.AudioContext || global.webkitAudioContext;
         if (!C) return null;
+        // «Efectos de sonido» apagado en el menú de accesibilidad: sin ruidos de ambiente.
+        if (document.body && document.body.classList.contains('sin-efectos')) return null;
         if (!audio.ctx) audio.ctx = new C();
         if (audio.ctx.state === 'suspended') audio.ctx.resume();
         if (!audio.ruido) {
@@ -418,6 +420,7 @@
         },
 
         tocaBocina: function (p) {
+            if (document.body.classList.contains('sin-repetir')) return false;                    // botón oculto desde accesibilidad: no responde
             var b = this.L && this.L.bocina;
             return !!b && Math.hypot(p.x - b.x, p.y - b.y) < b.r * 1.3;
         },
@@ -740,7 +743,8 @@
             var self = this;
             var L = this.L;
             if (!L) return;
-            (this.vivos || []).forEach(function (a) { if (a.cont && a.cont.active && a.actualizar) a.actualizar(time, delta); });
+            var quieto = document.body.classList.contains('sin-animaciones');
+            (this.vivos || []).forEach(function (a) { if (!quieto && a.cont && a.cont.active && a.actualizar) a.actualizar(time, delta); });
             var g = this.ondasG;
             if (g) {
                 g.clear();
@@ -755,8 +759,8 @@
             }
             if (this.bocina && this.bocina.halo) this.bocina.halo.setScale(1 + Math.sin(time / 380) * 0.06);
             if (this.fase === 'jugar' && this.autoRepetir !== false && !this.sonando && time - this.ultimoSonido > (this.repetirCada || 7500)) this.anunciar();
-            (this.nubes || []).forEach(function (c) { if (c.active) { c.x += c.vx * delta / 1000; if (c.x > L.W + 80) c.x = -120; } });
-            if (this.vidaAmb) this.vidaAmb.actualizar(time, delta);
+            (this.nubes || []).forEach(function (c) { if (!quieto && c.active) { c.x += c.vx * delta / 1000; if (c.x > L.W + 80) c.x = -120; } });
+            if (this.vidaAmb && !quieto) this.vidaAmb.actualizar(time, delta);
             if (this.paso) this.paso(time, delta);
         }
     };

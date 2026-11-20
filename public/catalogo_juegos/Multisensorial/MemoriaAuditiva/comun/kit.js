@@ -339,6 +339,7 @@
         },
 
         tocaBocina: function (p) {
+            if (document.body.classList.contains('sin-repetir')) return false;                    // botón oculto desde accesibilidad: no responde
             var b = this.L.bocina;
             return Math.hypot(p.x - b.x, p.y - b.y) < b.r * 1.3;
         },
@@ -1005,8 +1006,9 @@
                 }
             }
             if (this.bocina && this.bocina.halo) this.bocina.halo.setScale(1 + Math.sin(time / 380) * 0.06);
-            if (this.motesG) this.moverMotes(time, delta);
-            if (this.vidaAmb) this.vidaAmb.actualizar(time, delta);
+            var quieto = document.body.classList.contains('sin-animaciones');
+            if (this.motesG && !quieto) this.moverMotes(time, delta);
+            if (this.vidaAmb && !quieto) this.vidaAmb.actualizar(time, delta);
             if (this.paso2) this.paso2(time, delta);
         }
     };

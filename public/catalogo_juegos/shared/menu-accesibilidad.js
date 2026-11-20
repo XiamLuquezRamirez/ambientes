@@ -136,12 +136,92 @@
         Swal.fire = envuelta;
     }
 
+    /* ── Juegos Phaser (lienzo): las clases del body no los tocan, así que se aplican aquí ── */
+
+    var phaserEnganchado = false;
+    function marca(c) { return document.body.classList.contains(c); }
+
+    /** Con «Animar objetos» apagado los movimientos duran un instante y los bucles infinitos se detienen. */
+    function reducirTween(cfg) {
+        if (!cfg || typeof cfg !== "object" || Array.isArray(cfg) || !marca("sin-animaciones")) return cfg;
+        var c = Object.assign({}, cfg);
+        c.duration = 16;
+        c.delay = 0;
+        c.hold = 0;
+        c.repeatDelay = 0;
+        c.repeat = 0;
+        c.loop = 0;
+        return c;
+    }
+    function esInfinito(cfg) { return cfg && (cfg.repeat === -1 || cfg.loop === -1); }
+
+    function sincronizarEscena(sc) {
+        var oculta = marca("sin-repetir");
+        ["bocina", "oreja", "ondasG"].forEach(function (k) {
+            var o = sc[k];
+            if (o && o.setVisible && o.visible === oculta) o.setVisible(!oculta);
+        });
+        var sinProg = marca("sin-progreso");
+        if (sc.marcadorG && sc.marcadorG.setVisible && sc.marcadorG.visible === sinProg) sc.marcadorG.setVisible(!sinProg);
+        if (sc.estrellas && sc.estrellas.length) {
+            sc.estrellas.forEach(function (e) { if (e && e.setVisible && e.visible === sinProg) e.setVisible(!sinProg); });
+        }
+        // Al cambiar «Animar objetos» en caliente, se pausan o reanudan los bucles que ya corrían.
+        var sin = marca("sin-animaciones");
+        if (sc.__accSinAnim !== sin && sc.tweens && sc.tweens.getTweens) {
+            sc.__accSinAnim = sin;
+            sc.tweens.getTweens().forEach(function (t) {
+                var inf = t && (t.repeat === -1 || t.loop === -1 || t.isInfinite);
+                if (!inf) return;
+                if (sin && t.pause) t.pause();
+                else if (!sin && t.resume) t.resume();
+            });
+        }
+    }
+
+    function engancharPhaser() {
+        if (phaserEnganchado || !window.Phaser) return;
+        phaserEnganchado = true;
+        try {
+            var TM = Phaser.Tweens && Phaser.Tweens.TweenManager && Phaser.Tweens.TweenManager.prototype;
+            if (TM) {
+                ["add", "create"].forEach(function (nombre) {
+                    var original = TM[nombre];
+                    if (typeof original !== "function") return;
+                    TM[nombre] = function (cfg) {
+                        var infinito = esInfinito(cfg) && marca("sin-animaciones");
+                        var res = original.call(this, reducirTween(cfg));
+                        if (infinito && res && res.pause && !Array.isArray(res)) res.pause();
+                        return res;
+                    };
+                });
+            }
+            var Cam = Phaser.Cameras && Phaser.Cameras.Scene2D && Phaser.Cameras.Scene2D.Camera.prototype;
+            if (Cam && Cam.shake) {
+                var sacudir = Cam.shake;
+                Cam.shake = function () {
+                    if (marca("sin-animaciones") || marca("sin-feedback")) return this;
+                    return sacudir.apply(this, arguments);
+                };
+            }
+            var Sis = Phaser.Scenes && Phaser.Scenes.Systems && Phaser.Scenes.Systems.prototype;
+            if (Sis && Sis.step) {
+                var paso = Sis.step;
+                Sis.step = function (t, d) {
+                    if (this.scene) sincronizarEscena(this.scene);
+                    return paso.call(this, t, d);
+                };
+            }
+        } catch (e) { /* si Phaser cambia por dentro, el menú sigue funcionando para el resto */ }
+    }
+
     function aplicar(config) {
         var acc = accDe(config);
         var root = document.documentElement;
         registrarRutas(config);
         envolverSfx();
         engancharSwal();
+        engancharPhaser();
 
         function activo(key) {
             for (var i = 0; i < TOGGLES.length; i++) {

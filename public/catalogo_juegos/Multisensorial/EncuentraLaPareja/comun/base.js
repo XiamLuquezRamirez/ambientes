@@ -47,6 +47,7 @@
 
     /** Lluvia de chispas, notas, corazones… desde (x, y). */
     function estallido(scene, x, y, o) {
+        if (global.document && global.document.body && global.document.body.classList.contains('sin-feedback')) return;
         o = o || {};
         var A = global.PedniaArte;
         var n = o.n || 14;
@@ -75,6 +76,7 @@
 
     /** Confeti que cae por toda la pantalla. */
     function confeti(scene, n) {
+        if (global.document && global.document.body && global.document.body.classList.contains('sin-feedback')) return;
         var w = scene.scale.width;
         var h = scene.scale.height;
         var colores = [0xff6b6b, 0xfcc419, 0x51cf66, 0x339af0, 0xcc5de8, 0xff922b];

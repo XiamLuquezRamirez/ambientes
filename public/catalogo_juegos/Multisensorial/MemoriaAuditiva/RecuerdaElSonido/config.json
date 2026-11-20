@@ -72,11 +72,6 @@
       "nombre": "Perro",
       "sonido": "ladrido"
     },
-    "pasos": {
-      "img": "img/pasos.svg",
-      "nombre": "Pasos",
-      "sonido": "pasos"
-    },
     "caballo": {
       "img": "img/caballo.svg",
       "nombre": "Caballo",
@@ -178,7 +173,20 @@
           "id": "recuerda-sonido",
           "titulo": "Recuerda el sonido",
           "tipo": "elegir",
-          "dificultad": [{ "opciones": 3 }, { "opciones": 3 }, { "opciones": 3 }, { "opciones": 3 }],
+          "dificultad": [
+            {
+              "opciones": 3
+            },
+            {
+              "opciones": 3
+            },
+            {
+              "opciones": 3
+            },
+            {
+              "opciones": 3
+            }
+          ],
           "reproducciones": [
             [
               "vaca"

@@ -52,6 +52,7 @@
     }
 
     function reducido() {
+        if (global.document && global.document.body && global.document.body.classList.contains('sin-animaciones')) return true;
         return !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
     }
 
