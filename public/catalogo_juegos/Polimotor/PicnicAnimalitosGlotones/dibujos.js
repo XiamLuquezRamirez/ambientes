@@ -598,21 +598,15 @@
             '<ellipse cx="60" cy="274" rx="46" ry="15" fill="url(#cp)" stroke="' + CON.linea + '" stroke-width="3.2"/>' +
             '<ellipse cx="200" cy="274" rx="46" ry="15" fill="url(#cp)" stroke="' + CON.linea + '" stroke-width="3.2"/>' +
             dedos(CON.osc, [[40, 268, 0, 9], [58, 268, 0, 10], [76, 268, 0, 9], [184, 268, 0, 9], [202, 268, 0, 10], [220, 268, 0, 9]])),
-        // cabeza 240 × 200, centro (120, 100): ojos hacia (±36, -18), nariz (0, 12), boca desde (0, 32)
+        // cabeza 240 × 200, centro (120, 100), SIN ojos, nariz ni boca (los pone animales.js): ojos hacia (±36, -18), nariz (0, 12), boca desde (0, 32)
         cabeza: svg(240, 200,
-            "<defs>" + defsAnimal(CON) + rg("cn", [[0, "#ffd3cf"], [0.6, CON.rosa], [1, CON.rosa2]], 0.4, 0.3, 0.8) + "</defs>" +
+            "<defs>" + defsAnimal(CON) + "</defs>" +
             '<path d="' + peludo(elipsePol(120, 100, 102, 86, 44), 5, 49, 1) + '" fill="url(#cp)" stroke="' + CON.linea + '" stroke-width="3.5" stroke-linejoin="round"/>' +
             pelajeDe(CON, 151, { cx: 120, cy: 96, rx: 92, ry: 76 }, 170, 12, 2.2) +
             '<ellipse cx="96" cy="56" rx="40" ry="16" fill="#fff" opacity="0.28" transform="rotate(-14 96 56)"/>' +
-            '<ellipse cx="84" cy="84" rx="20" ry="17" fill="' + CON.osc + '" opacity="0.2"/><ellipse cx="156" cy="84" rx="20" ry="17" fill="' + CON.osc + '" opacity="0.2"/>' +
             '<ellipse cx="58" cy="118" rx="15" ry="9" fill="#ff9d96" opacity="0.4"/><ellipse cx="182" cy="118" rx="15" ry="9" fill="#ff9d96" opacity="0.4"/>' +
             '<path d="' + peludo(elipsePol(98, 134, 40, 30, 24), 3, 53, 1) + '" fill="url(#cc)" stroke="' + CON.med + '" stroke-width="1.8"/>' +
-            '<path d="' + peludo(elipsePol(142, 134, 40, 30, 24), 3, 55, 1) + '" fill="url(#cc)" stroke="' + CON.med + '" stroke-width="1.8"/>' +
-            '<path d="M106 106 C 106 98, 134 98, 134 106 C 134 115, 126 121, 120 121 C 114 121, 106 115, 106 106 Z" fill="url(#cn)" stroke="#9a4a52" stroke-width="2.2" stroke-linejoin="round"/>' +
-            '<ellipse cx="113" cy="104" rx="5" ry="2.6" fill="#fff" opacity="0.7" transform="rotate(-15 113 104)"/>' +
-            '<path d="M120 121 L 120 130" stroke="' + CON.linea + '" stroke-width="2.6" stroke-linecap="round"/>' +
-            '<g fill="' + CON.osc + '"><circle cx="90" cy="130" r="1.8"/><circle cx="84" cy="138" r="1.8"/><circle cx="96" cy="140" r="1.8"/>' +
-            '<circle cx="150" cy="130" r="1.8"/><circle cx="156" cy="138" r="1.8"/><circle cx="144" cy="140" r="1.8"/></g>'),
+            '<path d="' + peludo(elipsePol(142, 134, 40, 30, 24), 3, 55, 1) + '" fill="url(#cc)" stroke="' + CON.med + '" stroke-width="1.8"/>'),
         // oreja larga 80 × 200: la base queda abajo (pivote en 40, 190)
         oreja: svg(80, 200,
             "<defs>" + defsAnimal(CON) + rg("co", [[0, "#ffd6d1"], [1, CON.rosa2]], 0.4, 0.3, 0.8) + "</defs>" +
@@ -647,10 +641,9 @@
             '<ellipse cx="60" cy="274" rx="46" ry="15" fill="url(#cp)" stroke="' + PER.linea + '" stroke-width="3.2"/>' +
             '<ellipse cx="200" cy="274" rx="46" ry="15" fill="url(#cp)" stroke="' + PER.linea + '" stroke-width="3.2"/>' +
             dedos(PER.mancha2, [[40, 268, 0, 9], [58, 268, 0, 10], [76, 268, 0, 9], [184, 268, 0, 9], [202, 268, 0, 10], [220, 268, 0, 9]])),
-        // cabeza 250 × 220, centro (125, 110): ojos hacia (±37, -18), nariz (0, 12), boca desde (0, 38)
+        // cabeza 250 × 220, centro (125, 110), SIN ojos, nariz ni boca (los pone animales.js): ojos hacia (±37, -18), nariz (0, 12), boca desde (0, 38)
         cabeza: svg(250, 220,
             "<defs>" + defsAnimal(PER) + rg("pm", [[0, PER.manchaLuz], [0.5, PER.mancha], [1, PER.mancha2]], 0.38, 0.28, 0.85) +
-            rg("pn", [[0, "#6a5048"], [0.45, "#241813"], [1, "#0c0705"]], 0.35, 0.3, 0.75) +
             '<clipPath id="pk"><ellipse cx="125" cy="110" rx="100" ry="88"/></clipPath></defs>' +
             '<path d="' + peludo(elipsePol(125, 110, 100, 88, 44), 5, 67, 1) + '" fill="url(#cp)" stroke="' + PER.linea + '" stroke-width="3.5" stroke-linejoin="round"/>' +
             '<g clip-path="url(#pk)"><path d="' + peludo(elipsePol(80, 90, 34, 32, 22), 4, 68, 1) + '" fill="url(#pm)"/>' +
@@ -658,12 +651,7 @@
             pelajeDe(PER, 167, { cx: 125, cy: 106, rx: 90, ry: 76 }, 170, 12, 2.2) +
             '<ellipse cx="100" cy="58" rx="42" ry="14" fill="#fff" opacity="0.3" transform="rotate(-12 100 58)"/>' +
             '<path d="M70 66 C 78 60, 92 60, 100 66 M150 66 C 158 60, 172 60, 180 66" stroke="' + PER.mancha2 + '" stroke-width="3.4" fill="none" stroke-linecap="round" opacity="0.4"/>' +
-            '<path d="' + peludo(elipsePol(125, 144, 54, 40, 30), 3, 71, 1) + '" fill="url(#cc)" stroke="' + PER.osc + '" stroke-width="2.4"/>' +
-            '<g fill="' + PER.mancha + '" opacity="0.7"><circle cx="98" cy="132" r="1.8"/><circle cx="92" cy="140" r="1.8"/><circle cx="102" cy="142" r="1.8"/>' +
-            '<circle cx="152" cy="132" r="1.8"/><circle cx="158" cy="140" r="1.8"/><circle cx="148" cy="142" r="1.8"/></g>' +
-            '<path d="M102 118 C 102 106, 148 106, 148 118 C 148 130, 134 138, 125 138 C 116 138, 102 130, 102 118 Z" fill="url(#pn)" stroke="' + PER.linea + '" stroke-width="2.2" stroke-linejoin="round"/>' +
-            '<ellipse cx="114" cy="115" rx="9" ry="4.2" fill="#fff" opacity="0.55" transform="rotate(-12 114 115)"/>' +
-            '<path d="M125 138 L 125 148" stroke="' + PER.linea + '" stroke-width="3" stroke-linecap="round"/>'),
+            '<path d="' + peludo(elipsePol(125, 144, 54, 40, 30), 3, 71, 1) + '" fill="url(#cc)" stroke="' + PER.osc + '" stroke-width="2.4"/>'),
         // oreja caída 90 × 160: se cuelga de arriba (pivote en 45, 10)
         oreja: svg(90, 160,
             "<defs>" + rg("po", [[0, PER.manchaLuz], [0.5, PER.mancha], [1, PER.mancha2]], 0.38, 0.28, 0.85) + "</defs>" +
@@ -691,34 +679,38 @@
         // cuerpo rechoncho 240 × 250 con vientre crema; las patas son otra pieza
         cuerpo: svg(240, 250,
             "<defs>" + rg("pj", [[0, PAJ.luz], [0.5, PAJ.med], [1, PAJ.osc]], 0.38, 0.28, 0.85) +
-            rg("pv", [[0, "#ffffff"], [0.5, PAJ.crema], [1, PAJ.crema2]], 0.4, 0.3, 0.85) +
+            '<radialGradient id="pv" cx="0.5" cy="0.45" r="0.55"><stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="' + PAJ.crema + '"/>' +
+            '<stop offset="1" stop-color="' + PAJ.crema2 + '" stop-opacity="0"/></radialGradient>' +
             '<clipPath id="sb"><ellipse cx="120" cy="134" rx="100" ry="104"/></clipPath></defs>' +
             '<path d="' + peludo(elipsePol(120, 134, 102, 106, 44), 3.5, 81, 1) + '" fill="url(#pj)" stroke="' + PAJ.linea + '" stroke-width="3.5" stroke-linejoin="round"/>' +
             '<ellipse cx="62" cy="104" rx="15" ry="34" fill="#fff" opacity="0.22" transform="rotate(14 62 104)"/>' +
-            '<path d="' + peludo(elipsePol(120, 166, 64, 74, 34), 3, 83, 1) + '" fill="url(#pv)"/>' +
+            '<ellipse cx="120" cy="176" rx="68" ry="70" fill="url(#pv)" clip-path="url(#sb)"/>' +
             (function () {
                 var r = azar(85), o = '<g fill="none" stroke="' + PAJ.crema2 + '" stroke-width="2.4" stroke-linecap="round" opacity="0.8">';
                 for (var i = 0; i < 20; i++) {
-                    var p = puntoElipse(r, { cx: 120, cy: 166, rx: 60, ry: 70 }, 0, 0.9, 0, TAU);
+                    var p = puntoElipse(r, { cx: 120, cy: 176, rx: 56, ry: 62 }, 0, 0.9, 0, TAU);
                     o += '<path d="M' + n1(p.x - 7) + " " + n1(p.y) + " q 7 8 14 0" + '"/>';
                 }
                 return o + "</g>";
             })() +
             '<g clip-path="url(#sb)"><ellipse cx="120" cy="38" rx="70" ry="22" fill="' + PAJ.linea + '" opacity="0.28"/></g>' +
             '<path d="M70 236 C 90 244, 150 244, 170 236" stroke="' + PAJ.osc + '" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.5"/>'),
-        // cabeza 200 × 180, centro (100, 90): ojos hacia (±32, -14); la mitad INFERIOR del pico la dibuja animales.js
-        // (línea de apertura en y = 130, de x = 66 a 134)
-        cabeza: svg(200, 180,
+        // cabeza 150 × 135 (dibujada a 200 × 180 y escalada 0,75, ancho ~62 % del cuerpo), centro (75, 67.5), SIN ojos:
+        // ojos hacia (±24, -10,5); solo la mandíbula SUPERIOR del pico; la inferior la dibuja animales.js
+        // (línea de apertura en y = +30 desde el centro, de x = -26 a +26, en píxeles de esta textura)
+        cabeza: svg(150, 135,
             "<defs>" + rg("pj", [[0, PAJ.luz], [0.5, PAJ.med], [1, PAJ.osc]], 0.38, 0.28, 0.85) +
             rg("pp", [[0, "#ffd9a8"], [0.5, PAJ.pico], [1, PAJ.pico2]], 0.4, 0.25, 0.9) + "</defs>" +
+            '<g transform="scale(0.75)">' +
             '<path d="M88 24 C 78 12, 80 2, 90 2 C 98 8, 100 18, 100 28 Z" fill="url(#pj)" stroke="' + PAJ.linea + '" stroke-width="2.8" stroke-linejoin="round"/>' +
             '<path d="M104 24 C 104 10, 110 0, 120 2 C 124 12, 116 22, 110 30 Z" fill="url(#pj)" stroke="' + PAJ.linea + '" stroke-width="2.8" stroke-linejoin="round"/>' +
             '<path d="' + peludo(elipsePol(100, 94, 84, 76, 40), 3, 87, 1) + '" fill="url(#pj)" stroke="' + PAJ.linea + '" stroke-width="3.5" stroke-linejoin="round"/>' +
             '<ellipse cx="70" cy="58" rx="26" ry="12" fill="#fff" opacity="0.28" transform="rotate(-18 70 58)"/>' +
             '<ellipse cx="42" cy="108" rx="15" ry="9" fill="#ff9aa2" opacity="0.5"/><ellipse cx="158" cy="108" rx="15" ry="9" fill="#ff9aa2" opacity="0.5"/>' +
-            '<path d="M60 104 C 60 90, 140 90, 140 104 C 140 118, 122 130, 100 130 C 78 130, 60 118, 60 104 Z" fill="url(#pp)" stroke="' + PAJ.picoLinea + '" stroke-width="3.2" stroke-linejoin="round"/>' +
-            '<ellipse cx="82" cy="100" rx="11" ry="3.6" fill="#fff" opacity="0.6" transform="rotate(-8 82 100)"/>' +
-            '<ellipse cx="90" cy="108" rx="2.8" ry="2" fill="' + PAJ.picoLinea + '" opacity="0.65"/><ellipse cx="110" cy="108" rx="2.8" ry="2" fill="' + PAJ.picoLinea + '" opacity="0.65"/>'),
+            // mandíbula superior: abierta por abajo (borde casi recto en y = 120), sin cerrar el pico
+            '<path d="M62 112 C 60 96, 80 92, 100 92 C 120 92, 140 96, 138 112 C 124 120, 112 122, 100 122 C 88 122, 76 120, 62 112 Z" fill="url(#pp)" stroke="' + PAJ.picoLinea + '" stroke-width="3.2" stroke-linejoin="round"/>' +
+            '<ellipse cx="84" cy="100" rx="11" ry="3.6" fill="#fff" opacity="0.6" transform="rotate(-8 84 100)"/>' +
+            '<ellipse cx="90" cy="108" rx="2.8" ry="2" fill="' + PAJ.picoLinea + '" opacity="0.65"/><ellipse cx="110" cy="108" rx="2.8" ry="2" fill="' + PAJ.picoLinea + '" opacity="0.65"/></g>'),
         // ala 90 × 150: se cuelga de arriba (pivote en 45, 8)
         ala: svg(90, 150,
             "<defs>" + rg("pa", [[0, PAJ.luz], [0.5, PAJ.med], [1, PAJ.osc]], 0.35, 0.25, 0.9) + "</defs>" +
