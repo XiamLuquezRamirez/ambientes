@@ -125,5 +125,50 @@ prueba("ids únicos y tipo recuperable", function () {
     assert.strictEqual(R.tipoDe("r2-2-semillas"), "semillas");
 });
 
+prueba("revisarJuego detecta los cinco defectos y acepta el config real", function () {
+    assert.deepStrictEqual(R.revisarJuego(cfg), []);
+    const copia = function () { return JSON.parse(JSON.stringify(cfg)); };
+    const defectos = {
+        "más alimentos que animales": function (c) { c.rondas[0].alimentos.push("miel"); },
+        "alimento cuyo dueño no está en la ronda": function (c) { c.rondas[0].alimentos = ["zanahoria", "miel"]; },
+        "dos niveles": function (c) { c.niveles.push({ id: "5", edad: "5-6 años", titulo: "otro" }); },
+        "ronda que pierde un animal de la anterior": function (c) { c.rondas[2].animales = ["oso", "pajaro", "perro"]; },
+        "alimento con animal inexistente": function (c) { c.alimentos[0].animal = "dragon"; }
+    };
+    Object.keys(defectos).forEach(function (nombre) {
+        const c = copia();
+        defectos[nombre](c);
+        assert.ok(R.revisarJuego(c).length > 0, "no detectó: " + nombre);
+    });
+    assert.deepStrictEqual(R.revisarJuego(cfg), []);
+});
+
+prueba("piezasRonda es determinista y de verdad mezcla", function () {
+    const ids = function (rnd) { return R.piezasRonda(cfg, 2, rnd).map(function (p) { return p.id; }); };
+    const fijo = function () { return 0.5; };
+    assert.deepStrictEqual(ids(fijo), ids(fijo));
+    const alto = R.piezasRonda(cfg, 2, function () { return 0.99; });
+    const bajo = R.piezasRonda(cfg, 2, function () { return 0.01; });
+    assert.notDeepStrictEqual(alto.map(function (p) { return p.id; }), bajo.map(function (p) { return p.id; }));
+    [alto, bajo].forEach(function (piezas) {
+        assert.deepStrictEqual(piezas.map(function (p) { return p.tipo; }).sort(),
+            cfg.rondas[2].alimentos.slice().sort());
+    });
+});
+
+prueba("evaluarEntrega sin bocas da lejos sin lanzar", function () {
+    const res = R.evaluarEntrega({ alimento: { x: 10, y: 10 }, bocas: [],
+        tipo: "zanahoria", animalEsperado: "conejo", radio: 92, entregada: false });
+    assert.strictEqual(res.motivo, "lejos");
+    assert.strictEqual(res.acierto, false);
+});
+
+prueba("un alimento entregado y lejos de toda boca sigue siendo repetida", function () {
+    const res = R.evaluarEntrega({ alimento: { x: 1200, y: 200 }, bocas: [{ id: "conejo", x: 400, y: 500 }],
+        tipo: "zanahoria", animalEsperado: "conejo", radio: 92, entregada: true });
+    assert.strictEqual(res.motivo, "repetida");
+    assert.strictEqual(res.acierto, false);
+});
+
 console.log((ok === total ? "✓ " : "✗ ") + ok + "/" + total + " pruebas");
 process.exit(ok === total ? 0 : 1);
