@@ -400,5 +400,25 @@
 
     api.musica = musica;
     api.desbloquear = function () { audio(); };
+    /*
+     * Volumen por canal para comun/volumen.js (los dos controles del boton de sonido).
+     * `salida` es un unico compresor del que cuelga todo, asi que la separacion se hace aqui:
+     * los efectos escalan VOL (el factor que multiplica cada sonido) y el fondo va por el
+     * `volume` del objeto que devuelve musica().
+     */
+    var VOL_BASE = VOL;
+    api.volumenEfectos = function (pct) {
+        var f = Math.max(0, Math.min(1, (Number(pct) || 0) / 100));
+        VOL = VOL_BASE * f;
+    };
+    api.volumenFondo = function (pct) {
+        var f = Math.max(0, Math.min(1, (Number(pct) || 0) / 100));
+        if (musicaObj) {
+            // `volume` de este objeto es el nivel directo (0..1), igual que el <audio> que el
+            // juego ajustaba con su slider: se pasa el porcentaje tal cual, sin reescalar.
+            try { musicaObj.volume = f; } catch (e) { /* noop */ }
+        }
+    };
+
     global.SonidosArdilla = api;
 })(window);

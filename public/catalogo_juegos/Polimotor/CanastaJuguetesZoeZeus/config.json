@@ -1,0 +1,380 @@
+{
+  "nombre": "¡La canasta de juguetes!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 40,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "radioFactor": 0.42,
+    "atraerFactor": 0.58,
+    "radioMin": 74,
+    "ayudaMs": 12000,
+    "vozPausaMs": 2200
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Arrastrar, soltar y clasificar"
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡La canasta de juguetes!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "aciertos": [
+      "¡Muy bien!",
+      "¡Lo guardaste!",
+      "¡Excelente!"
+    ],
+    "aciertosFinales": [
+      "¡Muy bien!",
+      "¡A su lugar!",
+      "¡Qué ordenado!",
+      "¡Lo lograste!"
+    ],
+    "finalTitulo": "¡SÚPER ORDEN!",
+    "finalTexto": "¡Ayudaste a Zoe y Zeus a guardar todos sus juguetes!",
+    "finalVoz": "¡Lo logramos! ¡Guardamos todos los juguetes!",
+    "finalVozZeus": "¡Qué habitación tan bonita y ordenada!",
+    "botonOtraVez": "Volver a jugar",
+    "botonNivel3": "Jugar nivel 3",
+    "botonInicio": "Inicio",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola! Zoe y yo tenemos los juguetes por todos lados."
+      },
+      {
+        "personaje": 1,
+        "texto": "¿Nos ayudas a guardarlos en su lugar?"
+      }
+    ]
+  },
+  "nivelesJuego": [
+    {
+      "id": 1,
+      "nombre": "Guardamos los juguetes",
+      "demo": "coche",
+      "zoe": "¡Tenemos que guardar nuestros juguetes! ¿Me ayudas?",
+      "zeus": "Toma un juguete, llévalo hasta su caja y suéltalo.",
+      "demoVoz": "¡Mira! Toma el cochecito y suéltalo en su caja.",
+      "pista": "¡Vamos a buscar su cajita!",
+      "listo": "¡Qué bien! ¡Los juguetes están guardados!",
+      "zonas": [
+        {
+          "id": "caja-coche",
+          "acepta": [
+            "coche"
+          ],
+          "tinta": "#e03131",
+          "marca": "coche",
+          "x": 20,
+          "y": 40,
+          "nombre": "caja roja",
+          "sombra": "#a51111"
+        },
+        {
+          "id": "caja-oso",
+          "acepta": [
+            "oso"
+          ],
+          "tinta": "#b5651d",
+          "marca": "oso",
+          "x": 50,
+          "y": 38,
+          "nombre": "caja del osito",
+          "sombra": "#7a3f0c"
+        },
+        {
+          "id": "caja-pelota",
+          "acepta": [
+            "pelota"
+          ],
+          "tinta": "#f0b000",
+          "marca": "pelota",
+          "x": 80,
+          "y": 40,
+          "nombre": "caja amarilla",
+          "sombra": "#b87c00"
+        }
+      ],
+      "objetos": [
+        {
+          "id": "coche",
+          "tipo": "coche",
+          "nombre": "Cochecito rojo",
+          "zona": "caja-coche",
+          "x": 22,
+          "y": 78
+        },
+        {
+          "id": "oso",
+          "tipo": "oso",
+          "nombre": "Osito peluche",
+          "zona": "caja-oso",
+          "x": 50,
+          "y": 80
+        },
+        {
+          "id": "pelota",
+          "tipo": "pelota",
+          "nombre": "Pelota amarilla",
+          "zona": "caja-pelota",
+          "x": 78,
+          "y": 78
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nombre": "Ordenamos y clasificamos",
+      "demo": "bloque-rojo",
+      "zoe": "Busca el color y lleva cada juguete a su caja.",
+      "zeus": "¡Ahora tenemos más juguetes! Vamos a poner cada uno en su lugar.",
+      "demoVoz": "¡Mira! El bloque rojo va en la caja roja.",
+      "pista": "Busca una caja del mismo color.",
+      "listo": "¡Excelente! ¡Cada color en su caja!",
+      "zonas": [
+        {
+          "id": "bin-rojo",
+          "acepta": [
+            "bloque-rojo"
+          ],
+          "tinta": "#e03131",
+          "marca": "",
+          "x": 18,
+          "y": 42,
+          "nombre": "caja roja",
+          "sombra": "#a51111"
+        },
+        {
+          "id": "bin-azul",
+          "acepta": [
+            "bloque-azul"
+          ],
+          "tinta": "#1c7ed6",
+          "marca": "",
+          "x": 34,
+          "y": 42,
+          "nombre": "caja azul",
+          "sombra": "#0b4f91"
+        },
+        {
+          "id": "bin-amarillo",
+          "acepta": [
+            "bloque-amarillo"
+          ],
+          "tinta": "#f0b000",
+          "marca": "",
+          "x": 50,
+          "y": 42,
+          "nombre": "caja amarilla",
+          "sombra": "#b87c00"
+        },
+        {
+          "id": "bin-verde",
+          "acepta": [
+            "bloque-verde"
+          ],
+          "tinta": "#2f9e44",
+          "marca": "",
+          "x": 66,
+          "y": 42,
+          "nombre": "caja verde",
+          "sombra": "#1a6e2c"
+        },
+        {
+          "id": "bin-naranja",
+          "acepta": [
+            "bloque-naranja"
+          ],
+          "tinta": "#f76707",
+          "marca": "",
+          "x": 82,
+          "y": 42,
+          "nombre": "caja naranja",
+          "sombra": "#b43d00"
+        }
+      ],
+      "objetos": [
+        {
+          "id": "bloque-rojo",
+          "tipo": "cubo:rojo",
+          "nombre": "Bloque rojo",
+          "zona": "bin-rojo",
+          "x": 18,
+          "y": 72
+        },
+        {
+          "id": "bloque-azul",
+          "tipo": "estrella:azul",
+          "nombre": "Bloque azul",
+          "zona": "bin-azul",
+          "x": 34,
+          "y": 84
+        },
+        {
+          "id": "bloque-amarillo",
+          "tipo": "cilindro:amarillo",
+          "nombre": "Bloque amarillo",
+          "zona": "bin-amarillo",
+          "x": 50,
+          "y": 72
+        },
+        {
+          "id": "bloque-verde",
+          "tipo": "ladrillo:verde",
+          "nombre": "Bloque verde",
+          "zona": "bin-verde",
+          "x": 68,
+          "y": 84
+        },
+        {
+          "id": "bloque-naranja",
+          "tipo": "triangulo:naranja",
+          "nombre": "Bloque naranja",
+          "zona": "bin-naranja",
+          "x": 82,
+          "y": 72
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "nombre": "La gran canasta",
+      "demo": "tren",
+      "zoe": "¡Uy! ¡Tenemos muchos juguetes por guardar!",
+      "zeus": "Vamos a buscar dónde vive cada juguete. ¡Ayúdanos a ordenar la habitación!",
+      "demoVoz": "¡Mira! El tren va con los carritos.",
+      "pista": "¡Vamos a buscar su lugar!",
+      "listo": "¡Lo lograste! ¡La habitación está ordenada!",
+      "zonas": [
+        {
+          "id": "vehiculos",
+          "acepta": [
+            "coche3",
+            "camion",
+            "tren"
+          ],
+          "tinta": "#1971c2",
+          "marca": "garaje",
+          "x": 18,
+          "y": 40,
+          "nombre": "garaje",
+          "sombra": "#0b4f91"
+        },
+        {
+          "id": "peluches",
+          "acepta": [
+            "oso3",
+            "conejo",
+            "muneco"
+          ],
+          "tinta": "#d6709f",
+          "marca": "abrazo",
+          "x": 82,
+          "y": 40,
+          "nombre": "canasta de peluches",
+          "sombra": "#9b3f6c"
+        },
+        {
+          "id": "juego",
+          "acepta": [
+            "pelota3",
+            "cubo3"
+          ],
+          "tinta": "#f0b000",
+          "marca": "juego",
+          "x": 50,
+          "y": 38,
+          "nombre": "rincón de juego",
+          "sombra": "#b87c00"
+        }
+      ],
+      "objetos": [
+        {
+          "id": "coche3",
+          "tipo": "coche",
+          "nombre": "Coche",
+          "zona": "vehiculos",
+          "x": 12,
+          "y": 66,
+          "pista": "Los carritos van en el garaje."
+        },
+        {
+          "id": "camion",
+          "tipo": "camion",
+          "nombre": "Camión",
+          "zona": "vehiculos",
+          "x": 34,
+          "y": 68,
+          "pista": "Los carritos van en el garaje."
+        },
+        {
+          "id": "tren",
+          "tipo": "tren",
+          "nombre": "Tren",
+          "zona": "vehiculos",
+          "x": 22,
+          "y": 84,
+          "pista": "Los carritos van en el garaje."
+        },
+        {
+          "id": "oso3",
+          "tipo": "oso",
+          "nombre": "Osito",
+          "zona": "peluches",
+          "x": 70,
+          "y": 86,
+          "pista": "Los peluches van juntos."
+        },
+        {
+          "id": "conejo",
+          "tipo": "conejo",
+          "nombre": "Conejo",
+          "zona": "peluches",
+          "x": 86,
+          "y": 84,
+          "pista": "Los peluches van juntos."
+        },
+        {
+          "id": "muneco",
+          "tipo": "muneco",
+          "nombre": "Muñeco",
+          "zona": "peluches",
+          "x": 78,
+          "y": 66,
+          "pista": "Los peluches van juntos."
+        },
+        {
+          "id": "pelota3",
+          "tipo": "pelota",
+          "nombre": "Pelota",
+          "zona": "juego",
+          "x": 48,
+          "y": 82,
+          "pista": "La pelota va con los bloques."
+        },
+        {
+          "id": "cubo3",
+          "tipo": "madera",
+          "nombre": "Cubo",
+          "zona": "juego",
+          "x": 60,
+          "y": 66,
+          "pista": "La pelota va con los bloques."
+        }
+      ]
+    }
+  ]
+}

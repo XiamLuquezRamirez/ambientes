@@ -86,6 +86,16 @@ function mostrarAccionesFinal() {
     if (acciones) acciones.classList.add("visible");
 }
 
+function cancelarSecuenciaVictoria() {
+    if (secuenciaTimer) {
+        clearTimeout(secuenciaTimer);
+        secuenciaTimer = null;
+    }
+    detenerConfetiContinuo();
+    limpiarClasesVictoria();
+    ocultarAccionesFinal();
+}
+
 function limpiarClasesVictoria() {
     if (!pantalla) return;
     pantalla.classList.remove(
@@ -237,6 +247,7 @@ function iniciarVictoria() {
 
 window.iniciarSecuenciaVictoria = iniciarSecuenciaVictoria;
 window.iniciarVictoria = iniciarVictoria;
+window.cancelarSecuenciaVictoria = cancelarSecuenciaVictoria;
 window.detenerConfetiContinuo = detenerConfetiContinuo;
 
 if (document.body && document.body.getAttribute("data-final-demo") === "1") {

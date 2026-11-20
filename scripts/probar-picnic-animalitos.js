@@ -51,7 +51,7 @@ prueba("los animales entran y no se van", function () {
 
 prueba("textos literales del enunciado", function () {
     const t = cfg.textos;
-    assert.strictEqual(t.introZoe, "¡Hola! ¡Los animalitos tienen hambre! Toma la comida de la cesta con tu dedo, arrástrala hasta la boca de su dueño y suéltala para alimentarlo.");
+    assert.strictEqual(t.introZoe, "¡Hola! ¡Los animalitos tienen hambre! Toma la comida del plato con tu dedo, arrástrala hasta la boca de su dueño y suéltala para alimentarlo.");
     assert.strictEqual(t.zoeEligeBien, "¡Lleva cada comida a su animalito! ¡No la sueltes hasta llegar a su boca!");
     assert.strictEqual(t.finalZoe, "¡QUÉ GRAN ALIMENTADOR! Arrastraste la comida a cada animalito con una precisión genial.");
     assert.strictEqual(t.finalTitulo, "¡QUÉ GRAN ALIMENTADOR!");
@@ -168,6 +168,53 @@ prueba("un alimento entregado y lejos de toda boca sigue siendo repetida", funct
         tipo: "zanahoria", animalEsperado: "conejo", radio: 92, entregada: true });
     assert.strictEqual(res.motivo, "repetida");
     assert.strictEqual(res.acierto, false);
+});
+
+prueba("interfaz: controles en su lugar, sin título ni botón de edad en el juego", function () {
+    const html = fs.readFileSync(path.join(dir, "index.html"), "utf8");
+    ["btn-menu-acc", "btn-menu-vol", "btn-silencio", "contador", "indicador-ronda",
+     "btn-comenzar", "btn-otra-vez", "btn-al-menu", "menu-vol-panel", "rango-volumen"]
+        .forEach(function (id) { assert.ok(html.indexOf('id="' + id + '"') >= 0, "falta " + id); });
+    assert.ok(html.indexOf('id="intro-titulo"') < 0, "el título no debe estar en la pantalla de juego");
+    assert.ok(/comun\/interfaz\.css/.test(html), "faltan los botones comunes");
+    assert.ok(/onclick="location\.reload\(\)" class="btn btn-warning btn-round"[^>]*><i class="fa-solid fa-rotate"><\/i>/.test(html), "reiniciar distinto a los demás juegos");
+    assert.ok(/onclick="history\.back\(\)" class="btn btn-danger btn-round"[^>]*><i class="fa-solid fa-arrow-left"><\/i>/.test(html), "volver distinto a los demás juegos");
+    assert.ok(/id="btn-menu-acc" class="menu-acc-fab"/.test(html) && /fa-universal-access/.test(html), "accesibilidad distinta");
+    assert.ok(/id="btn-menu-vol" class="menu-acc-fab"/.test(html) && /fa-volume-high/.test(html), "volumen distinto");
+    assert.ok(!/3-4 años|5-6 años/.test(html), "no debe haber botón de edad");
+    assert.ok(/aria-valuemax="9"/.test(html), "el contador debe ser de 9");
+    assert.ok(fs.existsSync(path.join(dir, "picnic-animalitos.png")), "falta el ícono");
+});
+
+prueba("los scripts del juego se cargan en orden", function () {
+    const html = fs.readFileSync(path.join(dir, "index.html"), "utf8");
+    const orden = ["reglas.js", "dibujos.js", "sonidos.js", "animales.js", "escena-picnic.js", "demo.js", "script.js"];
+    let pos = -1;
+    orden.forEach(function (f) {
+        const i = html.indexOf('src="' + f);
+        assert.ok(i > pos, f + " fuera de orden");
+        pos = i;
+    });
+    assert.ok(html.indexOf("comun/volumen.js") >= 0, "falta el volumen por canales");
+    assert.ok(html.indexOf("oso.js") < 0, "no debe quedar oso.js");
+});
+
+prueba("los globales del juego no chocan con los del juego del oso", function () {
+    ["script.js", "escena-picnic.js", "demo.js", "sonidos.js", "animales.js"].forEach(function (f) {
+        const src = fs.readFileSync(path.join(dir, f), "utf8");
+        assert.ok(!/(Escenario|Sonidos|Dibujos|Reglas)Comer|ComerDemo|OsoComer/.test(src), f + " usa un global del juego del oso");
+    });
+    const son = fs.readFileSync(path.join(dir, "sonidos.js"), "utf8");
+    ["ladrido", "gruñido", "ñam", "niega", "volumenFondo", "volumenEfectos"].forEach(function (k) {
+        assert.ok(son.indexOf(k) >= 0, "sonidos.js sin " + k);
+    });
+});
+
+prueba("los textos que usa el flujo existen en el config", function () {
+    const src = fs.readFileSync(path.join(dir, "script.js"), "utf8");
+    const usados = {};
+    src.replace(/textos\(\)\.(\w+)/g, function (_, k) { usados[k] = true; });
+    Object.keys(usados).forEach(function (k) { assert.ok(cfg.textos[k] != null, "falta textos." + k); });
 });
 
 console.log((ok === total ? "✓ " : "✗ ") + ok + "/" + total + " pruebas");
