@@ -14,7 +14,58 @@
     var esperar = Ut.esperar;
     var tw = Ut.tween;
 
+    /**
+     * Diseño del equipo (img/diseno, 1280×720): fondo.svg trae el cuarto, el aro de la bóveda, los 2 paneles, el buzón y el piso.
+     * Lo que se mueve va aparte: puerta (cara con remaches), rueda, interior de la bóveda abierta y puerta abierta (Mesa de trabajo 13),
+     * luces de cerradura (roja/verde) y banderas (Mesa de trabajo 14: verde = primero; la de cuadros es la misma recoloreada).
+     * Medidas en unidades del dibujo. Si no cargan las imágenes queda la bóveda dibujada a mano.
+     */
+    var ARTE = {
+        dir: 'img/diseno/', fw: 1280, fh: 720,
+        puerta: { x: 640, y: 263.2, r: 162 },
+        mesa: 537,
+        buzon: { x: 638, y: 478, w: 148, h: 62, caja: [564, 447, 148, 64] },
+        panel: { w: 165, h: 125, s: 118, ini: [340.1, 286.7], fin: [939.9, 286.7] },
+        luces: [[559.1, 75.6], [639, 56.3], [718.7, 75.6]], luzVb: [539, 55, 42, 42],
+        off: [248.28, -41.43],
+        hud: { x: 70, y: 72 },
+        banderas: { ini: { x: 258, y: 222, flip: false, clave: 'bandera_verde' }, fin: { x: 1021.5, y: 222, flip: true, clave: 'bandera_cuadros' }, esc: 0.45, vb: [0, 120, 500, 345], piv: [58.6, 455] },
+        capas: {
+            puerta: { vb: [484, 106, 312, 312], esc: 3 },
+            rueda: { vb: [558, 178.4, 160, 160], esc: 4 },
+            interior_abierta: { vb: [262, 160, 270, 285], esc: 3 },
+            puerta_abierta: { vb: [86, 128, 178, 354], esc: 3 }
+        }
+    };
+
     var escena = {
+        precargar: function () {
+            var self = this;
+            if (!self.textures.exists('bv_fondo')) self.load.svg('bv_fondo', ARTE.dir + 'fondo.svg', { width: 1920, height: 1080 });
+            Object.keys(ARTE.capas).forEach(function (n) {
+                var c = ARTE.capas[n];
+                if (!self.textures.exists('bv_' + n)) self.load.svg('bv_' + n, ARTE.dir + n + '.svg', { width: Math.round(c.vb[2] * c.esc), height: Math.round(c.vb[3] * c.esc) });
+            });
+            var lv = ARTE.luzVb;
+            ['luz_roja', 'luz_verde'].forEach(function (n) {
+                if (!self.textures.exists('bv_' + n)) self.load.svg('bv_' + n, ARTE.dir + n + '.svg', { width: lv[2] * 6, height: lv[3] * 6 });
+            });
+            var b = ARTE.banderas;
+            ['bandera_verde', 'bandera_cuadros'].forEach(function (n) {
+                if (!self.textures.exists('bv_' + n)) self.load.svg('bv_' + n, ARTE.dir + n + '.svg', { width: b.vb[2] * 1.5, height: b.vb[3] * 1.5 });
+            });
+        },
+
+        /** El dibujo entero y apoyado abajo; lo que sobra se rellena estirando su borde. */
+        mapaFondo: function () {
+            var nec = ['bv_fondo', 'bv_puerta', 'bv_rueda', 'bv_interior_abierta', 'bv_puerta_abierta', 'bv_luz_roja', 'bv_luz_verde', 'bv_bandera_verde', 'bv_bandera_cuadros'];
+            for (var i = 0; i < nec.length; i++) if (!this.textures.exists(nec[i])) return null;
+            var W = this.scale.width, H = this.scale.height;
+            var k = Math.min(W / ARTE.fw, H / ARTE.fh);
+            var ox = (W - ARTE.fw * k) / 2, oy = H - ARTE.fh * k;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.dentro = [];
@@ -28,6 +79,21 @@
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
             var L = { W: W, H: H };
+            var F = this.mapaFondo();
+            if (F) {
+                var kk = F.k, A = ARTE;
+                L.arte = true; L.F = F;
+                L.pres = W >= 760 ? { x: W - 72, piso: H - 104, alto: Math.min(160, H * 0.28), modelo: 'nino' } : null;
+                L.der = L.pres ? W - 150 : W - 16;
+                L.mesa = F.sy(A.mesa);
+                L.puerta = { x: F.sx(A.puerta.x), y: F.sy(A.puerta.y), r: A.puerta.r * kk };
+                L.buzon = { x: F.sx(A.buzon.x), y: F.sy(A.buzon.y), w: A.buzon.w * kk, h: A.buzon.h * kk };
+                L.placaIni = { x: F.sx(A.panel.ini[0]), y: F.sy(A.panel.ini[1]), s: A.panel.s * kk };
+                L.placaFin = { x: F.sx(A.panel.fin[0]), y: F.sy(A.panel.fin[1]), s: A.panel.s * kk };
+                L.tam = Math.max(54, Math.min(100, (L.der - 30) / 4.6, H * 0.12));
+                L.bocina = { x: F.sx(A.hud.x), y: F.sy(A.hud.y), r: Math.max(24, Math.min(36, 30 * kk)) };
+                return L;
+            }
             var hueco = Math.max(60, H * 0.16);
             L.bocina = { x: W / 2, y: Math.max(60, Math.min(100, 56 + hueco * 0.2)), r: Math.max(28, Math.min(40, hueco * 0.3)) };
             L.pres = W >= 760 ? { x: W - 72, piso: H - 104, alto: Math.min(160, H * 0.28), modelo: 'nino' } : null;
@@ -46,6 +112,22 @@
         armar: function (reubicar) {
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            if (L.arte) {
+                var F = L.F;
+                if (F.oy > 0) keep(this.add.rectangle(0, 0, L.W, F.oy + 2, 0x112549).setOrigin(0, 0).setDepth(0));
+                keep(this.add.image(F.ox, F.oy, 'bv_fondo', '__BASE').setOrigin(0, 0).setDisplaySize(ARTE.fw * F.k, ARTE.fh * F.k).setDepth(0));
+                if (F.ox > 1) {
+                    var tx = this.textures.get('bv_fondo'), iw = tx.getSourceImage().width, ih = tx.getSourceImage().height;
+                    if (!tx.has('bi')) { tx.add('bi', 0, 10, 0, 2, ih); tx.add('bd', 0, iw - 12, 0, 2, ih); }
+                    keep(this.add.image(0, F.oy, 'bv_fondo', 'bi').setOrigin(0, 0).setDisplaySize(F.ox + 1 + 5 * F.k, ARTE.fh * F.k).setDepth(0));
+                    keep(this.add.image(L.W - F.ox - 1, F.oy, 'bv_fondo', 'bd').setOrigin(0, 0).setDisplaySize(F.ox + 1, ARTE.fh * F.k).setDepth(0));
+                }
+                this.sembrarMotes(keep, 16, { x: L.puerta.x - L.puerta.r, y: L.puerta.y - L.puerta.r, w: L.puerta.r * 2, h: L.puerta.r * 2, depth: 5 }, 0xfff3bf);
+                this.montarPuertaArte(keep);
+                this.montarHud(keep);
+                if (reubicar) this.ubicarCosas();
+                return;
+            }
             K.textura(this, 'boveda_sala', L.W, L.H, function (x, w, h) {
                 var g = x.createLinearGradient(0, 0, 0, L.mesa);
                 g.addColorStop(0, '#343a40'); g.addColorStop(1, '#212529');
@@ -73,6 +155,62 @@
             this.montarPuerta(keep);
             this.montarHud(keep);
             if (reubicar) this.ubicarCosas();
+        },
+
+        /** Capa recortada del diseño: imagen con su caja (vb) en unidades del dibujo; (px,py) = punto de la lámina que queda en (0,0) del padre. */
+        imgArte: function (clave, vb, centro) {
+            var k = this.L.F.k;
+            var im = this.add.image((vb[0] - centro[0]) * k, (vb[1] - centro[1]) * k, clave).setOrigin(0, 0).setDisplaySize(vb[2] * k, vb[3] * k);
+            return im;
+        },
+
+        montarPuertaArte: function (keep) {
+            var self = this, L = this.L, F = L.F, k = F.k, A = ARTE, Pt = L.puerta;
+            var C = [A.puerta.x, A.puerta.y];
+            var off = A.off;
+            // Interior de la bóveda (Mesa 13): nace oculto y se ve al abrir.
+            var vi = A.capas.interior_abierta.vb;
+            this.interiorImg = keep(this.add.image(F.sx(vi[0] + off[0]), F.sy(vi[1] + off[1]), 'bv_interior_abierta').setOrigin(0, 0)
+                .setDisplaySize(vi[2] * k, vi[3] * k).setDepth(6.4).setAlpha(0));
+            // Brillo dorado de adentro (como antes, pero con el interior pintado por debajo).
+            this.interior = keep(this.add.circle(Pt.x, Pt.y + 5 * k, 118 * k, 0xffe066, 0).setDepth(6.5).setVisible(false));
+            // Puerta abierta (Mesa 13): aparece solo en el final.
+            var vp = A.capas.puerta_abierta.vb;
+            this.puertaAb = keep(this.add.image(F.sx(vp[0] + vp[2] + off[0]), F.sy(vp[1] + vp[3] / 2 + off[1]), 'bv_puerta_abierta').setOrigin(1, 0.5)
+                .setDisplaySize(vp[2] * k, vp[3] * k).setDepth(7.5).setAlpha(0));
+            this.puertaAb.sx0 = this.puertaAb.scaleX;
+            this.puertaAb.scaleX = this.puertaAb.sx0 * 0.05;
+            // Puerta cerrada: cara + rueda, un contenedor que se achata al abrir.
+            var puerta = keep(this.add.container(Pt.x, Pt.y).setDepth(7));
+            puerta.add(this.imgArte('bv_puerta', A.capas.puerta.vb, C));
+            var vr = A.capas.rueda.vb;
+            var rueda = this.add.image((vr[0] + vr[2] / 2 - C[0]) * k, (vr[1] + vr[3] / 2 - C[1]) * k, 'bv_rueda').setDisplaySize(vr[2] * k, vr[3] * k);
+            puerta.add(rueda);
+            this.puerta = puerta; this.rueda = rueda;
+            // Tres luces de cerradura (rojas; pasan a verde al acertar).
+            var lv = A.luzVb;
+            this.luces = A.luces.map(function (p) {
+                var im = self.add.image(F.sx(p[0]), F.sy(p[1]), 'bv_luz_roja').setDisplaySize(lv[2] * k, lv[3] * k).setDepth(8);
+                im.base = im.scaleX;
+                return keep(im);
+            });
+            // Banderas (verde = primero, cuadros = último) sobre cada panel.
+            var B = A.banderas;
+            this.banderas = [B.ini, B.fin].map(function (b, i) {
+                var im = self.add.image(F.sx(b.x), F.sy(b.y), 'bv_' + b.clave).setOrigin(B.piv[0] / B.vb[2], (B.piv[1] - B.vb[1]) / B.vb[3]).setDepth(6);
+                var e = B.esc * k * (500 / im.width) * 1.5 / 1.5;
+                im.setDisplaySize(B.vb[2] * B.esc * k, B.vb[3] * B.esc * k);
+                im.sx0 = im.scaleX; im.sy0 = im.scaleY;
+                if (b.flip) im.scaleX = -im.sx0;
+                im.flip = b.flip ? -1 : 1;
+                return keep(im);
+            });
+            var P = A.panel;
+            this.placas = [L.placaIni, L.placaFin].map(function (Q) {
+                var marca = keep(self.add.rectangle(Q.x, Q.y, (P.w + 8) * k, (P.h + 8) * k, 0xffe066, 0).setStrokeStyle(4, 0xffe066, 0).setDepth(5));
+                return { x: Q.x, y: Q.y, s: Q.s, marca: marca };
+            });
+            this.buzonG = keep(this.add.graphics().setDepth(6));
         },
 
         montarPuerta: function (keep) {
@@ -122,7 +260,70 @@
             }, this);
         },
 
-        luz: function (i, si) { this.luces[i].setFillStyle(si ? 0x40c057 : 0xe03131); if (si) this.tweens.add({ targets: this.luces[i], scale: 1.6, duration: 160, yoyo: true }); },
+        luz: function (i, si) {
+            var l = this.luces[i];
+            if (this.L.arte) {
+                l.setTexture(si ? 'bv_luz_verde' : 'bv_luz_roja');
+                if (si) this.tweens.add({ targets: l, scaleX: l.base * 1.6, scaleY: l.base * 1.6, duration: 160, yoyo: true });
+                else l.setScale(l.base);
+                return;
+            }
+            l.setFillStyle(si ? 0x40c057 : 0xe03131);
+            if (si) this.tweens.add({ targets: l, scale: 1.6, duration: 160, yoyo: true });
+        },
+
+        /** Abre como en el diseño: la cara se achata hacia la bisagra, se ve el interior y asoma la puerta abierta. */
+        /**
+         * Giro de la puerta alrededor de su bisagra (borde izquierdo del aro): la cara redonda se achata hacia la bisagra
+         * mientras la puerta abierta (Mesa de trabajo 13) crece desde ella hacia la izquierda; al final queda el aro con el
+         * interior oscuro y la puerta de lado. p: 0 = cerrada, 1 = abierta.
+         */
+        giroPuerta: function (p) {
+            var L = this.L, Pt = L.puerta, hx = Pt.x - Pt.r;   // x de la bisagra
+            var cara = Math.max(0.02, 1 - p);
+            this.puerta.scaleX = cara;
+            this.puerta.x = hx + (Pt.x - hx) * cara;
+            if (this.puertaAb) this.puertaAb.scaleX = this.puertaAb.sx0 * Math.max(0.05, p);
+        },
+
+        abrirBoveda: async function (ms) {
+            var self = this;
+            ms = ms || 1200;
+            // 1) se destraba: un golpe seco y un temblor corto de la rueda
+            K.ruido({ f: 140, q: 1, dur: 0.25, vol: 0.1 });
+            this.cameras.main.shake(90, 0.003);
+            this.tweens.add({ targets: this.rueda, angle: this.rueda.angle - 14, duration: 90, yoyo: true });
+            await esperar(this, 220);
+            // 2) gira sobre la bisagra
+            this.puerta.setAlpha(1);
+            if (this.puertaAb) this.puertaAb.setAlpha(1);
+            this.mostrarInterior(1, ms * 0.55);
+            K.tono({ f: 180, f2: 90, dur: ms / 1000, vol: 0.05, tipo: 'triangle' });
+            var o = { p: 0 };
+            await tw(this, { targets: o, p: 1, duration: ms, ease: 'Sine.easeInOut', onUpdate: function () { self.giroPuerta(o.p); } });
+            this.giroPuerta(1);
+            this.puerta.setAlpha(0);
+            K.ruido({ f: 300, q: 1.2, dur: 0.12, vol: 0.08 });
+        },
+
+        cerrarBoveda: async function (ms) {
+            var self = this;
+            ms = ms || 900;
+            this.puerta.setAlpha(1);
+            K.tono({ f: 90, f2: 180, dur: ms / 1000, vol: 0.05, tipo: 'triangle' });
+            var o = { p: 1 };
+            await tw(this, { targets: o, p: 0, duration: ms, ease: 'Sine.easeInOut', onUpdate: function () { self.giroPuerta(o.p); } });
+            this.giroPuerta(0);
+            if (this.puertaAb) this.puertaAb.setAlpha(0);
+            this.mostrarInterior(0, 200);
+            K.ruido({ f: 220, q: 1, dur: 0.15, vol: 0.1 });
+            this.tweens.add({ targets: this.rueda, angle: this.rueda.angle + 20, duration: 160, yoyo: true });
+        },
+
+        /** Interior pintado de la bóveda (se ve al abrirse la puerta). */
+        mostrarInterior: function (alfa, ms) {
+            if (this.interiorImg) this.tweens.add({ targets: this.interiorImg, alpha: alfa, duration: ms || 400 });
+        },
 
         /** La rueda gira un clic con cada sonido. */
         alSonar: function () {
@@ -164,6 +365,11 @@
             [0, 1, 2].forEach(function (i) { self.luz(i, false); });
             this.placas.forEach(function (p) { p.marca.setStrokeStyle(4, 0xffe066, 0); });
             this.interior.setFillStyle(0xffe066, 0);
+            if (this.interiorImg) this.interiorImg.setAlpha(0);
+            if (this.puertaAb) this.puertaAb.setAlpha(0);
+            this.giroPuerta(0);
+            this.puerta.setAlpha(1);
+            this.puerta.x = this.L.puerta.x;
             await tw(this, { targets: this.puerta, scaleX: 1, duration: 300 });
         },
 
@@ -308,15 +514,19 @@
                 // Tres luces verdes: la rueda gira y la bóveda se entreabre; suena la secuencia entera.
                 this.giro += 360;
                 await tw(this, { targets: this.rueda, angle: this.giro, duration: 700, ease: 'Sine.easeInOut' });
-                this.tweens.add({ targets: this.interior, fillAlpha: 0.7, duration: 400 });
-                await tw(this, { targets: this.puerta, scaleX: 0.25, duration: 500, ease: 'Back.easeOut' });
+                if (this.L.arte) await this.abrirBoveda(800);
+                else {
+                    this.tweens.add({ targets: this.interior, fillAlpha: 0.7, duration: 400 });
+                    await tw(this, { targets: this.puerta, scaleX: 0.25, duration: 500, ease: 'Back.easeOut' });
+                }
                 var seq = this.nv.reproducciones[0];
                 for (var k = 0; k < seq.length; k++) {
                     this.reunidos.push(seq[k]);
                     Ut.estallido(this, this.L.puerta.x, this.L.puerta.y, { n: 4, tex: 'estrella', tam: 18, dist: 60, sinTinte: true, depth: 9 });
                     await this.sonar(seq[k], { breve: true, bocina: false });
                 }
-                await tw(this, { targets: this.puerta, scaleX: 1, duration: 400 });
+                if (this.L.arte) await this.cerrarBoveda(600);
+                else await tw(this, { targets: this.puerta, scaleX: 1, duration: 400 });
             }
         },
 
@@ -378,8 +588,11 @@
             [0, 1, 2].forEach(function (i) { self.luz(i, true); });
             this.giro += 720;
             await tw(this, { targets: this.rueda, angle: this.giro, duration: 1000, ease: 'Sine.easeInOut' });
-            this.tweens.add({ targets: this.interior, fillAlpha: 0.9, duration: 500 });
-            await tw(this, { targets: this.puerta, scaleX: 0.05, x: Pt.x - Pt.r * 0.95, duration: 700, ease: 'Sine.easeInOut' });
+            if (L.arte) await this.abrirBoveda(1000);
+            else {
+                this.tweens.add({ targets: this.interior, fillAlpha: 0.9, duration: 500 });
+                await tw(this, { targets: this.puerta, scaleX: 0.05, x: Pt.x - Pt.r * 0.95, duration: 700, ease: 'Sine.easeInOut' });
+            }
             // De la bóveda sale el tesoro: todos los sonidos que guardó, en abanico.
             var n = ids.length;
             for (var i = 0; i < n; i++) {
@@ -411,6 +624,7 @@
         paso: function (time, delta) {
             var dt = (delta || 16) / 1000;
             var L = this.L;
+            if (L.arte) this.animarArte(time);
             if (this.interior && !this.tweens.isTweening(this.interior) && this.interior.fillAlpha < 0.2) {
                 this.interior.setFillStyle(0xffe066, 0.04 + Math.sin(time / 500) * 0.03);
             }
@@ -431,6 +645,32 @@
                 if (this.apuntado === a) a.cont.setScale(1.08);
                 else if (Math.abs(a.cont.scale - 1) > 0.02) a.cont.setScale(1);
             }, this);
+        },
+
+        /** Banderas que ondean, luces rojas que respiran y el buzón que brilla cuando toca meter. */
+        animarArte: function (time) {
+            var L = this.L, k = L.F.k;
+            (this.banderas || []).forEach(function (b, i) {
+                if (!b.active) return;
+                var ph = i * 1.9;
+                b.setRotation(Math.sin(time / 520 + ph) * 0.035);
+                b.scaleX = b.flip * b.sx0 * (1 + Math.sin(time / 190 + ph) * 0.05);
+                b.scaleY = b.sy0 * (1 + Math.sin(time / 330 + ph) * 0.015);
+            });
+            (this.luces || []).forEach(function (l, i) {
+                if (!l.active || l.texture.key !== 'bv_luz_roja' || this.tweens.isTweening(l)) return;
+                var q = l.base * (1 + Math.sin(time / 430 + i * 1.3) * 0.05);
+                l.setScale(q);
+            }, this);
+            var g = this.buzonG;
+            if (g) {
+                g.clear();
+                if (this.paso === 0 && this.fase === 'jugar' && !this.enviando) {
+                    var c = ARTE.buzon.caja, F = L.F;
+                    g.lineStyle(Math.max(3, 4 * k), 0xffe066, 0.3 + 0.35 * Math.sin(time / 260));
+                    g.strokeRoundedRect(F.sx(c[0]), F.sy(c[1]), c[2] * k, c[3] * k, 6 * k);
+                }
+            }
         },
 
         estadoExtra: function () {

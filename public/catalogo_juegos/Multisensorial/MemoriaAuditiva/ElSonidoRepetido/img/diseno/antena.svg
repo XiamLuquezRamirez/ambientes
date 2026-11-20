@@ -1,0 +1,253 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  viewBox="645 50 363 139">
+<defs>
+    <style>
+      .cls-1 {
+        fill: #004038;
+      }
+
+      .cls-2 {
+        fill: #ae4ddb;
+      }
+
+      .cls-3 {
+        fill: #79473a;
+      }
+
+      .cls-4 {
+        fill: #e38f00;
+      }
+
+      .cls-5 {
+        fill: #ff6b6b;
+      }
+
+      .cls-6 {
+        mix-blend-mode: soft-light;
+        opacity: .46;
+      }
+
+      .cls-7 {
+        fill: #997db7;
+        opacity: .52;
+      }
+
+      .cls-8 {
+        opacity: .44;
+      }
+
+      .cls-8, .cls-9, .cls-10, .cls-11, .cls-12, .cls-13 {
+        mix-blend-mode: overlay;
+      }
+
+      .cls-8, .cls-10 {
+        fill: #322b3f;
+      }
+
+      .cls-14 {
+        fill: #fff3b2;
+      }
+
+      .cls-15 {
+        fill: #8fa53c;
+      }
+
+      .cls-16 {
+        fill: #fff8cf;
+      }
+
+      .cls-17, .cls-12 {
+        fill: #fff;
+      }
+
+      .cls-18 {
+        fill: #2ecccc;
+      }
+
+      .cls-19 {
+        fill: none;
+      }
+
+      .cls-20 {
+        fill: #9e68ba;
+        mix-blend-mode: multiply;
+        opacity: .2;
+      }
+
+      .cls-21 {
+        fill: #6172b4;
+      }
+
+      .cls-22 {
+        fill: #00b0bd;
+      }
+
+      .cls-23 {
+        fill: #21f0ff;
+      }
+
+      .cls-24 {
+        fill: #0b5c69;
+      }
+
+      .cls-25 {
+        fill: #f3d2b4;
+      }
+
+      .cls-26 {
+        clip-path: url(#clippath-1);
+      }
+
+      .cls-27 {
+        fill: #af2222;
+      }
+
+      .cls-28 {
+        fill: #8ea343;
+      }
+
+      .cls-29 {
+        fill: #9ab047;
+      }
+
+      .cls-30 {
+        isolation: isolate;
+      }
+
+      .cls-31 {
+        fill: #69f969;
+      }
+
+      .cls-32 {
+        fill: #ffae00;
+      }
+
+      .cls-33 {
+        fill: #eb412d;
+      }
+
+      .cls-9 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-9, .cls-11, .cls-13 {
+        opacity: .25;
+      }
+
+      .cls-34 {
+        fill: #265d6e;
+      }
+
+      .cls-35 {
+        fill: #012d26;
+      }
+
+      .cls-10 {
+        opacity: .18;
+      }
+
+      .cls-36 {
+        fill: #c67c39;
+      }
+
+      .cls-37 {
+        fill: #7092cb;
+      }
+
+      .cls-38 {
+        fill: #ffd43b;
+      }
+
+      .cls-11 {
+        fill: url(#linear-gradient-2);
+      }
+
+      .cls-39 {
+        fill: #f9994b;
+      }
+
+      .cls-40 {
+        fill: #36a892;
+      }
+
+      .cls-41 {
+        opacity: .35;
+      }
+
+      .cls-42 {
+        fill: #788b2f;
+      }
+
+      .cls-43 {
+        fill: #ce915b;
+      }
+
+      .cls-44 {
+        fill: #946a79;
+      }
+
+      .cls-45 {
+        fill: #cf4455;
+      }
+
+      .cls-46 {
+        fill: #fcb527;
+      }
+
+      .cls-47 {
+        fill: #ef813c;
+      }
+
+      .cls-48 {
+        fill: #07d2e0;
+      }
+
+      .cls-49 {
+        fill: #02bcc1;
+      }
+
+      .cls-12 {
+        opacity: .14;
+      }
+
+      .cls-50 {
+        fill: #e2b27f;
+      }
+
+      .cls-51 {
+        clip-path: url(#clippath);
+      }
+
+      .cls-52 {
+        fill: #678a87;
+      }
+
+      .cls-13 {
+        fill: url(#linear-gradient-3);
+      }
+
+      .cls-53 {
+        fill: #894c1f;
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-19" x="0" y="0" width="1280" height="720.01"/>
+    </clipPath>
+    <clipPath id="clippath-1">
+      <rect class="cls-19" y="48.73" width="1280" height="679.12"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="70.71" y1="483.94" x2="135.16" y2="483.94" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b0b0b0"/>
+      <stop offset="1" stop-color="#201c33"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="77.12" y1="404.24" x2="104.13" y2="404.24" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-3" x1="67.27" y1="173.47" x2="148.93" y2="173.47" xlink:href="#linear-gradient"/>
+  </defs>
+<g><g>
+          <g>
+            <path class="cls-35" d="M671.15,79.18c-.85,3.84.64,7.43,3.32,8.03l216.25,47.87,3.08-13.9-216.25-47.87c-2.69-.59-5.55,2.03-6.4,5.87Z"/>
+            <path class="cls-40" d="M983.72,148.37h0c-1.7,7.68-9.3,12.52-16.97,10.82l-93.49-20.7c-7.68-1.7-12.52-9.3-10.82-16.97h0c1.7-7.68,9.3-12.52,16.97-10.82l93.49,20.7c7.68,1.7,12.52,9.3,10.82,16.97Z"/>
+          </g>
+          <path class="cls-18" d="M987.67,128.54h-32.95c-7.62,0-13.79,6.17-13.79,13.79v41.54h60.53v-41.54c0-7.62-6.17-13.79-13.79-13.79Z"/>
+          <path class="cls-46" d="M666.56,96.15c-10.84-2.4-17.69-13.14-15.29-23.98,2.4-10.84,13.14-17.69,23.98-15.29,10.84,2.4,17.69,13.14,15.29,23.98-2.4,10.84-13.14,17.69-23.98,15.29Z"/>
+        </g></g>
+</svg>

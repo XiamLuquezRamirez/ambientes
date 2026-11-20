@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  viewBox="491 109 298 296">
+<defs>
+    <style>
+      .cls-1 {
+        fill: #5fc9c1;
+      }
+
+      .cls-2 {
+        clip-path: url(#clippath-7);
+      }
+
+      .cls-3 {
+        clip-path: url(#clippath-4);
+      }
+
+      .cls-4 {
+        mix-blend-mode: multiply;
+        opacity: .45;
+      }
+
+      .cls-5 {
+        fill: #8bc7c5;
+      }
+
+      .cls-6 {
+        clip-path: url(#clippath-10);
+      }
+
+      .cls-7 {
+        fill: #8d8f8f;
+      }
+
+      .cls-7, .cls-8, .cls-9, .cls-10, .cls-11, .cls-12, .cls-13, .cls-14, .cls-15, .cls-16 {
+        fill-rule: evenodd;
+      }
+
+      .cls-8 {
+        fill: #3b3f42;
+      }
+
+      .cls-9 {
+        fill: #b0b1b0;
+      }
+
+      .cls-17 {
+        fill: #ece5d6;
+      }
+
+      .cls-18 {
+        fill: none;
+      }
+
+      .cls-10 {
+        fill: #e4e5e5;
+      }
+
+      .cls-19 {
+        fill: #f2f0e4;
+      }
+
+      .cls-11 {
+        fill: #bebfbd;
+      }
+
+      .cls-20 {
+        clip-path: url(#clippath-1);
+      }
+
+      .cls-12 {
+        fill: #acadac;
+      }
+
+      .cls-21 {
+        fill: #f4c69d;
+      }
+
+      .cls-22 {
+        isolation: isolate;
+      }
+
+      .cls-23 {
+        fill: #60bab6;
+      }
+
+      .cls-24 {
+        clip-path: url(#clippath-5);
+      }
+
+      .cls-25 {
+        fill: #24788e;
+      }
+
+      .cls-26 {
+        clip-path: url(#clippath-8);
+      }
+
+      .cls-27 {
+        fill: #af56b2;
+      }
+
+      .cls-28 {
+        fill: #ea5c5c;
+      }
+
+      .cls-29 {
+        fill: #d39a66;
+      }
+
+      .cls-13 {
+        fill: #9c9d9d;
+      }
+
+      .cls-30 {
+        fill: #c67c39;
+      }
+
+      .cls-31 {
+        fill: #c18452;
+      }
+
+      .cls-32 {
+        fill: #e04444;
+      }
+
+      .cls-33 {
+        opacity: .35;
+      }
+
+      .cls-34 {
+        fill: #fffbee;
+      }
+
+      .cls-35 {
+        fill: #ce915b;
+      }
+
+      .cls-36 {
+        fill: #d8d0c0;
+      }
+
+      .cls-37 {
+        clip-path: url(#clippath-2);
+      }
+
+      .cls-14 {
+        fill: #4f5357;
+      }
+
+      .cls-15 {
+        fill: #d1d3d2;
+      }
+
+      .cls-16 {
+        fill: #676969;
+      }
+
+      .cls-38 {
+        fill: #ebc258;
+      }
+
+      .cls-39 {
+        fill: #a59c8c;
+        opacity: .36;
+      }
+
+      .cls-40 {
+        fill: #e2b27f;
+      }
+
+      .cls-41 {
+        clip-path: url(#clippath);
+      }
+
+      .cls-42 {
+        fill: #894c1f;
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-18" y="40.88" width="1280" height="679.12"/>
+    </clipPath>
+    <clipPath id="clippath-1">
+      <rect class="cls-18" x="0" y="0" width="1280" height="720.01"/>
+    </clipPath>
+    <clipPath id="clippath-2">
+      <rect class="cls-18" x="849.11" y="236.17" width="288.78" height="164.72"/>
+    </clipPath>
+    <clipPath id="clippath-4">
+      <rect class="cls-18" x="849.17" y="237.24" width="288.46" height="163.69"/>
+    </clipPath>
+    <clipPath id="clippath-5">
+      <rect class="cls-18" x="495.61" y="236.17" width="288.78" height="164.72"/>
+    </clipPath>
+    <clipPath id="clippath-7">
+      <rect class="cls-18" x="495.67" y="237.24" width="288.46" height="163.69"/>
+    </clipPath>
+    <clipPath id="clippath-8">
+      <rect class="cls-18" x="142.11" y="236.17" width="288.78" height="164.72"/>
+    </clipPath>
+    <clipPath id="clippath-10">
+      <rect class="cls-18" x="142.17" y="237.24" width="288.46" height="163.69"/>
+    </clipPath>
+  </defs>
+<g><rect class="cls-38" x="495.65" y="235.46" width="288.68" height="165.45"/>
+<rect class="cls-17" x="759.39" y="236.56" width="23.92" height="18.98"/>
+<g>
+              <polygon class="cls-19" points="495.88 236.31 495.71 235.45 495.56 235.37 495.56 235.45 495.56 235.45 495.56 266.13 495.58 266.13 495.65 400.92 640 318.19 521.04 249.98 495.88 236.31"/>
+              <polygon class="cls-19" points="784.44 235.45 784.44 235.45 758.96 250.05 640 318.19 784.34 400.92 784.42 266.13 784.44 266.13 784.44 235.45"/>
+            </g>
+<g class="cls-24">
+              <g>
+                <polygon class="cls-28" points="510.42 402.53 704.57 219.46 714.2 230.6 530.37 402.43 510.42 402.53"/>
+                <polygon class="cls-5" points="551.77 401.01 741.87 221.96 751.5 233.1 551.97 420.51 551.77 401.01"/>
+                <polygon class="cls-32" points="531.55 229.41 495.22 263.63 495.42 283.12 552.61 229.41 531.55 229.41"/>
+                <polygon class="cls-23" points="571.39 231.4 495.22 303.13 495.42 322.63 592.56 231.4 571.39 231.4"/>
+                <polygon class="cls-32" points="611.85 231.4 494.94 341.51 495.14 361.01 633.13 231.4 611.85 231.4"/>
+                <polygon class="cls-23" points="653.8 231.4 494.94 381.02 495.14 400.51 675.2 231.4 653.8 231.4"/>
+                <polygon class="cls-32" points="793.11 289.09 657.61 416.85 677.56 416.75 793.11 308.75 793.11 289.09"/>
+                <polygon class="cls-32" points="766.55 408.16 793.11 383.21 793.11 363.35 745.54 408.16 766.55 408.16"/>
+                <polygon class="cls-23" points="712.44 402.98 733.45 402.98 793.11 346.95 793.11 327 712.44 402.98"/>
+                <polygon class="cls-23" points="625.91 405.37 646.88 405.37 793.11 268.03 793.11 247.89 625.91 405.37"/>
+                <polygon class="cls-32" points="606.11 405.77 789.11 233.88 779.49 222.74 589.39 401.79 589.43 405.77 606.11 405.77"/>
+              </g>
+            </g>
+<rect class="cls-19" x="504.56" y="235.38" width="270.94" height="155.37"/>
+<path class="cls-1" d="M495.57,234.99l138.73,78.11,42.5-17.36,107.64-60.67s-288.87,1.08-288.87-.08Z"/>
+<rect class="cls-36" x="495.56" y="235.01" width="288.87" height="1.55"/>
+<polygon class="cls-17" points="759.12 236.53 759.2 249.3 784.44 236.6 759.12 236.53"/>
+<polygon class="cls-17" points="520.88 236.53 520.89 249.28 495.56 236.52 520.88 236.53"/></g>
+</svg>

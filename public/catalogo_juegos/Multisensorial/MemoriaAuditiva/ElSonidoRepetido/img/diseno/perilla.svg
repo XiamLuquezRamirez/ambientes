@@ -1,0 +1,253 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  viewBox="785 492 106 106">
+<defs>
+    <style>
+      .cls-1 {
+        fill: #004038;
+      }
+
+      .cls-2 {
+        fill: #ae4ddb;
+      }
+
+      .cls-3 {
+        fill: #79473a;
+      }
+
+      .cls-4 {
+        fill: #e38f00;
+      }
+
+      .cls-5 {
+        fill: #ff6b6b;
+      }
+
+      .cls-6 {
+        mix-blend-mode: soft-light;
+        opacity: .46;
+      }
+
+      .cls-7 {
+        fill: #997db7;
+        opacity: .52;
+      }
+
+      .cls-8 {
+        opacity: .44;
+      }
+
+      .cls-8, .cls-9, .cls-10, .cls-11, .cls-12, .cls-13 {
+        mix-blend-mode: overlay;
+      }
+
+      .cls-8, .cls-10 {
+        fill: #322b3f;
+      }
+
+      .cls-14 {
+        fill: #fff3b2;
+      }
+
+      .cls-15 {
+        fill: #8fa53c;
+      }
+
+      .cls-16 {
+        fill: #fff8cf;
+      }
+
+      .cls-17, .cls-12 {
+        fill: #fff;
+      }
+
+      .cls-18 {
+        fill: #2ecccc;
+      }
+
+      .cls-19 {
+        fill: none;
+      }
+
+      .cls-20 {
+        fill: #9e68ba;
+        mix-blend-mode: multiply;
+        opacity: .2;
+      }
+
+      .cls-21 {
+        fill: #6172b4;
+      }
+
+      .cls-22 {
+        fill: #00b0bd;
+      }
+
+      .cls-23 {
+        fill: #21f0ff;
+      }
+
+      .cls-24 {
+        fill: #0b5c69;
+      }
+
+      .cls-25 {
+        fill: #f3d2b4;
+      }
+
+      .cls-26 {
+        clip-path: url(#clippath-1);
+      }
+
+      .cls-27 {
+        fill: #af2222;
+      }
+
+      .cls-28 {
+        fill: #8ea343;
+      }
+
+      .cls-29 {
+        fill: #9ab047;
+      }
+
+      .cls-30 {
+        isolation: isolate;
+      }
+
+      .cls-31 {
+        fill: #69f969;
+      }
+
+      .cls-32 {
+        fill: #ffae00;
+      }
+
+      .cls-33 {
+        fill: #eb412d;
+      }
+
+      .cls-9 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-9, .cls-11, .cls-13 {
+        opacity: .25;
+      }
+
+      .cls-34 {
+        fill: #265d6e;
+      }
+
+      .cls-35 {
+        fill: #012d26;
+      }
+
+      .cls-10 {
+        opacity: .18;
+      }
+
+      .cls-36 {
+        fill: #c67c39;
+      }
+
+      .cls-37 {
+        fill: #7092cb;
+      }
+
+      .cls-38 {
+        fill: #ffd43b;
+      }
+
+      .cls-11 {
+        fill: url(#linear-gradient-2);
+      }
+
+      .cls-39 {
+        fill: #f9994b;
+      }
+
+      .cls-40 {
+        fill: #36a892;
+      }
+
+      .cls-41 {
+        opacity: .35;
+      }
+
+      .cls-42 {
+        fill: #788b2f;
+      }
+
+      .cls-43 {
+        fill: #ce915b;
+      }
+
+      .cls-44 {
+        fill: #946a79;
+      }
+
+      .cls-45 {
+        fill: #cf4455;
+      }
+
+      .cls-46 {
+        fill: #fcb527;
+      }
+
+      .cls-47 {
+        fill: #ef813c;
+      }
+
+      .cls-48 {
+        fill: #07d2e0;
+      }
+
+      .cls-49 {
+        fill: #02bcc1;
+      }
+
+      .cls-12 {
+        opacity: .14;
+      }
+
+      .cls-50 {
+        fill: #e2b27f;
+      }
+
+      .cls-51 {
+        clip-path: url(#clippath);
+      }
+
+      .cls-52 {
+        fill: #678a87;
+      }
+
+      .cls-13 {
+        fill: url(#linear-gradient-3);
+      }
+
+      .cls-53 {
+        fill: #894c1f;
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-19" x="0" y="0" width="1280" height="720.01"/>
+    </clipPath>
+    <clipPath id="clippath-1">
+      <rect class="cls-19" y="48.73" width="1280" height="679.12"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="70.71" y1="483.94" x2="135.16" y2="483.94" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b0b0b0"/>
+      <stop offset="1" stop-color="#201c33"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="77.12" y1="404.24" x2="104.13" y2="404.24" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-3" x1="67.27" y1="173.47" x2="148.93" y2="173.47" xlink:href="#linear-gradient"/>
+  </defs>
+<g><g>
+          <path class="cls-17" d="M885.33,545.22c0,25.91-21.02,46.93-46.93,46.93s-46.93-21.02-46.93-46.93c0-24.43,18.65-44.5,42.49-46.72,1.46-.14,2.94-.2,4.43-.2s2.97.07,4.42.2c23.84,2.23,42.51,22.29,42.51,46.72Z"/>
+          <path class="cls-32" d="M876.84,545.22c0,21.19-17.24,38.43-38.43,38.43s-38.43-17.24-38.43-38.43c0-19.71,14.88-35.97,34-38.16,1.44-.19,2.94-.27,4.43-.27s2.97.09,4.42.27c19.11,2.17,34.01,18.45,34.01,38.16Z"/>
+          <g>
+            <path class="cls-27" d="M839.81,498.29h0c2.44,0,4.43,1.98,4.43,4.43v27.62h-8.85v-27.62c0-2.44,1.98-4.43,4.43-4.43Z"/>
+            <path class="cls-33" d="M838.4,498.29h0c2.44,0,4.43,1.98,4.43,4.43v27.62h-8.85v-27.62c0-2.44,1.98-4.43,4.43-4.43Z"/>
+          </g>
+        </g></g>
+</svg>

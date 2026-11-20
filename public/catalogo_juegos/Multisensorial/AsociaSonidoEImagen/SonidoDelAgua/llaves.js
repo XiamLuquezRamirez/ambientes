@@ -105,7 +105,7 @@
                 var F = L.F;
                 // Pared de arriba hasta el borde (el dibujo empieza con ese color) y el dibujo entero.
                 keep(this.add.rectangle(0, 0, L.W, L.H, 0xffd0a5).setOrigin(0, 0).setDepth(0));
-                keep(this.add.image(F.ox, F.oy, 'agua_fondo').setOrigin(0, 0).setDisplaySize(ARTE.fw * F.k, ARTE.fh * F.k).setDepth(1));
+                keep(this.add.image(F.ox, F.oy, 'agua_fondo', '__BASE').setOrigin(0, 0).setDisplaySize(ARTE.fw * F.k, ARTE.fh * F.k).setDepth(1));
                 // Si sobran franjas a los lados, se continúan con el borde del dibujo reflejado (el jardín y el lavadero siguen).
                 if (F.ox > 1) {
                     var tex = this.textures.get('agua_fondo');

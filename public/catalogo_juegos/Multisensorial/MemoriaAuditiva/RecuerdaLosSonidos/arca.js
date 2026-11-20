@@ -14,7 +14,43 @@
     var tw = Ut.tween;
     var rnd = Ut.rnd;
 
+    /**
+     * Diseño del equipo (img/diseno, 1280×720): fondo_atras (cielo, sol, nubes, colinas, mar), barco (casco, cabina con 4 ojos
+     * de buey, puerta, banderines, mástil, salvavidas) y frente (muelle, bolardos y rampa). Las tres capas llevan la misma
+     * lámina; el barco es un contenedor aparte para que se mueva y zarpe. Medidas en unidades del dibujo.
+     * Si no cargan las imágenes queda el arca dibujada a mano.
+     */
+    var ARTE = {
+        dir: 'img/diseno/', fw: 1280, fh: 720,
+        piv: { x: 660, y: 560 },
+        puerta: { x: 708, y: 440, w: 112, h: 128 },
+        rampa: { x0: 474, y0: 605, x1: 709, y1: 488 },
+        vent: [[665.6, 312.9], [751.4, 310.7], [837, 310.7], [922.7, 310.7]], rv: 24.5,
+        muelle: 598, techo: 232, cubierta: { x0: 600, x1: 915 },
+        hud: { x: 66, y: 62 }, nino: { x: 70, y: 655 }
+    };
+
     var escena = {
+        precargar: function () {
+            var self = this;
+            ['fondo_atras', 'barco', 'frente', 'olas', 'colinas'].forEach(function (n) {
+                if (!self.textures.exists('ar_' + n)) self.load.svg('ar_' + n, ARTE.dir + n + '.svg', { width: 1920, height: 1080 });
+            });
+            // Capas que se mueven (sol, nube y bandera: la lámina entera con solo ese elemento).
+            ['sol', 'nube1', 'bandera'].forEach(function (n) {
+                if (!self.textures.exists('ar_' + n)) self.load.svg('ar_' + n, ARTE.dir + n + '.svg', { width: 1280, height: 720 });
+            });
+        },
+
+        /** El dibujo entero y apoyado abajo; lo que sobra se rellena estirando su borde. */
+        mapaFondo: function () {
+            if (!this.textures.exists('ar_fondo_atras') || !this.textures.exists('ar_barco') || !this.textures.exists('ar_frente')) return null;
+            var W = this.scale.width, H = this.scale.height;
+            var k = Math.min(W / ARTE.fw, H / ARTE.fh);
+            var ox = (W - ARTE.fw * k) / 2, oy = H - ARTE.fh * k;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.abordo = [];
@@ -30,6 +66,23 @@
         calcular: function () {
             var W = this.scale.width, H = this.scale.height;
             var L = { W: W, H: H };
+            var F = this.mapaFondo();
+            if (F) {
+                var kk = F.k;
+                L.arte = true; L.F = F; L.pres = null;
+                L.der = W - 24; L.izq = 24;
+                L.muelle = F.sy(ARTE.muelle);
+                L.mar = F.sy(300);
+                L.arca = { x: F.sx(790), y: F.sy(490), w: 380 * kk, h: 190 * kk };
+                L.puerta = { x: F.sx(ARTE.puerta.x), y: F.sy(ARTE.puerta.y) };
+                var Rr = ARTE.rampa;
+                L.rampa = { x0: F.sx(Rr.x0), y0: F.sy(Rr.y0), x1: F.sx(Rr.x1), y1: F.sy(Rr.y1) };
+                L.tam = Math.max(60, Math.min(120, 100 * kk, (L.der - 40) / 5.5));
+                L.ventTam = 2 * ARTE.rv * kk * 1.1;
+                var rb = Math.max(24, Math.min(36, 30 * kk));
+                L.bocina = { x: F.sx(ARTE.hud.x), y: F.sy(ARTE.hud.y), r: rb };
+                return L;
+            }
             L.pres = null;
             L.der = W - 24;
             L.izq = 24;
@@ -53,6 +106,32 @@
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
             var V = this.montarVida(keep);
+            if (L.arte) {
+                var F = L.F;
+                // Cielo hacia arriba y bordes estirados a los lados si el dibujo no llena la pantalla.
+                if (F.oy > 0) keep(this.add.rectangle(0, 0, L.W, F.oy + 2, 0x8bd3fc).setOrigin(0, 0).setDepth(0));
+                keep(this.add.image(F.ox, F.oy, 'ar_fondo_atras', '__BASE').setOrigin(0, 0).setDisplaySize(ARTE.fw * F.k, ARTE.fh * F.k).setDepth(1));
+                if (F.ox > 1) {
+                    var tx = this.textures.get('ar_fondo_atras'), iw = tx.getSourceImage().width, ih = tx.getSourceImage().height;
+                    if (!tx.has('bi')) { tx.add('bi', 0, 0, 0, 2, ih); tx.add('bd', 0, iw - 2, 0, 2, ih); }
+                    keep(this.add.image(0, F.oy, 'ar_fondo_atras', 'bi').setOrigin(0, 0).setDisplaySize(F.ox + 1, ARTE.fh * F.k).setDepth(1));
+                    keep(this.add.image(L.W - F.ox - 1, F.oy, 'ar_fondo_atras', 'bd').setOrigin(0, 0).setDisplaySize(F.ox + 1, ARTE.fh * F.k).setDepth(1));
+                    // Muelle (frente): también se estira, por encima del barco.
+                    var tf = this.textures.get('ar_frente');
+                    if (!tf.has('bi')) { tf.add('bi', 0, 0, 0, 2, ih); tf.add('bd', 0, iw - 2, 0, 2, ih); }
+                    keep(this.add.image(0, F.oy, 'ar_frente', 'bi').setOrigin(0, 0).setDisplaySize(F.ox + 1, ARTE.fh * F.k).setDepth(20));
+                    keep(this.add.image(L.W - F.ox - 1, F.oy, 'ar_frente', 'bd').setOrigin(0, 0).setDisplaySize(F.ox + 1, ARTE.fh * F.k).setDepth(20));
+                }
+                keep(this.add.image(F.ox, F.oy, 'ar_frente', '__BASE').setOrigin(0, 0).setDisplaySize(ARTE.fw * F.k, ARTE.fh * F.k).setDepth(20));
+                this.montarAnimadas(keep);
+                if (V) V.pajaros(3, F.sy(40), F.sy(230));
+                this.sembrarMotes(keep, 14, { x: 0, y: F.sy(420), w: L.W, h: F.sy(585) - F.sy(420), depth: 6 }, 0xd0ebff);
+                this.montarArca(keep);
+                this.miraG = keep(this.add.graphics().setDepth(40));
+                this.montarHud(keep);
+                if (reubicar) this.ubicarCosas();
+                return;
+            }
             if (V) {
                 V.parque({ horizonte: L.mar, arboles: [], solX: 0.12, nubes: 4 });
                 V.pajaros(3, 36, L.mar * 0.55);
@@ -97,7 +176,90 @@
             if (reubicar) this.ubicarCosas();
         },
 
+        /** Barco del diseño: una imagen en un contenedor (gira y zarpa), halo en la puerta y brillo en cada ojo de buey. */
+        montarArcaArte: function (keep) {
+            var L = this.L, F = L.F, k = F.k, P = ARTE.piv;
+            var c = keep(this.add.container(F.sx(P.x), F.sy(P.y)).setScale(k).setDepth(10));
+            c.add(this.add.image(-P.x, -P.y, 'ar_barco').setOrigin(0, 0).setDisplaySize(ARTE.fw, ARTE.fh));
+            this.puertaHalo = this.add.ellipse(ARTE.puerta.x - P.x, ARTE.puerta.y - P.y, ARTE.puerta.w, ARTE.puerta.h, 0xffe066, 0);
+            c.add(this.puertaHalo);
+            this.ventanas = [];
+            for (var i = 0; i < ARTE.vent.length; i++) {
+                var vx = ARTE.vent[i][0], vy = ARTE.vent[i][1];
+                var g = this.add.circle(vx - P.x, vy - P.y, ARTE.rv, 0xfff3bf, 0);
+                c.add(g);
+                this.ventanas.push({ x: F.sx(vx), y: F.sy(vy), r: g });
+            }
+            this.arca = c;
+            this.arcaY0 = c.y;
+            this.bandera = null;
+            if (this.textures.exists('ar_bandera')) {
+                // Gira y se estira sobre su asta (punto 928,165 de la lámina).
+                this.bandera = this.add.image(928 - P.x, 165 - P.y, 'ar_bandera').setOrigin(928 / ARTE.fw, 165 / ARTE.fh).setDisplaySize(ARTE.fw, ARTE.fh);
+                c.add(this.bandera);
+            }
+        },
+
+        /** Mar, nubes, sol y destellos con vida propia (se mueven en paso() con el reloj de la escena). */
+        montarAnimadas: function (keep) {
+            var L = this.L, F = L.F, k = F.k, self = this;
+            var A = this.anim = { nubes: [], destellos: [] };
+            var lamina = function (clave, prof, ox, oy) {
+                var im = self.add.image(F.sx(ox == null ? 0 : ox), F.sy(oy == null ? 0 : oy), clave).setDepth(prof);
+                im.setOrigin(ox == null ? 0 : ox / ARTE.fw, oy == null ? 0 : oy / ARTE.fh).setDisplaySize(ARTE.fw * k, ARTE.fh * k);
+                return keep(im);
+            };
+            if (this.textures.exists('ar_olas')) A.olas = lamina('ar_olas', 1.1);
+            if (this.textures.exists('ar_nube1')) {
+                // La nube de la lámina, tres veces: cada una cruza el cielo a su paso y vuelve a entrar por el otro lado.
+                [{ dy: 0, s: 1, v: 0.016, off: 0.12 }, { dy: 78, s: 1.3, v: 0.010, off: 0.56 }, { dy: -42, s: 0.75, v: 0.024, off: 0.86 }].forEach(function (c) {
+                    var im = lamina('ar_nube1', 1.2, 669, 119.5 + c.dy);
+                    im.setDisplaySize(ARTE.fw * k * c.s, ARTE.fh * k * c.s);
+                    c.im = im;
+                    A.nubes.push(c);
+                });
+            }
+            if (this.textures.exists('ar_sol')) A.sol = lamina('ar_sol', 1.3, 304, 93);
+            if (this.textures.exists('ar_colinas')) lamina('ar_colinas', 1.4);
+            // Destellos sobre el agua.
+            for (var i = 0; i < 14; i++) {
+                var d = keep(this.add.ellipse(rnd(0, L.W), F.sy(rnd(445, 585)), rnd(8, 18) * k, rnd(2, 4) * k, 0xffffff, 1).setAlpha(0).setDepth(6.5));
+                A.destellos.push({ o: d, ph: rnd(0, 6.28), v: rnd(0.0012, 0.0024) });
+            }
+        },
+
+        animarEscenario: function (t) {
+            var A = this.anim, L = this.L;
+            if (!A || !L || !L.arte) return;
+            var F = L.F, k = F.k;
+            if (A.olas && A.olas.active) A.olas.setPosition(F.ox + Math.sin(t / 2200) * 14 * k, F.oy + Math.sin(t / 1400) * 3 * k);
+            if (A.sol && A.sol.active) {
+                A.sol.setAngle(t / 90);
+                var e = 1 + Math.sin(t / 700) * 0.05;
+                A.sol.setDisplaySize(ARTE.fw * k * e, ARTE.fh * k * e);
+            }
+            var span = L.W + 500;
+            A.nubes.forEach(function (c) {
+                if (!c.im.active) return;
+                c.im.x = ((t * c.v * Math.max(0.6, k) + c.off * span) % span) - 250;
+            });
+            A.destellos.forEach(function (d) {
+                if (!d.o.active) return;
+                var q = Math.sin(t * d.v + d.ph);
+                d.o.setAlpha(q > 0.5 ? (q - 0.5) * 1.4 : 0);
+            });
+            if (this.bandera && this.bandera.active) {
+                this.bandera.setRotation(Math.sin(t / 260) * 0.06);
+                this.bandera.setDisplaySize(ARTE.fw * (1 + Math.sin(t / 150) * 0.05), ARTE.fh);
+            }
+            if (this.arca && !this.tweens.isTweening(this.arca)) this.arca.y = this.arcaY0 + Math.sin(t / 1100) * 3 * k;
+        },
+
+        ventanaOff: function (v) { v.r.setFillStyle(this.L.arte ? 0xfff3bf : 0x343a40, this.L.arte ? 0 : 1); },
+        ventanaOn: function (v) { v.r.setFillStyle(0xfff3bf, this.L.arte ? 0.85 : 1); },
+
         montarArca: function (keep) {
+            if (this.L.arte) return this.montarArcaArte(keep);
             var A = this.L.arca, w = A.w, h = A.h;
             var c = keep(this.add.container(A.x, A.y).setDepth(10));
             var g = this.add.graphics();
@@ -204,7 +366,7 @@
             await this.retirar(this.cosas.filter(function (a) { return !a.usada; }).concat(this.abordo));
             this.cosas = [];
             this.abordo = [];
-            this.ventanas.forEach(function (v) { v.r.setFillStyle(0x343a40); });
+            this.ventanas.forEach(function (v) { this.ventanaOff(v); }, this);
             if (this.puertaHalo) this.puertaHalo.setFillStyle(0xffe066, 0);
         },
 
@@ -324,9 +486,9 @@
                 duration: 380, ease: 'Sine.easeIn'
             });
             var v = this.ventanas[(this.abordo.length - 1) % this.ventanas.length];
-            v.r.setFillStyle(0xfff3bf);
+            this.ventanaOn(v);
             a.cont.setPosition(v.x, v.y)
-                .setScale(A.h * 0.24 / a.tam * 1.6)
+                .setScale((L.arte ? L.ventTam : A.h * 0.24 * 1.6) / a.tam)
                 .setAlpha(1)
                 .setDepth(11);
             if (a.sombra) a.sombra.setVisible(false);
@@ -361,7 +523,7 @@
             await this.retirar(this.cosas.filter(function (a) { return !a.usada; }).concat(this.abordo));
             this.cosas = [];
             this.abordo = [];
-            this.ventanas.forEach(function (v) { v.r.setFillStyle(0x343a40); });
+            this.ventanas.forEach(function (v) { this.ventanaOff(v); }, this);
         },
 
         mostrarPista: function (cancelada) {
@@ -388,13 +550,26 @@
                 return true;
             });
             var asomados = ids.map(function (id, i) {
-                var a = self.crearCosa(
-                    id,
-                    A.x - A.w * 0.4 + A.w * 0.8 * (i + 0.5) / Math.max(1, ids.length),
-                    A.y - A.h * 0.62,
-                    Math.min(L.tam * 0.7, A.w / Math.max(1, ids.length) * 0.9),
-                    { sinSombra: true, depth: 9 }
-                );
+                var n = Math.max(1, ids.length), a;
+                if (L.arte) {
+                    // Asoman por detrás del techo de la cabina (el barco, con más profundidad, les tapa los pies).
+                    // Hasta 5 por fila; las filas de atrás asoman más arriba (un grupito apretado).
+                    var porFila = Math.min(n, 5), fila = Math.floor(i / porFila), col = i % porFila;
+                    var enFila = Math.min(porFila, n - fila * porFila);
+                    var celda = (ARTE.cubierta.x1 - ARTE.cubierta.x0) / porFila;
+                    var cx = (ARTE.cubierta.x0 + ARTE.cubierta.x1) / 2 + (col - (enFila - 1) / 2) * celda;
+                    var tamA = Math.min(L.tam * 0.8, celda * 0.95 * L.F.k);
+                    a = self.crearCosa(id, L.F.sx(cx), L.F.sy(ARTE.techo - 8) - fila * tamA * 0.55, tamA,
+                        { sinSombra: true, depth: 9 - fila * 0.1 });
+                } else {
+                    a = self.crearCosa(
+                        id,
+                        A.x - A.w * 0.4 + A.w * 0.8 * (i + 0.5) / n,
+                        A.y - A.h * 0.62,
+                        Math.min(L.tam * 0.7, A.w / n * 0.9),
+                        { sinSombra: true, depth: 9 }
+                    );
+                }
                 a.cont.setScale(0.2);
                 self.tweens.add({
                     targets: a.cont, scale: 1, duration: 300, delay: i * 80, ease: 'Back.easeOut'
@@ -444,9 +619,10 @@
         paso: function (time, delta) {
             var L = this.L;
             var dt = (delta || 16) / 1000;
+            this.animarEscenario(time);
             this.dibujarMira();
             if (this.arca && !this.tweens.isTweening(this.arca)) {
-                this.arca.angle = Math.sin(time / 900) * 1.5;
+                this.arca.angle = Math.sin(time / 900) * (this.L.arte ? 0.6 : 1.5);
             }
             if (this.fase !== 'jugar' || this.subiendo) return;
             var limIzq = L.izq + L.tam * 0.4;

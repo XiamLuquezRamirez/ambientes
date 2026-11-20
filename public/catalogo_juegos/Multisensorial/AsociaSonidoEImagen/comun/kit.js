@@ -337,10 +337,15 @@
             var L = this.L;
             var b = keep(this.add.container(L.bocina.x, L.bocina.y).setDepth(80));
             var halo = this.add.circle(0, 0, L.bocina.r * 1.25, 0xffffff, 0.35);
-            var plato = this.add.circle(0, 0, L.bocina.r, 0xff922b).setStrokeStyle(5, 0xffffff);
-            var luz = this.add.circle(-L.bocina.r * 0.3, -L.bocina.r * 0.35, L.bocina.r * 0.35, 0xffffff, 0.3);
-            var icono = this.add.image(0, 0, A.textura(this, 'bocina', 128)).setDisplaySize(L.bocina.r * 1.35, L.bocina.r * 1.35);
-            b.add([halo, plato, luz, icono]);
+            if (this.textures.exists('pa:escuchar')) {
+                // Botón de escuchar del diseño (la oreja morada), igual en todos los juegos.
+                b.add([halo, this.add.image(0, 0, 'pa:escuchar').setDisplaySize(L.bocina.r * 2.3, L.bocina.r * 2.3)]);
+            } else {
+                var plato = this.add.circle(0, 0, L.bocina.r, 0xff922b).setStrokeStyle(5, 0xffffff);
+                var luz = this.add.circle(-L.bocina.r * 0.3, -L.bocina.r * 0.35, L.bocina.r * 0.35, 0xffffff, 0.3);
+                var icono = this.add.image(0, 0, A.textura(this, 'bocina', 128)).setDisplaySize(L.bocina.r * 1.35, L.bocina.r * 1.35);
+                b.add([halo, plato, luz, icono]);
+            }
             b.halo = halo;
             this.bocina = b;
             this.ondasG = keep(this.add.graphics().setDepth(79));
@@ -803,6 +808,7 @@
             cargarPieles(this, prefijo, idsDesdeConfig(this, pielesExtra));
             if (userPreload) userPreload.call(this);
             // Estrella del diseño para todos los juegos (si el motor no trae la suya en 'pa:estrella@N').
+            if (!this.textures.exists('pa:escuchar')) this.load.svg('pa:escuchar', '../comun/escuchar.svg', { width: 300, height: 300 });
             var cola = this.load.list ? Array.from(this.load.list) : [];
             var yaCarga = cola.some(function (f) { return f && f.key === 'pa:estrella@256'; });
             if (!yaCarga && !this.textures.exists('pa:estrella@256') && !this.textures.exists('pa:estrella@64')) {
