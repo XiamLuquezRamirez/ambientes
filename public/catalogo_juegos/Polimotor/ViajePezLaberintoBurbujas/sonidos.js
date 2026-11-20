@@ -25,7 +25,7 @@
 
     var ctx = null;
     var salida = null;
-    var VOL = 0.5;
+    var VOL = 1.8;
     var ruido = null;
 
     function audio() {
@@ -298,7 +298,7 @@
         var paso = 0;
         var ACORDES = [[174.61, 220, 261.63], [146.83, 220, 293.66], [233.08, 293.66, 349.23], [196, 261.63, 329.63]];
         function aplicar() {
-            if (g && ctx) g.gain.setTargetAtTime(silencio() ? 0.0001 : Math.max(0.0001, vol * 0.5), ctx.currentTime, 0.4);
+            if (g && ctx) g.gain.setTargetAtTime(silencio() ? 0.0001 : Math.min(0.85, Math.max(0.0001, vol * 2.2)), ctx.currentTime, 0.4);
         }
         function acorde() {
             var c = audio();

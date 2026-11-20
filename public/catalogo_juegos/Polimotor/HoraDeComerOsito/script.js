@@ -1038,7 +1038,7 @@ async function reiniciarPartida() {
 // ------------------------------------------------------------------ arranque
 
 $(document).ready(function () {
-    gameConfig = JSON.parse(readText("config.json?v=20261119f"));
+    gameConfig = JSON.parse(readText("config.json?v=20261119vol"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = textos().conversacion || [];
     if (!gameConfig.accesibilidad) gameConfig.accesibilidad = {};

@@ -1132,7 +1132,7 @@ function apiDemo() {
 $(document).ready(function () {
     // Las piezas SVG de Zeus y Zoe se leen ya, en segundo plano (no al aparecer cada pose).
     if (window.Personajes && Personajes.precargar) Personajes.precargar();
-    gameConfig = JSON.parse(readText("config.json?v=20261110a")); // subir ?v= al cambiar las poses
+    gameConfig = JSON.parse(readText("config.json?v=20261119vol")); // subir ?v= al cambiar las poses
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = textos().conversacion || [];
     sincronizarDialogoIntro3d();

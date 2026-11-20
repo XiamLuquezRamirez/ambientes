@@ -1072,7 +1072,7 @@ function esperarModulo(nombre, ms) {
 }
 
 $(document).ready(function () {
-    gameConfig = JSON.parse(readText("config.json?v=20261119c"));
+    gameConfig = JSON.parse(readText("config.json?v=20261119vol"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = textos().conversacion || [];
     sincronizarDialogoIntro3d();

@@ -8,7 +8,7 @@
     "use strict";
 
     var ctx = null, maestro = null, efectos = null, amb = null;
-    var vol = 0.45, mudo = false;
+    var vol = 0.9, mudo = false;
     var ambienteOn = false, tPajaro = null, nodosAmb = [];
     var musicaOn = false, tMusica = null;
     var ultimoArrastre = 0;
@@ -24,10 +24,10 @@
         maestro = ctx.createGain();
         maestro.connect(comp);
         efectos = ctx.createGain();
-        efectos.gain.value = 0.9;
+        efectos.gain.value = 3;
         efectos.connect(maestro);
         amb = ctx.createGain();
-        amb.gain.value = 0.55;
+        amb.gain.value = 0.9;
         amb.connect(maestro);
         aplicarVolumen();
         return ctx;
@@ -117,7 +117,7 @@
         f.type = "lowpass";
         f.frequency.value = 520;
         var g = ctx.createGain();
-        g.gain.value = 0.05;
+        g.gain.value = 0.5;
         var lfo = ctx.createOscillator(), lfoG = ctx.createGain();
         lfo.frequency.value = 0.09;
         lfoG.gain.value = 0.03;
@@ -287,7 +287,7 @@
         /** Baja el ambiente mientras hablan Zoe o Zeus. */
         agachar: function (on) {
             if (!amb) return;
-            amb.gain.setTargetAtTime(on ? 0.2 : 0.55, ctx.currentTime, 0.2);
+            amb.gain.setTargetAtTime(on ? 0.25 : 0.9, ctx.currentTime, 0.2);
         },
         detenerTodo: function () {
             ambiente(false);

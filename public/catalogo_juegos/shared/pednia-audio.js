@@ -32,7 +32,7 @@
             // Bucle de 33 s (116 BPM): marimba, guitarra apagada, bajo, batería y palmas de tribuna.
             // ?v= cambia al regenerar los archivos (la tablet no se queda con la copia vieja).
             musica: 'audio/polimotor/musica.wav?v=20261028d',
-            efectos: 'audio/polimotor/efectos.wav?v=20261028g',
+            efectos: 'audio/polimotor/efectos.wav?v=20261119a',
             // Mapa en ms que imprime scripts/audio/sintetizar_polimotor.py (0.45 s de silencio entre sonidos).
             // Ningún efecto lleva tonos puros (se comprueba con scripts/audio/detectar_pitidos.py).
             sprite: {
@@ -191,7 +191,7 @@
         var id = null;
         var pedida = false;
         var pausada = false;
-        var vol = 0.2;
+        var vol = 0.5;
         var tasa = 1;
         var ducking = 1;   // multiplicador temporal (celebración)
 
@@ -213,6 +213,7 @@
         // (Howler los encola y en HTML5 se quedaban atascados: música sonando a volumen 0).
         function arrancar() {
             if (!h || id !== null || !pedida || h.state() !== 'loaded') return;
+            asegurarLimitador();
             var webAudio = !!h._webAudio;
             h.volume(webAudio ? 0 : vol * ducking);   // volumen del Howl antes de play
             if (webAudio) {
@@ -305,12 +306,46 @@
         });
     }
 
+    // El sprite viene normalizado (RMS -15.7 dBFS, pico -0.3). Medido en el juego, con x2 el
+    // efecto ya picaba a +0.4 dB ANTES del limitador (Howler satura ahi), asi que se queda en 1:
+    // el volumen extra lo da el nodo de ganancia de asegurarLimitador(), que si tiene el
+    // limitador detras para sujetar los picos.
+    var GANANCIA_EFECTOS = 1;
+
+    /**
+     * Limitador a la salida de Howler: deja subir la ganancia de efectos sin que los picos
+     * recorten. Se engancha una sola vez, cuando Howler ya creo su contexto.
+     */
+    var limitadorPuesto = false;
+    function asegurarLimitador() {
+        if (limitadorPuesto || !activo) return;
+        if (!Howler.ctx || !Howler.masterGain) return;
+        try {
+            var c = Howler.ctx.createDynamicsCompressor();
+            c.threshold.value = -6;
+            c.knee.value = 0;
+            c.ratio.value = 20;
+            c.attack.value = 0.002;
+            c.release.value = 0.12;
+            // Howler.volume() no pasa de 1, asi que la ganancia extra va en un nodo propio
+            // delante del limitador: sube el nivel y el limitador sujeta los picos.
+            var g = Howler.ctx.createGain();
+            g.gain.value = 1.8;
+            Howler.masterGain.disconnect();
+            Howler.masterGain.connect(g);
+            g.connect(c);
+            c.connect(Howler.ctx.destination);
+            limitadorPuesto = true;
+        } catch (e) { /* sin limitador se sigue oyendo, solo con menos margen */ }
+    }
+
     function sonarEfecto(nombre, vol, tasa) {
         if (!sprite || !tema || !tema.sprite[nombre]) return false;
+        asegurarLimitador();
         // Un efecto que llega antes de que cargue el sprite no se encola (llegaría tarde).
         if (sprite.state() !== 'loaded') return true;
         var id = sprite.play(nombre);
-        sprite.volume(limitar(vol == null ? 1 : vol, 0, 1), id);
+        sprite.volume(limitar((vol == null ? 1 : vol) * GANANCIA_EFECTOS, 0, 1), id);
         if (tasa && tasa !== 1) sprite.rate(tasa, id);
         return true;
     }

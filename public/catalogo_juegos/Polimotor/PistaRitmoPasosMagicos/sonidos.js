@@ -30,7 +30,7 @@
 
     var ctx = null;
     var bus = null;
-    var VOL = 0.42;
+    var VOL = 1.8;
     var ECO = 0.2;
     /** Duración de cada sonido de baldosa (segundos): suena fuerte y parejo todo ese tiempo. */
     var DURACION = 1.5;

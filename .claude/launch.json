@@ -162,6 +162,19 @@
       ],
       "port": 8040,
       "autoPort": false
+    },
+    {
+      "name": "juegos-esfera",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8041",
+        "--directory",
+        "public"
+      ],
+      "port": 8041,
+      "autoPort": false
     }
   ]
 }

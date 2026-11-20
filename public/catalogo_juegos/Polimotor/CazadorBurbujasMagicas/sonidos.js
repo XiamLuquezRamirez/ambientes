@@ -20,7 +20,7 @@
 
     var ctx = null;
     var salida = null;
-    var VOL = 0.5;
+    var VOL = 1.8;
     var ruido = null;
 
     function audio() {

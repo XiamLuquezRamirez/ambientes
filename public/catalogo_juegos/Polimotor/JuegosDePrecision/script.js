@@ -1234,7 +1234,7 @@
     function boot() {
         try {
             const rawIntro = readText("../../intro.json");
-            const rawGame = readText("config.json");
+            const rawGame = readText("config.json?v=20261119vol");
             if (!rawIntro || !rawGame) throw new Error("No se pudo leer intro/config");
             introConfig = JSON.parse(rawIntro);
             gameConfig = JSON.parse(rawGame);

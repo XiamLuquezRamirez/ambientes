@@ -23,7 +23,7 @@
     var ctx = null;
     var salida = null;
     var maestro = null;
-    var VOL = 0.5;
+    var VOL = 1.8;
     var ruido = null;
     var mudo = false;
 
@@ -347,7 +347,7 @@
         var ACORDES_FINAL = [[293.66, 369.99, 440], [246.94, 293.66, 369.99], [196, 246.94, 293.66], [220, 277.18, 329.63]];
 
         function aplicar() {
-            if (g && ctx) g.gain.setTargetAtTime(Math.max(0.0001, vol * 0.9), ctx.currentTime, 0.4);
+            if (g && ctx) g.gain.setTargetAtTime(Math.min(0.85, Math.max(0.0001, vol * 1.6)), ctx.currentTime, 0.4);
             if (amb && ctx) amb.gain.setTargetAtTime(modo === "final" ? 0.25 : 1, ctx.currentTime, 1.2);
         }
 

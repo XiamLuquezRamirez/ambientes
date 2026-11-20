@@ -18,7 +18,7 @@
     var ctx = null;
     var salida = null;
     var maestro = null;
-    var VOL = 0.5;
+    var VOL = 1.8;
     var ruido = null;
     var mudo = false;
 
@@ -307,7 +307,7 @@
         var ACORDES = [[349.23, 440, 523.25], [293.66, 349.23, 440], [233.08, 293.66, 349.23], [261.63, 329.63, 392]];
         var ARP_FINAL = [523.25, 659.25, 783.99, 1046.5];
         function aplicar() {
-            if (g && ctx) g.gain.setTargetAtTime(Math.max(0.0001, vol * 0.5), ctx.currentTime, 0.4);
+            if (g && ctx) g.gain.setTargetAtTime(Math.min(0.85, Math.max(0.0001, vol * 2.2)), ctx.currentTime, 0.4);
         }
         function ciclo() {
             var c = audio();

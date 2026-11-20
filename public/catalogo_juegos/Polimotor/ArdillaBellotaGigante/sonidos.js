@@ -20,7 +20,7 @@
 
     var ctx = null;
     var salida = null;
-    var VOL = 0.5;
+    var VOL = 1.8;
     var ruido = null, ruidoBlanco = null;
 
     function audio() {
@@ -308,7 +308,7 @@
         var MEL_INTRO = [784, 659, 784, 880, 784, 659, 587, 659];
         var MEL_FINAL = [523, 659, 784, 1047, 880, 784, 880, 1047, 1175, 1047, 880, 784];
         function aplicar() {
-            if (g && ctx) g.gain.setTargetAtTime(silencio() ? 0.0001 : Math.max(0.0001, vol * 0.5), ctx.currentTime, 0.4);
+            if (g && ctx) g.gain.setTargetAtTime(silencio() ? 0.0001 : Math.min(0.85, Math.max(0.0001, vol * 2.2)), ctx.currentTime, 0.4);
         }
         function ciclo() {
             var c = audio();

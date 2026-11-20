@@ -2022,7 +2022,7 @@
     /* ── Boot ─────────────────────────────────────────────────── */
 
     $(document).ready(function () {
-        gameConfig = JSON.parse(readText("config.json?v=20261107d"));
+        gameConfig = JSON.parse(readText("config.json?v=20261119vol"));
         introConfig = JSON.parse(readText("../../intro.json"));
         introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
         aplicarLetterSpacing();
