@@ -1,0 +1,108 @@
+{
+  "nombre": "Picnic con los Animalitos Glotones",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 85,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "radioBoca": 92,
+    "radioBocaPorFallo": 12,
+    "radioBocaMax": 140,
+    "ayudaMs": 10000,
+    "ayudaRepetirMs": 14000,
+    "vozPausaMs": 2600,
+    "aroPulsoMs": 1200
+  },
+  "animales": [
+    { "id": "conejo", "nombre": "el conejito", "dieta": "herbivoro", "comer": "mordisquea" },
+    { "id": "perro", "nombre": "el perrito", "dieta": "carnivoro", "comer": "roe" },
+    { "id": "pajaro", "nombre": "el pajarito", "dieta": "granivoro", "comer": "picotea" },
+    { "id": "oso", "nombre": "el osito", "dieta": "omnivoro", "comer": "mastica" }
+  ],
+  "alimentos": [
+    { "id": "zanahoria", "nombre": "la zanahoria", "articulo": "la", "plural": false, "animal": "conejo" },
+    { "id": "lechuga", "nombre": "la lechuga", "articulo": "la", "plural": false, "animal": "conejo" },
+    { "id": "manzana", "nombre": "la manzana", "articulo": "la", "plural": false, "animal": "conejo" },
+    { "id": "huesito", "nombre": "el huesito", "articulo": "el", "plural": false, "animal": "perro" },
+    { "id": "salchicha", "nombre": "la salchicha", "articulo": "la", "plural": false, "animal": "perro" },
+    { "id": "croqueta", "nombre": "la croqueta", "articulo": "la", "plural": false, "animal": "perro" },
+    { "id": "semillas", "nombre": "las semillas", "articulo": "las", "plural": true, "animal": "pajaro" },
+    { "id": "maiz", "nombre": "el maíz", "articulo": "el", "plural": false, "animal": "pajaro" },
+    { "id": "miel", "nombre": "la miel", "articulo": "la", "plural": false, "animal": "oso" }
+  ],
+  "rondas": [
+    {
+      "id": 1,
+      "titulo": "RONDA 1",
+      "nombre": "Dos amigos",
+      "animales": ["conejo", "perro"],
+      "alimentos": ["zanahoria", "huesito"]
+    },
+    {
+      "id": 2,
+      "titulo": "RONDA 2",
+      "nombre": "Llega el pajarito",
+      "animales": ["conejo", "perro", "pajaro"],
+      "alimentos": ["lechuga", "salchicha", "semillas"]
+    },
+    {
+      "id": 3,
+      "titulo": "RONDA 3",
+      "nombre": "Todos a comer",
+      "animales": ["conejo", "perro", "pajaro", "oso"],
+      "alimentos": ["manzana", "croqueta", "maiz", "miel"]
+    }
+  ],
+  "demo": {
+    "alimento": "zanahoria"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "Picnic con los Animalitos Glotones",
+    "subtituloIntro": "¡Alimenta a cada animalito!",
+    "introZoe": "¡Hola! ¡Los animalitos tienen hambre! Toma la comida de la cesta con tu dedo, arrástrala hasta la boca de su dueño y suéltala para alimentarlo.",
+    "demoZeus": "¡Mira! Cada animalito come algo distinto. Lleva la zanahoria al conejito y suéltala en su boquita.",
+    "zoeEligeBien": "¡Lleva cada comida a su animalito! ¡No la sueltes hasta llegar a su boca!",
+    "zoeBien": "¡Muy bien! ¡Qué rico le quedó!",
+    "zoeOtraVez": "¡Inténtalo otra vez!",
+    "noEsSuyo": "{alimento} {verbo} para {animal}.",
+    "noEsSuyoVerboSingular": "es",
+    "noEsSuyoVerboPlural": "son",
+    "llegaAnimal": "¡Mira! Llegó {animal} y también tiene hambre.",
+    "rondaLista": "¡Muy bien! ¡Todos quedaron contentos!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "rondaListaTitulo": "¡RONDA {n} LISTA!",
+    "rondaSiguienteTitulo": "¡RONDA {n}!",
+    "instruccionRonda": [
+      { "pj": "zoe", "texto": "¡Mira bien a cada animalito!" },
+      { "pj": "zoe", "texto": "¡Lleva cada comida a su animalito!" },
+      { "pj": "zeus", "texto": "¡Suéltala en su boquita!" }
+    ],
+    "ayuda": [
+      "¡Mira bien a cada animalito!",
+      "¡Lleva la comida hasta su boquita!"
+    ],
+    "finalZoe": "¡QUÉ GRAN ALIMENTADOR! Arrastraste la comida a cada animalito con una precisión genial.",
+    "finalZeus": "¡Aprendiste que cada animalito come algo diferente y llevaste cada comida a su dueño!",
+    "finalTitulo": "¡QUÉ GRAN ALIMENTADOR!",
+    "finalResultado": "¡{n} ALIMENTOS ENTREGADOS!",
+    "botonOtraVez": "Jugar nuevamente",
+    "botonMenu": "Volver al menú",
+    "conversacion": [
+      { "personaje": 0, "texto": "¡Hola, amigos! Hoy vamos de picnic al bosque con unos animalitos muy glotones." },
+      { "personaje": 1, "texto": "¡Vamos a darle a cada uno su comida favorita!" }
+    ]
+  },
+  "niveles": [
+    { "id": "3", "edad": "3-4 años", "titulo": "Coordinación visual: a cada uno lo suyo" }
+  ]
+}
