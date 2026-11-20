@@ -184,6 +184,7 @@
 
     /** Estrella del proyecto (diseño), compartida con Asocia. Las páginas de juego están a 2 niveles de Multisensorial. */
     var ESTRELLA_SVG = '../../AsociaSonidoEImagen/comun/estrella.svg';
+    var ESCUCHAR_SVG = '../../AsociaSonidoEImagen/comun/escuchar.svg';
 
     var BASE = {
         preload: function () {
@@ -202,6 +203,7 @@
             if (ins && /\.svg$/i.test(ins) && !self.textures.exists('insignia_cfg')) self.load.svg('insignia_cfg', ins, { width: 420, height: 420 });
             // Estrella del diseño (la misma que usan los juegos de Asocia): marcador de niveles, estallidos y final.
             if (!self.textures.exists('pa:estrella@256')) self.load.svg('pa:estrella@256', ESTRELLA_SVG, { width: 256, height: 256 });
+            if (!self.textures.exists('pa:escuchar')) self.load.svg('pa:escuchar', ESCUCHAR_SVG, { width: 300, height: 300 });
             if (this.precargar) this.precargar();
         },
 
@@ -277,15 +279,20 @@
             var L = this.L;
             var b = keep(this.add.container(L.bocina.x, L.bocina.y).setDepth(80));
             var halo = this.add.circle(0, 0, L.bocina.r * 1.25, 0xffffff, 0.35);
-            var plato = this.add.circle(0, 0, L.bocina.r, 0x7950f2).setStrokeStyle(5, 0xffffff);
-            var luz = this.add.circle(-L.bocina.r * 0.3, -L.bocina.r * 0.35, L.bocina.r * 0.35, 0xffffff, 0.3);
-            var oreja = this.add.graphics();
-            var r = L.bocina.r;
-            oreja.lineStyle(Math.max(3, r * 0.12), 0xffffff, 1);
-            oreja.beginPath(); oreja.arc(r * 0.02, -r * 0.08, r * 0.38, Math.PI * 1.05, Math.PI * 2.25); oreja.strokePath();
-            oreja.beginPath(); oreja.arc(r * 0.04, -r * 0.08, r * 0.18, Math.PI * 1.1, Math.PI * 2.1); oreja.strokePath();
-            oreja.lineBetween(r * 0.22, r * 0.2, r * 0.02, r * 0.45);
-            b.add([halo, plato, luz, oreja]);
+            if (this.textures.exists('pa:escuchar')) {
+                // Botón de escuchar del diseño (la oreja morada), igual en todos los juegos.
+                b.add([halo, this.add.image(0, 0, 'pa:escuchar').setDisplaySize(L.bocina.r * 2.3, L.bocina.r * 2.3)]);
+            } else {
+                var plato = this.add.circle(0, 0, L.bocina.r, 0x7950f2).setStrokeStyle(5, 0xffffff);
+                var luz = this.add.circle(-L.bocina.r * 0.3, -L.bocina.r * 0.35, L.bocina.r * 0.35, 0xffffff, 0.3);
+                var oreja = this.add.graphics();
+                var r = L.bocina.r;
+                oreja.lineStyle(Math.max(3, r * 0.12), 0xffffff, 1);
+                oreja.beginPath(); oreja.arc(r * 0.02, -r * 0.08, r * 0.38, Math.PI * 1.05, Math.PI * 2.25); oreja.strokePath();
+                oreja.beginPath(); oreja.arc(r * 0.04, -r * 0.08, r * 0.18, Math.PI * 1.1, Math.PI * 2.1); oreja.strokePath();
+                oreja.lineBetween(r * 0.22, r * 0.2, r * 0.02, r * 0.45);
+                b.add([halo, plato, luz, oreja]);
+            }
             b.halo = halo;
             this.bocina = b;
             this.ondasG = keep(this.add.graphics().setDepth(79));
@@ -332,6 +339,7 @@
         },
 
         tocaBocina: function (p) {
+            if (document.body.classList.contains('sin-repetir')) return false;                    // botón oculto desde accesibilidad: no responde
             var b = this.L.bocina;
             return Math.hypot(p.x - b.x, p.y - b.y) < b.r * 1.3;
         },
@@ -998,8 +1006,9 @@
                 }
             }
             if (this.bocina && this.bocina.halo) this.bocina.halo.setScale(1 + Math.sin(time / 380) * 0.06);
-            if (this.motesG) this.moverMotes(time, delta);
-            if (this.vidaAmb) this.vidaAmb.actualizar(time, delta);
+            var quieto = document.body.classList.contains('sin-animaciones');
+            if (this.motesG && !quieto) this.moverMotes(time, delta);
+            if (this.vidaAmb && !quieto) this.vidaAmb.actualizar(time, delta);
             if (this.paso2) this.paso2(time, delta);
         }
     };

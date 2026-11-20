@@ -40,6 +40,8 @@
     function actx() {
         var C = global.AudioContext || global.webkitAudioContext;
         if (!C) return null;
+        // «Efectos de sonido» apagado en el menú de accesibilidad: sin ruidos de ambiente.
+        if (document.body && document.body.classList.contains('sin-efectos')) return null;
         if (!audio.ctx) audio.ctx = new C();
         if (audio.ctx.state === 'suspended') audio.ctx.resume();
         if (!audio.ruido) {
@@ -515,6 +517,7 @@
             // Despegada del carrito, flotando sobre el pasto.
             var cx = (j.x0 + j.x1) / 2, cy = j.y0 - h * 1.95;
             var g = keep(this.add.graphics().setDepth(29));
+            this.marcadorG = g;                                        // para ocultarlo con «Mostrar progreso»
             g.fillStyle(0xd62a7f, 1);                                  // borde rosado oscuro
             g.fillRoundedRect(cx - w / 2, cy - h / 2, w, h, radio);
             g.fillStyle(0xf74d9c, 1);                                  // relleno rosado claro
@@ -958,6 +961,7 @@
         },
 
         tocaBocina: function (p) {
+            if (document.body.classList.contains('sin-repetir')) return false;                    // botón oculto desde accesibilidad: no responde
             var b = this.L.bocina;
             return Math.hypot(p.x - b.x, p.y - b.y) < b.r * 1.3;
         },

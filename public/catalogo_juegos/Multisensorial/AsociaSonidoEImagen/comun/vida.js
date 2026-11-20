@@ -49,6 +49,8 @@
     function ctx() {
         var C = global.AudioContext || global.webkitAudioContext;
         if (!C) return null;
+        // «Efectos de sonido» apagado en el menú de accesibilidad: sin ruidos de ambiente.
+        if (document.body && document.body.classList.contains('sin-efectos')) return null;
         if (!ac) ac = new C();
         if (ac.state === 'suspended') ac.resume();
         return ac;

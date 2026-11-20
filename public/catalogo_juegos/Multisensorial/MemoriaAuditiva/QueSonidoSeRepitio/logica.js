@@ -26,14 +26,14 @@
                 [["manos"]],
                 [["botella", "pollito"]],
                 [["pollito", "campana", "pollito"]],
-                [["pasos", "caballo", "reloj"], ["pasos", "reloj"]],
+                [["perro", "caballo", "reloj"], ["perro", "reloj"]],
                 [["vaca"]]
             ],
             opciones: [
                 ["tren", "trompeta", "manos"],
                 ["campana", "botella", "pollito"],
                 ["perro", "campana", "pollito"],
-                ["pasos", "caballo", "reloj"],
+                ["perro", "caballo", "reloj"],
                 ["vaca", "burro", "elefante"]
             ],
             cantidades: [3, 3, 3, 3, 3],

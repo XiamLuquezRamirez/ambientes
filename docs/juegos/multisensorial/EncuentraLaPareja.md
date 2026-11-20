@@ -27,7 +27,7 @@ Mismo `extras: true` (presentador = Zeus). Se partieron las rondas largas para l
 |---|---|---|---|---|
 | ConectandoElHeladoGusto (`fabrica.js`) | helado + sabor | cinta (4 cosas) | cinta más rápida (5, ×1.6) | **Las llaves**: tocar la llave del sabor que pide cada cono que pasa |
 | ConectandoElSolVista (`observatorio.js`) | sol + colores | espejos 1 | espejos 2 | **El telescopio**: mover la lente por la cúpula para que brillen 4 estrellas escondidas |
-| ConectandoLaCampanaAudicion (`estudio.js`) | campana + ecualizador | centralita | escucha | **¿Dónde suena?**: mover el micrófono y buscar 4 campanas por el sonido (volumen y lado según la cercanía) |
+| ConectandoLaCampanaAudicion (`campanario.js`, rehecho 2026-11-19) | **«El campanario del gigante»**: noche en un pueblo; un gigante dormido muestra sus 5 sentidos (órganos enormes). R1 tirar de la soga y llevar la nota al oído + afinar con 3 campanillas · R2 regalos del pueblo a su sentido · R3 contraventanas: ¿qué instrumento suena? · R4 campanas perdidas con la trompetilla | cierre: el gigante despierta y la señal llega a su cerebro (título de Ingeniero) |
 | ConectandoLaFlorOlfato (`invernadero.js`) | flor + moléculas | tubos 3×3 | tubos 3×4 | **El ventilador**: girar la rueda con el dedo para llevar el aroma hasta la nariz |
 
 `rondaCinta(meta, vel, intro, cierre)`, `rondaEspejos(parte)` y `rondaTubos(parte)` ahora reciben el tramo. Las rondas nuevas se pueden lanzar directo: `escena().rondaValvulas()`,
@@ -36,3 +36,5 @@ Mismo `extras: true` (presentador = Zeus). Se partieron las rondas largas para l
 ## Pendiente
 - Las 4 de 5-6 años se probaron por ronda nueva y con el arranque normal, no el recorrido completo de principio a fin.
 - Flor y Helado: la 4.ª ronda se probó suelta y el recorrido completo solo hasta el primer nivel; el Sol y la Campana avanzan entre rondas con el marcador.
+
+2026-11-19: Conectando la Campana rehecho como campanario.js (ya no usa el laboratorio de cables). Pendientes del mismo rediseño: Flor (huerto/regar), Helado (heladería/armar conos), Sol (cielo/arrastrar el sol). `PedniaLab.titulo` sigue en uso.

@@ -111,11 +111,6 @@
       "nombre": "Pollito",
       "sonido": "pollito"
     },
-    "pasos": {
-      "img": "img/pasos.svg",
-      "nombre": "Pasos",
-      "sonido": "pasos"
-    },
     "caballo": {
       "img": "img/caballo.svg",
       "nombre": "Caballo",

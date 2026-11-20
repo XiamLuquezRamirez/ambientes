@@ -1,0 +1,299 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1280 720">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #8bd3fc;
+      }
+
+      .cls-2 {
+        clip-path: url(#clippath-6);
+      }
+
+      .cls-3 {
+        clip-path: url(#clippath-7);
+      }
+
+      .cls-4 {
+        opacity: .58;
+      }
+
+      .cls-4, .cls-5, .cls-6, .cls-7, .cls-8, .cls-9 {
+        mix-blend-mode: multiply;
+      }
+
+      .cls-10 {
+        fill: #ef3f50;
+      }
+
+      .cls-11 {
+        clip-path: url(#clippath-4);
+      }
+
+      .cls-12 {
+        fill: #349943;
+      }
+
+      .cls-13 {
+        fill: #f99e32;
+      }
+
+      .cls-14 {
+        fill: #77d6e5;
+      }
+
+      .cls-15 {
+        fill: #00ce5d;
+      }
+
+      .cls-16 {
+        fill: #64b9cc;
+      }
+
+      .cls-17 {
+        fill: #e03f4f;
+      }
+
+      .cls-18 {
+        opacity: .3;
+      }
+
+      .cls-19 {
+        clip-path: url(#clippath-9);
+      }
+
+      .cls-5 {
+        opacity: .31;
+      }
+
+      .cls-20 {
+        fill: #efcd43;
+      }
+
+      .cls-6 {
+        opacity: .56;
+      }
+
+      .cls-21 {
+        fill: #1d1d1b;
+      }
+
+      .cls-21, .cls-22 {
+        mix-blend-mode: soft-light;
+      }
+
+      .cls-23 {
+        fill: #fff;
+      }
+
+      .cls-24 {
+        fill: #9d9d9c;
+      }
+
+      .cls-25 {
+        fill: #99622c;
+      }
+
+      .cls-26 {
+        fill: #bf6e58;
+      }
+
+      .cls-27 {
+        fill: none;
+      }
+
+      .cls-28 {
+        clip-path: url(#clippath-1);
+      }
+
+      .cls-7 {
+        opacity: .46;
+      }
+
+      .cls-29 {
+        fill: #c48d69;
+      }
+
+      .cls-30 {
+        fill: #57cae5;
+      }
+
+      .cls-31 {
+        isolation: isolate;
+      }
+
+      .cls-32 {
+        fill: #88cfe2;
+      }
+
+      .cls-33 {
+        clip-path: url(#clippath-5);
+      }
+
+      .cls-34 {
+        clip-path: url(#clippath-8);
+      }
+
+      .cls-35 {
+        fill: #c17b53;
+      }
+
+      .cls-36 {
+        fill: #217a2a;
+      }
+
+      .cls-37 {
+        fill: #fcd8a4;
+      }
+
+      .cls-38 {
+        fill: #ffac00;
+      }
+
+      .cls-39 {
+        clip-path: url(#clippath-3);
+      }
+
+      .cls-40 {
+        fill: #b2793b;
+      }
+
+      .cls-40, .cls-41, .cls-42 {
+        fill-rule: evenodd;
+      }
+
+      .cls-43 {
+        fill: #e58217;
+      }
+
+      .cls-44 {
+        fill: #99432b;
+      }
+
+      .cls-45 {
+        fill: #386688;
+      }
+
+      .cls-46 {
+        fill: #e84542;
+      }
+
+      .cls-47 {
+        fill: #4eaf59;
+      }
+
+      .cls-48 {
+        fill: #97cfdc;
+      }
+
+      .cls-8 {
+        opacity: .39;
+      }
+
+      .cls-49 {
+        fill: #f9f5e4;
+      }
+
+      .cls-50 {
+        fill: #05af2d;
+      }
+
+      .cls-41 {
+        fill: #974612;
+      }
+
+      .cls-9 {
+        opacity: .17;
+      }
+
+      .cls-51 {
+        fill: #b55a3e;
+      }
+
+      .cls-52 {
+        fill: #9bccdd;
+      }
+
+      .cls-53 {
+        fill: #ba6338;
+      }
+
+      .cls-42 {
+        fill: #cf9651;
+      }
+
+      .cls-54 {
+        clip-path: url(#clippath-2);
+      }
+
+      .cls-55 {
+        fill: #eabb7d;
+      }
+
+      .cls-56 {
+        fill: #ffc200;
+      }
+
+      .cls-57 {
+        fill: #ec5d64;
+      }
+
+      .cls-58 {
+        fill: #773422;
+      }
+
+      .cls-59 {
+        fill: #b56128;
+      }
+
+      .cls-60 {
+        clip-path: url(#clippath);
+      }
+
+      .cls-61 {
+        fill: #7b6a58;
+      }
+
+      .cls-62 {
+        fill: #edb04c;
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-27" width="1280" height="720"/>
+    </clipPath>
+    <clipPath id="clippath-1">
+      <polygon class="cls-27" points="978.23 489.16 613.92 492.52 610.05 255.24 974.36 251.87 978.23 489.16"/>
+    </clipPath>
+    <clipPath id="clippath-2">
+      <circle class="cls-27" cx="665.61" cy="312.91" r="24.48"/>
+    </clipPath>
+    <clipPath id="clippath-3">
+      <circle class="cls-27" cx="751.36" cy="310.66" r="24.48"/>
+    </clipPath>
+    <clipPath id="clippath-4">
+      <circle class="cls-27" cx="837.04" cy="310.66" r="24.48"/>
+    </clipPath>
+    <clipPath id="clippath-5">
+      <circle class="cls-27" cx="922.67" cy="310.66" r="24.48"/>
+    </clipPath>
+    <clipPath id="clippath-6">
+      <rect class="cls-27" x="-15.56" y="590.24" width="1580.09" height="143.03"/>
+    </clipPath>
+    <clipPath id="clippath-7">
+      <rect class="cls-27" x="-15.56" y="576.75" width="1580.09" height="121.44"/>
+    </clipPath>
+    <clipPath id="clippath-8">
+      <rect class="cls-27" x="-15.56" y="578.1" width="1416.82" height="147.08"/>
+    </clipPath>
+    <clipPath id="clippath-9">
+      <polygon class="cls-27" points="504.57 622.59 444.4 587.94 670.67 483.72 748.11 485.01 504.57 622.59"/>
+    </clipPath>
+  </defs>
+  <g class="cls-31">
+    <g id="Capa_1" data-name="Capa 1">
+      <g class="cls-60">
+        <path class="cls-14" d="M1144.03,461.67c126.41-.51,101.03,18.19-13.48,22.06-242.71,8.21-286.21,22.83-279.23,35.99,8.43,15.9,467.81,19.84,183.59,29.67-296.65,10.26-288.04,27.7-117.8,29.75,190.89,2.3,362.67,13.67,279.17,15.9-97.81,2.61-96.73,10.55-3.37,9.24,109.56-1.54,153.38-19.49,20.23-25.65-136.68-6.31-215.08-2.2-60.43-9.82,154.65-7.62,109.87-31.01-80.59-43.06-202.46-12.81-106.13-27.65,1.13-31.76,227.54-8.72,296.65-40.53,107.87-42.58-217.53-2.37-131.52,10.65-37.08,10.26Z"/>
+        <path class="cls-14" d="M411.48,489.09c90.29,1.14,224.64,3.95,99.71,6.47-124.93,2.53-327.12,38.35-165.83,48.95,161.3,10.6,187.65,32.77,80.35,35.2-224.55,5.09-243.23-9.96-167.32-15.52,75.9-5.55,20.26-26.89-109.41-31.94-129.67-5.05-311.28-6.19-303.92-16.53,7.91-11.11,602.22-7.27,426.97-11.61-183.44-4.54-140.44-18.56,139.46-15.03Z"/>
+      </g>
+    </g>
+  </g>
+</svg>

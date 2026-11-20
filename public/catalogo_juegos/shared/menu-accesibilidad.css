@@ -216,3 +216,6 @@ body.sin-animaciones *:not(#pantalla-inicio):not(#pantalla-inicio *) {
     animation-delay: 0s !important;
     transition-duration: 0.01ms !important;
 }
+
+/* Juegos de lienzo (Phaser): el alto contraste se aplica al dibujo completo */
+body.alto-contraste canvas { filter: contrast(1.35) saturate(1.2); }

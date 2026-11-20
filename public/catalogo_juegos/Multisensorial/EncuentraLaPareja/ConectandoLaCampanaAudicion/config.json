@@ -2,17 +2,17 @@
   "nombre": "Conectando la Campana (Audición)",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: el tambor suena... ¿con qué parte del cuerpo lo escuchamos?",
+    "demostracion": "¡Vamos con un ejemplo! Mira: el tambor suena… ¿con qué parte del cuerpo del gigante lo escuchamos?",
     "demostracionAcierto": "¡Así se une un estímulo con su sentido!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "¡Bienvenido al Laboratorio Sensorial!"
+        "texto": "¡Bienvenido al campanario del gigante!"
       },
       {
         "personaje": 0,
-        "texto": "¡Conecta cada estímulo con su sentido!"
+        "texto": "¡Lleva cada sonido y cada regalo a su sentido!"
       }
     ]
   },
@@ -105,11 +105,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "¡Bienvenido al Laboratorio Sensorial!"
+          "texto": "¡Bienvenido al campanario del gigante!"
         },
         {
           "personaje": 0,
-          "texto": "¡Conecta cada estímulo con su sentido!"
+          "texto": "¡Lleva cada sonido y cada regalo a su sentido!"
         }
       ],
       "retos": [
@@ -127,7 +127,7 @@
           "correcto": "oido",
           "presentacion": {
             "voz": "zoe",
-            "texto": "¡Bienvenido al Laboratorio Sensorial! La campana emite ondas de sonido. Conecta la campana con el órgano del sentido primario que nos permite escucharla."
+            "texto": "¡Bienvenido al campanario! La campana emite ondas de sonido. Tira de la soga y lleva su sonido hasta el sentido que nos permite escucharlo."
           },
           "acierto": {
             "animacion": "vuelaOido",
