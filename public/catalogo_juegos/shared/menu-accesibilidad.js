@@ -163,7 +163,7 @@
         });
         var sinProg = marca("sin-progreso");
         if (sc.marcadorG && sc.marcadorG.setVisible && sc.marcadorG.visible === sinProg) sc.marcadorG.setVisible(!sinProg);
-        if (sc.estrellas && sc.estrellas.length) {
+        if (Array.isArray(sc.estrellas) && sc.estrellas.length) {
             sc.estrellas.forEach(function (e) { if (e && e.setVisible && e.visible === sinProg) e.setVisible(!sinProg); });
         }
         // Al cambiar «Animar objetos» en caliente, se pausan o reanudan los bucles que ya corrían.
@@ -208,7 +208,8 @@
             if (Sis && Sis.step) {
                 var paso = Sis.step;
                 Sis.step = function (t, d) {
-                    if (this.scene) sincronizarEscena(this.scene);
+                    // Nunca debe romper el fotograma del juego: ante cualquier rareza, se omite.
+                    try { if (this.scene) sincronizarEscena(this.scene); } catch (e) { /* noop */ }
                     return paso.call(this, t, d);
                 };
             }
