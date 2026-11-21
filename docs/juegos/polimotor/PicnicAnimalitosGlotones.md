@@ -1,6 +1,6 @@
 # Picnic con los Animalitos Glotones
 
-`public/catalogo_juegos/Polimotor/PicnicAnimalitosGlotones/` · slug `picnic-animalitos-glotones` · **3-4 años** · Eje 17 «Coordinación y orientación», temática 34 «Coordinación visual» · orden 35 · color `#51cf66`.
+`public/catalogo_juegos/Polimotor/PicnicAnimalitosGlotones/` · slug `picnic-animalitos-glotones` · **3-4 años** · Eje 18 «Habilidad y precisión», temática 35 «Arrastrar y soltar objetos» · orden 35 · color `#51cf66`.
 
 Picnic en el bosque (el mismo de «¡La Hora de Comer!»): varios animalitos sentados en la manta esperan con la boca abierta. El niño toma cada comida del plato y la arrastra hasta la boca del animalito que la come.
 

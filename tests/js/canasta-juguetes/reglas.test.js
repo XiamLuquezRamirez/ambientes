@@ -205,18 +205,22 @@ module.exports = {
 
         // ------------------------------------------------------- nivel 2: color
         {
-            descripcion: 'en el nivel 2 cada pieza lleva el color de su caja',
+            descripcion: 'en el nivel 2 cada pieza lleva el color de la caja que la acepta',
             fn: function () {
                 var R = modulo();
                 var n2 = R.nivel(config(), 1);
-                var porZona = {};
-                n2.zonas.forEach(function (z) {
-                    (z.acepta || []).forEach(function (id) { porZona[id] = z.id; });
-                });
+                // El nombre de la caja («caja roja») dice su color; la pieza debe traer ese mismo.
                 n2.objetos.forEach(function (o) {
                     var color = String(o.tipo).split(':')[1];
                     cierto(color, o.id + ' declara color en el tipo');
-                    cierto(o.id.indexOf(color) >= 0, o.id + ' usa el color ' + color);
+                    var zona = n2.zonas.filter(function (z) { return z.id === o.zona; })[0];
+                    cierto(zona, o.id + ' apunta a una zona que existe');
+                    // «rojo» y «roja» comparten raíz: comparamos sin la vocal de género.
+                    var raiz = color.replace(/[oa]$/, '');
+                    cierto(
+                        String(zona.nombre).indexOf(raiz) >= 0,
+                        o.id + ' (' + color + ') no casa con «' + zona.nombre + '»'
+                    );
                 });
             }
         },
@@ -257,11 +261,11 @@ module.exports = {
             descripcion: 'una forma coloreada cambia de color con el sufijo',
             fn: function () {
                 var J = juguetes();
-                var rojo = J.dibujar('cubo:rojo');
-                var azul = J.dibujar('cubo:azul');
+                var rojo = J.dibujar('estrella:rojo');
+                var azul = J.dibujar('estrella:azul');
                 cierto(rojo !== azul, 'el color cambia el SVG');
-                cierto(rojo.indexOf('#ff6b6b') >= 0, 'el cubo rojo usa el rojo de la paleta');
-                cierto(azul.indexOf('#4dabf7') >= 0, 'el cubo azul usa el azul de la paleta');
+                cierto(rojo.indexOf('#ff6b6b') >= 0, 'la estrella roja usa el rojo de la paleta');
+                cierto(azul.indexOf('#4dabf7') >= 0, 'la estrella azul usa el azul de la paleta');
             }
         },
         {

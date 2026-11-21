@@ -45,15 +45,23 @@ casaban entre sí.
 
 | Tipo | Qué es |
 |------|--------|
-| `coche`, `camion`, `tren` | vehículos con ruedas de tapacubos, faros y franjas; el tren echa humo |
-| `oso`, `conejo`, `muneco` | peluches con ojos con brillo, mofletes, lazo y costuras |
-| `pelota` | pelota de playa de seis gajos de colores |
-| `madera` | cubo de madera con veta y una letra A |
-| `garaje` | marca de la caja de vehículos |
+| `coche`, `camion`, `tren` | vehículos con ruedas de tapacubos y faros; el tren echa humo |
+| `oso`, `conejo`, `muneco` | peluches con ojos con brillo y mofletes |
+| `pelota` | pelota de playa de seis gajos |
+| `madera` | cubo de construcción con una letra A |
+| `estrella`, `corazon`, `flor`, `globo`, `manzana` | las cinco figuras del nivel 2 |
 
-`dibujar(tipo)` acepta un sufijo de color: `cubo:rojo`, `estrella:azul`, `caja:verde`. Las cinco formas
-del nivel 2 (`cubo`, `estrella`, `cilindro`, `ladrillo`, `triangulo`) comparten una paleta de cinco colores
-(`PALETA`), de modo que la forma varía pero **el color manda**.
+**El color va en el tipo**: `dibujar("oso")` da el oso marrón de siempre y `dibujar("oso:rosa")` lo
+pinta entero de rosa. Hay dos tablas de color:
+
+- `NATURAL` — el color propio de cada juguete, el que se usa cuando no hay sufijo. El oso es marrón,
+  la pelota va a gajos de colores. Es lo del **nivel 1**, donde la pista es el dibujo de la caja.
+- `PALETA` — ocho colores con tres tonos cada uno (cara, lado en sombra y luz). Es lo de los
+  **niveles 2 y 3**, donde el color *es* la regla: el juguete se pinta entero de un color y por eso
+  se lee «el juguete azul» aunque tenga volumen.
+
+Los ojos, el hocico y las ruedas se quedan oscuros aunque el juguete vaya de un color: sin cara no se
+distingue un oso de un conejo, y una rueda de color no parece una rueda.
 
 ## Los tres niveles
 
@@ -62,9 +70,21 @@ Definidos en `config.json` → `nivelesJuego`. Cada uno declara sus `zonas` (con
 
 | Nivel | Qué pide | Juguetes | Cajas |
 |-------|----------|----------|-------|
-| 1 | Guardar cada juguete en su caja | 3: coche, oso, pelota | 3, con la marca de lo que va dentro |
-| 2 | Clasificar por color | 5 formas distintas, una por color | 5 de colores vivos, sin marca |
-| 3 | Clasificar por categoría | 8 | 3: garaje, peluches, rincón de juego |
+| 1 | Guardar cada juguete en su caja | 3 con su color natural: coche, oso, pelota | 3, con el dibujo de lo que va dentro |
+| 2 | Clasificar por color | 5 figuras de un color cada una | 5 de colores vivos, sin dibujo |
+| 3 | Clasificar por color | 8, en tres grupos de color | 3 (azul, rosa, amarilla), sin dibujo |
+
+**Los niveles 2 y 3 van por color, y las cajas no llevan dibujo**: solo su color. En el 3 los ocho
+juguetes conservan su forma (coche, oso, pelota…) pero van pintados del color de su caja — tres azules,
+tres rosas y dos amarillos. Antes el 3 clasificaba por categoría con un icono en cada caja, y resultaba
+confuso: el icono competía con el juguete y la categoría no es evidente a los 3 años.
+
+**En el nivel 2 los juguetes salen en desorden**, repartidos por la alfombra sin que ninguno caiga bajo
+su propia caja: si cada uno apareciera justo debajo de la suya, la posición resolvería el juego y el
+color dejaría de importar.
+
+Las cinco figuras del nivel 2 son cosas que un niño nombra de un vistazo —estrella, corazón, flor, globo
+y manzana—, no formas geométricas: la silueta ayuda a distinguirlas entre sí mientras el color manda.
 
 El nivel siguiente solo se abre al completar el actual. En el final hay botón para repetir o saltar al 3.
 
@@ -91,8 +111,22 @@ Soltar sobre un juguete ya guardado devuelve `ya` y no vuelve a contarlo.
 
 - Juguete en reposo: flota con un balanceo propio por pieza (`flota`, con `--balanceo`).
 - Al tomarlo: sube 20 px, crece, se inclina y proyecta una sombra larga; su sombra en el suelo se encoge.
-- Al soltarlo bien: cae en la caja (`caeEnCaja`: sube, gira y se hunde a escala 0.42), la caja rebota como
-  cartón (`rebote`), se abre una onda blanca en la boca (`.anillo`) y salen siete estrellas (`estrellaSale`).
+- Al soltarlo bien: toma impulso hacia arriba, se hunde en la caja y rebota al fondo (`caeEnCaja`),
+  la caja rebota como cartón (`rebote`), se abre una onda blanca en la boca (`.anillo`) y salen siete
+  estrellas (`estrellaSale`). El último fotograma de `caeEnCaja` es idéntico al reposo de
+  `.pieza.guardado`, para que al acabar la animación el juguete no dé un salto.
+
+### Que el juguete quede *dentro* de la caja
+
+Tres cosas, porque con una sola seguía viéndose por fuera:
+
+1. `slotDe` mide sobre `.zona-cuerpo`, no sobre `.zona`. La zona incluye las solapas abiertas, que
+   sobresalen por los lados; repartir ahí dejaba el primer juguete fuera del cartón.
+2. Con varios juguetes en una caja se reparten en filas de hasta tres y de abajo hacia arriba, como si
+   se apilaran en el fondo. La última fila, si va incompleta, se centra.
+3. Al terminar de caer, la pieza se mueve en el DOM a la capa `.guardadas` (z-index 5), que va entre
+   las cajas y las piezas sueltas. Así queda por detrás de las solapas y se ve metida dentro, no posada
+   encima. `deshacer` la devuelve a `.piezas` (lo usa la demo).
 - Al soltarlo mal: vuelve a su sitio con un bote blando (`vuelveASitio`).
 - La caja correcta, cuando el juguete se acerca, late y enciende su halo (`atrae`).
 - Al completar el nivel: cartel central con entrada rebotada (`cartelEntra`), confeti y luz más cálida.

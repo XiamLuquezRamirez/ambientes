@@ -138,17 +138,17 @@
     {
       "id": 2,
       "nombre": "Ordenamos y clasificamos",
-      "demo": "bloque-rojo",
+      "demo": "globo-verde",
       "zoe": "Busca el color y lleva cada juguete a su caja.",
-      "zeus": "¡Ahora tenemos más juguetes! Vamos a poner cada uno en su lugar.",
-      "demoVoz": "¡Mira! El bloque rojo va en la caja roja.",
+      "zeus": "¡Los juguetes están por todos lados! Cada color tiene su caja.",
+      "demoVoz": "¡Mira! El globo verde va en la caja verde.",
       "pista": "Busca una caja del mismo color.",
       "listo": "¡Excelente! ¡Cada color en su caja!",
       "zonas": [
         {
           "id": "bin-rojo",
           "acepta": [
-            "bloque-rojo"
+            "estrella-roja"
           ],
           "tinta": "#e03131",
           "marca": "",
@@ -160,7 +160,7 @@
         {
           "id": "bin-azul",
           "acepta": [
-            "bloque-azul"
+            "corazon-azul"
           ],
           "tinta": "#1c7ed6",
           "marca": "",
@@ -172,7 +172,7 @@
         {
           "id": "bin-amarillo",
           "acepta": [
-            "bloque-amarillo"
+            "flor-amarilla"
           ],
           "tinta": "#f0b000",
           "marca": "",
@@ -184,7 +184,7 @@
         {
           "id": "bin-verde",
           "acepta": [
-            "bloque-verde"
+            "globo-verde"
           ],
           "tinta": "#2f9e44",
           "marca": "",
@@ -196,7 +196,7 @@
         {
           "id": "bin-naranja",
           "acepta": [
-            "bloque-naranja"
+            "manzana-naranja"
           ],
           "tinta": "#f76707",
           "marca": "",
@@ -208,44 +208,44 @@
       ],
       "objetos": [
         {
-          "id": "bloque-rojo",
-          "tipo": "cubo:rojo",
-          "nombre": "Bloque rojo",
+          "id": "estrella-roja",
+          "tipo": "estrella:rojo",
+          "nombre": "Estrella roja",
           "zona": "bin-rojo",
-          "x": 18,
-          "y": 72
+          "x": 72,
+          "y": 70
         },
         {
-          "id": "bloque-azul",
-          "tipo": "estrella:azul",
-          "nombre": "Bloque azul",
+          "id": "corazon-azul",
+          "tipo": "corazon:azul",
+          "nombre": "Corazón azul",
           "zona": "bin-azul",
-          "x": 34,
+          "x": 24,
           "y": 84
         },
         {
-          "id": "bloque-amarillo",
-          "tipo": "cilindro:amarillo",
-          "nombre": "Bloque amarillo",
+          "id": "flor-amarilla",
+          "tipo": "flor:amarillo",
+          "nombre": "Flor amarilla",
           "zona": "bin-amarillo",
-          "x": 50,
-          "y": 72
+          "x": 86,
+          "y": 82
         },
         {
-          "id": "bloque-verde",
-          "tipo": "ladrillo:verde",
-          "nombre": "Bloque verde",
+          "id": "globo-verde",
+          "tipo": "globo:verde",
+          "nombre": "Globo verde",
           "zona": "bin-verde",
-          "x": 68,
-          "y": 84
+          "x": 15,
+          "y": 68
         },
         {
-          "id": "bloque-naranja",
-          "tipo": "triangulo:naranja",
-          "nombre": "Bloque naranja",
+          "id": "manzana-naranja",
+          "tipo": "manzana:naranja",
+          "nombre": "Manzana naranja",
           "zona": "bin-naranja",
-          "x": 82,
-          "y": 72
+          "x": 49,
+          "y": 78
         }
       ]
     },
@@ -254,9 +254,9 @@
       "nombre": "La gran canasta",
       "demo": "tren",
       "zoe": "¡Uy! ¡Tenemos muchos juguetes por guardar!",
-      "zeus": "Vamos a buscar dónde vive cada juguete. ¡Ayúdanos a ordenar la habitación!",
-      "demoVoz": "¡Mira! El tren va con los carritos.",
-      "pista": "¡Vamos a buscar su lugar!",
+      "zeus": "Mira el color de cada juguete y llévalo a la caja de ese color.",
+      "demoVoz": "¡Mira! El tren azul va en la caja azul.",
+      "pista": "Busca una caja del mismo color.",
       "listo": "¡Lo lograste! ¡La habitación está ordenada!",
       "zonas": [
         {
@@ -266,8 +266,8 @@
             "camion",
             "tren"
           ],
-          "tinta": "#1971c2",
-          "marca": "garaje",
+          "tinta": "#1c7ed6",
+          "marca": "",
           "x": 18,
           "y": 40,
           "nombre": "garaje",
@@ -280,12 +280,12 @@
             "conejo",
             "muneco"
           ],
-          "tinta": "#d6709f",
-          "marca": "abrazo",
+          "tinta": "#f06595",
+          "marca": "",
           "x": 82,
           "y": 40,
           "nombre": "canasta de peluches",
-          "sombra": "#9b3f6c"
+          "sombra": "#a61e4d"
         },
         {
           "id": "juego",
@@ -294,7 +294,7 @@
             "cubo3"
           ],
           "tinta": "#f0b000",
-          "marca": "juego",
+          "marca": "",
           "x": 50,
           "y": 38,
           "nombre": "rincón de juego",
@@ -304,75 +304,75 @@
       "objetos": [
         {
           "id": "coche3",
-          "tipo": "coche",
+          "tipo": "coche:azul",
           "nombre": "Coche",
           "zona": "vehiculos",
           "x": 12,
           "y": 66,
-          "pista": "Los carritos van en el garaje."
+          "pista": "Busca la caja azul."
         },
         {
           "id": "camion",
-          "tipo": "camion",
+          "tipo": "camion:azul",
           "nombre": "Camión",
           "zona": "vehiculos",
           "x": 34,
           "y": 68,
-          "pista": "Los carritos van en el garaje."
+          "pista": "Busca la caja azul."
         },
         {
           "id": "tren",
-          "tipo": "tren",
+          "tipo": "tren:azul",
           "nombre": "Tren",
           "zona": "vehiculos",
           "x": 22,
           "y": 84,
-          "pista": "Los carritos van en el garaje."
+          "pista": "Busca la caja azul."
         },
         {
           "id": "oso3",
-          "tipo": "oso",
+          "tipo": "oso:rosa",
           "nombre": "Osito",
           "zona": "peluches",
           "x": 70,
           "y": 86,
-          "pista": "Los peluches van juntos."
+          "pista": "Busca la caja rosada."
         },
         {
           "id": "conejo",
-          "tipo": "conejo",
+          "tipo": "conejo:rosa",
           "nombre": "Conejo",
           "zona": "peluches",
           "x": 86,
           "y": 84,
-          "pista": "Los peluches van juntos."
+          "pista": "Busca la caja rosada."
         },
         {
           "id": "muneco",
-          "tipo": "muneco",
+          "tipo": "muneco:rosa",
           "nombre": "Muñeco",
           "zona": "peluches",
           "x": 78,
           "y": 66,
-          "pista": "Los peluches van juntos."
+          "pista": "Busca la caja rosada."
         },
         {
           "id": "pelota3",
-          "tipo": "pelota",
+          "tipo": "pelota:amarillo",
           "nombre": "Pelota",
           "zona": "juego",
           "x": 48,
           "y": 82,
-          "pista": "La pelota va con los bloques."
+          "pista": "Busca la caja amarilla."
         },
         {
           "id": "cubo3",
-          "tipo": "madera",
+          "tipo": "madera:amarillo",
           "nombre": "Cubo",
           "zona": "juego",
           "x": 60,
           "y": 66,
-          "pista": "La pelota va con los bloques."
+          "pista": "Busca la caja amarilla."
         }
       ]
     }

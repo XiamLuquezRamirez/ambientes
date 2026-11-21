@@ -1,0 +1,154 @@
+{
+  "nombre": "¡El Árbol de las Formas Mágicas!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 40,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "radioAcierto": 96,
+    "radioCerca": 200,
+    "radioMolde": 70,
+    "ayudaMs": 11000,
+    "ayudaRepetirMs": 14000,
+    "vozPausaMs": 2200,
+    "fuerasParaPista": 2
+  },
+  "frutos": [
+    {
+      "id": "manzana",
+      "forma": "circulo",
+      "nombre": "Manzana Circular",
+      "voz": "la manzana",
+      "formaNombre": "el círculo",
+      "pista": "¡La manzana es redonda como un círculo! Llévala al círculo del tronco."
+    },
+    {
+      "id": "ciruela",
+      "forma": "cuadrado",
+      "nombre": "Ciruela Cuadrada",
+      "voz": "la ciruela",
+      "formaNombre": "el cuadrado",
+      "pista": "¡La ciruela tiene forma de cuadrado! Llévala al cuadrado del tronco."
+    },
+    {
+      "id": "pera",
+      "forma": "triangulo",
+      "nombre": "Pera Triangular",
+      "voz": "la pera",
+      "formaNombre": "el triángulo",
+      "pista": "¡La pera tiene forma de triángulo! Llévala al triángulo del tronco."
+    },
+    {
+      "id": "fresa",
+      "forma": "corazon",
+      "nombre": "Fresa Corazón",
+      "voz": "la fresa",
+      "formaNombre": "el corazón",
+      "pista": "¡La fresa tiene forma de corazón! Llévala al corazón del tronco."
+    },
+    {
+      "id": "carambola",
+      "forma": "estrella",
+      "nombre": "Carambola Estrella",
+      "voz": "la carambola",
+      "formaNombre": "la estrella",
+      "pista": "¡La carambola tiene forma de estrella! Llévala a la estrella del tronco."
+    }
+  ],
+  "moldes": [
+    "circulo",
+    "cuadrado",
+    "triangulo",
+    "corazon",
+    "estrella"
+  ],
+  "demo": {
+    "fruto": "manzana"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡El Árbol de las Formas Mágicas!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "introZoe": "¡El árbol mágico necesita sus frutos! Toma cada fruto, arrástralo hasta el molde que tiene su misma forma en el tronco y suéltalo para encajarlo.",
+    "demoZeus": "¡Mira! La manzana es redonda. La llevo hasta el círculo y la suelto.",
+    "aciertos": [
+      "¡Muy bien!",
+      "¡Qué forma tan bonita!",
+      "¡Lo encontraste!",
+      "¡Perfecto!"
+    ],
+    "otraForma": "¡Busca el molde que tenga la misma forma!",
+    "fuera": "¡Llévalo hasta el tronco del árbol!",
+    "ayudaZoe": "¡Fíjate en la forma! Lleva el círculo con el círculo y el triángulo con el triángulo.",
+    "listo": "¡La magia volvió al árbol!",
+    "finalVoz": "¡ESPECTACULAR! Dominaste el arrastre y el encaje de formas.",
+    "finalVozZeus": "¡Eres un maestro de la precisión!",
+    "finalTitulo": "¡ESPECTACULAR!",
+    "finalTexto": "Dominaste el arrastre y el encaje de formas. ¡Eres un maestro de la precisión!",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola, amigos! En el bosque vive un árbol mágico muy especial."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Sus frutos mágicos se cayeron! Vamos a devolverlos a su lugar."
+      }
+    ],
+    "ayudaNivel": "¡Mira bien la forma de cada fruto!"
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "3-4 años",
+      "titulo": "Asociar formas: círculo, cuadrado y triángulo"
+    }
+  ],
+  "nivelesJuego": [
+    {
+      "id": 1,
+      "titulo": "Nivel 1",
+      "frutos": [
+        "manzana",
+        "ciruela",
+        "pera"
+      ],
+      "zoe": "¡El árbol mágico necesita sus frutos! Toma cada fruto, arrástralo hasta el molde que tiene su misma forma en el tronco y suéltalo para encajarlo.",
+      "listo": "¡Nivel 1 listo! ¡Viene un fruto nuevo!"
+    },
+    {
+      "id": 2,
+      "titulo": "Nivel 2",
+      "frutos": [
+        "fresa",
+        "manzana",
+        "pera",
+        "ciruela"
+      ],
+      "zoe": "¡Llegó un fruto nuevo! La fresa tiene forma de corazón. Busca el corazón en el tronco y lleva cada fruto a su molde.",
+      "listo": "¡Nivel 2 listo! ¡Ahora vienen cinco frutos!"
+    },
+    {
+      "id": 3,
+      "titulo": "Nivel 3",
+      "frutos": [
+        "carambola",
+        "fresa",
+        "manzana",
+        "ciruela",
+        "pera"
+      ],
+      "zoe": "¡Ahora son cinco frutos! La carambola es una estrella. Mira bien cada forma y encuentra su molde.",
+      "listo": "¡La magia volvió al árbol!"
+    }
+  ]
+}

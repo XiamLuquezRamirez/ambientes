@@ -430,6 +430,10 @@ body.intro3d-activa #pista {
 .piezas { z-index: 6; }
 .fx { z-index: 8; pointer-events: none; }
 
+/* "guardadas" va entre las cajas y las piezas sueltas: un juguete ya guardado se dibuja
+   ahí, detrás de las solapas de su caja, para que se vea metido dentro y no posado encima. */
+.guardadas { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+
 .zona {
   position: absolute;
   width: 168px;
@@ -597,8 +601,8 @@ body.intro3d-activa #pista {
 .pieza.tomado .pieza-sombra { transform: scale(0.62); opacity: 0.4; }
 
 /* Entra en la caja. */
-.pieza.guardando { z-index: 30; transition: left 0.42s cubic-bezier(0.3, 0.9, 0.4, 1), top 0.42s cubic-bezier(0.3, 0.9, 0.4, 1); }
-.pieza.guardando .pieza-cuerpo { animation: caeEnCaja 0.48s cubic-bezier(0.4, 0, 0.6, 1) forwards; }
+.pieza.guardando { z-index: 30; transition: left 0.44s cubic-bezier(0.34, 0.8, 0.3, 1), top 0.44s cubic-bezier(0.34, 0.8, 0.3, 1); }
+.pieza.guardando .pieza-cuerpo { animation: caeEnCaja 0.52s cubic-bezier(0.4, 0, 0.55, 1) forwards; }
 .pieza.guardando .pieza-sombra { opacity: 0; }
 
 /* Vuelve a su sitio tras un intento fallido. */
@@ -607,7 +611,7 @@ body.intro3d-activa #pista {
 
 /* Ya guardado: pequeño dentro de la caja. */
 .pieza.guardado { z-index: 5; pointer-events: none; transition: left 0.3s ease, top 0.3s ease; }
-.pieza.guardado .pieza-cuerpo { transform: scale(0.44) translateY(10px); filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.3)); animation: none; }
+.pieza.guardado .pieza-cuerpo { transform: translateY(2px) scale(0.5); filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.35)); animation: none; }
 .pieza.guardado .pieza-sombra { opacity: 0; }
 
 body.demo-lock .pieza { pointer-events: none; }
@@ -974,11 +978,14 @@ body.alto-contraste .zona-caja { box-shadow: inset 0 0 0 4px #000, 0 10px 0 rgba
   100% { transform: scale(1, 1); }
 }
 
-/* El juguete cae dentro de la caja: se encoge y se hunde. */
+/* El juguete cae dentro de la caja: toma impulso, se hunde y rebota al fondo.
+   El fotograma final es idéntico al reposo de .pieza.guardado, para que no dé un salto. */
 @keyframes caeEnCaja {
-  0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
-  45% { transform: translateY(-18px) scale(1.06) rotate(-8deg); }
-  100% { transform: translateY(16px) scale(0.42) rotate(10deg); opacity: 0.92; }
+  0%   { transform: translateY(0) scale(1) rotate(0deg); }
+  30%  { transform: translateY(-22px) scale(1.08) rotate(-7deg); }
+  70%  { transform: translateY(6px) scale(0.5) rotate(5deg); }
+  85%  { transform: translateY(0) scale(0.52) rotate(2deg); }
+  100% { transform: translateY(2px) scale(0.5) rotate(0deg); }
 }
 
 /* Vuelve a su sitio con un bote blando. */

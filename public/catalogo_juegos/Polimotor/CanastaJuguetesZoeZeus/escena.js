@@ -62,6 +62,7 @@
             '<div class="desorden" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>' +
             '<div class="calidez"></div>' +
             '<div class="zonas"></div>' +
+            '<div class="guardadas"></div>' +
             '<div class="piezas"></div>' +
             '<div class="fx"></div>' +
             '</div>';
@@ -133,6 +134,8 @@
         hab.dataset.nivel = String(nivel.id || "");
         cajaZ.innerHTML = "";
         cajaP.innerHTML = "";
+        var cajaG = $(".guardadas");
+        if (cajaG) cajaG.innerHTML = "";
         (nivel.zonas || []).forEach(function (z) {
             var n = document.createElement("div");
             n.className = "zona";
@@ -184,12 +187,27 @@
         });
     }
 
+    /**
+     * Dónde se posa un juguete dentro de su caja.
+     *
+     * Se mide sobre el CUERPO de la caja (.zona-cuerpo), no sobre la zona entera: la zona
+     * incluye las solapas abiertas, que sobresalen, y usarlas dejaba los juguetes por fuera.
+     * Con varios juguetes se reparten en filas de hasta 3 para que ninguno se salga por los lados.
+     */
     function slotDe(zona, i, total) {
         var base = root.getBoundingClientRect();
-        var r = zona.el.getBoundingClientRect();
+        var cuerpo = zona.el.querySelector(".zona-cuerpo");
+        var r = (cuerpo || zona.el).getBoundingClientRect();
         var n = Math.max(1, total || 1);
-        var cx = r.left - base.left + r.width * ((i + 1) / (n + 1));
-        var cy = r.top - base.top + r.height * 0.6;
+        var porFila = Math.min(n, 3);
+        var filas = Math.ceil(n / porFila);
+        var fila = Math.floor(i / porFila);
+        var col = i % porFila;
+        // La última fila puede ir incompleta: se centra.
+        var enEstaFila = Math.min(porFila, n - fila * porFila);
+        var cx = r.left - base.left + r.width * ((col + 1) / (enEstaFila + 1));
+        // De abajo hacia arriba, como si se fueran apilando en el fondo de la caja.
+        var cy = r.top - base.top + r.height * (filas === 1 ? 0.56 : (0.78 - fila * 0.3));
         return { x: cx, y: cy };
     }
 
@@ -423,9 +441,13 @@
         var total = (nivel.objetos || []).length || 1;
         var hab = $(".habitacion");
         if (hab) hab.style.setProperty("--orden", String(ordenLista.length / total));
-        return sleep(480).then(function () {
+        return sleep(520).then(function () {
             p.el.classList.remove("guardando");
             p.el.classList.add("guardado");
+            // Pasa detrás de las solapas: ya está dentro de la caja.
+            var cajaG = $(".guardadas");
+            if (cajaG && p.el.parentNode !== cajaG) cajaG.appendChild(p.el);
+            colocarEnZona(p, z.n);
             return true;
         });
     }
@@ -450,6 +472,8 @@
         var z = zonas[p.def.zona];
         p.guardado = false;
         p.el.classList.remove("guardado", "guardando");
+        var cajaP = $(".piezas");
+        if (cajaP && p.el.parentNode !== cajaP) cajaP.appendChild(p.el);
         if (z) {
             z.n = Math.max(0, z.n - 1);
             if (z.n === 0) z.el.classList.remove("llena");

@@ -690,7 +690,7 @@ function salirAlMenu() {
 // ------------------------------------------------------------------ arranque
 
 document.addEventListener("DOMContentLoaded", function () {
-    var crudo = readText("config.json?v=20261120x9");
+    var crudo = readText("config.json?v=20261121c");
     gameConfig = JSON.parse(crudo);
     var introCrudo = readText("../../intro.json");
     introConfig = introCrudo ? JSON.parse(introCrudo) : { personajes: [] };
