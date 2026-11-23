@@ -339,13 +339,21 @@
             K.ruido({ f: 120, q: 0.5, dur: 0.2, vol: 0.05 });
         },
 
+        /** Y del centro de un animal para que sus PIES queden sobre las tablas del muelle (f = 0 arriba del muelle, 1 abajo). */
+        pisoY: function (f) {
+            var L = this.L;
+            var banda = L.H - L.muelle;
+            var pies = L.muelle + banda * (L.arte ? 0.12 + f * 0.5 : f * 0.6);
+            return pies - L.tam * 0.42;
+        },
+
         lugares: function (n) {
             var L = this.L, out = [];
             for (var i = 0; i < n; i++) {
                 var t = n === 1 ? 0.5 : i / (n - 1);
                 out.push({
                     x: L.izq + L.tam * 0.6 + (L.der * 0.48 - L.tam) * t,
-                    y: L.muelle + (L.H - L.muelle) * (0.35 + (i % 2) * 0.22)
+                    y: this.pisoY(i % 2 ? 0.88 : 0.58)
                 });
             }
             return out;
@@ -627,8 +635,8 @@
             if (this.fase !== 'jugar' || this.subiendo) return;
             var limIzq = L.izq + L.tam * 0.4;
             var limDer = L.der * 0.5;
-            var yMin = L.muelle + 20;
-            var yMax = L.H - L.tam * 0.45;
+            var yMin = this.pisoY(0.1);
+            var yMax = this.pisoY(1);
             this.cosas.forEach(function (a) {
                 if (a.usada || a.ocupada || !a.cont.active) return;
                 if (this.tweens.isTweening(a.cont)) return;

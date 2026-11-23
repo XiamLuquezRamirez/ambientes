@@ -40,6 +40,12 @@
         { cielo: [0x070d2b, 0x2d3d82], astro: 0xf1f3f5, astroY: 0.22, noche: 1, lejos: 0x2c3b72, medio: 0x1f2d5e, cerca: 0x17234f, suelo: 0x121c42, nieve: 0, ampL: 80, ampM: 52, tipo: 'aldea', nube: 0x4a5590 }
     ];
 
+    // Fondos del diseño: bioma 0 aldea (FONDO 2), 1 montañas nevadas (FONDO 1), 2 cañón al atardecer (FONDO 3), 3 noche (FONDO 4).
+    var FONDO_DE = [1, 0, 2, 3];
+    var ESCENA_Y = 575, DIB_H = 720;      // el tablado de la orquesta empieza en y=575 del dibujo
+    var GLOBO_DE = { tambor: 'globo3', campana: 'globo4', maracas: 'globo2', trompeta: 'globo1' };
+    var GLOBO_CY = { globo1: 171, globo2: 144.7, globo3: 157.7, globo4: 144, globo5: 157.7 };   // centro del cuerpo del globo-regalo en el dibujo
+
     function mezcla(a, b, t) {
         var c = C.Interpolate.ColorWithColor(C.ValueToColor(a), C.ValueToColor(b), 100, Math.max(0, Math.min(1, t)) * 100);
         return C.GetColor(c.r, c.g, c.b);
@@ -101,6 +107,64 @@
     }
 
     var escena = {
+        precargar: function () {
+            var self = this;
+            [1, 2, 3, 4].forEach(function (i) { if (!self.textures.exists('di_fondo' + i)) self.load.svg('di_fondo' + i, 'img/diseno/fondo' + i + '.svg', { width: 1280, height: 720 }); });
+            if (!this.textures.exists('di_arte')) this.load.svg('di_arte', 'img/diseno/arte.svg', { width: 1500, height: 706 });
+        },
+
+        /** Registra los marcos de la hoja de arte (una vez) y avisa si el diseño está disponible. */
+        prepararArte: function () {
+            var A = global.DosInstrumentosArte;
+            var tex = this.textures.exists('di_arte') ? this.textures.get('di_arte') : null;
+            this.arteOk = !!(A && tex && this.textures.exists('di_fondo1') && this.textures.exists('di_fondo2') && this.textures.exists('di_fondo3') && this.textures.exists('di_fondo4'));
+            if (!this.arteOk || tex.__diMarcos) return;
+            Object.keys(A.frames).forEach(function (n) { var m = A.frames[n]; tex.add(n, 0, m.x, m.y, m.w, m.h); });
+            tex.__diMarcos = true;
+        },
+
+        /** Imagen de un marco anclada en el punto (px, py) del dibujo; kd = px por unidad del dibujo. */
+        dd: function (nom, x, y, kd, px, py) {
+            var m = global.DosInstrumentosArte.frames[nom], wu = m.w / m.k, hu = m.h / m.k;
+            var im = this.add.image(x, y, 'di_arte', nom);
+            im.setOrigin(px == null ? 0.5 : (px - m.ox) / wu, py == null ? 0.5 : (py - m.oy) / hu);
+            im.setDisplaySize(wu * kd, hu * kd);
+            im.sx0 = im.scaleX; im.sy0 = im.scaleY;
+            return im;
+        },
+
+        /** Fondos del diseño (se mezclan al cambiar de paisaje), nubes que pasan y brillos de estrellas. */
+        montarFondoArte: function (keep) {
+            var L = this.L, self = this;
+            this.dfondos = [1, 2, 3, 4].map(function (i) { return keep(self.add.image(0, 0, 'di_fondo' + i).setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(0.5)); });
+            this.dnubes = [];
+            for (var n = 0; n < 7; n++) this.dnubes.push(keep(this.dd(n % 2 ? 'nube2' : 'nube1', 0, 0, n % 2 ? 0.27 : 0.33, null, null).setDepth(4)));
+            this.dnubes2 = [0, 1].map(function (q) { return keep(self.dd('nube2', 0, 0, 0.6, null, null).setDepth(36)); });
+        },
+
+        /** Cada cuadro: mezcla los fondos, mueve las nubes y hace titilar estrellas de noche. */
+        animarFondoArte: function (time, s, P, te, M) {
+            var L = this.L, W = L.W, de = FONDO_DE[this.biomaDe], bi = FONDO_DE[this.bioma];
+            this.dfondos.forEach(function (im, i) {
+                var a = i === bi ? te : (i === de ? 1 : 0);
+                if (de === bi) a = i === bi ? 1 : 0;
+                im.setAlpha(a).setVisible(a > 0.01).setDepth(i === bi ? 0.52 : 0.5);
+            });
+            this.dnubes.forEach(function (im, n) {
+                var par = 0.35 + (n % 4) * 0.18, nx = W + 200 - ((M * par + s * 4 + n * 290) % (W + 400)), ny = L.suelo * (0.08 + (n % 5) * 0.14);
+                im.setPosition(nx, ny).setTint(mezcla(0xffffff, P.nube, 0.6)).setAlpha(0.9 - 0.3 * P.noche);
+            });
+            this.dnubes2.forEach(function (im, q) {
+                var qx = W + 300 - ((M * 1.25 + q * 760 + s * 8) % (W + 700)), qy = L.suelo * (0.28 + q * 0.32);
+                im.setPosition(qx, qy).setTint(mezcla(0xffffff, P.nube, 0.6)).setAlpha(0.5 - 0.25 * P.noche);
+            });
+            var ag = this.astroG; ag.clear();
+            if (P.noche > 0.02) for (var e = 0; e < 28; e++) {
+                ag.fillStyle(0xffffff, P.noche * (0.15 + 0.7 * Math.abs(Math.sin(s * 1.6 + e * 2.3))));
+                ag.fillCircle((e * 977 + 50) % W, 8 + (e * 613) % (L.suelo * 0.6), 1.2 + (e % 3) * 0.7);
+            }
+        },
+
         iniciar: function () {
             this.bioma = 0; this.biomaDe = 0; this.biomaT = 1;
             this.items = [];
@@ -129,7 +193,7 @@
             var L = { W: W, H: H };
             L.pres = W >= 900 ? { x: W - 88, piso: H - 70, alto: Math.min(165, H * 0.28), giro: 0.35 } : null;
             L.der = L.pres ? W - 168 : W - 16;
-            L.escH = Math.round(Math.max(96, H * 0.15));
+            L.escH = this.arteOk ? Math.round(H * (DIB_H - ESCENA_Y) / DIB_H) : Math.round(Math.max(96, H * 0.15));
             L.suelo = H - L.escH;
             L.tamG = Math.round(Math.max(108, Math.min(158, H * 0.19)));
             L.xIni = Math.round(W * 0.3);
@@ -141,6 +205,7 @@
         },
 
         armar: function (reubicar) {
+            this.prepararArte();
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
             this.cieloG = keep(this.add.graphics().setDepth(1));
@@ -156,6 +221,7 @@
             this.escenarioG = keep(this.add.graphics().setDepth(40));
             this.escenarioFrente = keep(this.add.graphics().setDepth(46));
             this.ayudaG = keep(this.add.graphics().setDepth(19));
+            if (this.arteOk) this.montarFondoArte(keep);
             this.montarHud(keep);
             this.pintarEscenario();
             this.sembrarMotes(keep, 8, { x: 0, y: 60, w: L.W, h: L.suelo - 80, depth: 5 }, 0xffffff);
@@ -169,6 +235,7 @@
         pintarEscenario: function () {
             var L = this.L, g = this.escenarioG, f = this.escenarioFrente;
             g.clear(); f.clear();
+            if (this.arteOk) return;   // el tablado ya viene en el fondo del diseño
             var y0 = L.suelo;
             g.fillStyle(0x000000, 0.35); g.fillRect(0, y0 - 6, L.W, 8);
             g.fillStyle(0x7a4419, 1); g.fillRect(0, y0, L.W, L.escH);
@@ -190,7 +257,7 @@
         },
 
         crearMusico: function (id, animal, x, y) {
-            var L = this.L, t = Math.round(L.escH * 0.9);
+            var L = this.L, t = Math.round(Math.min(L.escH * 0.9, L.H * 0.15));
             var c = this.add.container(x, y).setDepth(42);
             var sombra = this.add.ellipse(0, t * 0.46, t * 0.8, t * 0.18, 0x000000, 0.25);
             var cuerpo = this.add.container(0, 0);
@@ -205,7 +272,15 @@
 
         /** Marcadores de la canción: un atril con '?' para el siguiente músico. */
         crearAtril: function (x, y) {
-            var L = this.L, t = Math.round(L.escH * 0.9);
+            var L = this.L, t = Math.round(Math.min(L.escH * 0.9, L.H * 0.15));
+            if (this.arteOk) {
+                var ca = this.add.container(x, y).setDepth(41);
+                var sombra = this.add.ellipse(0, t * 0.46, t * 0.6, t * 0.14, 0x000000, 0.22);
+                var aviso = this.dd('aviso', 0, t * 0.46, t * 1.25 / 462, 144, 478);
+                ca.add([sombra, aviso]);
+                this.tweens.add({ targets: aviso, scaleX: aviso.sx0 * 1.05, scaleY: aviso.sy0 * 1.05, duration: 480, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+                return { cont: ca };
+            }
             var c = this.add.container(x, y).setDepth(41);
             var g = this.add.graphics();
             g.fillStyle(0x000000, 0.22); g.fillEllipse(0, t * 0.46, t * 0.8, t * 0.18);
@@ -295,6 +370,32 @@
         },
 
         pintarGlobo: function () {
+            if (this.arteOk) { this.pintarGloboArte(); return; }
+            this.pintarGloboViejo();
+        },
+
+        /** Globo aerostático del diseño: el pollito asoma sobre la cesta y la llama sale de la boca del globo. */
+        pintarGloboArte: function () {
+            var G = this.globo, s = this.L.tamG / 130, kd = 0.6;
+            G.cuerpo.removeAll(true);
+            G.s = s;
+            G.pil = null;
+            if (this.textures.exists('el_pollito')) {
+                var pil = this.add.image(0, (404 - 190) * kd, 'el_pollito');
+                pil.setScale(34 / Math.max(pil.width, pil.height));
+                G.pil = pil; G.py = pil.y; G.cuerpo.add(pil);
+            }
+            G.aero = this.dd('aero', 0, 0, kd, 250, 190);
+            G.cuerpo.add(G.aero);
+            G.llamaG = this.add.graphics(); G.cuerpo.add(G.llamaG);
+            G.fy = (356 - 190) * kd;
+            G.cesta = (470 - 190) * kd;
+            G.cuerpo.setScale(s);
+            G.r = 62 * s;
+            G.cy = 0;
+        },
+
+        pintarGloboViejo: function () {
             var G = this.globo, s = this.L.tamG / 130;
             G.cuerpo.removeAll(true);
             G.s = s;
@@ -352,6 +453,21 @@
         },
 
         crearItem: function (id) {
+            if (!this.arteOk) return this.crearItemViejo(id);
+            var L = this.L, t = L.tamI;
+            var c = this.add.container(L.W + t, this.yLibre()).setDepth(20);
+            var nom = GLOBO_DE[id] || 'globo5';
+            var body = this.dd(nom, 0, 0, t * 1.0 / 185, 250, GLOBO_CY[nom]);
+            var disco = this.add.graphics();
+            disco.fillStyle(0xffffff, 1); disco.fillCircle(0, 0, t * 0.3);
+            disco.lineStyle(3, 0xffffff, 0.9); disco.strokeCircle(0, 0, t * 0.34);
+            var im = this.add.image(0, 0, 'el_' + id);
+            im.setScale((t * 0.44) / Math.max(im.width, im.height));
+            c.add([body, disco, im]);
+            return { tipo: 'item', id: id, cont: c, r: t * 0.5, fase: Math.random() * 6, vx: 0, vy: 0, vivo: true, y0: c.y };
+        },
+
+        crearItemViejo: function (id) {
             var L = this.L, t = L.tamI;
             var c = this.add.container(L.W + t, this.yLibre()).setDepth(20);
             var col = COL_INS[id] || 0xff6b6b;
@@ -370,6 +486,15 @@
         },
 
         crearTormenta: function () {
+            if (this.arteOk) {
+                var La = this.L;
+                var ca = this.add.container(La.W + 160, La.yMin + 10 + Math.random() * (La.yMax - La.yMin - 100)).setDepth(21);
+                var cual = Math.random() < 0.5 ? 'trueno1' : 'trueno2';
+                var nube = this.dd(cual, 0, 0, 0.4, 338, 170);
+                var rayoA = this.add.graphics();
+                ca.add([nube, rayoA]);
+                return { tipo: 'tormenta', cont: ca, rayo: rayoA, img: nube, r: 78, fase: Math.random() * 6, vivo: true, vx: 0, vy: 0, arte: true };
+            }
             var L = this.L;
             var c = this.add.container(L.W + 160, L.yMin + 10 + Math.random() * (L.yMax - L.yMin - 100)).setDepth(21);
             var g = this.add.graphics();
@@ -740,6 +865,7 @@
             var W = L.W, H = L.H, M = this.mundo;
 
             // ── Cielo, astro y estrellas ──
+            if (!this.arteOk) {
             var cg = this.cieloG; cg.clear();
             for (var b = 0; b < 20; b++) { cg.fillStyle(mezcla(P.cielo[0], P.cielo[1], b / 19), 1); cg.fillRect(0, (L.suelo / 20) * b, W, L.suelo / 20 + 1); }
             var ag = this.astroG; ag.clear();
@@ -813,8 +939,12 @@
             var tipoA = BIOMAS[this.biomaDe].tipo, tipoB = BIOMAS[this.bioma].tipo;
             if (te < 1 && tipoA !== tipoB) { dibujaCerca(tipoA, 1 - te); dibujaCerca(tipoB, te); } else dibujaCerca(tipoB, 1);
 
+            }
+
+            if (this.arteOk) { this.cieloG.clear(); this.lejosG.clear(); this.medioG.clear(); this.cercaG.clear(); this.nubesG.clear(); this.nubes2G.clear(); this.animarFondoArte(time, s, P, te, M); }
             // ── Nubes ──
             var ng = this.nubesG; ng.clear();
+            if (!this.arteOk) {
             for (var n = 0; n < 7; n++) {
                 var par = 0.35 + (n % 4) * 0.18, nx = W + 200 - ((M * par + s * 4 + n * 290) % (W + 400)), ny = L.suelo * (0.08 + (n % 5) * 0.14);
                 ng.fillStyle(P.nube, 0.9 - 0.3 * P.noche);
@@ -827,6 +957,8 @@
                 var qx = W + 300 - ((M * 1.25 + q * 760 + s * 8) % (W + 700)), qy = L.suelo * (0.28 + q * 0.32);
                 n2.fillStyle(P.nube, 0.5 - 0.25 * P.noche);
                 n2.fillEllipse(qx, qy, 330, 58); n2.fillCircle(qx - 90, qy - 14, 42); n2.fillCircle(qx, qy - 30, 56); n2.fillCircle(qx + 92, qy - 12, 40);
+            }
+
             }
 
             // ── Globo: sube hacia el dedo, baja despacio si no hay dedo, y se mueve un poco de lado ──
@@ -863,14 +995,15 @@
             if (fl && fl.active) {
                 fl.clear();
                 if (G.llama > 0.03) {
-                    var fh = (14 + 12 * Math.sin(s * 30) + 7 * Math.sin(s * 53)) * G.llama;
-                    fl.fillStyle(0xff922b, 0.9 * G.llama); fl.fillTriangle(-9, 76, 9, 76, 0, 76 + fh * 1.5);
-                    fl.fillStyle(0xffe066, 0.95 * G.llama); fl.fillTriangle(-5, 76, 5, 76, 0, 76 + fh);
-                    fl.fillStyle(0xffffff, 0.9 * G.llama); fl.fillTriangle(-2, 76, 2, 76, 0, 76 + fh * 0.5);
-                    fl.fillStyle(0xffd43b, 0.18 * G.llama); fl.fillCircle(0, 48, 62);
+                    var fh = (14 + 12 * Math.sin(s * 30) + 7 * Math.sin(s * 53)) * G.llama, fy = G.fy || 76;
+                    fl.fillStyle(0xff922b, 0.9 * G.llama); fl.fillTriangle(-9, fy, 9, fy, 0, fy + fh * 1.5);
+                    fl.fillStyle(0xffe066, 0.95 * G.llama); fl.fillTriangle(-5, fy, 5, fy, 0, fy + fh);
+                    fl.fillStyle(0xffffff, 0.9 * G.llama); fl.fillTriangle(-2, fy, 2, fy, 0, fy + fh * 0.5);
+                    fl.fillStyle(0xffd43b, 0.18 * G.llama); fl.fillCircle(0, fy - 28, 62);
                 }
             }
-            if (G.pil && G.pil.active) G.pil.y = 90 + Math.sin(s * 2.4) * 1.5 - G.llama * 2;
+            if (G.pil && G.pil.active) G.pil.y = (G.py || 90) + Math.sin(s * 2.4) * 1.5 - G.llama * 2;
+            if (G.aero && G.aero.active) G.aero.scaleY = G.aero.sy0 * (1 + Math.sin(s * 2.2) * 0.01 + G.llama * 0.012);
             // Sombra del globo sobre la capa del paisaje (más pequeña cuanto más alto).
             var sg = this.efectosG; sg.clear();
             var alt = Math.max(0, Math.min(1, (L.yMax - gc.y) / (L.yMax - L.yMin)));
@@ -892,7 +1025,8 @@
                     o.y0 = Math.max(L.yMin - 20, Math.min(L.yMax + 10, o.y0));
                 } else {
                     var ry = o.rayo; ry.clear();
-                    if (o.rayoT && time - o.rayoT < 260 && Math.floor(time / 60) % 2 === 0) { ry.fillStyle(0xfff3bf, 1); ry.fillPoints([{ x: 0, y: 14 }, { x: -16, y: 52 }, { x: -2, y: 50 }, { x: -14, y: 90 }, { x: 18, y: 38 }, { x: 4, y: 40 }, { x: 12, y: 14 }], true); }
+                    if (o.arte) { var fla = o.rayoT && time - o.rayoT < 260 && Math.floor(time / 60) % 2 === 0; if (fla) o.img.setTint(0xfff3bf); else o.img.clearTint(); o.img.scaleY = o.img.sy0 * (1 + Math.sin(s * 2 + o.fase) * 0.02); }
+                    if (!o.arte && o.rayoT && time - o.rayoT < 260 && Math.floor(time / 60) % 2 === 0) { ry.fillStyle(0xfff3bf, 1); ry.fillPoints([{ x: 0, y: 14 }, { x: -16, y: 52 }, { x: -2, y: 50 }, { x: -14, y: 90 }, { x: 18, y: 38 }, { x: 4, y: 40 }, { x: 12, y: 14 }], true); }
                     else if (Math.sin(s * 0.7 + o.fase) > 0.985) o.rayoT = time;
                     for (var d2 = 0; d2 < 3; d2++) { var rx = -60 + d2 * 60 + ((s * 90 + d2 * 17) % 30), rya = 24 + ((s * 220 + d2 * 41) % 70); ry.lineStyle(2, 0x74c0fc, 0.7); ry.lineBetween(rx, rya, rx - 5, rya + 14); }
                 }
@@ -914,7 +1048,7 @@
 
             // ── Pista de aterrizaje: bajar y posar el globo ──
             if (this.pad && this.completa && this.fase === 'jugar' && !this.llegando && !this.aterrizando) {
-                var pd = this.pad.cont, cestaY = gc.y + 124 * sG;
+                var pd = this.pad.cont, cestaY = gc.y + (G.cesta || 124) * sG;
                 var dxp = Math.abs(gc.x - pd.x), sobre = dxp < this.pad.w * 0.42, baja = cestaY > pd.y - 26;
                 if (sobre && baja && Math.abs(this.vy) < 120) { this.aterrizar(); }
             }
@@ -946,7 +1080,7 @@
             var G = this.globo, gc = G.cont, L = this.L, pd = this.pad.cont, sG = G.s, self = this;
             this.vx = 0; this.vy = 0;
             K.tono({ f: 300, f2: 180, dur: 0.25, vol: 0.05 });
-            await tw(this, { targets: gc, x: pd.x, y: pd.y - 124 * sG + 18, duration: 600, ease: 'Sine.easeOut' });
+            await tw(this, { targets: gc, x: pd.x, y: pd.y - (G.cesta || 124) * sG + 18, duration: 600, ease: 'Sine.easeOut' });
             await tw(this, { targets: G.cuerpo, scaleY: sG * 0.9, scaleX: sG * 1.05, duration: 220, yoyo: true });
             Ut.estallido(this, pd.x, pd.y - 10, { n: 10, tex: 'chispa', tam: 20, dist: 110, depth: 60, colores: [0xe9d8a6, 0xffffff], angulo: -Math.PI / 2, abanico: 2.4, gravedad: 70 });
             if (G.pil && G.pil.active) this.tweens.add({ targets: G.pil, y: 78, duration: 160, yoyo: true, repeat: 2 });

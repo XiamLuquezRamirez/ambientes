@@ -36,6 +36,11 @@
         { nombre: 'noche', cielo: [0x060b26, 0x2a3a78], astro: 0xf1f3f5, astroY: 0.22, noche: 1, lejos: 0x2a3566, medio: 0x1c274f, suelo: 0x3f4466, suelo2: 0x343958, hierba: 0x1f2a46, arbol: 'acacia', nubes: 0x46508a }
     ];
 
+    // Fondos del diseño (1280x720): 0 desierto dorado, 1 selva, 2 sabana al atardecer, 3 noche con luna.
+    var DIB = { w: 1280, h: 720, sol: [[639, 172], null, null, [600, 191]] };
+    // Cartel de madera: el tablero va de x=52.5 a 738 y de y=168 a 439 (centro 395, 303) en un dibujo de 780x500.
+    var CARTEL = { w: 780.53, h: 500, tabW: 685.5, cx: 395.3, cy: 303.5 };
+
     function mezcla(a, b, t) {
         var c = C.Interpolate.ColorWithColor(C.ValueToColor(a), C.ValueToColor(b), 100, Math.max(0, Math.min(1, t)) * 100);
         return C.GetColor(c.r, c.g, c.b);
@@ -50,6 +55,53 @@
     function hash(i) { var x = Math.sin(i * 12.9898 + 4.1) * 43758.5453; return x - Math.floor(x); }
 
     var escena = {
+        precargar: function () {
+            var self = this;
+            [1, 2, 3, 4].forEach(function (i) { if (!self.textures.exists('sd_fondo' + i)) self.load.svg('sd_fondo' + i, 'img/diseno/fondo' + i + '.svg', { width: 1280, height: 720 }); });
+            if (!this.textures.exists('sd_cartel')) this.load.svg('sd_cartel', 'img/diseno/cartel.svg', { width: 940, height: 602 });
+        },
+
+        prepararArte: function () {
+            this.arteOk = [1, 2, 3, 4].every(function (i) { return this.textures.exists('sd_fondo' + i); }, this) && this.textures.exists('sd_cartel');
+        },
+
+        /** Los cuatro fondos del diseño, apilados: se mezclan al cambiar de lugar y se mecen despacio. */
+        montarFondoArte: function (keep) {
+            var L = this.L, self = this;
+            this.dfondos = [1, 2, 3, 4].map(function (i) {
+                var im = keep(self.add.image(0, 0, 'sd_fondo' + i).setOrigin(0, 0).setDisplaySize(L.W * 1.05, L.H).setDepth(0.5));
+                return im;
+            });
+        },
+
+        animarFondoArte: function (time, s, P, te) {
+            var L = this.L, W = L.W, de = this.biomaDe, bi = this.bioma;
+            var x = -0.025 * W + Math.sin(s * 0.12) * 0.02 * W;
+            var pesos = [0, 0, 0, 0];
+            pesos[de] += 1 - te; pesos[bi] += te;
+            this.dfondos.forEach(function (im, i) {
+                var a = i === bi ? te : (i === de ? 1 : 0);
+                if (de === bi) a = i === bi ? 1 : 0;
+                im.setPosition(x, 0).setAlpha(a).setVisible(a > 0.01).setDepth(i === bi ? 0.52 : 0.5);
+            });
+            var ag = this.astroG; ag.clear();
+            // Brillo que late alrededor del sol y de la luna del diseño.
+            [0, 3].forEach(function (i) {
+                if (pesos[i] < 0.02) return;
+                var p = DIB.sol[i]; if (!p) return;
+                var cx = x + p[0] / DIB.w * W * 1.05, cy = p[1] / DIB.h * L.H;
+                ag.fillStyle(i === 3 ? 0xdfe8ff : 0xfff3bf, pesos[i] * (0.1 + 0.05 * Math.sin(s * 1.8)));
+                ag.fillCircle(cx, cy, 96 + 6 * Math.sin(s * 1.8));
+                ag.fillStyle(i === 3 ? 0xdfe8ff : 0xfff3bf, pesos[i] * (0.07 + 0.04 * Math.sin(s * 1.8 + 1)));
+                ag.fillCircle(cx, cy, 150);
+            });
+            // Estrellas que titilan en la noche.
+            if (pesos[3] > 0.02) for (var e = 0; e < 40; e++) {
+                ag.fillStyle(0xffffff, pesos[3] * (0.12 + 0.7 * Math.max(0, Math.sin(s * 1.7 + e * 2.3))));
+                ag.fillCircle((e * 977 + 50) % W, 8 + (e * 613) % (L.horiz * 0.8), 1.3 + (e % 3) * 0.7);
+            }
+        },
+
         iniciar: function () {
             this.bioma = 0; this.biomaDe = 0; this.biomaT = 1;
             this.animales = [];
@@ -93,8 +145,10 @@
         },
 
         armar: function (reubicar) {
+            this.prepararArte();
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            if (this.arteOk) this.montarFondoArte(keep);
             this.cieloG = keep(this.add.graphics().setDepth(1));
             this.astroG = keep(this.add.graphics().setDepth(1.5));
             this.lejosG = keep(this.add.graphics().setDepth(2));
@@ -139,14 +193,23 @@
             g.clear();
             (this.letreroObjs || []).forEach(function (o) { if (o.active) o.destroy(); });
             this.letreroObjs = [];
+            if (this.cartelImg && this.cartelImg.active && (!this.nv || !this.nv.guests)) { this.cartelImg.destroy(); this.cartelImg = null; }
             if (!this.nv || !this.nv.guests) return;
             var n = this.nv.guests.length, paso = 78, a = (n + 1) * paso + 50;
             var x0 = L.letrero.x - a / 2, y0 = L.letrero.y - 44;
-            g.lineStyle(4, 0x5c3312, 1); g.lineBetween(x0 + 24, y0, x0 + 24, 0); g.lineBetween(x0 + a - 24, y0, x0 + a - 24, 0);
-            g.fillStyle(0x000000, 0.25); g.fillRoundedRect(x0 + 3, y0 + 5, a, 92, 16);
-            g.fillStyle(0x8b5524, 1); g.fillRoundedRect(x0, y0, a, 92, 16);
-            g.fillStyle(0xa8642e, 1); g.fillRoundedRect(x0 + 6, y0 + 6, a - 12, 80, 12);
-            var t = this.add.text(L.letrero.x, y0 + 14, 'INVITADOS', { fontFamily: 'Arial Black, Arial', fontSize: '15px', color: '#fff3bf' }).setOrigin(0.5).setDepth(63);
+            if (this.cartelImg && this.cartelImg.active) this.cartelImg.destroy();
+            this.cartelImg = null;
+            if (this.arteOk) {
+                var kc = a / CARTEL.tabW;
+                this.cartelImg = this.add.image(L.letrero.x, y0 + 46, 'sd_cartel').setOrigin(CARTEL.cx / CARTEL.w, CARTEL.cy / CARTEL.h).setDisplaySize(CARTEL.w * kc, CARTEL.h * kc).setDepth(61.9);
+                this.cartelImg.kc = kc; this.cartelImg.sx0 = this.cartelImg.scaleX; this.cartelImg.sy0 = this.cartelImg.scaleY;
+            } else {
+                g.lineStyle(4, 0x5c3312, 1); g.lineBetween(x0 + 24, y0, x0 + 24, 0); g.lineBetween(x0 + a - 24, y0, x0 + a - 24, 0);
+                g.fillStyle(0x000000, 0.25); g.fillRoundedRect(x0 + 3, y0 + 5, a, 92, 16);
+                g.fillStyle(0x8b5524, 1); g.fillRoundedRect(x0, y0, a, 92, 16);
+                g.fillStyle(0xa8642e, 1); g.fillRoundedRect(x0 + 6, y0 + 6, a - 12, 80, 12);
+            }
+            var t = this.add.text(L.letrero.x, y0 + 14, 'INVITADOS', { fontFamily: 'Arial Black, Arial', fontSize: '15px', color: this.arteOk ? '#6c3521' : '#fff3bf' }).setOrigin(0.5).setDepth(63);
             this.letreroObjs.push(t);
             for (var i = 0; i < n; i++) {
                 var cx = x0 + 25 + paso * (i + 0.5) + 14, cy = y0 + 56;
@@ -164,10 +227,10 @@
             var q = this.add.text(qx, qy, '?', { fontFamily: 'Arial Black, Arial', fontSize: '34px', color: '#e03131' }).setOrigin(0.5).setDepth(63);
             this.tweens.add({ targets: q, scale: { from: 1, to: 1.25 }, duration: 520, yoyo: true, repeat: -1 });
             this.letreroObjs.push(q);
-            var t2 = this.add.text(qx, y0 + 14, 'INTRUSO', { fontFamily: 'Arial Black, Arial', fontSize: '12px', color: '#ffb3b3' }).setOrigin(0.5).setDepth(63);
+            var t2 = this.add.text(qx, y0 + 14, 'INTRUSO', { fontFamily: 'Arial Black, Arial', fontSize: '12px', color: this.arteOk ? '#b02a2a' : '#ffb3b3' }).setOrigin(0.5).setDepth(63);
             this.letreroObjs.push(t2);
             this.letreroPos = { x0: x0, paso: paso, y: y0 + 56, n: n };
-            this.ignorarEnLente(this.letreroObjs);
+            this.ignorarEnLente(this.cartelImg ? this.letreroObjs.concat([this.cartelImg]) : this.letreroObjs);
         },
 
         resaltaInvitado: function (k) {
@@ -477,7 +540,14 @@
             var self = this;
             return [function () {
                 var intr = self.animales.filter(function (a) { return a.vivo && a.tipo === 'intruso'; })[0];
-                if (!intr) return null;
+                if (!intr) {
+                    // La demo no espera al desfile: deja la escena limpia y pone al intruso a la vista.
+                    self.spawnOn = false;
+                    self.animales = self.animales.filter(function (a) { if (a.tipo === 'invitado') { a.cont.destroy(); return false; } return true; });
+                    self.sinIntruso = self.gapObj; self.intrusoVivo = false;
+                    intr = self.lanzar();
+                    intr.cont.x = self.L.W * 0.7;
+                }
                 intr.lento = true;
                 var v = self.visor;
                 return {
@@ -590,6 +660,7 @@
             var W = L.W, H = L.H, M = this.mundo;
 
             // ── Cielo y astro ──
+if (!this.arteOk) {
             var cg = this.cieloG; cg.clear();
             for (var b = 0; b < 16; b++) { cg.fillStyle(mezcla(P.cielo[0], P.cielo[1], b / 15), 1); cg.fillRect(0, (L.horiz / 16) * b, W, L.horiz / 16 + 1); }
             var ag = this.astroG; ag.clear();
@@ -638,8 +709,12 @@
                     for (var jn = 0; jn < 5; jn++) { var jx = x + (jn - 2) * 12, jh = 50 + ((i + jn) % 3) * 20; mg.lineStyle(3, 0x4f7a3a, 1); mg.beginPath(); mg.moveTo(jx, yb); mg.lineTo(jx + Math.sin(s * 1.4 + jn + i) * 4, yb - jh); mg.strokePath(); mg.fillStyle(0x6d4c2a, 1); mg.fillRoundedRect(jx - 3, yb - jh - 14, 6, 16, 3); }
                 }
             }
+}
+
+            if (this.arteOk) { this.cieloG.clear(); this.lejosG.clear(); this.medioG.clear(); this.sueloG.clear(); this.animarFondoArte(time, s, P, te); }
             // ── Suelo / pasarela y brillo del agua (laguna) ──
             var sg = this.sueloG; sg.clear();
+if (!this.arteOk) {
             var altoS = H - L.horiz;
             for (var gb = 0; gb < 12; gb++) { sg.fillStyle(mezcla(mezcla(P.suelo, 0xffe9b0, 0.25), mezcla(P.suelo2, 0x000000, 0.35), gb / 11), 1); sg.fillRect(0, L.horiz + altoS / 12 * gb, W, altoS / 12 + 1); }
             // Camino de tierra por donde pasa el desfile, con huellas.
@@ -665,6 +740,8 @@
             }
             sg.lineStyle(2, 0x000000, 0.08);
             for (var ln = 0; ln < 18; ln++) { var lx = ((ln * 120 - M * 1.0) % (W + 120) + W + 120) % (W + 120) - 60; sg.lineBetween(lx, L.carriles[0] - 40, lx - 50, H); }
+}
+
             // Mechones de hierba del suelo (parallax cercano), por detrás y por delante de los animales.
             var sh = this.sombraG; sh.clear();
             for (var gt = 0; gt < 26; gt++) {

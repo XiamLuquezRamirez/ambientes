@@ -28,6 +28,14 @@
     var POR_NIVEL = [['cubo'], ['cubo', 'tablon'], ['cubo', 'tablon', 'alto'], ['cubo', 'tablon', 'alto', 'pequeno']];
     var COLORES = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8, 0xff922b, 0x20c997, 0xf783ac];
 
+    var ARTE = { w: 1280, h: 720, suelo: 680, pedTop: 606, pedX: 532.75, pedW: 272.5, elfoX: 125, elfoY: 686 };
+    // Cajas de regalo del diseño: centro y tamaño del cuerpo (sin lazo) en unidades del dibujo.
+    var CAJAS = {
+        caja1: { cx: 250, cy: 282.1, bw: 284.9, bh: 292.4 },
+        caja2: { cx: 342.5, cy: 298, bw: 575.7, bh: 238 },
+        caja3: { cx: 342.5, cy: 250, bw: 568.5, bh: 205.2 }
+    };
+
     function colorDe(id) {
         var h = 0;
         for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
@@ -35,6 +43,43 @@
     }
 
     var escena = {
+        precargar: function () {
+            if (!this.textures.exists('tr_fondo')) this.load.svg('tr_fondo', 'img/diseno/fondo.svg', { width: 1280, height: 720 });
+            if (!this.textures.exists('tr_arte')) this.load.svg('tr_arte', 'img/diseno/arte.svg', { width: 1400, height: 637 });
+        },
+
+        prepararArte: function () {
+            var A = global.TresSonidosArte;
+            var tex = this.textures.exists('tr_arte') ? this.textures.get('tr_arte') : null;
+            this.arteOk = !!(A && tex && this.textures.exists('tr_fondo'));
+            if (!this.arteOk || tex.__trMarcos) return;
+            Object.keys(A.frames).forEach(function (n) { var m = A.frames[n]; tex.add(n, 0, m.x, m.y, m.w, m.h); });
+            tex.__trMarcos = true;
+        },
+
+        /** Imagen de un marco anclada en el punto (px, py) del dibujo, con escala propia en x e y. */
+        ddxy: function (nom, x, y, kx, ky, px, py) {
+            var m = global.TresSonidosArte.frames[nom], wu = m.w / m.k, hu = m.h / m.k;
+            var im = this.add.image(x, y, 'tr_arte', nom);
+            im.setOrigin(px == null ? 0.5 : (px - m.ox) / wu, py == null ? 0.5 : (py - m.oy) / hu);
+            im.setDisplaySize(wu * kx, hu * ky);
+            im.sx0 = im.scaleX; im.sy0 = im.scaleY;
+            return im;
+        },
+
+        /** Fondo del taller, árbol, lámpara y pedestal del diseño. */
+        montarFondoArte: function (keep) {
+            var L = this.L, sx = L.W / ARTE.w, sy = L.H / ARTE.h, self = this;
+            var A = global.TresSonidosArte.frames;
+            keep(this.add.image(0, 0, 'tr_fondo').setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(0.5));
+            var esquina = function (nom, depth) { var m = A[nom]; return keep(self.ddxy(nom, m.ox * sx, m.oy * sy, sx, sy, m.ox, m.oy).setDepth(depth)); };
+            this.darbol = esquina('f_arbol', 1.5);
+            this.dbanco = esquina('f_banco', 2);
+            this.dlampara = keep(this.ddxy('f_lampara', 1265 * sx, 100 * sy, sx, sy, 1265, 100).setDepth(1.6));
+            // Ventana del taller (cristal) para la nieve.
+            this.ventana = { x0: 582 * sx, w: 140 * sx, y0: 135 * sy, h: 340 * sy };
+        },
+
         iniciar: function () {
             this.bloques = [];
             this.cola = [];
@@ -73,13 +118,25 @@
             L.cinta = { x0: Math.round(W * 0.5), x1: L.der - 20, y: Math.round(H * 0.66) };
             L.tolva = { x: L.cinta.x1 - 60, y: Math.round(H * 0.3) };
             L.caja = { x: Math.round(W * 0.14), y: Math.round(H * 0.5) };
+            if (this.arteOk) {
+                // El tablado, el pedestal rojo y el suelo siguen al dibujo del diseño.
+                L.banco = Math.round(H * ARTE.suelo / ARTE.h);
+                L.ped = { x: Math.round(W * ARTE.pedX / ARTE.w), w: Math.round(W * ARTE.pedW / ARTE.w) };
+                L.ped.top = Math.round(H * ARTE.pedTop / ARTE.h);
+                L.ped.alto = L.banco - L.ped.top;
+                L.cinta = { x0: Math.round(L.ped.x + L.ped.w / 2 + 90), x1: L.der - 20, y: Math.round(H * 0.66) };
+                L.tolva = { x: L.cinta.x1 - 140, y: Math.round(H * 0.28) };
+                L.caja = { x: Math.round(W * 0.268), y: L.banco - 40 };
+            }
             L.bocina = { x: 48, y: Math.round(H * 0.2), r: 30 };
             return L;
         },
 
         armar: function (reubicar) {
+            this.prepararArte();
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            if (this.arteOk) this.montarFondoArte(keep);
             this.paredG = keep(this.add.graphics().setDepth(1));
             this.dinG = keep(this.add.graphics().setDepth(2));
             this.bancoG = keep(this.add.graphics().setDepth(45));
@@ -102,6 +159,7 @@
         pintarTaller: function () {
             var L = this.L, g = this.paredG;
             g.clear();
+if (!this.arteOk) {
             // Pared de madera verde azulada con tablas.
             g.fillStyle(0x2c6e6a, 1); g.fillRect(0, 0, L.W, L.H);
             for (var x = 0; x < L.W; x += 78) { g.fillStyle(x % 156 ? 0x2f7571 : 0x2a6965, 1); g.fillRect(x, 0, 78, L.banco); g.lineStyle(2, 0x1f4f4c, 0.7); g.lineBetween(x, 0, x, L.banco); }
@@ -144,13 +202,15 @@
             g.fillStyle(0xf0c27f, 1); g.fillRoundedRect(P.x - P.w / 2, P.top, P.w, 10, { tl: 10, tr: 10, bl: 0, br: 0 });
             g.lineStyle(3, 0x8b5524, 1); g.strokeRoundedRect(P.x - P.w / 2, P.top, P.w, P.alto + 6, 10);
             g.fillStyle(0xfab005, 1); g.fillTriangle(P.x - 14, P.top + 18, P.x + 14, P.top + 18, P.x, P.top + 30);
+}
+
             // Cinta transportadora (se mueve en dinG) y tolva.
             var C = L.cinta;
             g.fillStyle(0x495057, 1); g.fillRoundedRect(C.x0 - 16, C.y, C.x1 - C.x0 + 40, 26, 13);
             g.fillStyle(0x343a40, 1); g.fillRect(C.x0 + 20, C.y + 24, 14, L.banco - C.y - 24); g.fillRect(C.x1 - 40, C.y + 24, 14, L.banco - C.y - 24);
             var T = L.tolva;
-            g.fillStyle(0x6d3d16, 1); g.fillPoints([{ x: T.x - 62, y: T.y - 50 }, { x: T.x + 62, y: T.y - 50 }, { x: T.x + 30, y: T.y + 30 }, { x: T.x - 30, y: T.y + 30 }], true);
-            g.fillStyle(0x8b5524, 1); g.fillRect(T.x - 70, T.y - 56, 140, 12);
+            g.fillStyle(this.arteOk ? 0x0f6f63 : 0x6d3d16, 1); g.fillPoints([{ x: T.x - 62, y: T.y - 50 }, { x: T.x + 62, y: T.y - 50 }, { x: T.x + 30, y: T.y + 30 }, { x: T.x - 30, y: T.y + 30 }], true);
+            g.fillStyle(this.arteOk ? 0xd90b3c : 0x8b5524, 1); g.fillRect(T.x - 70, T.y - 56, 140, 12);
             g.fillStyle(0x343a40, 1); g.fillRect(T.x - 4, T.y - 140, 8, 90);
             g.lineStyle(3, 0x343a40, 1); g.lineBetween(T.x, T.y - 140, T.x, 0);
         },
@@ -176,7 +236,15 @@
             bailarina.setPosition(0, -4);
             c.add(bailarina);
             this.caja = { cont: c, bailarina: bailarina, giro: 0, luz: 0 };
+            if (this.arteOk) c.setScale(0.8);
             // Duende: gorro rojo, barba blanca y delantal, a la izquierda del pedestal.
+            if (this.arteOk) {
+                var ea = keep(this.add.container(Math.round(L.W * ARTE.elfoX / ARTE.w), L.banco - 4).setDepth(9));
+                var kk = L.H / ARTE.h;
+                ea.add(this.ddxy('f_elfo', 0, (ARTE.elfoY - ARTE.suelo + 4) * kk, kk, kk, ARTE.elfoX, ARTE.elfoY));
+                this.elfo = { cont: ea, brazos: [], base: ea.y };
+            }
+            if (!this.arteOk) {
             var e = keep(this.add.container(Math.round(L.W * 0.17), L.banco - 4).setDepth(9));
             var d = this.add.graphics();
             d.fillStyle(0x000000, 0.2); d.fillEllipse(0, 4, 70, 14);
@@ -195,6 +263,8 @@
             var bra2 = this.add.graphics(); bra2.fillStyle(0x2f9e44, 1); bra2.fillRoundedRect(-32, -4, 40, 12, 6); bra2.fillStyle(0xffe0c2, 1); bra2.fillCircle(-34, 2, 7); bra2.setPosition(30, -56);
             e.add([bra1, bra2]);
             this.elfo = { cont: e, brazos: [bra1, bra2], base: e.y };
+}
+
         },
 
         elfoAnimar: function (tipo) {
@@ -256,6 +326,7 @@
             M.Composite.add(this.motor.world, cuerpo);
             var c = this.add.container(x, y).setDepth(30);
             var col = colorDe(id);
+            if (this.arteOk) return this.crearBloqueArte(id, tipo, cuerpo, c, w, h);
             var g = this.add.graphics();
             g.fillStyle(0x000000, 0.2); g.fillRoundedRect(-w / 2 + 3, -h / 2 + 4, w, h, 10);
             g.fillStyle(col, 1); g.fillRoundedRect(-w / 2, -h / 2, w, h, 10);
@@ -271,6 +342,28 @@
             im.setScale((lado * 0.82) / Math.max(im.width, im.height));
             var halo = this.add.graphics();
             c.add([g, im, halo]);
+            var b = { img: im, id: id, tipo: tipo, body: cuerpo, cont: c, w: w, h: h, halo: halo, estado: null, quieto: 0, asentado: false, ultimoSonido: 0, spawn: this.time.now };
+            cuerpo.plugin = { bloque: b };
+            this.bloques.push(b);
+            return b;
+        },
+
+        /** Caja de regalo del diseño: el cuerpo físico es el mismo; solo cambia cómo se ve. */
+        crearBloqueArte: function (id, tipo, cuerpo, c, w, h) {
+            var par = { nom: 'caja1', rot: false };
+            if (tipo === 'tablon') par.nom = (colorDe(id) % 2) ? 'caja2' : 'caja3';
+            if (tipo === 'alto') { par.nom = 'caja3'; par.rot = true; }
+            var D = CAJAS[par.nom];
+            var spr = this.ddxy(par.nom, 0, 0, (par.rot ? h : w) / D.bw, (par.rot ? w : h) / D.bh, D.cx, D.cy);
+            if (par.rot) spr.setRotation(Math.PI / 2);
+            var rr = Math.min(w, h) * 0.3;
+            var disco = this.add.graphics();
+            disco.fillStyle(0xffffff, 1); disco.fillCircle(0, 0, rr);
+            disco.lineStyle(3, 0xffffff, 0.85); disco.strokeCircle(0, 0, rr + 3);
+            var im = this.add.image(0, 0, 'el_' + id);
+            im.setScale((rr * 1.5) / Math.max(im.width, im.height));
+            var halo = this.add.graphics();
+            c.add([spr, disco, im, halo]);
             var b = { img: im, id: id, tipo: tipo, body: cuerpo, cont: c, w: w, h: h, halo: halo, estado: null, quieto: 0, asentado: false, ultimoSonido: 0, spawn: this.time.now };
             cuerpo.plugin = { bloque: b };
             this.bloques.push(b);
@@ -627,25 +720,39 @@
 
             // ── Dibujo dinámico: engranajes, péndulo del reloj, cinta que gira, nieve, luces ──
             var g = this.dinG; g.clear();
+if (!this.arteOk) {
             // Engranajes de la pared.
             [[L.W * 0.5, L.H * 0.1, 54, 1], [L.W * 0.55, L.H * 0.1 + 66, 34, -1.6]].forEach(function (e) {
                 g.fillStyle(0xb5803f, 0.9);
                 for (var t = 0; t < 10; t++) { var a = s * e[3] * 0.5 + t * Math.PI / 5; g.fillCircle(e[0] + Math.cos(a) * e[2], e[1] + Math.sin(a) * e[2], e[2] * 0.2); }
                 g.fillCircle(e[0], e[1], e[2] * 0.85); g.fillStyle(0x7a4419, 1); g.fillCircle(e[0], e[1], e[2] * 0.3);
             });
+}
+
             // Cinta: tiras que avanzan hacia la izquierda.
             g.fillStyle(0x212529, 1); g.fillRoundedRect(C.x0 - 16, C.y - 4, C.x1 - C.x0 + 40, 10, 5);
             g.fillStyle(0x495057, 1);
             for (var x = C.x0 - 10 + (-(s * 90) % 28); x < C.x1 + 20; x += 28) { if (x > C.x0 - 12) g.fillRect(x, C.y - 3, 12, 8); }
             [C.x0, C.x1].forEach(function (rx) { g.fillStyle(0x6c757d, 1); g.fillCircle(rx, C.y + 8, 15); g.lineStyle(3, 0x343a40, 1); var a = s * 6; g.lineBetween(rx - Math.cos(a) * 11, C.y + 8 - Math.sin(a) * 11, rx + Math.cos(a) * 11, C.y + 8 + Math.sin(a) * 11); });
+            if (this.arteOk) {   // nieve que cae por la ventana del diseño
+                var Vn = this.ventana;
+                g.fillStyle(0xffffff, 0.9);
+                for (var cn = 0; cn < 26; cn++) {
+                    var fxn = Vn.x0 + Vn.w * (0.5 + Math.sin(cn * 2.7 + s * 0.6) * 0.45), fyn = Vn.y0 + ((s * (16 + (cn % 4) * 6) + cn * 37) % Vn.h);
+                    g.fillCircle(fxn, fyn, 1.6 + (cn % 3) * 0.5);
+                }
+            }
+            if (!this.arteOk) {
             // Nieve que cae por la ventana.
             var V = this.ventana;
             g.fillStyle(0xffffff, 0.9);
             for (var c = 0; c < 18; c++) { var fx = V.x + Math.sin(c * 2.7 + s * 0.6) * V.r * 0.85, fy = V.y - V.r + ((s * (14 + (c % 4) * 5) + c * 23) % (V.r * 2)); if (Math.hypot(fx - V.x, fy - V.y) < V.r - 3) g.fillCircle(fx, fy, 1.6 + (c % 3) * 0.5); }
+}
+
             // Bombillas que cuentan los sonidos de la canción (se vuelven doradas con cada piso bien puesto).
             var n = this.song ? this.song.length : 0;
             if (n) {
-                var bx0 = L.W * 0.1, by0 = L.H * 0.3 - 40;
+                var bx0 = this.arteOk ? L.W * 0.34 : L.W * 0.1, by0 = this.arteOk ? L.H * 0.075 : L.H * 0.3 - 40;
                 g.lineStyle(3, 0x343a40, 1); g.beginPath(); g.moveTo(bx0 - 30, by0 - 24);
                 for (var q2 = 0; q2 <= 1.0001; q2 += 0.1) g.lineTo(bx0 - 30 + q2 * (n * 62 + 20), by0 - 24 + Math.sin(q2 * Math.PI) * 18);
                 g.strokePath();
@@ -667,6 +774,18 @@
                 var f = Math.max(0, 1 - (time - CJ.luz) / 500);
                 if (f > 0) { g.fillStyle(0xffd43b, 0.35 * f); g.fillCircle(L.caja.x, L.caja.y - 22, 64 + 14 * f); }
             }
+            if (this.arteOk) {   // el árbol brilla, la lámpara se mece
+                var kx = L.W / ARTE.w, ky = L.H / ARTE.h;
+                g.fillStyle(0xffe066, 0.16 + 0.1 * Math.sin(s * 3)); g.fillCircle(151 * kx, 148 * ky, 26 * kx);
+                var tcol = [0xffffff, 0xffe066, 0xff8fb1, 0x8fe3ff];
+                for (var tq = 0; tq < 20; tq++) {
+                    var tyy = 190 + ((tq * 137) % 430), tmed = (tyy - 140) / 500 * 112, txx = 160 + ((((tq * 61) % 100) / 50) - 1) * tmed;
+                    g.fillStyle(tcol[tq % 4], 0.12 + 0.6 * Math.max(0, Math.sin(s * 2.2 + tq * 1.7)));
+                    g.fillCircle(txx * kx, tyy * ky, 2.3 * kx);
+                }
+                if (this.dlampara && this.dlampara.active) this.dlampara.angle = Math.sin(s * 1.1) * 0.8;
+            }
+            if (!this.arteOk) {
             // Péndulo del cuco / reloj de pared y lámpara colgante.
             var rx = L.W * 0.46, ry = L.H * 0.12;
             g.fillStyle(0x7a4419, 1); g.fillRoundedRect(rx - 34, ry - 52, 68, 100, 12); g.fillTriangle(rx - 42, ry - 50, rx + 42, ry - 50, rx, ry - 92);
@@ -680,6 +799,8 @@
             g.fillStyle(0xd9a05b, 1); g.fillTriangle(Pq.x - 52, L.H * 0.1 + 28, Pq.x + 52, L.H * 0.1 + 28, Pq.x, L.H * 0.1 - 10);
             g.fillStyle(0xfff3bf, 1); g.fillEllipse(Pq.x, L.H * 0.1 + 30, 48, 10);
             g.fillStyle(0xfff3bf, 0.07 + 0.015 * Math.sin(s * 3)); g.fillTriangle(Pq.x - 40, L.H * 0.1 + 32, Pq.x + 40, L.H * 0.1 + 32, Pq.x + 150, Pq.top); g.fillTriangle(Pq.x - 40, L.H * 0.1 + 32, Pq.x - 150, Pq.top, Pq.x + 150, Pq.top);
+}
+
             // Sombra donde caería el bloque que sostienes y marca del dedo.
             var sh = this.sombraG; sh.clear();
             var dg = this.dedoG; dg.clear();

@@ -51,10 +51,38 @@
             bajo: (a.bajo ? 1 : 0) * (1 - t) + (b.bajo ? 1 : 0) * t
         };
     }
-    var CASCO = [{ x: -88, y: -26 }, { x: 70, y: -26 }, { x: 102, y: -46 }, { x: 86, y: 4 }, { x: -82, y: 4 }, { x: -96, y: -40 }];
+    var CASCO = [{ x: -80, y: -30 }, { x: 62, y: -30 }, { x: 84, y: -42 }, { x: 64, y: 4 }, { x: -62, y: 4 }, { x: -82, y: -34 }];
+    // Barco del diseño: punto de anclaje en el dibujo (centro del casco sobre la línea de agua) y px por unidad del dibujo.
+    var KB = 0.68, BOX = 255.7, BOY = 418;
+    var ARTE_FONDO = { w: 1280, h: 720, horiz: 258.5 };
     var LINEA_AGUA = 4;   // altura (en el dibujo del barco) a la que el agua corta el casco
 
     var escena = {
+        precargar: function () {
+            if (!this.textures.exists('dd_fondo')) this.load.svg('dd_fondo', 'img/diseno/fondo.svg', { width: 1280, height: 720 });
+            if (!this.textures.exists('dd_arte')) this.load.svg('dd_arte', 'img/diseno/arte.svg', { width: 2700, height: 1466 });
+        },
+
+        /** Registra los marcos de la hoja de arte (una sola vez) y avisa si el diseño está disponible. */
+        prepararArte: function () {
+            var A = global.DosSonidosArte;
+            var tex = this.textures.exists('dd_arte') ? this.textures.get('dd_arte') : null;
+            this.arteOk = !!(A && tex && this.textures.exists('dd_fondo'));
+            if (!this.arteOk || tex.__ddMarcos) return;
+            Object.keys(A.frames).forEach(function (n) { var m = A.frames[n]; tex.add(n, 0, m.x, m.y, m.w, m.h); });
+            tex.__ddMarcos = true;
+        },
+
+        /** Imagen de un marco: se ancla en el punto (px, py) del dibujo y mide kd px por unidad del dibujo. */
+        dd: function (nom, x, y, kd, px, py) {
+            var m = global.DosSonidosArte.frames[nom], wu = m.w / m.k, hu = m.h / m.k;
+            var im = this.add.image(x, y, 'dd_arte', nom);
+            im.setOrigin(px == null ? 0.5 : (px - m.ox) / wu, py == null ? 0.5 : (py - m.oy) / hu);
+            im.setDisplaySize(wu * kd, hu * kd);
+            im.sx0 = im.scaleX; im.sy0 = im.scaleY;
+            return im;
+        },
+
         iniciar: function () {
             this.hora = 0;
             this.cosasMar = [];      // boyas, monedas, rocas, remolinos
@@ -84,7 +112,7 @@
             var L = { W: W, H: H };
             L.pres = W >= 900 ? { x: W - 88, piso: H - 70, alto: Math.min(165, H * 0.28), giro: 0.35 } : null;
             L.der = L.pres ? W - 168 : W - 16;
-            L.horiz = Math.round(H * 0.34);
+            L.horiz = Math.round(H * ARTE_FONDO.horiz / ARTE_FONDO.h);
             L.mar = { x0: 90, x1: L.der - 110, y0: L.horiz + 70, y1: H - 60 };
             L.tamB = Math.round(Math.max(70, Math.min(96, H * 0.12)));
             L.tamBarco = Math.round(Math.max(130, Math.min(190, H * 0.24)));
@@ -96,8 +124,10 @@
         armar: function (reubicar) {
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            this.prepararArte();
             this.cieloG = keep(this.add.graphics().setDepth(1));
-            this.fondoG = keep(this.add.graphics().setDepth(1.5));
+            this.fondoG = keep(this.add.graphics().setDepth(1.1));
+            if (this.arteOk) this.montarFondoArte(keep);
             this.marG = keep(this.add.graphics().setDepth(3));
             this.delfinG = keep(this.crearDelfin().setDepth(4));
             this.estelaG = keep(this.add.graphics().setDepth(5));
@@ -115,6 +145,64 @@
             if (!this.barco || !this.barco.cont.active) this.crearBarco();
             else this.pintarBarco();
             if (reubicar) this.limitarBarco();
+        },
+
+        /** Fondo del diseño: cielo y mar, nubes que pasan, olas que se mecen y los astros (sol, atardecer, luna). */
+        montarFondoArte: function (keep) {
+            var L = this.L, self = this;
+            var sx = L.W / ARTE_FONDO.w, sy = L.H / ARTE_FONDO.h;
+            this.dfondo = keep(this.add.image(0, 0, 'dd_fondo').setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(0.5));
+            var mk = function (nom, depth) {
+                var m = global.DosSonidosArte.frames[nom], wu = m.w / m.k, hu = m.h / m.k;
+                var im = keep(self.add.image(m.ox * sx, m.oy * sy, 'dd_arte', nom).setOrigin(0, 0).setDisplaySize(wu * sx, hu * sy).setDepth(depth));
+                im.bx = m.ox * sx; im.by = m.oy * sy;
+                return im;
+            };
+            this.dnubes = [mk('f_nubes', 1.45), mk('f_nubes', 1.45)];
+            this.dolas = [1, 2, 3, 4, 5].map(function (i) {
+                var im = mk('f_ola' + i, 2.2);
+                im.setDisplaySize(im.displayWidth * 1.04, im.displayHeight);
+                im.bx -= im.displayWidth * 0.02; im.x = im.bx;
+                return im;
+            });
+            var kd = 0.53;
+            var astro = function (nom, depth) { return keep(self.dd(nom, 0, 0, kd, null, null).setDepth(depth)); };
+            this.dastro = {
+                solR: astro('sol_rayos', 1.2), solD: astro('sol_disco', 1.21),
+                atR: astro('atard_rayos', 1.2), atD: astro('atard_disco', 1.21),
+                luna: astro('luna', 1.21)
+            };
+        },
+
+        /** Cada cuadro: los astros se mezclan según la hora, las nubes y las olas se mueven, y la hora tiñe el cielo y el mar. */
+        animarFondoArte: function (time, s, P, te) {
+            var L = this.L, D = this.dastro, ax = L.W * 0.82, ay = L.horiz * (0.38 + 0.4 * P.bajo);
+            if (!D) return;
+            var peso = function (h) { return h < 2 ? 0 : (h === 2 ? 1 : 2); };
+            var w = [0, 0, 0];
+            var de = peso(this.horaDe), a = peso(this.hora);
+            w[de] += 1 - te; w[a] += te;
+            var ponerPar = function (r, d, alfa, giro) {
+                r.setPosition(ax, ay).setAlpha(alfa).setVisible(alfa > 0.01);
+                if (giro != null) r.rotation = giro;
+                d.setPosition(ax, ay).setAlpha(alfa).setVisible(alfa > 0.01);
+            };
+            ponerPar(D.solR, D.solD, w[0], s * 0.15);
+            ponerPar(D.atR, D.atD, w[1], -s * 0.12);
+            D.luna.setPosition(ax, ay).setAlpha(w[2]).setVisible(w[2] > 0.01);
+            D.luna.setScale(D.luna.sx0 * (1 + Math.sin(s * 1.6) * 0.012));
+            D.solD.setScale(D.solD.sx0 * (1 + Math.sin(s * 2.1) * 0.02));
+            D.atD.setScale(D.atD.sx0 * (1 + Math.sin(s * 1.7) * 0.025));
+            // Nubes: dos copias seguidas que dan la vuelta; la hora las tiñe.
+            var per = L.W, off = (this.mundo * 0.25 + s * 8) % per;
+            this.dnubes.forEach(function (n, i) { n.x = n.bx - off + i * per; n.setTint(P.nubes).setAlpha(1 - 0.35 * P.noche); });
+            // Olas: se mecen despacio, cada una a su ritmo.
+            var tinte = mezcla(0xffffff, 0x9fb2e6, P.noche);
+            this.dolas.forEach(function (o, i) {
+                o.x = o.bx + Math.sin(s * 0.55 + i * 1.7) * 16 + Math.sin(this.mundo * 0.01 + i) * 6;
+                o.y = o.by + Math.sin(s * 0.9 + i * 1.3) * 3.5;
+                o.setAlpha(0.7 + 0.3 * Math.sin(s * 1.4 + i * 2.1)).setTint(tinte);
+            }, this);
         },
 
         pintarCielo: function () {
@@ -184,6 +272,39 @@
         },
 
         pintarBarco: function () {
+            if (this.arteOk) { this.pintarBarcoArte(); return; }
+            this.pintarBarcoViejo();
+        },
+
+        /** Barco pirata del diseño en capas (mástiles, velas, bandera, loro, casco); las velas y la bandera se mueven con el viento. */
+        pintarBarcoArte: function () {
+            var B = this.barco, s = this.L.tamBarco / 180, self = this;
+            B.cuerpo.removeAll(true);
+            var u = KB / s;   // unidades del dibujo -> unidades del cuerpo (el cuerpo ya se escala por s)
+            var capa = function (nom, px, py) {
+                var pxx = px == null ? BOX : px, pyy = py == null ? BOY : py;
+                return self.dd(nom, (pxx - BOX) * u, (pyy - BOY) * u, u, pxx, pyy);
+            };
+            B.cuerpo.add(capa('b_fondo'));
+            B.bandera = capa('b_bandera', 265.3, 118);
+            B.cuerpo.add(B.bandera);
+            B.vela = [capa('b_vela1', 107.3, 205), capa('b_vela2', 209.3, 280), capa('b_vela3', 210.7, 185)];
+            B.cuerpo.add(B.vela[0]);
+            B.cuerpo.add(capa('b_yardas'));
+            B.cuerpo.add(B.vela[1]); B.cuerpo.add(B.vela[2]);
+            var lo = capa('b_loro', 322, 392);
+            B.cuerpo.add(lo);
+            this.loro = { cont: lo, cuerpo: lo, cab: lo, pico: lo, pup: { active: true, x: 7, y: -1, scaleY: 1 }, sy0: lo.scaleY, y0: lo.y, esArte: true };
+            B.cuerpo.add(capa('b_casco'));
+            B.velaG = null;
+            B.aguaG = this.add.graphics(); B.cuerpo.add(B.aguaG);
+            this.bandera = this.add.graphics(); B.cuerpo.add(this.bandera);   // solo la luz del farol de noche
+            B.s = s;
+            B.cuerpo.setScale(s * (B.dir || 1), s);
+            B.r = 80 * s;
+        },
+
+        pintarBarcoViejo: function () {
             var B = this.barco, s = this.L.tamBarco / 180;
             B.cuerpo.removeAll(true);
             // Mástil y botavara (la vela se dibuja cada cuadro: se hincha con el viento).
@@ -228,7 +349,22 @@
 
         /** Vela: se hincha con la velocidad y ondula con el viento. Franjas y estrella siguen la curva. */
         pintarVela: function (belly, s) {
-            var g = this.barco.velaG;
+            var B = this.barco;
+            if (B.vela) {   // velas y bandera del diseño: se hinchan con la velocidad y ondulan con el viento
+                var hin = Math.max(0, Math.min(0.12, (belly - 6) * 0.007));
+                B.vela.forEach(function (v, i) {
+                    if (!v.active) return;
+                    v.scaleX = v.sx0 * (1 + hin * (1 - i * 0.25) + Math.sin(s * 2.2 + i * 1.3) * 0.014);
+                    v.scaleY = v.sy0 * (1 + Math.sin(s * 1.9 + i) * 0.01);
+                    v.angle = Math.sin(s * 1.7 + i * 0.9) * 0.9;
+                });
+                var bn = B.bandera;
+                if (bn && bn.active) { bn.angle = Math.sin(s * 7) * 6 + hin * 30; bn.scaleX = bn.sx0 * (1 + Math.sin(s * 9) * 0.06); }
+                var lo = this.loro;
+                if (lo && lo.esArte && lo.cab.active && !this.tweens.isTweening(lo.cab)) { lo.cab.angle = Math.sin(s * 2) * 1.4; }
+                return;
+            }
+            var g = B.velaG;
             if (!g || !g.active) return;
             g.clear();
             var xl = -58, xr = 58, yt = -132, yb = -40, N = 12;
@@ -287,14 +423,14 @@
             var lo = this.loro;
             if (!lo || !lo.pico.active) return;
             this.tweens.killTweensOf(lo.pico);
-            lo.pico.angle = 0;
-            this.tweens.add({ targets: lo.pico, angle: 32, duration: 110, yoyo: true, repeat: Math.max(0, Math.round((ms || 400) / 240) - 1) });
+            if (!lo.esArte) lo.pico.angle = 0;
+            this.tweens.add({ targets: lo.pico, angle: lo.esArte ? 7 : 32, duration: 110, yoyo: true, repeat: Math.max(0, Math.round((ms || 400) / 240) - 1) });
         },
 
         aletear: function () {
             var lo = this.loro;
             if (!lo || !lo.cuerpo.active) return;
-            this.tweens.add({ targets: lo.cuerpo, y: -22, duration: 170, yoyo: true, repeat: 1, ease: 'Quad.easeOut' });
+            this.tweens.add({ targets: lo.cuerpo, y: lo.esArte ? lo.y0 - 16 : -22, duration: 170, yoyo: true, repeat: 1, ease: 'Quad.easeOut' });
             K.tono({ f: 1300, f2: 1900, dur: 0.09, vol: 0.04 });
         },
 
@@ -318,7 +454,26 @@
 
         /* ── Cosas del mar ── */
 
-        crearBoya: function (id, x, y) {
+        crearBoya: function (id, x, y) { return this.arteOk ? this.crearBoyaArte(id, x, y) : this.crearBoyaVieja(id, x, y); },
+
+        crearBoyaArte: function (id, x, y) {
+            var t = this.L.tamB, kd = t * 1.7 / 321;
+            var c = this.add.container(x, y);
+            var cuerpo = this.dd('boya' + (ANIM.indexOf(id) >= 0 ? ANIM.indexOf(id) : INST.indexOf(id) + 3) % 5, 0, 0, kd, 254, 405);
+            var dy = -70 * kd;
+            var ins = this.add.container(0, dy);
+            var disco = this.add.graphics();
+            disco.fillStyle(0xffffff, 1); disco.fillCircle(0, 0, t * 0.26);
+            disco.lineStyle(3, 0x1c7ed6, 1); disco.strokeCircle(0, 0, t * 0.26);
+            var im = this.add.image(0, 0, 'el_' + id);
+            im.setScale((t * 0.38) / Math.max(im.width, im.height));
+            ins.add([disco, im]);
+            var agua = this.add.graphics();
+            c.add([cuerpo, ins, agua]);
+            return { tipo: 'boya', agua: agua, id: id, cont: c, r: t * 0.42, fase: Math.random() * 6, vx: 0, vy: 0, vivo: true, dy: dy, arte: true };
+        },
+
+        crearBoyaVieja: function (id, x, y) {
             var t = this.L.tamB;
             var c = this.add.container(x, y);
             var g = this.add.graphics();
@@ -337,6 +492,12 @@
         },
 
         crearMoneda: function (x, y) {
+            if (this.arteOk) {
+                var cm = this.add.container(x, y);
+                var im = this.dd('moneda', 0, 0, 0.15, 250, 255);
+                cm.add(im);
+                return { tipo: 'moneda', cont: cm, g: im, r: 22, fase: Math.random() * 6, vivo: true, arte: true };
+            }
             var c = this.add.container(x, y);
             var g = this.add.graphics();
             g.fillStyle(0xe8a317, 1); g.fillCircle(0, 0, 16);
@@ -348,6 +509,13 @@
         },
 
         crearRoca: function (x, y) {
+            if (this.arteOk) {
+                var cr = this.add.container(x, y);
+                var cual = Math.random() < 0.5 ? 'roca1' : 'roca2';
+                var ri = this.dd(cual, 0, 6, cual === 'roca1' ? 0.25 : 0.27, null, null);
+                cr.add(ri);
+                return { tipo: 'roca', cont: cr, esp: this.add.graphics(), r: 48, fase: Math.random() * 6, vivo: true, arte: true, img: ri };
+            }
             var c = this.add.container(x, y);
             var g = this.add.graphics();
             g.fillStyle(0x000000, 0.2); g.fillEllipse(0, 20, 120, 26);
@@ -491,6 +659,7 @@
         /* ── La isla de cada nivel ── */
 
         traerIsla: function () {
+            if (this.arteOk) { this.traerIslaArte(); return; }
             var L = this.L;
             var c = this.add.container(L.W + 260, (L.mar.y0 + L.mar.y1) / 2).setDepth(12);
             var g = this.add.graphics();
@@ -514,6 +683,20 @@
             var self = this;
             this.cosasMar.forEach(function (o) { if (o.vivo) self.quitar(o, true); });
             this.tweens.add({ targets: c, x: L.mar.x1 - 120, duration: 2600, ease: 'Sine.easeOut' });
+        },
+
+        /** La isla del diseño llega desde la derecha; su muelle (a la izquierda) es donde atraca el barco. */
+        traerIslaArte: function () {
+            var L = this.L, h = HORAS[this.hora];
+            var c = this.add.container(L.W + 360, (L.mar.y0 + L.mar.y1) / 2).setDepth(12);
+            var kd = 0.64;
+            var im = this.dd('isla', 0, -76, kd, 36 + 817.5 / 2, 33.5 + 424 / 2);
+            im.setTint(h.noche ? 0x8d9ac4 : (h.bajo ? 0xffd9b8 : 0xffffff));
+            c.add(im);
+            this.isla = { cont: c, muelle: { dx: -243, dy: 20 }, img: im };
+            var self = this;
+            this.cosasMar.forEach(function (o) { if (o.vivo) self.quitar(o, true); });
+            this.tweens.add({ targets: c, x: L.mar.x1 - 60, duration: 2600, ease: 'Sine.easeOut' });
         },
 
         llegar: async function () {
@@ -750,8 +933,8 @@
         sorpresa: function () {
             var lo = this.loro;
             if (!lo || !lo.cab.active) return;
-            this.tweens.add({ targets: lo.cab, angle: { from: -16, to: 16 }, duration: 70, yoyo: true, repeat: 3, onComplete: function () { lo.cab.angle = 0; } });
-            this.tweens.add({ targets: lo.cuerpo, y: -10, duration: 110, yoyo: true });
+            this.tweens.add({ targets: lo.cab, angle: lo.esArte ? { from: -7, to: 7 } : { from: -16, to: 16 }, duration: 70, yoyo: true, repeat: 3, onComplete: function () { lo.cab.angle = 0; } });
+            this.tweens.add({ targets: lo.cuerpo, y: lo.esArte ? lo.y0 - 8 : -10, duration: 110, yoyo: true });
         },
 
         armarMonedas: function (keep) {
@@ -761,12 +944,18 @@
             g.fillStyle(0x000000, 0.3); g.fillRoundedRect(2, -20, 118, 44, 22);
             g.fillStyle(0x12263f, 0.88); g.fillRoundedRect(0, -22, 118, 44, 22);
             g.lineStyle(3, 0xffd43b, 0.9); g.strokeRoundedRect(0, -22, 118, 44, 22);
-            g.fillStyle(0xe8a317, 1); g.fillCircle(24, 0, 17);
-            g.fillStyle(0xffd43b, 1); g.fillCircle(24, 0, 14);
-            g.fillStyle(0xfff3bf, 1); g.fillCircle(19, -5, 4);
-            g.lineStyle(2, 0xe8a317, 1); g.strokeCircle(24, 0, 9);
             var tx = this.add.text(54, 0, String(this.monedasMostradas || 0), { fontFamily: 'Arial Black, Arial', fontSize: '26px', color: '#ffffff' }).setOrigin(0, 0.5);
-            c.add([g, tx]);
+            c.add(g);
+            if (this.arteOk) c.add(this.dd('moneda', 24, 0, 0.13, 250, 255));
+            else {
+                var gm = this.add.graphics();
+                gm.fillStyle(0xe8a317, 1); gm.fillCircle(24, 0, 17);
+                gm.fillStyle(0xffd43b, 1); gm.fillCircle(24, 0, 14);
+                gm.fillStyle(0xfff3bf, 1); gm.fillCircle(19, -5, 4);
+                gm.lineStyle(2, 0xe8a317, 1); gm.strokeCircle(24, 0, 9);
+                c.add(gm);
+            }
+            c.add(tx);
             this.hudMon = { cont: c, txt: tx, x: 50, y: L.H - 44 };
         },
 
@@ -774,9 +963,12 @@
             var self = this, h = this.hudMon;
             if (!h || !h.cont.active) return;
             var c = this.add.container(x, y).setDepth(72);
-            var g = this.add.graphics();
-            g.fillStyle(0xe8a317, 1); g.fillCircle(0, 0, 15); g.fillStyle(0xffd43b, 1); g.fillCircle(0, 0, 12); g.fillStyle(0xfff3bf, 1); g.fillCircle(-4, -4, 3.5);
-            c.add(g);
+            if (this.arteOk) c.add(this.dd('moneda', 0, 0, 0.16, 250, 255));
+            else {
+                var g = this.add.graphics();
+                g.fillStyle(0xe8a317, 1); g.fillCircle(0, 0, 15); g.fillStyle(0xffd43b, 1); g.fillCircle(0, 0, 12); g.fillStyle(0xfff3bf, 1); g.fillCircle(-4, -4, 3.5);
+                c.add(g);
+            }
             this.tweens.add({
                 targets: c, x: h.x, y: h.y, scale: { from: 1.4, to: 0.8 }, duration: 650, ease: 'Cubic.easeIn',
                 onComplete: function () {
@@ -818,21 +1010,18 @@
             var alto = L.H - L.horiz;
             var B = this.barco.cont, sB = this.barco.s, dir = this.barco.dir;
 
-            // ── Cielo con el astro, estrellas, nubes y gaviotas (la hora cambia poco a poco) ──
-            var cg0 = this.cieloG; cg0.clear();
-            for (var cb = 0; cb < 18; cb++) { cg0.fillStyle(mezcla(P.cielo[0], P.cielo[1], cb / 17), 1); cg0.fillRect(0, (L.horiz / 18) * cb, L.W, L.horiz / 18 + 1); }
-            var f = this.fondoG; f.clear();
+            // ── Cielo y mar del diseño; la hora (atardecer, noche) los tiñe con un velo de color ──
             var ax = L.W * 0.82, ay = L.horiz * (0.38 + 0.4 * P.bajo);
+            var cg0 = this.cieloG; cg0.clear();
+            var velo = this.arteOk ? Math.min(1, P.bajo + P.noche) : 1;
+            if (velo > 0.01) {
+                for (var cb = 0; cb < 18; cb++) { cg0.fillStyle(mezcla(P.cielo[0], P.cielo[1], cb / 17), 0.92 * velo); cg0.fillRect(0, (L.horiz / 18) * cb, L.W, L.horiz / 18 + 1); }
+                for (var mb = 0; mb < 12; mb++) { cg0.fillStyle(mezcla(P.mar[0], P.mar[2], mb / 11), 0.88 * velo); cg0.fillRect(0, L.horiz + (alto / 12) * mb, L.W, alto / 12 + 1); }
+            }
+            if (this.arteOk) this.animarFondoArte(time, s, P, te);
+            var f = this.fondoG; f.clear();
             if (P.noche > 0.02) for (var e = 0; e < 55; e++) { f.fillStyle(0xffffff, P.noche * (0.3 + 0.6 * Math.abs(Math.sin(s * 1.2 + e * 2.3)))); f.fillCircle((e * 977 + 50) % L.W, 8 + (e * 613) % (L.horiz - 20), 1 + (e % 3) * 0.6); }
             f.fillStyle(P.astro, 0.2); f.fillCircle(ax, ay, 80 - 18 * P.noche);
-            if (P.noche < 0.5) for (var rr = 0; rr < 12; rr++) { var an = s * 0.15 + rr * Math.PI / 6; f.fillStyle(P.astro, 0.22 * (1 - P.noche * 2)); f.fillTriangle(ax + Math.cos(an - 0.08) * 48, ay + Math.sin(an - 0.08) * 48, ax + Math.cos(an + 0.08) * 48, ay + Math.sin(an + 0.08) * 48, ax + Math.cos(an) * 92, ay + Math.sin(an) * 92); }
-            f.fillStyle(P.astro, 1); f.fillCircle(ax, ay, 38 - 4 * P.noche);
-            if (P.noche > 0.5) { f.fillStyle(0xced4da, 1); f.fillCircle(ax - 10, ay - 7, 7); f.fillCircle(ax + 9, ay + 10, 5); }
-            for (var n = 0; n < 5; n++) {
-                var nx = L.W + 200 - ((this.mundo * (0.2 + n * 0.05) + s * 6 + n * 330) % (L.W + 400)), ny = L.horiz * (0.16 + (n % 3) * 0.2);
-                f.fillStyle(P.nubes, 0.95 - 0.45 * P.noche);
-                f.fillEllipse(nx, ny, 150, 28); f.fillCircle(nx - 26, ny - 8, 20); f.fillCircle(nx + 4, ny - 15, 26); f.fillCircle(nx + 34, ny - 6, 18);
-            }
             if (P.noche < 0.5) for (var gv = 0; gv < 3; gv++) {
                 var gx = ((s * (38 + gv * 12) + gv * 400) % (L.W + 200)) - 100, gy = L.horiz * (0.35 + gv * 0.15) + Math.sin(s * 2 + gv) * 8, al = Math.sin(s * 9 + gv) * 6;
                 f.lineStyle(3, 0x343a40, 0.8); f.beginPath(); f.moveTo(gx - 12, gy - al); f.lineTo(gx, gy); f.lineTo(gx + 12, gy - al); f.strokePath();
@@ -841,7 +1030,7 @@
             // ── Mar: degradado, camino de luz del astro, peces, capas de olas con crestas y espuma ──
             var g = this.marG;
             g.clear();
-            for (var b = 0; b < 12; b++) { g.fillStyle(mezcla(P.mar[0], P.mar[2], b / 11), 1); g.fillRect(0, L.horiz + (alto / 12) * b, L.W, alto / 12 + 1); }
+            if (!this.arteOk) for (var b = 0; b < 12; b++) { g.fillStyle(mezcla(P.mar[0], P.mar[2], b / 11), 1); g.fillRect(0, L.horiz + (alto / 12) * b, L.W, alto / 12 + 1); }
             for (var gi = 0; gi < 14; gi++) {
                 var gy2 = L.horiz + 5 + gi * (alto * 0.42 / 14), gw = 8 + gi * 6;
                 for (var d = 0; d < 4; d++) {
@@ -854,19 +1043,13 @@
                 var fx = L.W + 80 - ((this.mundo * 0.6 + s * (18 + pk * 5) + pk * 260) % (L.W + 220)), fy = L.horiz + alto * (0.22 + (pk % 3) * 0.24) + Math.sin(s * 1.2 + pk) * 6;
                 g.fillStyle(0x08305a, 0.15 + 0.04 * (pk % 2)); g.fillEllipse(fx, fy, 30, 11); g.fillTriangle(fx + 13, fy, fx + 26, fy - 8, fx + 26, fy + 8);
             }
-            for (var l = 0; l < 5; l++) {
+            if (!this.arteOk) for (var l = 0; l < 5; l++) {
                 var base = L.horiz + alto * (0.05 + l * 0.2), amp = 2.5 + l * 2.2, len = 38 + l * 20;
                 var fase = this.mundo * (0.010 + l * 0.008) + s * (0.55 + l * 0.13);
                 var pts = [];
                 for (var px = -10; px <= L.W + 20; px += 14) pts.push({ x: px, y: base + amp * Math.sin(px / len + fase) + amp * 0.45 * Math.sin(px / (len * 0.43) - fase * 1.6) });
-                g.fillStyle(mezcla(P.mar[1], P.mar[2], 0.55), 0.13);
-                g.beginPath(); g.moveTo(pts[0].x, L.H);
-                pts.forEach(function (p) { g.lineTo(p.x, p.y); });
-                g.lineTo(pts[pts.length - 1].x, L.H); g.closePath(); g.fillPath();
                 g.lineStyle(1.6 + l * 0.6, 0xffffff, 0.13 + l * 0.045);
                 g.beginPath(); pts.forEach(function (p, i) { if (!i) g.moveTo(p.x, p.y); else g.lineTo(p.x, p.y); }); g.strokePath();
-                g.lineStyle(2 + l * 0.5, 0xffffff, 0.5);
-                for (var pi = 1; pi < pts.length - 1; pi++) if (pts[pi].y < pts[pi - 1].y && pts[pi].y <= pts[pi + 1].y && ((pi * 7 + l * 3) % 3 !== 0)) g.lineBetween(pts[pi].x - 7 - l * 2, pts[pi].y + 1, pts[pi].x + 7 + l * 2, pts[pi].y + 1);
             }
 
             // ── Delfín que salta de vez en cuando ──
@@ -906,14 +1089,16 @@
             if (ag && ag.active) {
                 ag.clear();
                 var ola = function (x) { return LINEA_AGUA + Math.sin(x / 16 + s * 3) * 3 + Math.sin(x / 7 - s * 5) * 1.2; };
-                ag.fillStyle(0x7a4419, 1);
-                ag.beginPath(); ag.moveTo(-82.2, -2); ag.lineTo(86.2, -2);
-                for (var wx = 86; wx >= -82; wx -= 6) ag.lineTo(wx, ola(wx));
-                ag.closePath(); ag.fillPath();
-                ag.fillStyle(0x3d2208, 0.45);
-                ag.beginPath(); ag.moveTo(-82.2, -9); ag.lineTo(86.2, -9);
-                for (var wz = 86; wz >= -82; wz -= 6) ag.lineTo(wz, ola(wz));
-                ag.closePath(); ag.fillPath();
+                if (!this.arteOk) {
+                    ag.fillStyle(0x7a4419, 1);
+                    ag.beginPath(); ag.moveTo(-82.2, -2); ag.lineTo(86.2, -2);
+                    for (var wx = 86; wx >= -82; wx -= 6) ag.lineTo(wx, ola(wx));
+                    ag.closePath(); ag.fillPath();
+                    ag.fillStyle(0x3d2208, 0.45);
+                    ag.beginPath(); ag.moveTo(-82.2, -9); ag.lineTo(86.2, -9);
+                    for (var wz = 86; wz >= -82; wz -= 6) ag.lineTo(wz, ola(wz));
+                    ag.closePath(); ag.fillPath();
+                }
                 // Espuma: banda translúcida pegada al casco y línea blanca en la superficie.
                 ag.fillStyle(0xffffff, 0.38);
                 ag.beginPath(); ag.moveTo(-104, ola(-104));
@@ -929,10 +1114,13 @@
             var bm = this.bandera;
             if (bm && bm.active) {
                 var amp2 = 3 + vel * 0.02;
-                bm.clear(); bm.fillStyle(0xe03131, 1); bm.beginPath(); bm.moveTo(0, -170);
-                for (var q = 0; q <= 1.0001; q += 0.25) bm.lineTo(-q * 40, -170 + Math.sin(s * 7 - q * 4) * amp2);
-                for (var q2 = 1; q2 >= -0.0001; q2 -= 0.25) bm.lineTo(-q2 * 40, -150 + Math.sin(s * 7 - q2 * 4) * amp2);
-                bm.closePath(); bm.fillPath(); bm.fillStyle(0x6d3d16, 1); bm.fillRect(-3, -176, 6, 30);
+                bm.clear();
+                if (!this.arteOk) {
+                    bm.fillStyle(0xe03131, 1); bm.beginPath(); bm.moveTo(0, -170);
+                    for (var q = 0; q <= 1.0001; q += 0.25) bm.lineTo(-q * 40, -170 + Math.sin(s * 7 - q * 4) * amp2);
+                    for (var q2 = 1; q2 >= -0.0001; q2 -= 0.25) bm.lineTo(-q2 * 40, -150 + Math.sin(s * 7 - q2 * 4) * amp2);
+                    bm.closePath(); bm.fillPath(); bm.fillStyle(0x6d3d16, 1); bm.fillRect(-3, -176, 6, 30);
+                }
                 if (P.noche > 0.3) { bm.fillStyle(0xffd43b, (0.22 + 0.06 * Math.sin(s * 5)) * P.noche); bm.fillCircle(-80, -60, 30); bm.fillStyle(0xffe066, P.noche); bm.fillRoundedRect(-85, -66, 10, 14, 3); }
             }
             // Loro: la pupila mira hacia lo que busca y parpadea.
@@ -996,17 +1184,18 @@
                 if (o.tipo === 'boya') {
                     var bob = self.olaY(o.cont.x, s + o.fase) * 1.4;
                     o.cont.angle = Math.sin(s * 1.8 + o.fase) * 6 + Math.atan(Math.cos(o.cont.x / 90 + s * 1.6) * 3 / 90) * 57;
-                    o.cont.list[0].y = bob; o.cont.list[1].y = -self.L.tamB * 0.1 + bob;
+                    o.cont.list[0].y = bob; o.cont.list[1].y = (o.arte ? o.dy : -self.L.tamB * 0.1) + bob;
                     var tB = self.L.tamB, ga = o.agua;
-                    if (ga && ga.active) {
+                    if (ga && ga.active && !o.arte) {
                         ga.clear(); ga.fillStyle(mezcla(P.mar[0], P.mar[2], Math.max(0, Math.min(1, (o.cont.y + tB * 0.36 - L.horiz) / alto))), 0.97); ga.fillEllipse(0, tB * 0.36, tB * 1.05, tB * 0.2 + Math.sin(s * 2 + o.fase) * 2);
                         ga.lineStyle(2, 0xffffff, 0.75); ga.beginPath();
                         for (var bx = -tB * 0.5; bx <= tB * 0.5 + 0.01; bx += tB * 0.05) { var by = tB * 0.36 - tB * 0.1 * Math.sqrt(Math.max(0, 1 - Math.pow(bx / (tB * 0.525), 2))) + Math.sin(bx * 0.2 + s * 4 + o.fase) * 1.3; if (bx === -tB * 0.5) ga.moveTo(bx, by); else ga.lineTo(bx, by); }
                         ga.strokePath();
                     }
                 }
-                if (o.tipo === 'moneda') o.g.scaleX = Math.cos(s * 4 + o.fase);
-                if (o.tipo === 'roca') { o.esp.clear(); o.esp.lineStyle(3, 0xffffff, 0.6); o.esp.strokeEllipse(0, 18, 128 + Math.sin(s * 3 + o.fase) * 8, 30); }
+                if (o.tipo === 'moneda') o.g.scaleX = o.arte ? o.g.sx0 * (0.3 + 0.7 * Math.abs(Math.cos(s * 4 + o.fase))) : Math.cos(s * 4 + o.fase);
+                if (o.tipo === 'roca' && o.arte) { o.img.y = 6 + Math.sin(s * 1.6 + o.fase) * 1.6; o.img.angle = Math.sin(s * 1.2 + o.fase) * 0.7; }
+                else if (o.tipo === 'roca') { o.esp.clear(); o.esp.lineStyle(3, 0xffffff, 0.6); o.esp.strokeEllipse(0, 18, 128 + Math.sin(s * 3 + o.fase) * 8, 30); }
                 if (o.tipo === 'remolino') {
                     o.g.clear();
                     for (var ring = 0; ring < 4; ring++) {
@@ -1082,7 +1271,7 @@
                 var m2 = { x: this.isla.cont.x + this.isla.muelle.dx, y: this.isla.cont.y + this.isla.muelle.dy };
                 ay3.fillStyle(0xffe066, 0.25 + 0.15 * Math.sin(s * 6)); ay3.fillCircle(m2.x, m2.y, 70);
             }
-            if (this.loro && this.loro.cuerpo.active) this.loro.cuerpo.scaleY = 1 + Math.sin(s * 2.4) * 0.03;
+            if (this.loro && this.loro.cuerpo.active) this.loro.cuerpo.scaleY = (this.loro.sy0 || 1) * (1 + Math.sin(s * 2.4) * 0.03);
 
             // ── Ambiente sonoro suave: oleaje, madera que cruje y alguna gaviota ──
             if ((this.fase === 'jugar' || this.fase === 'escuchando') && !(this.ctx.enDemo && this.ctx.enDemo())) {

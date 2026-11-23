@@ -2,17 +2,17 @@
   "nombre": "Conectando la Campana (Audición)",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Vamos con un ejemplo! Mira: el tambor suena… ¿con qué parte del cuerpo del gigante lo escuchamos?",
+    "demostracion": "¡Vamos con un ejemplo! Mira: el tambor suena, pero Sensi no lo escucha. ¿Qué pieza le instalamos?",
     "demostracionAcierto": "¡Así se une un estímulo con su sentido!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "¡Bienvenido al campanario del gigante!"
+        "texto": "¡Bienvenido al taller de Sensi, el robot!"
       },
       {
         "personaje": 0,
-        "texto": "¡Lleva cada sonido y cada regalo a su sentido!"
+        "texto": "¡Instálale la pieza del sentido que percibe cada estímulo!"
       }
     ]
   },
@@ -105,11 +105,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "¡Bienvenido al campanario del gigante!"
+          "texto": "¡Bienvenido al taller de Sensi, el robot!"
         },
         {
           "personaje": 0,
-          "texto": "¡Lleva cada sonido y cada regalo a su sentido!"
+          "texto": "¡Instálale la pieza del sentido que percibe cada estímulo!"
         }
       ],
       "retos": [
@@ -127,7 +127,7 @@
           "correcto": "oido",
           "presentacion": {
             "voz": "zoe",
-            "texto": "¡Bienvenido al campanario! La campana emite ondas de sonido. Tira de la soga y lleva su sonido hasta el sentido que nos permite escucharlo."
+            "texto": "¡Bienvenido al taller de Sensi! La campana emite ondas de sonido, pero Sensi todavía no tiene sentidos. Instálale la pieza que le permite escucharla."
           },
           "acierto": {
             "animacion": "vuelaOido",

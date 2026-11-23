@@ -23,9 +23,9 @@
         "ra_inicio": "automático",
         "ra_velocidad": 100,
         "ra_contenido": "audio narrado",
-        "contraste": "alto",
+        "contraste": "máximo",
         "modo_color": "escala_grises",
-        "fondo_pantalla": "crema",
+        "fondo_pantalla": "gris_suave",
         "elementos_flotantes": false,
         "cursor_grande": true,
         "refuerzo_visual": true,
@@ -134,6 +134,6 @@
             }
         }
     },
-    "actualizado_en": "2026-11-23T11:50:50-05:00",
+    "actualizado_en": "2026-11-23T11:56:33-05:00",
     "institucion_id": 1
 }
