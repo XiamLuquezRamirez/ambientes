@@ -2,17 +2,17 @@
   "nombre": "Conectando la Flor (Olfato)",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: el tambor suena... ¿con qué parte del cuerpo lo escuchamos?",
+    "demostracion": "¡Vamos con un ejemplo! Mira: llega un pedido con un tambor. ¿Qué sello le ponemos para el sentido que lo percibe?",
     "demostracionAcierto": "¡Así se une un estímulo con su sentido!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "¡Bienvenido al Laboratorio Sensorial!"
+        "texto": "¡Bienvenido a la perfumería!"
       },
       {
         "personaje": 0,
-        "texto": "¡Conecta cada estímulo con su sentido!"
+        "texto": "¡Sella cada pedido con el sentido que lo percibe!"
       }
     ]
   },
@@ -105,11 +105,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "¡Bienvenido al Laboratorio Sensorial!"
+          "texto": "¡Bienvenido a la perfumería!"
         },
         {
           "personaje": 0,
-          "texto": "¡Conecta cada estímulo con su sentido!"
+          "texto": "¡Sella cada pedido con el sentido que lo percibe!"
         }
       ],
       "retos": [
@@ -127,7 +127,7 @@
           "correcto": "nariz",
           "presentacion": {
             "voz": "zeus",
-            "texto": "Esta flor desprende partículas perfumadas en el aire. Conecta la flor con el sentido que nos permite percibir su aroma."
+            "texto": "¡Bienvenido a la perfumería! Esta flor desprende partículas perfumadas. Gira la manivela del alambique para destilar su aroma."
           },
           "acierto": {
             "animacion": "aspira",

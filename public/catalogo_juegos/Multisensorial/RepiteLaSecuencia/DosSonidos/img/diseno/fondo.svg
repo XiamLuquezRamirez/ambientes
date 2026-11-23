@@ -1,0 +1,46 @@
+<svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1280 720">
+<defs>
+    <style>
+      .cls-1 {
+        opacity: .22;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5 {
+        fill: none;
+        stroke: #adf5ff;
+        stroke-miterlimit: 10;
+        stroke-width: 3px;
+      }
+
+      .cls-2 {
+        opacity: .31;
+      }
+
+      .cls-4 {
+        opacity: .6;
+      }
+
+      .cls-6 {
+        fill: #fff;
+      }
+
+      .cls-7 {
+        fill: #b7e1f6;
+      }
+
+      .cls-5 {
+        opacity: .54;
+      }
+
+      .cls-8 {
+        fill: url(#Degradado_sin_nombre_18);
+      }
+    </style>
+    <linearGradient id="Degradado_sin_nombre_18" data-name="Degradado sin nombre 18" x1="640" y1="720.03" x2="640" y2="258.74" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#13589b"/>
+      <stop offset="1" stop-color="#4ac0ff"/>
+    </linearGradient>
+  </defs>
+<rect class="cls-7" x=".24" y="0" width="1279.76" height="720.03"/>
+<rect class="cls-8" x=".12" y="258.74" width="1279.76" height="461.3"/>
+</svg>

@@ -36,6 +36,9 @@
     ];
     var COL_TECLA = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8, 0xff922b];
 
+    // Dibujo del diseñador (1280x720): máquina de chicles en el fondo, suelo de caramelo desde y=575.
+    var ARTE = { w: 1280, h: 720, suelo: 590, maq: [149, 207], globoR: 60 };
+
     function mezcla(a, b, t) {
         var c = C.Interpolate.ColorWithColor(C.ValueToColor(a), C.ValueToColor(b), 100, Math.max(0, Math.min(1, t)) * 100);
         return C.GetColor(c.r, c.g, c.b);
@@ -43,6 +46,29 @@
     function hsv(h) { var c = C.HSVToRGB(((h % 1) + 1) % 1, 0.65, 1); return c.color; }
 
     var escena = {
+        precargar: function () {
+            var self = this;
+            [1, 2, 3, 4].forEach(function (i) { if (!self.textures.exists('gf_fondo' + i)) self.load.svg('gf_fondo' + i, 'img/diseno/fondo' + i + '.svg', { width: 1280, height: 720 }); });
+            if (!this.textures.exists('gf_arte')) this.load.svg('gf_arte', 'img/diseno/arte.svg', { width: 1400, height: 488 });
+        },
+
+        prepararArte: function () {
+            var A = global.GranSecuenciaArte;
+            var tex = this.textures.exists('gf_arte') ? this.textures.get('gf_arte') : null;
+            this.arteOk = !!(A && tex && [1, 2, 3, 4].every(function (i) { return this.textures.exists('gf_fondo' + i); }, this));
+            if (!this.arteOk || tex.__gfMarcos) return;
+            Object.keys(A.frames).forEach(function (n) { var m = A.frames[n]; tex.add(n, 0, m.x, m.y, m.w, m.h); });
+            tex.__gfMarcos = true;
+        },
+
+        /** Imagen de un marco de la hoja, a un ancho dado en pantalla. */
+        pieza: function (nom, x, y, ancho) {
+            var m = global.GranSecuenciaArte.frames[nom];
+            var im = this.add.image(x, y, 'gf_arte', nom);
+            im.setDisplaySize(ancho, ancho * m.bh / m.bw);
+            return im;
+        },
+
         iniciar: function () {
             this.motor = null; this.estaticosF = [];
             this.teclas = []; this.rebotadores = [];
@@ -72,18 +98,32 @@
             L.pres = W >= 900 ? { x: W - 88, piso: H - 70, alto: Math.min(165, H * 0.28), giro: 0.35 } : null;
             L.der = L.pres ? W - 168 : W - 16;
             L.k = Math.max(0.72, Math.min(1.15, H / 768));
-            L.suelo = Math.round(H * 0.9);
+            L.suelo = Math.round(H * (this.arteOk ? ARTE.suelo / ARTE.h : 0.9));
             L.zona = { x0: Math.round(W * 0.2), x1: L.der - 24, y0: Math.round(H * 0.2), y1: L.suelo - 30 };
             L.maq = { x: Math.round(W * 0.095), y: Math.round(H * 0.34) };
             L.salida = { x: Math.round(W * 0.195), y: Math.round(H * 0.3) };
+            if (this.arteOk) {
+                L.maq = { x: Math.round(W * ARTE.maq[0] / ARTE.w), y: Math.round(H * ARTE.maq[1] / ARTE.h) };
+                L.salida = { x: Math.round(W * 0.195), y: Math.round(H * 283 / ARTE.h) };   // a la altura de la ranura de la máquina
+            }
             L.goma = { x: 58, y: H - 62, r: 38 };
             L.bocina = { x: 48, y: Math.round(H * 0.17), r: 30 };
             return L;
         },
 
         armar: function (reubicar) {
+            this.prepararArte();
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            this.fondoImg = null; this.nubesImg = null; this.fondoNuevo = null; this.fondoClave = 'gf_fondo' + (this.pal + 1);
+            if (this.arteOk) {
+                this.fondoImg = keep(this.add.image(0, 0, 'gf_fondo' + (this.pal + 1)).setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(0.5));
+                this.nubesImg = [0, 1, 2, 0].map(function (q, i) {
+                    var im = keep(this.pieza('n' + (q + 1), 0, 0, Math.round(L.W * (0.13 + 0.02 * (i % 2)))).setDepth(3).setAlpha(0.88));
+                    im.vel = 8 + i * 3; im.fase = i * 360; im.fy = 0.1 + i * 0.07;
+                    return im;
+                }, this);
+            }
             this.fondoG = keep(this.add.graphics().setDepth(1));
             this.dinG = keep(this.add.graphics().setDepth(2));
             this.trazoG = keep(this.add.graphics().setDepth(20));
@@ -101,6 +141,17 @@
         pintarFondo: function () {
             var L = this.L, g = this.fondoG, P = PAL[this.pal];
             g.clear();
+            if (this.arteOk) {
+                // Fondo del diseño: se mezcla suavemente al cambiar de nivel.
+                var clave = 'gf_fondo' + (this.pal + 1), fi = this.fondoImg, self = this;
+                if (fi && fi.active && this.fondoClave !== clave) {
+                    this.fondoClave = clave;
+                    if (this.fondoNuevo && this.fondoNuevo.active) { fi.setTexture(this.fondoNuevo.texture.key); this.tweens.killTweensOf(this.fondoNuevo); this.fondoNuevo.destroy(); }
+                    var nuevo = this.fondoNuevo = this.add.image(0, 0, clave).setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(0.55).setAlpha(0);
+                    this.tweens.add({ targets: nuevo, alpha: 1, duration: 700, onComplete: function () { if (fi.active) fi.setTexture(clave); if (nuevo.active) nuevo.destroy(); if (self.fondoNuevo === nuevo) self.fondoNuevo = null; } });
+                }
+                return;
+            }
             for (var b = 0; b < 16; b++) { g.fillStyle(mezcla(P.fondo[0], P.fondo[1], b / 15), 1); g.fillRect(0, (L.suelo / 16) * b, L.W, L.suelo / 16 + 1); }
             g.fillStyle(P.franja, 0.35);
             for (var x = 0; x < L.W; x += 120) g.fillRect(x, 0, 60, L.suelo);
@@ -138,6 +189,27 @@
 
         armarMaquina: function (keep) {
             var L = this.L;
+            if (this.arteOk) {
+                // La máquina ya viene dibujada en el fondo: solo queda la zona de toque y el brillo.
+                var ca = keep(this.add.container(L.maq.x, L.maq.y).setDepth(8));
+                var ra = Math.round(L.H * 80 / ARTE.h);
+                this.maquina = { cont: ca, r: ra, bolas: this.add.container(0, 0), mani: this.add.graphics() };
+                ca.add([this.maquina.bolas, this.maquina.mani]);
+                // Boca: un tubo rojo que sale de la ranura de la máquina; cada bola asoma por su extremo.
+                var hT = Math.round(L.k * 58), lar = L.salida.x + 26 - L.maq.x;
+                var bo = keep(this.add.container(L.maq.x, L.salida.y).setDepth(9));
+                var bg = this.add.graphics();
+                bg.fillStyle(0x000000, 0.2); bg.fillRoundedRect(2, -hT / 2 + 6, lar, hT, 14);
+                bg.fillStyle(0xb81d2b, 1); bg.fillRoundedRect(0, -hT / 2, lar, hT, 14);
+                bg.fillStyle(0xe03131, 1); bg.fillRoundedRect(0, -hT / 2, lar, hT * 0.62, 12);
+                bg.fillStyle(0xff8787, 0.8); bg.fillRoundedRect(8, -hT / 2 + 5, lar - 40, 7, 3);
+                bg.fillStyle(0xffffff, 0.9); bg.fillRoundedRect(lar * 0.35, -hT / 2 - 1, 8, hT + 2, 3);
+                bg.fillStyle(0x5a0f18, 1); bg.fillEllipse(lar, 0, hT * 0.42, hT * 0.98);
+                bg.lineStyle(5, 0xffd43b, 1); bg.strokeEllipse(lar, 0, hT * 0.42, hT * 0.98);
+                bo.add(bg);
+                this.boca = bo; this.bocaLar = lar;
+                return;
+            }
             var c = keep(this.add.container(L.maq.x, L.maq.y).setDepth(8));
             var g = this.add.graphics();
             var r = Math.round(L.k * 62);
@@ -175,6 +247,7 @@
             add(L.W / 2, L.suelo + 40, L.W * 3, 80);
             add(L.zona.x0 - 40, L.H / 2, 40, L.H * 2);
             add(L.zona.x1 + 40, L.H / 2, 40, L.H * 2);
+            if (this.arteOk) add(L.salida.x + 6, L.salida.y + Math.round(L.k * 20) + 5, 80, 8, { angle: 0.15, friction: 0.02, restitution: 0.1 });   // fondo de la boca
             M.Composite.add(mundo, this.estaticosF);
         },
 
@@ -195,12 +268,18 @@
                 var c = self.add.container(x, y).setDepth(14);
                 var g = self.add.graphics();
                 var col = COL_TECLA[i % 6];
+                if (self.arteOk) {
+                    g.fillStyle(0x000000, 0.16); g.fillRoundedRect(-w / 2 + 3, -h / 2 + 6, w, h, 12);
+                    c.add(g);
+                    c.add(self.pieza('b' + ((i % 6) + 1), 0, 1, w * 1.06));
+                } else {
                 g.fillStyle(0x000000, 0.2); g.fillRoundedRect(-w / 2 + 3, -h / 2 + 5, w, h, 10);
                 g.fillStyle(col, 1); g.fillRoundedRect(-w / 2, -h / 2, w, h, 10);
                 g.fillStyle(0xffffff, 0.35); g.fillRoundedRect(-w / 2 + 4, -h / 2 + 3, w - 8, 8, 4);
                 g.lineStyle(3, 0x000000, 0.2); g.strokeRoundedRect(-w / 2, -h / 2, w, h, 10);
                 g.fillStyle(0xffffff, 0.5); for (var s = -w / 2 + 14; s < w / 2 - 10; s += 22) g.fillRect(s, h / 2 - 7, 10, 4);
                 c.add(g);
+                }
                 var halo = self.add.graphics(); c.add(halo);
                 var disco = self.add.container(0, -h / 2 - 28);
                 var dg = self.add.graphics();
@@ -222,11 +301,16 @@
                 var c = self.add.container(x, y).setDepth(13);
                 var g = self.add.graphics();
                 g.fillStyle(0x000000, 0.18); g.fillCircle(3, 5, r);
+                if (self.arteOk) {
+                    c.add(g);
+                    c.add(self.pieza('dona', 0, 0, r * 2.1));
+                } else {
                 g.fillStyle(0xf783ac, 1); g.fillCircle(0, 0, r);
                 g.fillStyle(0xffffff, 1); g.fillCircle(0, 0, r * 0.38);
                 g.lineStyle(5, 0xc2255c, 0.6); g.strokeCircle(0, 0, r * 0.72);
                 g.fillStyle(0xffffff, 0.85); [[-0.5, -0.4], [0.45, -0.5], [0.1, 0.62], [-0.55, 0.3]].forEach(function (p) { g.fillRoundedRect(p[0] * r - 4, p[1] * r - 2, 9, 4, 2); });
                 c.add(g);
+                }
                 self.rebotadores.push({ cuerpo: cuerpo, cont: c, r: r, body: cuerpo });
             });
         },
@@ -243,11 +327,19 @@
             var c = this.add.container(x, y).setDepth(30);
             var g = this.add.graphics();
             var col = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8][(Math.random() * 5) | 0];
+            if (this.arteOk) {
+                var pq = 1 + ((Math.random() * 6) | 0);
+                g.fillStyle(0x000000, 0.13); g.fillEllipse(0, r * 0.7, r * 1.5, r * 0.6);
+                c.add(g);
+                c.add(this.pieza('p' + pq, 0, 0, r * 2.15));
+                col = [0xff922b, 0xcc5de8, 0xff6b6b, 0x69db7c, 0x4dabf7, 0xf06595][pq - 1];
+            } else {
             g.fillStyle(col, 1); g.fillCircle(0, 0, r);
             g.fillStyle(0x000000, 0.13); g.fillEllipse(0, r * 0.55, r * 1.5, r * 0.8);
             g.fillStyle(0xffffff, 0.75); g.fillCircle(-r * 0.35, -r * 0.35, r * 0.3);
             g.lineStyle(2, 0x000000, 0.18); g.strokeCircle(0, 0, r);
             c.add(g);
+            }
             this.bola = { body: cuerpo, cont: c, r: r, col: col, estela: [] };
             c.setScale(0.2); this.tweens.add({ targets: c, scale: 1, duration: 260, ease: 'Back.easeOut' });
             this.crank = 1;
@@ -470,20 +562,27 @@
                 return function () {
                     var t = self.teclas.filter(function (q) { return q.id === id; })[0];
                     if (!t) return null;
-                    var b = self.bola ? self.bola.body.position : self.L.salida;
+                    var x = t.body.position.x, y = t.body.position.y;
+                    var ini = { x: x - 80, y: y - 110 }, fin = { x: x - 80 + 72, y: y - 110 + 56 };
+                    // La mano recorre exactamente la rampa y el trazo se dibuja a la vez, punto a punto.
+                    self.borrarTodo();
+                    self.time.delayedCall(300, function () { self.iniciarTrazo(ini); });
+                    for (var q = 1; q <= 4; q++) (function (q) {
+                        self.time.delayedCall(300 + q * 225, function () {
+                            self.agregarPunto({ x: ini.x + q * 18, y: ini.y + q * 14 });
+                            if (q === 4) self.trazoActual = null;
+                        });
+                    })(q);
                     return {
-                        desde: { x: b.x + 20, y: b.y + 60 }, hasta: { x: t.body.position.x - 60, y: t.body.position.y - 40 },
+                        desde: ini, hasta: fin,
                         hacer: async function () {
                             self.fase = 'jugar';
-                            // Rampa corta sobre la tecla y la bola cae encima.
-                            var x = t.body.position.x, y = t.body.position.y;
-                            self.iniciarTrazo({ x: x - 90, y: y - 130 });
-                            for (var q = 1; q <= 6; q++) self.agregarPunto({ x: x - 90 + q * 20, y: y - 130 + q * 12 });
                             self.trazoActual = null;
-                            if (!self.bola) self.crearBola();
-                            M.Body.setPosition(self.bola.body, { x: x - 40, y: y - 120 });
-                            M.Body.setVelocity(self.bola.body, { x: 1.2, y: 0 });
-                            await esperar(self, 1700);
+                            self.crearBola();
+                            M.Body.setPosition(self.bola.body, { x: x - 74, y: y - 135 });
+                            M.Body.setVelocity(self.bola.body, { x: 0, y: 0 });
+                            for (var w = 0; w < 30 && self.prog <= k && !self.completa; w++) await esperar(self, 100);
+                            await esperar(self, 600);
                         }
                     };
                 };
@@ -574,7 +673,23 @@
 
             // ── Dibujo dinámico: nubes de algodón, trazos de crayón, estela de la bola, bombillas de progreso ──
             var g = this.dinG; g.clear();
-            for (var nn = 0; nn < 4; nn++) {
+            if (this.arteOk) {
+                (this.nubesImg || []).forEach(function (im) {
+                    if (!im.active) return;
+                    var nx = ((s * im.vel + im.fase) % (L.W + 300)) - 150;
+                    im.setPosition(nx, L.H * im.fy + Math.sin(s * 0.5 + im.fase) * 4);
+                    im.setAlpha(0.88 * Math.max(0, Math.min(1, (nx - L.W * 0.17) / 140)));   // se desvanecen antes de la máquina
+                });
+                // Destellos que titilan sobre el suelo de caramelo.
+                for (var dz = 0; dz < 22; dz++) {
+                    var al = Math.max(0, Math.sin(s * 1.6 + dz * 2.9));
+                    if (al < 0.05) continue;
+                    var dx = (dz * 137 + 40) % L.W, dy = L.suelo + 8 + (dz * 53) % (L.H - L.suelo - 24);
+                    g.fillStyle(0xffffff, al * 0.7); g.fillCircle(dx, dy, 1.5 + al * 1.6);
+                    g.fillRect(dx - 4 * al, dy - 0.5, 8 * al, 1); g.fillRect(dx - 0.5, dy - 4 * al, 1, 8 * al);
+                }
+            }
+            for (var nn = 0; nn < (this.arteOk ? 0 : 4); nn++) {
                 var nx = ((s * (8 + nn * 3) + nn * 360) % (L.W + 300)) - 150, ny = L.H * (0.1 + nn * 0.07);
                 g.fillStyle(0xffffff, 0.8); g.fillEllipse(nx, ny, 140, 28); g.fillCircle(nx - 24, ny - 8, 20); g.fillCircle(nx + 4, ny - 14, 26); g.fillCircle(nx + 32, ny - 6, 18);
             }
@@ -583,9 +698,19 @@
             if (Mq && Mq.cont.active) {
                 this.crank = Math.max(0, this.crank - dt * 1.4);
                 var m = Mq.mani; m.clear();
+                if (this.arteOk) {
+                    // Brillo del globo de la máquina: late en reposo y destella al soltar una bola.
+                    var gr = L.H * ARTE.globoR / ARTE.h;
+                    m.fillStyle(0xffffff, 0.06 + 0.04 * Math.sin(s * 2) + this.crank * 0.32); m.fillCircle(0, 0, gr * (0.95 + this.crank * 0.12));
+                    m.fillStyle(0xffd43b, this.crank * 0.5); m.fillCircle(0, gr * 0.75, gr * 0.28);
+                    if (this.crank > 0.05) { m.fillStyle(0xffffff, this.crank * 0.9); m.fillCircle(Math.cos(s * 20) * gr * 0.5, Math.sin(s * 17) * gr * 0.5, 4); m.fillCircle(Math.cos(s * 14 + 2) * gr * 0.6, Math.sin(s * 23) * gr * 0.4, 3); }
+                    Mq.cont.angle = Math.sin(s * 40) * this.crank * 2.5;
+                    if (this.boca && this.boca.active) this.boca.setScale(1 + 0.04 * this.crank, 1 + 0.14 * this.crank * Math.abs(Math.sin(s * 14)));   // la boca "escupe" la bola
+                } else {
                 m.fillStyle(0xadb5bd, 1); m.fillCircle(0, 8, 12); m.lineStyle(6, 0x868e96, 1);
                 var an = s * 0 + this.crank * 9; m.lineBetween(0, 8, Math.cos(an) * 20, 8 + Math.sin(an) * 20); m.fillStyle(0xe03131, 1); m.fillCircle(Math.cos(an) * 20, 8 + Math.sin(an) * 20, 6);
                 Mq.bolas.angle = Math.sin(s * 0.9) * 3 + this.crank * 20;
+                }
             }
             var tg = this.trazoG; tg.clear();
             this.trazos.forEach(function (t, ti) {

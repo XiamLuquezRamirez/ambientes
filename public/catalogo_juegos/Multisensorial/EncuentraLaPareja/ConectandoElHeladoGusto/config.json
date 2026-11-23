@@ -2,17 +2,17 @@
   "nombre": "Conectando el Helado (Gusto)",
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: el tambor suena... ¿con qué parte del cuerpo lo escuchamos?",
+    "demostracion": "¡Vamos con un ejemplo! Mira: llega un plato con un tambor. ¿A qué cliente se lo llevamos para que lo disfrute?",
     "demostracionAcierto": "¡Así se une un estímulo con su sentido!",
     "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "¡Bienvenido al Laboratorio Sensorial!"
+        "texto": "¡Bienvenido a la heladería retro!"
       },
       {
         "personaje": 0,
-        "texto": "¡Conecta cada estímulo con su sentido!"
+        "texto": "¡Sirve a cada cliente lo que disfruta con su sentido!"
       }
     ]
   },
@@ -105,11 +105,11 @@
       "bienvenida": [
         {
           "personaje": 1,
-          "texto": "¡Bienvenido al Laboratorio Sensorial!"
+          "texto": "¡Bienvenido a la heladería retro!"
         },
         {
           "personaje": 0,
-          "texto": "¡Conecta cada estímulo con su sentido!"
+          "texto": "¡Sirve a cada cliente lo que disfruta con su sentido!"
         }
       ],
       "retos": [
@@ -127,7 +127,7 @@
           "correcto": "lengua",
           "presentacion": {
             "voz": "zoe",
-            "texto": "El helado es dulce, frío y sabroso. Conecta el helado con el sentido que nos permite saborear su gusto."
+            "texto": "¡Bienvenido a la heladería! Un cliente quiere un helado. Saca una bola de un bote, ponla en el cono y llévaselo al cliente que lo disfruta."
           },
           "acierto": {
             "animacion": "lenguetazo",
