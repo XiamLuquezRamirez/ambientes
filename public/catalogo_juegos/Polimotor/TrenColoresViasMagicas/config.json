@@ -66,7 +66,7 @@
       "cartel": {
         "etiqueta": "Nivel 2 completado",
         "titulo": "¡El tren azul llegó!",
-        "sub": "Ahora cuatro estaciones"
+        "sub": "Ahora las vías con curvas"
       },
       "logro": "¡Qué bien! El tren azul llegó a su estación.",
       "estaciones": 3,
@@ -83,36 +83,36 @@
     },
     {
       "id": 3,
-      "nombre": "Cuatro estaciones",
+      "nombre": "Vías con curvas",
       "color": "verde",
-      "ancho": 1.8,
+      "ancho": 1.85,
       "voz": "zoe",
-      "instruccion": "¡Cuatro estaciones! Desliza tu dedo derechito por los puntos de luz, de estación en estación.",
+      "instruccion": "¡Las vías ahora tienen curvas! Sigue los puntos de luz despacito hasta cada estación.",
       "cartel": {
         "etiqueta": "Nivel 3 completado",
         "titulo": "¡El tren verde llegó!",
-        "sub": "Ahora las vías con curvas"
+        "sub": "Ahora curvas más grandes"
       },
-      "logro": "¡Excelente! El tren verde llegó a la última estación.",
+      "logro": "¡Excelente! El tren verde llegó por las curvas.",
       "estaciones": 4,
       "desnivel": true,
-      "curvas": false,
+      "curvas": true,
       "hitos": [
         0.33,
         0.66
       ],
       "hueco": [
         18,
-        25
+        24
       ]
     },
     {
       "id": 4,
-      "nombre": "Vías con curvas",
+      "nombre": "Curvas grandes",
       "color": "amarillo",
-      "ancho": 1.85,
+      "ancho": 1.9,
       "voz": "zeus",
-      "instruccion": "¡Las vías ahora tienen curvas! Sigue los puntos de luz despacito hasta cada estación.",
+      "instruccion": "¡Ahora las curvas son más grandes! Sigue los puntos de luz despacito, sin soltar, hasta cada estación.",
       "cartel": {
         "etiqueta": "Nivel 4 completado",
         "titulo": "¡Todos los trenes llegaron!",
@@ -128,8 +128,13 @@
       ],
       "hueco": [
         18,
-        24
-      ]
+        22
+      ],
+      "curva": [
+        2.6,
+        3.2
+      ],
+      "margenCurva": 1.9
     }
   ],
   "textos": {

@@ -52,7 +52,7 @@ module.exports = {
     nombre: 'El Tren de Colores y las Vías Mágicas (reglas)',
     casos: [
         {
-            descripcion: 'config: 4 niveles con 2, 3, 4 y 4 estaciones (el último con curvas), edad 3-4 años y textos pedidos',
+            descripcion: 'config: 4 niveles con 2, 3, 4 y 4 estaciones (3 y 4 con curvas, más altas en el 4), edad 3-4 años y textos pedidos',
             fn: function () {
                 var c = config();
                 igual(c.vias.length, 4, 'niveles');
@@ -62,7 +62,7 @@ module.exports = {
                 igual(c.textos.guiaZeus, '¡Sigue los puntos de luz con tu dedo sin soltar el camino!', 'audio de Zeus');
                 igual(c.textos.finalVoz, '¡EXCELENTE MAQUINISTA! Trazaste las vías rectas y el tren llegó a su destino.', 'cierre');
                 igual(c.vias.map(function (v) { return v.estaciones; }).join(','), '2,3,4,4', 'estaciones por nivel');
-                igual(c.vias.map(function (v) { return !!v.curvas; }).join(','), 'false,false,false,true', 'curvas solo en el nivel 4');
+                igual(c.vias.map(function (v) { return !!v.curvas; }).join(','), 'false,false,true,true', 'curvas en los niveles 3 y 4');
                 c.vias.forEach(function (v, i) {
                     cierto(v.ancho >= 1.7, 'carril ancho para 3-4 años en el nivel ' + (i + 1));
                     cierto(v.cartel && v.cartel.titulo, 'cartel del nivel ' + (i + 1));
@@ -105,16 +105,16 @@ module.exports = {
             }
         },
         {
-            descripcion: 'niveles 1 y 2 en línea recta; nivel 3 con desnivel recto; nivel 4 con curvas que salen y llegan derechas',
+            descripcion: 'niveles 1 y 2 en línea recta; niveles 3 y 4 con curvas que salen y llegan derechas',
             fn: function () {
                 rutas().forEach(function (r) {
                     var que = 'nivel ' + r.nivel + ' semilla ' + r.semilla;
                     r.ruta.tramos.forEach(function (tr) {
-                        if (r.nivel < 4) igual(tr.puntos.length, 2, 'tramo recto en ' + que);
+                        if (r.nivel < 3) igual(tr.puntos.length, 2, 'tramo recto en ' + que);
                         else cierto(tr.puntos.length > 8, 'tramo curvo en ' + que);
                     });
                     if (r.nivel <= 2) cierto(r.ruta.estaciones.every(function (e) { return e.z === r.ruta.estaciones[0].z; }), 'todas a la misma altura en ' + que);
-                    if (r.nivel === 4) {
+                    if (r.nivel >= 3) {
                         r.ruta.tramos.forEach(function (tr) {
                             var p = tr.puntos;
                             var A = p[0], B = p[p.length - 1];
@@ -123,7 +123,7 @@ module.exports = {
                                 var u = (q[0] - A[0]) / (B[0] - A[0]);
                                 flecha = Math.max(flecha, Math.abs(q[1] - (A[1] + (B[1] - A[1]) * u)));
                             });
-                            cierto(flecha >= 0.55, 'la curva se nota en ' + que);
+                            cierto(flecha >= (r.nivel === 4 ? 1.6 : 0.55), 'la curva se nota en ' + que);
                             // cerca de las estaciones (1,2 de cada lado) casi no se aparta: no pisa los andenes
                             p.forEach(function (q) {
                                 var u = (q[0] - A[0]) / (B[0] - A[0]);

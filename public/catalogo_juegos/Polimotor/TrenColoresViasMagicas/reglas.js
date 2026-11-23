@@ -303,7 +303,8 @@
     /**
      * Ruta de un nivel: n estaciones de izquierda a derecha con huecos de largo al azar.
      *   nivel: { estaciones: 2..4, hueco: [mín, máx] (largo al azar de cada hueco), desnivel: true (las estaciones
-     *   a distinta altura), curvas: true, ancho, hitos }
+     *   a distinta altura), curvas: true, curva: [mín, máx] y margenCurva (alto de las curvas del nivel), ancho,
+     *   hitos }
      *   cfg: config.json → ruta (zona y medidas). azar: función 0..1 (Math.random por defecto; las pruebas
      *   pasan una con semilla).
      * Devuelve { estaciones: [{ x, z }], tramos: [{ id, puntos, ancho, hitos, curva }], camino: [[x, z], …]
@@ -378,10 +379,14 @@
             if (nivel && nivel.curvas) {
                 // joroba sin²: sale y llega derecha a las estaciones (no pisa sus andenes) y se curva en el medio;
                 // alterna hacia el fondo y hacia el frente
-                var alto = o.curvaMin + rnd() * (o.curvaMax - o.curvaMin);
+                // cada nivel puede pedir curvas más altas: nivel.curva = [mín, máx] y nivel.margenCurva
+                var cMin = num(nivel.curva && nivel.curva[0], o.curvaMin);
+                var cMax = Math.max(cMin, num(nivel.curva && nivel.curva[1], o.curvaMax));
+                var margen = num(nivel.margenCurva, o.margenCurva);
+                var alto = cMin + rnd() * (cMax - cMin);
                 var tope2 = signo > 0
-                    ? (o.zMax + o.margenCurva) - Math.max(A.z, B.z)
-                    : Math.min(A.z, B.z) - (o.zMin - o.margenCurva);
+                    ? (o.zMax + margen) - Math.max(A.z, B.z)
+                    : Math.min(A.z, B.z) - (o.zMin - margen);
                 var dx2 = B.x - A.x;
                 // la joroba (1 − cos)/2 se curva más en la cima y en los extremos: radio = L² / (2π²·alto)
                 var porRadio = dx2 * dx2 / (2 * Math.PI * Math.PI * o.radioMin);

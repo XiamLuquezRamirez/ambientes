@@ -23,18 +23,23 @@ Trazado de vías en un valle de juguete **3D real (three.js)** armado con los mo
 - Materiales y modelos de las experiencias (kit low-poly) y personajes low-poly más livianos, para tabletas de 4 GB de RAM.
 - Cámara más alejada.
 
+## Tercera vuelta (2026-11-23)
+
+- El nivel 3 pasa a ser el de curvas (el que antes era el 4). El de cuatro estaciones rectas con desnivel ya no existe.
+- El nivel 4 tiene curvas más pronunciadas: `vias[3].curva` = [2,6; 3,2] y `margenCurva` 1,9. Las curvas se apartan en promedio 2,4 de la recta (en el nivel 3, 1,7), y la vía llega como mucho a z ≈ ±3,5.
+
 ## Niveles (`config.json → vias`, ruta al azar con `ReglasTren.generarRuta`)
 
 | Nivel | Tren | Estaciones | Huecos | Largo de cada hueco (al azar) | Forma | Carril |
 |---|---|---|---|---|---|---|
 | 1 | rojo | 2 | 1 | 24 a 28 | recta | 1,9 |
 | 2 | azul | 3 | 2 | 20 a 27 | recta | 1,85 |
-| 3 | verde | 4 | 3 | 18 a 25 | rectas con desnivel | 1,8 |
-| 4 | amarillo | 4 | 3 | 18 a 24 | curvas | 1,85 |
+| 3 | verde | 4 | 3 | 18 a 24 | curvas | 1,85 |
+| 4 | amarillo | 4 | 3 | 18 a 22 | curvas más altas | 1,9 |
 
 - Cada hueco ocupa toda la pantalla y la ruta sigue fuera de ella: la primera estación está en x = −10,5 y la última llega hasta x ≈ 65. El valle (árboles, vallas, flores, animales, nubes y montañas) se extiende hasta x ≈ 100.
 - Con desnivel, cada estación queda a otra altura (z entre −1,5 y 1,7).
-- Curvas: joroba (1 − cos)/2 de 1,6 a 2,6 de alto, alternando hacia el fondo y hacia el frente. El radio nunca baja de `radioMin` 2,6.
+- Curvas: joroba (1 − cos)/2 de 1,6 a 2,6 de alto (nivel 3) o de 2,6 a 3,2 (nivel 4, `curva` y `margenCurva` del nivel), alternando hacia el fondo y hacia el frente. El radio nunca baja de `radioMin` 2,6.
 - El niño construye un hueco cada vez. Al terminarlo:
   1. el tren viaja a la estación siguiente;
   2. la cámara se desliza (2,2 s) hasta encuadrar el hueco nuevo;
@@ -97,7 +102,7 @@ Trazado de vías en un valle de juguete **3D real (three.js)** armado con los mo
 10. Al completar un hueco: barrido de luz, anticipación, vapor, pitido, el tren viaja y llega, y hay confeti en esa estación. Si quedan huecos, Zoe o Zeus lo celebran, la estrella guía recorre el siguiente y se sigue construyendo.
 11. Al completar el último hueco del nivel: cartel con los colores del juego (azul, turquesa, amarillo y naranja).
 12. Fundido y siguiente nivel, con una ruta nueva al azar (estrella guía de 3 s más la instrucción por voz).
-13. Nivel 4, con curvas.
+13. Niveles 3 y 4, con curvas (más altas en el 4).
 14. Cinemática final.
 15. Zoe «¡EXCELENTE MAQUINISTA!…» y Zeus.
 16. Victoria compartida.
@@ -132,10 +137,10 @@ Expone `volumenFondo` y `volumenEfectos` para `comun/volumen.js`. Las voces van 
 ## Pruebas
 
 - `node tests/js/run-tests.js`: suite «El Tren de Colores y las Vías Mágicas (reglas)», 12 casos. Cada uno recorre los 4 niveles con 5 semillas, es decir, todos sus huecos:
-  - config: estaciones 2/3/4/4, curvas solo en el nivel 4 y textos pedidos;
+  - config: estaciones 2/3/4/4, curvas en los niveles 3 y 4 y textos pedidos;
   - rutas de izquierda a derecha, sin huecos menores que `huecoMin`;
   - distancias distintas con otra semilla;
-  - rectas en los niveles 1 a 3, desnivel en el 3 y curvas que salen derechas en el 4;
+  - rectas en los niveles 1 y 2, y curvas que salen derechas en el 3 y el 4 (en el 4 se apartan al menos 1,6);
   - llegada con hitos;
   - zigzag tolerado (también en las curvas);
   - salto imposible;

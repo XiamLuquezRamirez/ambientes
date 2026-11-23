@@ -803,7 +803,7 @@ function ocultarCartel() {
 // ------------------------------------------------------------------ arranque
 
 document.addEventListener("DOMContentLoaded", function () {
-    gameConfig = JSON.parse(readText("config.json?v=20261123i"));
+    gameConfig = JSON.parse(readText("config.json?v=20261123j"));
     var introCrudo = readText("../../intro.json");
     introConfig = introCrudo ? JSON.parse(introCrudo) : { personajes: [] };
     introConfig.conversacion = textos().conversacion || [];
