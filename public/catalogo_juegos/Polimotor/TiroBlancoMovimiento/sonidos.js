@@ -271,6 +271,24 @@
         },
         ambiente: ambiente,
         musica: musica,
+        /**
+         * Volumen de la musica/ambiente (0..100), independiente de los efectos.
+         * Lo usa comun/volumen.js (el canal "Musica de fondo" del boton de sonido).
+         */
+        volumenFondo: function (pct) {
+            if (!asegurar() || !amb) return;
+            var f = Math.max(0, Math.min(1, (Number(pct) || 0) / 100));
+            amb.gain.setTargetAtTime(0.9 * f, ctx.currentTime, 0.05);
+        },
+        /**
+         * Volumen de los efectos (0..100), independiente del fondo.
+         * Lo usa comun/volumen.js (el canal "Efectos y voces" del boton de sonido).
+         */
+        volumenEfectos: function (pct) {
+            if (!asegurar() || !efectos) return;
+            var f = Math.max(0, Math.min(1, (Number(pct) || 0) / 100));
+            efectos.gain.setTargetAtTime(3 * f, ctx.currentTime, 0.05);
+        },
         volumen: function (pct) {
             vol = Math.max(0, Math.min(1, (Number(pct) || 0) / 100));
             aplicarVolumen();

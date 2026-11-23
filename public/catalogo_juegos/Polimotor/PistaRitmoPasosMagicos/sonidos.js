@@ -443,4 +443,16 @@
         cuentaAtras: cuentaAtras,
         fiesta: fiesta
     };
+
+    /*
+     * Volumen de efectos para comun/volumen.js (el control "Efectos y voces" del boton de sonido).
+     * Este modulo no tiene musica propia: el fondo del juego lo maneja TextoVoz o PedniaAudio.
+     * VOL es el factor que multiplica cada sonido, asi que basta escalarlo.
+     */
+    var VOL_BASE = VOL;
+    global.SonidosPista.volumenEfectos = function (pct) {
+        var f = Math.max(0, Math.min(1, (Number(pct) || 0) / 100));
+        VOL = VOL_BASE * f;
+    };
+
 })(window);

@@ -317,5 +317,16 @@
         })
     };
 
+    /*
+     * Volumen por canal para comun/volumen.js (los dos controles del boton de sonido).
+     * Este modulo no tiene musica propia: solo se escala el canal de efectos, que es todo lo
+     * que produce (el fondo del juego lo maneja TextoVoz o PedniaAudio).
+     */
+    var VOL_BASE = VOL;
+    api.volumenEfectos = function (pct) {
+        var f = Math.max(0, Math.min(1, (Number(pct) || 0) / 100));
+        VOL = VOL_BASE * f;
+    };
+
     global.SonidosAnillos = api;
 })(window);

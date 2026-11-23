@@ -175,6 +175,71 @@
       ],
       "port": 8041,
       "autoPort": false
+    },
+    {
+      "name": "juegos-canasta",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8042",
+        "--directory",
+        "public"
+      ],
+      "port": 8042,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-picnic",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8043",
+        "--directory",
+        "public"
+      ],
+      "port": 8043,
+      "autoPort": false
+    },
+    {
+      "name": "maqueta-tienda",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8050",
+        "--directory",
+        "D:/tienda-carlos/docs/maqueta"
+      ],
+      "port": 8050,
+      "autoPort": false
+    },
+    {
+      "name": "tienda-publica",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8051",
+        "--directory",
+        "D:/tienda-carlos/public"
+      ],
+      "port": 8051,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-arbol",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8044",
+        "--directory",
+        "public"
+      ],
+      "port": 8044,
+      "autoPort": false
     }
   ]
 }

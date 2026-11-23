@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>¡El Pinball de Gravedad Mágica!</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" href="../../../assets/css/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../../assets/css/fontawesome/css/all.min.css">
+	<link rel="stylesheet" href="../../../assets/css/sweetalert2.min.css">
+	<script src="../../../assets/js/jquery-4.0.0.min.js"></script>
+	<script src="../../../assets/js/sweetalert.js"></script>
+	<link rel="stylesheet" href="../comun/inicio-fondo.css?v=20261030d">
+	<script src="../comun/inicio-fondo.js?v=20261030d"></script>
+	<script src="../comun/volumen.js?v=20261120vol3"></script>
+	<link rel="stylesheet" href="../../intro3d/css/intro.css">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261005a">
+	<link rel="stylesheet" href="style.css?v=20261120v">
+	<link rel="stylesheet" href="../comun/interfaz.css?v=20261022o">
+</head>
+<body class="esperando-inicio">
+
+	<div id="pantalla-inicio" class="pantalla-inicio">
+		<button type="button" id="btn-inicio-volver" class="inicio-volver" hidden>
+			<img src="../../../assets/images/selector-aula/volver.png" alt="Volver">
+		</button>
+		<div class="inicio-mancha" aria-hidden="true"></div>
+		<div class="inicio-contenido">
+			<img class="inicio-icono" src="pinball-gravedad.png" alt="" aria-hidden="true">
+			<p class="inicio-kicker">¡El Pinball de Gravedad Mágica!</p>
+			<button type="button" id="btn-empecemos" class="btn-empecemos">
+				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
+				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
+				<span class="btn-empecemos-texto">¡Empecemos!</span>
+			</button>
+		</div>
+	</div>
+
+	<div id="intro3d-root" hidden>
+		<div id="three-container"></div>
+		<div id="phaser-container"></div>
+		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;">
+			Omitir <i class="fa fa-forward" aria-hidden="true"></i>
+		</button>
+		<div id="intro3d-continuar" hidden>
+			<div class="intro3d-continuar-card">
+				<div class="intro3d-titulo-wrap">
+					<span class="intro3d-ray intro3d-ray-l1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l3" aria-hidden="true"></span>
+					<h2>¡Listo!</h2>
+					<span class="intro3d-ray intro3d-ray-r1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r3" aria-hidden="true"></span>
+				</div>
+				<p>Toca el botón para empezar el juego</p>
+				<div class="intro3d-btn-wrap">
+					<span class="intro3d-ray intro3d-ray-bl1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-bl2" aria-hidden="true"></span>
+					<button type="button" id="btn-continuar-intro3d">
+						<span class="intro3d-btn-shine" aria-hidden="true"></span>
+						<span class="intro3d-play" aria-hidden="true"></span>
+						<span>CONTINUAR</span>
+					</button>
+					<span class="intro3d-ray intro3d-ray-br1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-br2" aria-hidden="true"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Cielo vivo del campamento (fondo.js): estrellas, aurora, fugaces… reacciona al juego. -->
+	<canvas id="fondo-cielo" class="fondo-cielo" aria-hidden="true"></canvas>
+
+	<div id="principal">
+		<!-- La máquina. El lienzo se inclina en perspectiva con CSS (no hay motor 3D). -->
+		<div id="zona-mesa" class="zona-mesa">
+			<div id="marcador" class="marcador" aria-live="polite" aria-label="Puntos">
+				<span class="marcador-fondo" aria-hidden="true">88888888</span>
+				<span id="marcador-num" class="marcador-num">00000000</span>
+				<span id="marcador-suma" class="marcador-suma" hidden></span>
+			</div>
+			<div id="mesa-escena" class="mesa-escena">
+				<canvas id="mesa" role="application" tabindex="0"
+					aria-label="Mesa de pinball: sigue la bola de energía y toca los botones de abajo para mover las palancas antes de que caiga"></canvas>
+			</div>
+			<div id="mensaje" class="mensaje" aria-live="polite" hidden></div>
+			<div id="cartel" class="cartel" hidden>
+				<strong id="cartel-titulo"></strong>
+				<span id="cartel-sub"></span>
+			</div>
+			<div id="trofeo" class="trofeo" hidden aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
+		</div>
+
+		<!-- Lo que dicen Zoe y Zeus: nube con el ícono de quien habla (Zoe a la izquierda, Zeus a la derecha). -->
+		<div id="nube-zoe" class="nube nube-zoe" aria-live="polite" hidden>
+			<img class="nube-icono" src="icono-zoe.png" alt="">
+			<span class="nube-cuerpo"><b class="nube-nombre">Zoe</b><span id="nube-zoe-texto"></span></span>
+		</div>
+		<div id="nube-zeus" class="nube nube-zeus" aria-live="polite" hidden>
+			<img class="nube-icono" src="icono-zeus.png" alt="">
+			<span class="nube-cuerpo"><b class="nube-nombre">Zeus</b><span id="nube-zeus-texto"></span></span>
+		</div>
+
+		<!-- Zoe 3D: entra caminando solo para la presentación y la demo, y luego sale (guia-3d.js). -->
+		<div id="guia-demo" class="guia-demo" role="img" aria-label="Zoe" hidden></div>
+
+		<!-- Consola frontal de la máquina con los botones arcade de las palancas (se acopla al pie de la mesa). -->
+		<div id="controles-palancas" class="controles-palancas">
+			<button type="button" id="btn-palanca-izq" class="palanca-btn izq" aria-label="Palanca izquierda">
+				<span class="arcade" aria-hidden="true"><span class="arcade-tapa"><i class="fa-solid fa-arrow-left"></i></span></span>
+				<span class="palanca-texto">Toca Izquierda</span>
+			</button>
+			<div class="consola-luces" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+			<button type="button" id="btn-palanca-der" class="palanca-btn der" aria-label="Palanca derecha">
+				<span class="arcade" aria-hidden="true"><span class="arcade-tapa"><i class="fa-solid fa-arrow-right"></i></span></span>
+				<span class="palanca-texto">Toca Derecha</span>
+			</button>
+		</div>
+
+		<!-- Abajo a la izquierda: ronda y progreso. -->
+		<div id="indicador-ronda" class="indicador-ronda" aria-live="polite">
+			<strong id="ronda-texto" class="ronda-texto">RONDA 1/3</strong>
+			<div id="golpes-puntos" class="golpes-puntos" aria-hidden="true"></div>
+			<span id="golpes-texto" class="golpes-texto">Golpes: 0 de 6</span>
+		</div>
+	</div>
+
+	<!-- Mano animada de la demostración. -->
+	<div id="mano-demo" class="mano-demo" hidden aria-hidden="true"><i class="fa-solid fa-hand-pointer"></i></div>
+
+	<!-- Arriba a la derecha: Reiniciar y Volver (los mismos botones e íconos de los demás juegos, comun/interfaz.css). -->
+	<div class="controles-arriba hud-nav">
+		<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+		<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
+	</div>
+
+	<div id="comenzar-wrap" class="comenzar-wrap" hidden>
+		<button type="button" id="btn-comenzar" class="btn-comenzar"><i class="fa-solid fa-play"></i><span class="btn-comenzar-texto">¡Comenzar a jugar!</span></button>
+	</div>
+
+	<!-- Abajo a la derecha: accesibilidad y volumen. -->
+	<div id="menu-acc" class="control-flotante">
+		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
+			<i class="fa-solid fa-universal-access"></i>
+		</button>
+		<div id="menu-acc-panel" class="panel-flotante" hidden>
+			<div class="panel-cab">
+				<strong>Accesibilidad</strong>
+				<button type="button" id="btn-cerrar-menu-acc" class="panel-cerrar" aria-label="Cerrar">&times;</button>
+			</div>
+			<div id="menu-acc-ops" class="panel-ops"></div>
+		</div>
+	</div>
+
+	<div id="menu-vol" class="control-flotante">
+		<button type="button" id="btn-menu-vol" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-vol-panel" title="Sonido">
+			<i class="fa-solid fa-volume-high"></i>
+		</button>
+		<div id="menu-vol-panel" class="panel-flotante" hidden>
+			<div class="panel-cab">
+				<strong>Sonido</strong>
+				<button type="button" id="btn-cerrar-menu-vol" class="panel-cerrar" aria-label="Cerrar">&times;</button>
+			</div>
+			<label class="panel-op panel-rango">
+				<span>Volumen <strong id="vol-val">45</strong></span>
+				<input type="range" id="rango-volumen" min="0" max="100" step="1" value="45">
+			</label>
+			<button type="button" id="btn-silencio" class="boton-neon btn-silencio" aria-pressed="false"><i class="fa-solid fa-volume-xmark"></i><span>Silenciar</span></button>
+		</div>
+	</div>
+
+	<!-- Resumen de la celebración final. -->
+	<div id="final-panel" class="final-panel" hidden>
+		<strong id="final-titulo" class="final-titulo"></strong>
+		<span id="final-sub" class="final-sub"></span>
+		<div id="final-estrellas" class="final-estrellas" aria-hidden="true">
+			<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+		</div>
+		<div class="final-resumen">
+			<div class="res-item res-total"><span>Puntos de energía</span><strong id="res-puntos">0</strong></div>
+			<div class="res-item"><span>Golpes de palanca</span><strong id="res-golpes">0</strong></div>
+			<div class="res-item"><span>Mejor racha</span><strong id="res-racha">0</strong></div>
+			<div class="res-item"><span>Rondas</span><strong id="res-rondas">0</strong></div>
+		</div>
+		<div class="final-botones">
+			<button type="button" id="btn-otra-vez" class="boton-neon verde"><i class="fa-solid fa-rotate-right"></i><span>Jugar nuevamente</span></button>
+			<button type="button" id="btn-al-menu" class="boton-neon azul"><i class="fa-solid fa-house"></i><span>Volver al menú</span></button>
+		</div>
+	</div>
+
+	<script src="../../texto_voz.js?v=20261119vol"></script>
+	<script src="../../shared/edad-nivel.js"></script>
+	<script src="../../../assets/vendor/phaser/phaser.min.js"></script>
+	<script src="../../intro3d/js/config.js?v=20261007a"></script>
+	<script src="../../intro3d/js/ambientes-tema.js?v=20261105a"></script>
+	<script type="importmap">
+	{
+	  "imports": {
+	    "three": "../../../assets/vendor/three/three.module.js",
+	    "three/addons/": "../../../assets/vendor/three/addons/"
+	  }
+	}
+	</script>
+	<script type="module" src="../../intro3d/js/three-scene.js?v=20261105a"></script>
+	<script src="../../tutorial/tutorial.js?v=20261019c"></script>
+	<script src="../../intro3d/js/intro.js?v=20261028p4"></script>
+	<script src="../../shared/aplicar-perfil-juego.js?v=20261013a"></script>
+	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
+	<script src="reglas.js?v=20261120u"></script>
+	<script src="mesa.js?v=20261120u"></script>
+	<script src="sonidos.js?v=20261120u"></script>
+	<script src="demo.js?v=20261120u"></script>
+	<script src="fondo.js?v=20261120u"></script>
+	<script src="script.js?v=20261120u"></script>
+	<script type="module" src="guia-3d.js?v=20261120u"></script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+{
+  "nombre": "¡El Pinball de Gravedad Mágica!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "menosEfectos": false,
+    "letterSpacing": 2,
+    "volumenFondo": 35,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "anchoMesa": 1000,
+    "altoMesa": 1600,
+    "radioBola": 24,
+    "gravedadBase": 640,
+    "friccion": 0.9995,
+    "restitucionMuro": 0.72,
+    "velocidadMaxima": 1300,
+    "impulsoFlipper": 1400,
+    "alcanceFlipper": 190,
+    "flipperSubidaMs": 90,
+    "flipperBajadaMs": 170,
+    "impulsoBumper": 600,
+    "antiatascoMs": 2600,
+    "antiatascoVelocidad": 70,
+    "avisoAnticipacionY": 950,
+    "ayudaMs": 11000,
+    "ayudaRepetirMs": 13000,
+    "rescateMs": 1400,
+    "vozPausaMs": 2400,
+    "impulsoRebotador": 460
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "nombre": "Conoce las palancas",
+      "golpesObjetivo": 6,
+      "gravedad": 520,
+      "velocidadMaxima": 1180,
+      "impulsoBumper": 520,
+      "radioBumper": 50,
+      "dianas": false,
+      "avisos": true,
+      "tutorialPrimerGolpe": true
+    },
+    {
+      "id": 2,
+      "nombre": "Coordinación y anticipación",
+      "golpesObjetivo": 8,
+      "gravedad": 640,
+      "velocidadMaxima": 1280,
+      "impulsoBumper": 600,
+      "radioBumper": 46,
+      "dianas": true,
+      "avisos": true,
+      "tutorialPrimerGolpe": false
+    },
+    {
+      "id": 3,
+      "nombre": "Pinball mágico",
+      "golpesObjetivo": 10,
+      "gravedad": 760,
+      "velocidadMaxima": 1380,
+      "impulsoBumper": 680,
+      "radioBumper": 42,
+      "dianas": true,
+      "avisos": true,
+      "tutorialPrimerGolpe": false
+    }
+  ],
+  "bumpers": [
+    {
+      "id": "b1",
+      "x": 300,
+      "y": 470,
+      "nota": 523.25,
+      "color": "#ff922b"
+    },
+    {
+      "id": "b2",
+      "x": 420,
+      "y": 380,
+      "nota": 659.25,
+      "color": "#3bc9db"
+    },
+    {
+      "id": "b3",
+      "x": 580,
+      "y": 380,
+      "nota": 783.99,
+      "color": "#ff6b6b"
+    },
+    {
+      "id": "b4",
+      "x": 700,
+      "y": 470,
+      "nota": 880.0,
+      "color": "#ffd43b"
+    }
+  ],
+  "dianas": [
+    {
+      "id": "d1",
+      "x": 62,
+      "y": 760,
+      "ancho": 150,
+      "alto": 20,
+      "angulo": 1.5708,
+      "color": "#51cf66"
+    },
+    {
+      "id": "d2",
+      "x": 938,
+      "y": 760,
+      "ancho": 150,
+      "alto": 20,
+      "angulo": 1.5708,
+      "color": "#51cf66"
+    },
+    {
+      "id": "d3",
+      "x": 500,
+      "y": 600,
+      "ancho": 130,
+      "alto": 24,
+      "angulo": 0,
+      "color": "#f783ac"
+    }
+  ],
+  "rampas": [
+    {
+      "id": "r-izq",
+      "x1": 150,
+      "y1": 560,
+      "x2": 205,
+      "y2": 860,
+      "color": "#b197fc"
+    },
+    {
+      "id": "r-der",
+      "x1": 850,
+      "y1": 560,
+      "x2": 795,
+      "y2": 860,
+      "color": "#b197fc"
+    }
+  ],
+  "flippers": {
+    "izquierda": {
+      "pivoteX": 330,
+      "pivoteY": 1470,
+      "largo": 140,
+      "anguloReposo": 0.45,
+      "anguloGolpe": -0.5
+    },
+    "derecha": {
+      "pivoteX": 670,
+      "pivoteY": 1470,
+      "largo": 140,
+      "anguloReposo": 2.6916,
+      "anguloGolpe": 3.6416
+    }
+  },
+  "puntos": {
+    "bumper": 10,
+    "diana": 25,
+    "flipperAcertado": 15,
+    "rachaBonus": 5,
+    "rondaCompleta": 100,
+    "rebotador": 5,
+    "aro": 20
+  },
+  "demo": {
+    "pasos": [
+      {
+        "texto": "Mira cómo baja la bola de energía."
+      },
+      {
+        "texto": "¡Toca el botón izquierdo para mover la palanca!"
+      },
+      {
+        "texto": "¡Ahora el derecho! Así la bola nunca cae."
+      }
+    ]
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡El Pinball de Gravedad Mágica!",
+    "subtituloIntro": "¡Mueve las palancas y mantén la bola en juego!",
+    "introZoe": "¡El gran Pinball de la gravedad mágica! Mira por dónde baja la bola de energía. Toca los botones de abajo para accionar las palancas y golpear la bola antes de que caiga al fondo.",
+    "demoZeus": "¡Mira! Toco el botón izquierdo y la palanca golpea la bola hacia arriba.",
+    "instruccionZoe": "¡Sigue la bola con tus ojos! Toca izquierda o derecha según por dónde venga.",
+    "demoMuyBien": "¡Así se juega!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "avisoIzquierda": "¡Viene por la izquierda!",
+    "avisoDerecha": "¡Viene por la derecha!",
+    "tocaAhora": "¡Toca ahora!",
+    "acierto": [
+      "¡Muy bien, otra vez!",
+      "¡Buen rebote!",
+      "¡Mantenla en juego!",
+      "¡Qué reflejos!",
+      "¡Excelente golpe!",
+      "¡Sigue la bola!"
+    ],
+    "bumper": [
+      "¡Buen rebote!",
+      "¡La bola rebota con fuerza!",
+      "¡Energía pura!"
+    ],
+    "diana": [
+      "¡Diana encendida!",
+      "¡Le diste al blanco!",
+      "¡Qué puntería!"
+    ],
+    "caida": [
+      "¡Uy! Vamos a darle otra oportunidad.",
+      "¡No pasa nada! Aquí viene otra bola.",
+      "¡Otra vez! Tú puedes."
+    ],
+    "ayuda": [
+      "¡Sigue la bola con tus ojos!",
+      "¡Toca el botón del lado por donde baja la bola!",
+      "¡Mantenla en juego!"
+    ],
+    "rondaInicio": [
+      {
+        "pj": "zoe",
+        "texto": "¡Conoce las palancas! La bola baja despacio. Toca izquierda o derecha para golpearla."
+      },
+      {
+        "pj": "zeus",
+        "texto": "¡Coordinación y anticipación! Ahora la bola va más rápido y hay dianas de energía."
+      },
+      {
+        "pj": "zoe",
+        "texto": "¡Pinball mágico! Última ronda. ¡Sigue la bola y mantenla en juego!"
+      }
+    ],
+    "rondaLista": "¡Muy bien! Cada vez controlas mejor las palancas.",
+    "rondaListaTitulo": "¡RONDA {n} LISTA!",
+    "rondaListaSub": "¡{c} golpes de palanca!",
+    "rondaSiguienteTitulo": "¡RONDA {n}!",
+    "rondaDe": "RONDA {n}/{t}",
+    "golpesDe": "Golpes: {n} de {t}",
+    "finalTitulo": "¡ESPECTACULAR DOMINIO VISOMOTOR!",
+    "finalSub": "Controlaste el pinball con un ojo y una precisión increíbles.",
+    "final": "¡ESPECTACULAR DOMINIO VISOMOTOR! Controlaste el pinball con un ojo y una precisión increíbles. ¡Eres un maestro de la gravedad mágica!",
+    "finalZoe": "¡ESPECTACULAR DOMINIO VISOMOTOR!",
+    "finalZeus": "¡Eres un maestro de la gravedad mágica!",
+    "cierre": "¡ESPECTACULAR DOMINIO VISOMOTOR! Controlaste el pinball con un ojo y una precisión increíbles. ¡Eres un maestro de la gravedad mágica!",
+    "botonOtraVez": "Jugar nuevamente",
+    "botonMenu": "Volver al menú",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Bienvenidos a la máquina de pinball de la gravedad mágica!"
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Vamos a mover las palancas para que la bola de energía nunca caiga!"
+      }
+    ],
+    "avisoIzquierdaLargo": "¡Ahí viene por la izquierda! ¡Toca la palanca izquierda ahora!",
+    "avisoDerechaLargo": "¡Ahí viene por la derecha! ¡Toca la palanca derecha ahora!",
+    "aro": [
+      "¡Por el aro de energía!",
+      "¡Cruzó el portal!"
+    ]
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Coordinación visual: seguir, anticipar y golpear a tiempo"
+    }
+  ],
+  "mesa": {
+    "paredX": 40,
+    "arco": {
+      "cx": 500,
+      "cy": 380,
+      "rx": 460,
+      "ry": 320
+    },
+    "yRebotador": 1120,
+    "finRebotador": {
+      "x": 270,
+      "y": 1431
+    },
+    "colorRebotadorIzq": "#3bc9db",
+    "colorRebotadorDer": "#ffd43b"
+  },
+  "aro": {
+    "x": 500,
+    "y": 830,
+    "radio": 110
+  }
+}

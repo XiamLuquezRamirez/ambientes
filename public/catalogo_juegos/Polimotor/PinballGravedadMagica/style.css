@@ -1,0 +1,879 @@
+/**
+ * style.css — El Pinball de Gravedad Mágica
+ *
+ * Máquina arcade en un campamento nocturno (imagen de referencia). La mesa es un <canvas>
+ * inclinado con `perspective` + `rotateX`: la cabecera queda lejos y las palancas cerca.
+ * Los botones redondos de control los pinta ../comun/interfaz.css (se carga después).
+ *
+ * Capas: fondo 0 · #principal 1 · guías 20 · comenzar 1200 · botones redondos 1500 · final 2000
+ *        · portada 4000.
+ */
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('../../fonts/Fredoka-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('../../fonts/Fredoka-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --alto-consola: clamp(112px, 17.5vh, 140px);
+  --noche: #140a3d;
+  --violeta: #7c4dff;
+  --violeta-claro: #c5b3ff;
+  --cian: #3bc9db;
+  --ambar: #ffd43b;
+  --naranja: #ff922b;
+  --rojo: #ff6b3d;
+  --rosa: #ff4fd8;
+  --texto: #ffffff;
+  --contorno: #2a1150;
+  --hc-letter-spacing: 1px;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--noche);
+  font-family: 'Fredoka', 'Arial Rounded MT Bold', Arial, sans-serif;
+  font-weight: 600;
+  letter-spacing: var(--hc-letter-spacing);
+  color: var(--texto);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------------------------------------------------------- portada compartida */
+
+.pantalla-inicio {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 22%, #e5dbff 0 110px, transparent 111px),
+    radial-gradient(circle at 84% 18%, #ffdeeb 0 130px, transparent 131px),
+    radial-gradient(circle at 80% 84%, #c5f6fa 0 120px, transparent 121px),
+    #f4f0ff;
+}
+
+.pantalla-inicio[hidden] { display: none !important; }
+.pantalla-inicio.is-out { pointer-events: none; animation: inicioDisuelve 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.pantalla-inicio.is-out .inicio-contenido { animation: inicioContenidoSalida 0.28s linear forwards; }
+.pantalla-inicio.is-out .btn-empecemos { animation: none; opacity: 0; }
+.pantalla-inicio.is-out .inicio-mancha { animation: pinturaExpande 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; }
+
+@keyframes inicioContenidoSalida { to { opacity: 0; } }
+@keyframes pinturaExpande { from { clip-path: circle(0px at 50% 50%); } to { clip-path: circle(150vmax at 50% 50%); } }
+@keyframes inicioDisuelve { 0%, 58% { opacity: 1; } 100% { opacity: 0; } }
+
+body.esperando-inicio #principal,
+body.esperando-inicio .control-flotante,
+body.esperando-inicio .controles-arriba,
+body.intro3d-activa #principal,
+body.intro3d-activa .controles-arriba,
+body.intro3d-activa .control-flotante,
+body.intro3d-activa .fondo-cielo {
+  visibility: hidden;
+}
+
+/* ---------------------------------------------------------------- cielo vivo (fondo.js) */
+
+.fondo-cielo {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- escena */
+
+#principal {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+#principal.aparece { animation: aparecePrincipal 0.8s ease both; }
+@keyframes aparecePrincipal { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------------------------------------------------------------- mesa */
+
+.zona-mesa {
+  position: absolute;
+  top: 10px;
+  bottom: calc(var(--alto-consola) + 2px);
+  left: 50%;
+  width: min(60vw, 920px);
+  transform: translateX(-50%);
+}
+
+.mesa-escena {
+  position: absolute;
+  inset: 34px 0 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  perspective: 1500px;
+  perspective-origin: 50% 100%;
+}
+
+#mesa {
+  display: block;
+  transform: rotateX(24deg);
+  transform-origin: 50% 100%;
+  touch-action: none;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Marcador LED en la cabecera de la máquina. */
+.marcador {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  padding: 5px 16px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #1b0f3d, #0b0620);
+  border: 4px solid #7c4dff;
+  box-shadow: 0 0 22px rgba(124, 77, 255, 0.8), inset 0 0 12px rgba(0, 0, 0, 0.8);
+  font-family: 'Courier New', Consolas, monospace;
+  font-weight: 700;
+  font-size: clamp(18px, 3.4vh, 30px);
+  letter-spacing: 4px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.marcador-fondo { color: rgba(59, 201, 219, 0.12); }
+
+.marcador-num {
+  position: absolute;
+  left: 16px;
+  top: 5px;
+  color: var(--cian);
+  text-shadow: 0 0 10px rgba(59, 201, 219, 0.95);
+}
+
+.marcador-num .apagado { color: rgba(59, 201, 219, 0.25); text-shadow: none; }
+
+.marcador-suma {
+  position: absolute;
+  left: 100%;
+  top: 2px;
+  margin-left: 10px;
+  color: #69db7c;
+  font-family: 'Fredoka', sans-serif;
+  letter-spacing: 0;
+  -webkit-text-stroke: 3px var(--contorno);
+  paint-order: stroke fill;
+  animation: subeSuma 0.7s ease-out;
+}
+
+@keyframes subeSuma {
+  0% { opacity: 0; transform: translateY(8px); }
+  30% { opacity: 1; transform: translateY(-2px); }
+  100% { opacity: 0; transform: translateY(-14px); }
+}
+
+/* Mensaje breve: avisos y ánimo, nunca párrafos. */
+.mensaje {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  padding: 10px 26px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe066, #ff922b);
+  border: 4px solid #fff;
+  color: #4a1d00;
+  font-weight: 700;
+  font-size: clamp(16px, 2.8vh, 28px);
+  white-space: nowrap;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.mensaje.entra { animation: mensajeEntra 0.34s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes mensajeEntra { from { opacity: 0; transform: translateX(-50%) scale(0.7); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+
+.cartel {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.cartel.visible { opacity: 1; }
+
+.cartel strong {
+  padding: 10px 34px;
+  border-radius: 24px;
+  background: rgba(27, 12, 70, 0.88);
+  border: 4px solid var(--ambar);
+  font-size: clamp(30px, 6vh, 64px);
+  font-weight: 700;
+  color: var(--ambar);
+  -webkit-text-stroke: 4px var(--contorno);
+  paint-order: stroke fill;
+  box-shadow: 0 0 40px rgba(255, 212, 59, 0.5);
+  animation: cartelPop 0.45s cubic-bezier(.2, 1.5, .4, 1);
+}
+
+.cartel span {
+  padding: 6px 20px;
+  border-radius: 999px;
+  background: rgba(27, 12, 70, 0.85);
+  font-size: clamp(16px, 2.8vh, 28px);
+  color: #fff;
+}
+
+@keyframes cartelPop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.trofeo {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: 9;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: clamp(80px, 18vh, 190px);
+  color: var(--ambar);
+  filter: drop-shadow(0 0 40px rgba(255, 212, 59, 0.95)) drop-shadow(0 6px 0 #a65f00);
+  pointer-events: none;
+}
+
+.trofeo.entra { animation: trofeoEntra 0.9s cubic-bezier(.2, 1.5, .35, 1) forwards; }
+@keyframes trofeoEntra {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(-25deg); opacity: 0; }
+  65% { transform: translate(-50%, -50%) scale(1.18) rotate(6deg); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
+}
+
+/* ---------------------------------------------------------------- nubes de Zoe y Zeus */
+
+/* Zoe habla desde la columna izquierda y Zeus desde la derecha, junto a la máquina.
+   script.js ajusta --hueco-lado al espacio libre entre el borde y la mesa. */
+.nube {
+  position: absolute;
+  top: 88px;
+  z-index: 40;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: min(330px, calc(var(--hueco-lado, 300px) - 26px));
+  padding: 10px 14px 12px 10px;
+  border-radius: 22px;
+  background: #ffffff;
+  border: 4px solid #7c4dff;
+  color: #1d1240;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  animation: nubeEntra 0.3s cubic-bezier(.2, 1.4, .4, 1);
+}
+
+.nube[hidden] { display: none; }
+.nube-zoe { left: 12px; border-radius: 22px 22px 22px 8px; }
+.nube-zeus { right: 12px; flex-direction: row-reverse; border-color: #f59f00; background: #fff9db; border-radius: 22px 22px 8px 22px; }
+
+.nube-icono {
+  flex: none;
+  width: clamp(48px, 8vh, 66px);
+  height: clamp(48px, 8vh, 66px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #e5dbff, #b197fc);
+  border: 3px solid #7c4dff;
+  object-fit: cover;
+}
+
+.nube-zeus .nube-icono { background: radial-gradient(circle at 50% 35%, #fff3bf, #ffd43b); border-color: #f59f00; }
+
+.nube-cuerpo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.nube-zeus .nube-cuerpo { text-align: right; }
+
+.nube-nombre {
+  font-size: clamp(14px, 2.1vh, 18px);
+  font-weight: 700;
+  color: #7c4dff;
+  letter-spacing: 0.5px;
+}
+
+.nube-zeus .nube-nombre { color: #e67700; }
+
+.nube-cuerpo > span {
+  font-size: clamp(13px, 2vh, 18px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+@keyframes nubeEntra { from { opacity: 0; transform: scale(0.85) translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* Zoe 3D de la demo: abajo a la izquierda, bajo su nube. Sin filtros: son caros en tableta. */
+.guia-demo {
+  position: absolute;
+  left: 0.5vw;
+  bottom: 118px;
+  z-index: 20;
+  width: clamp(150px, 16vw, 230px);
+  height: clamp(230px, 44vh, 360px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.guia-demo[hidden] { display: none; }
+
+.guia-3d-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- botones arcade de las palancas */
+
+/* Consola frontal: forma parte del mueble de la máquina (mismo violeta y mismo riel de neón).
+   script.js la coloca justo debajo del borde inferior de la mesa y con su mismo ancho. */
+.controles-palancas {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 600px;
+  height: var(--alto-consola);
+  z-index: 30;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  align-items: stretch;
+  background:
+    linear-gradient(90deg, #3b1a7a 0%, #7c4dff 6%, #4c2a99 13%, #4c2a99 87%, #7c4dff 94%, #3b1a7a 100%);
+  border: 4px solid rgba(197, 179, 255, 0.85);
+  border-top: 0;
+  border-radius: 0 0 34px 34px;
+  box-shadow: 0 0 34px rgba(150, 110, 255, 0.55), 0 16px 28px rgba(0, 0, 0, 0.55),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.35);
+  visibility: hidden;          /* hasta que script.js la mida y la acople */
+}
+
+.controles-palancas.acoplada { visibility: visible; }
+
+/* Riel de neón donde la consola se une a la mesa. */
+.controles-palancas::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  top: 0;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #3bc9db, #c5b3ff 30%, #c5b3ff 70%, #ff4fd8);
+  box-shadow: 0 0 14px rgba(197, 179, 255, 0.9);
+}
+
+/* Franja de luces al centro de la consola. */
+.consola-luces {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  gap: clamp(6px, 1vw, 12px);
+  pointer-events: none;
+}
+
+.consola-luces span {
+  width: clamp(10px, 1.6vh, 14px);
+  height: clamp(10px, 1.6vh, 14px);
+  border-radius: 50%;
+  background: #ffd43b;
+  box-shadow: 0 0 10px currentColor;
+  animation: lucesConsola 1.4s ease-in-out infinite;
+}
+
+.consola-luces span:nth-child(2) { background: #ff6b6b; animation-delay: 0.2s; }
+.consola-luces span:nth-child(3) { background: #51cf66; animation-delay: 0.4s; }
+.consola-luces span:nth-child(4) { background: #4dabf7; animation-delay: 0.6s; }
+.consola-luces span:nth-child(5) { background: #f783ac; animation-delay: 0.8s; }
+@keyframes lucesConsola { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+.palanca-btn {
+  pointer-events: auto;
+  position: relative;
+  flex: 0 0 36%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 0 8px;
+  border: 0;
+  background: linear-gradient(165deg, #7c4dff 0%, #5a32c4 38%, #3b1a7a 100%);
+  box-shadow: inset 0 4px 0 rgba(197, 179, 255, 0.85), inset 0 -10px 18px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+/* Panel izquierdo: el borde interior se abre hacia abajo; el contenido se centra en el panel. */
+.palanca-btn.izq {
+  clip-path: polygon(0 0, 82% 0, 100% 100%, 0 100%);
+  padding-right: 9%;
+  border-bottom-left-radius: 30px;
+}
+
+.palanca-btn.der {
+  clip-path: polygon(18% 0, 100% 0, 100% 100%, 0 100%);
+  padding-left: 9%;
+  border-bottom-right-radius: 30px;
+}
+
+/* Filo de neón sobre el borde inclinado de cada panel. */
+.palanca-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, #c5b3ff, rgba(197, 179, 255, 0.2));
+  pointer-events: none;
+}
+
+.palanca-btn.izq::after { right: 9%; transform: skewX(10deg); transform-origin: top; }
+.palanca-btn.der::after { left: 9%; transform: skewX(-10deg); transform-origin: top; }
+
+/* Botón arcade empotrado en la consola: aro metálico y tapa abombada. */
+.arcade {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(var(--alto-consola) - 46px);
+  height: calc(var(--alto-consola) - 46px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #2a1660, #120830 72%);
+  border: 5px solid #dfe6f5;
+  box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(18, 8, 48, 0.8), 0 0 22px rgba(124, 77, 255, 0.6);
+}
+
+.arcade-tapa {
+  display: grid;
+  place-items: center;
+  width: 78%;
+  height: 78%;
+  border-radius: 50%;
+  font-size: clamp(30px, 5.4vh, 48px);
+  color: #fff;
+  transition: transform 0.08s ease, filter 0.1s ease, box-shadow 0.1s ease;
+}
+
+.palanca-btn.izq .arcade-tapa {
+  background: radial-gradient(circle at 35% 30%, #ffb199, #ff5a36 45%, #c92a2a 100%);
+  box-shadow: 0 8px 0 #8a1c1c, inset 0 -6px 10px rgba(0, 0, 0, 0.25), inset 0 6px 10px rgba(255, 255, 255, 0.45);
+}
+
+.palanca-btn.der .arcade-tapa {
+  background: radial-gradient(circle at 35% 30%, #fff3bf, #ffd43b 45%, #f08c00 100%);
+  box-shadow: 0 8px 0 #a65f00, inset 0 -6px 10px rgba(0, 0, 0, 0.2), inset 0 6px 10px rgba(255, 255, 255, 0.55);
+}
+
+.arcade-tapa i {
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.35));
+}
+
+/* Presionado: la tapa se hunde y se ilumina. */
+.palanca-btn:active .arcade-tapa,
+.palanca-btn.pulsado .arcade-tapa {
+  transform: translateY(7px);
+  filter: brightness(1.3);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5), inset 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.palanca-btn.pulsado .arcade { box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(18, 8, 48, 0.8), 0 0 46px rgba(255, 255, 255, 0.95); }
+
+/* Aviso anticipado: el botón del lado por donde viene la bola late. */
+.palanca-btn.avisando .arcade { animation: avisaArcade 0.4s ease-in-out 3; }
+@keyframes avisaArcade {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(18, 8, 48, 0.8), 0 0 50px rgba(255, 79, 216, 1); }
+}
+
+/* Resaltado de la demostración. */
+.palanca-btn.resaltado .arcade { animation: resaltaArcade 0.9s ease-in-out infinite; }
+@keyframes resaltaArcade {
+  0%, 100% { box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(18, 8, 48, 0.8), 0 0 18px rgba(255, 255, 255, 0.5); }
+  50% { box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(18, 8, 48, 0.8), 0 0 50px rgba(255, 255, 255, 1); }
+}
+
+.palanca-texto {
+  color: #fff;
+  font-weight: 700;
+  font-size: clamp(14px, 2.3vh, 20px);
+  white-space: nowrap;
+  -webkit-text-stroke: 4px #1d0f4a;
+  paint-order: stroke fill;
+}
+
+/* ---------------------------------------------------------------- arriba a la derecha: reiniciar y volver (comunes) */
+
+.controles-arriba {
+  position: fixed;
+  top: 12px;
+  right: 14px;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-round {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 23px;
+  display: inline-grid;
+  place-items: center;
+  border: 4px solid #fff;
+  transition: transform 0.18s cubic-bezier(.2, 1.6, .4, 1), filter 0.18s;
+}
+
+/* ---------------------------------------------------------------- abajo a la izquierda: ronda */
+
+.indicador-ronda {
+  position: fixed;
+  left: 14px;
+  bottom: 14px;
+  z-index: 1400;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(60, 30, 130, 0.94), rgba(22, 10, 60, 0.94));
+  border: 3px solid rgba(197, 179, 255, 0.75);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+body.sin-progreso .indicador-ronda .golpes-puntos,
+body.sin-progreso .indicador-ronda .golpes-texto { display: none; }
+
+.ronda-texto {
+  font-size: clamp(16px, 2.6vh, 24px);
+  font-weight: 700;
+  color: var(--ambar);
+  -webkit-text-stroke: 3px var(--contorno);
+  paint-order: stroke fill;
+}
+
+.golpes-puntos { display: flex; gap: 5px; flex-wrap: wrap; max-width: 200px; }
+
+.punto-golpe {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(197, 179, 255, 0.6);
+  transition: all 0.25s ease;
+}
+
+.punto-golpe.lleno {
+  background: var(--ambar);
+  border-color: #fff;
+  box-shadow: 0 0 10px rgba(255, 212, 59, 0.95);
+}
+
+.golpes-texto { font-size: clamp(12px, 1.7vh, 15px); opacity: 0.9; }
+
+/* ---------------------------------------------------------------- abajo a la derecha: accesibilidad y volumen */
+
+.control-flotante {
+  position: fixed;
+  bottom: 14px;
+  z-index: 1500;
+}
+
+#menu-vol { right: 14px; }
+#menu-acc { right: 86px; }
+
+.menu-acc-fab {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  background: linear-gradient(180deg, #ffa94d, #f76707);
+  color: #fff;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .btn-round:hover,
+  .menu-acc-fab:hover { transform: translateY(-3px) scale(1.05); filter: brightness(1.08); }
+}
+
+.panel-flotante {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 12px);
+  width: min(84vw, 320px);
+  padding: 16px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(52, 26, 110, 0.98), rgba(20, 10, 52, 0.98));
+  border: 3px solid rgba(197, 179, 255, 0.7);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+}
+
+.panel-cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.panel-cerrar {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 6px;
+}
+
+.panel-ops { display: flex; flex-direction: column; gap: 9px; }
+
+.panel-op,
+.boton-neon {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 11px 15px;
+  border: 2px solid rgba(197, 179, 255, 0.5);
+  border-radius: 14px;
+  background: rgba(124, 77, 255, 0.22);
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+}
+
+.panel-op:hover,
+.boton-neon:hover { background: rgba(124, 77, 255, 0.42); }
+
+.panel-op[aria-pressed="true"] {
+  background: linear-gradient(180deg, var(--cian), #0c8599);
+  border-color: #fff;
+  color: #04282e;
+}
+
+.panel-rango { flex-direction: column; align-items: stretch; gap: 8px; cursor: default; }
+.panel-rango input[type="range"] { width: 100%; accent-color: var(--cian); }
+
+/* ---------------------------------------------------------------- demo */
+
+.mano-demo {
+  position: fixed;
+  z-index: 1600;
+  transform: translate(-20%, -10%);
+  font-size: 58px;
+  color: #fff;
+  filter: drop-shadow(0 4px 0 #2a1150) drop-shadow(0 8px 14px rgba(0, 0, 0, 0.6));
+  pointer-events: none;
+}
+
+.mano-demo.tocando { animation: manoToca 0.75s ease-in-out infinite; }
+@keyframes manoToca {
+  0%, 100% { transform: translate(-20%, -10%) scale(1); }
+  50% { transform: translate(-20%, 6%) scale(0.86); }
+}
+
+body.demo-lock .palanca-btn,
+body.demo-lock #mesa { pointer-events: none; }
+
+.comenzar-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(ellipse at center, rgba(20, 8, 56, 0.55), rgba(4, 2, 12, 0.8));
+}
+
+.comenzar-wrap[hidden] { display: none; }
+
+.btn-comenzar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 48px;
+  border: 5px solid #fff;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: clamp(22px, 4vh, 38px);
+  color: #fff;
+  background: linear-gradient(180deg, #8ce99a 0%, #40c057 45%, #2b8a3e 100%);
+  box-shadow: 0 10px 0 #1e6b30, 0 22px 44px rgba(0, 0, 0, 0.6);
+  -webkit-text-stroke: 3px #1e6b30;
+  paint-order: stroke fill;
+  animation: lateComenzar 1.5s ease-in-out infinite;
+}
+
+.btn-comenzar:active { transform: translateY(8px); box-shadow: 0 2px 0 #1e6b30, 0 10px 20px rgba(0, 0, 0, 0.5); }
+@keyframes lateComenzar { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+/* ---------------------------------------------------------------- panel final */
+
+.final-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 22px;
+  text-align: center;
+  background: radial-gradient(ellipse at center, rgba(40, 16, 100, 0.92), rgba(8, 4, 24, 0.96));
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.final-panel[hidden] { display: none; }
+.final-panel.visible { opacity: 1; }
+
+.final-titulo {
+  font-size: clamp(24px, 5vh, 54px);
+  font-weight: 700;
+  color: var(--ambar);
+  -webkit-text-stroke: 5px var(--contorno);
+  paint-order: stroke fill;
+  filter: drop-shadow(0 0 24px rgba(255, 212, 59, 0.5));
+}
+
+.final-sub { font-size: clamp(15px, 2.4vh, 24px); color: var(--violeta-claro); max-width: 760px; }
+
+.final-estrellas { display: flex; gap: 16px; font-size: clamp(34px, 6.4vh, 66px); }
+
+.final-estrellas i {
+  color: var(--ambar);
+  filter: drop-shadow(0 0 20px rgba(255, 212, 59, 0.9));
+  transform: scale(0);
+  transition: transform 0.4s cubic-bezier(.2, 1.6, .4, 1);
+}
+
+.final-estrellas i.brilla { transform: scale(1); }
+.final-estrellas i.apagada { color: rgba(255, 255, 255, 0.17); filter: none; transform: scale(0.82); }
+
+.final-resumen { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 4px 0; }
+
+.res-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 132px;
+  padding: 11px 18px;
+  border-radius: 16px;
+  background: rgba(124, 77, 255, 0.24);
+  border: 2px solid rgba(197, 179, 255, 0.5);
+}
+
+.res-item span { font-size: 13px; opacity: 0.9; }
+.res-item strong { font-size: clamp(20px, 3vh, 30px); color: var(--ambar); }
+.res-total { background: rgba(255, 212, 59, 0.18); border-color: rgba(255, 212, 59, 0.6); }
+
+.final-botones { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 6px; }
+
+.final-botones .boton-neon {
+  width: auto;
+  padding: 15px 30px;
+  font-size: clamp(15px, 2.3vh, 22px);
+  font-weight: 700;
+  border-radius: 999px;
+  justify-content: center;
+  border: 4px solid #fff;
+}
+
+.boton-neon.verde { background: linear-gradient(180deg, #8ce99a, #2b8a3e); color: #fff; box-shadow: 0 7px 0 #1e6b30; }
+.boton-neon.azul { background: linear-gradient(180deg, #74c0fc, #1971c2); color: #fff; box-shadow: 0 7px 0 #0b4f8a; }
+
+/* ---------------------------------------------------------------- accesibilidad */
+
+body.alto-contraste .fondo-cielo { filter: brightness(0.45); }
+body.alto-contraste .nube { border-color: #000; color: #000; background: #fff; }
+body.alto-contraste .mensaje { background: #fff; color: #000; border-color: #000; }
+body.alto-contraste .palanca-texto,
+body.alto-contraste .indicador-ronda { background: #000; border-color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-comenzar { animation: none; }
+}
+
+/* ---------------------------------------------------------------- tamaños: escritorio y tableta horizontal */
+
+@media (max-width: 1150px) {
+  .zona-mesa { width: 54vw; }
+  .indicador-ronda { padding: 8px 12px; }
+  .golpes-puntos { max-width: 145px; }
+  .punto-golpe { width: 12px; height: 12px; }
+  .guia-demo { width: clamp(130px, 15vw, 170px); height: clamp(200px, 36vh, 280px); }
+  .nube { width: clamp(150px, 19vw, 220px); font-size: clamp(12px, 1.8vh, 16px); }
+}
+
+@media (max-height: 680px) {
+  .guia-demo { height: 190px; }
+}
+
+/* El juego es para escritorio y tableta horizontal: en vertical se pide girar. */
+@media (orientation: portrait) and (max-width: 1024px) {
+  #principal::after {
+    content: "Gira la tableta para jugar";
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: grid;
+    place-items: center;
+    padding: 40px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    background: rgba(20, 10, 61, 0.97);
+    color: var(--ambar);
+  }
+}
