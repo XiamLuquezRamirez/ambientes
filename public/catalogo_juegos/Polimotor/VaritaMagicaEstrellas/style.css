@@ -1,0 +1,431 @@
+/* La Varita Mágica y las Estrellas en el Cielo — chrome del juego. La escena la dibuja Phaser.
+   Los botones redondos (reiniciar, salir, accesibilidad, volumen) los pinta comun/interfaz.css. */
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('../../fonts/Fredoka-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('../../fonts/Fredoka-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --tinta: #2b2366;
+  --crema: #fbf8ff;
+  --cian: #8b7bff;
+  --hoja: #7048e8;
+  --c1: #38d9ff;
+  --c2: #b197fc;
+  --letter-spacing: 1px;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #6f74e6;
+  font-family: 'Fredoka', 'Arial Rounded MT Bold', Arial, sans-serif;
+  font-weight: 600;
+  letter-spacing: var(--letter-spacing);
+  color: var(--tinta);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------------------------------------------------------- portada compartida */
+
+.pantalla-inicio {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  overflow: hidden;
+}
+.pantalla-inicio[hidden] { display: none !important; }
+.pantalla-inicio.is-out { pointer-events: none; animation: inicioDisuelve 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.pantalla-inicio.is-out .inicio-contenido { animation: inicioContenidoSalida 0.28s linear forwards; }
+.pantalla-inicio.is-out .btn-empecemos { animation: none; opacity: 0; }
+.pantalla-inicio.is-out .inicio-mancha { animation: pinturaExpande 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; }
+
+@keyframes inicioContenidoSalida { to { opacity: 0; } }
+@keyframes pinturaExpande { from { clip-path: circle(0px at 50% 50%); } to { clip-path: circle(150vmax at 50% 50%); } }
+@keyframes inicioDisuelve { 0%, 58% { opacity: 1; } 100% { opacity: 0; } }
+
+body.esperando-inicio #principal,
+body.esperando-inicio .control-flotante,
+body.esperando-inicio .controles-arriba,
+body.esperando-inicio #pista,
+body.intro3d-activa #principal,
+body.intro3d-activa .control-flotante,
+body.intro3d-activa .controles-arriba,
+body.intro3d-activa #pista {
+  visibility: hidden;
+}
+
+/* ---------------------------------------------------------------- escena */
+
+#principal { position: fixed; inset: 0; z-index: 1; }
+
+#escenario {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #6f74e6;
+  touch-action: none;
+}
+#escenario canvas { display: block; touch-action: none; }
+body.demo-lock #escenario { pointer-events: none; }
+
+/* ---------------------------------------------------------------- HUD */
+
+.controles-arriba {
+  position: fixed;
+  top: 12px;
+  right: 14px;
+  z-index: 1500;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-round, .menu-acc-fab {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+}
+
+.control-flotante { position: fixed; bottom: 14px; z-index: 1500; }
+#menu-vol { right: 14px; }
+#menu-acc { right: 84px; }
+
+.panel-flotante {
+  position: absolute;
+  right: 0;
+  bottom: 74px;
+  width: min(320px, calc(100vw - 28px));
+  max-height: min(68vh, 460px);
+  overflow: auto;
+  padding: 12px 14px 14px;
+  border-radius: 20px;
+  background: var(--crema);
+  box-shadow: 0 12px 28px rgba(5, 10, 40, 0.4);
+}
+.panel-flotante[hidden] { display: none; }
+.panel-cab { display: flex; align-items: center; justify-content: space-between; font-size: 20px; }
+.panel-cerrar {
+  width: 42px; height: 42px;
+  border: 0; border-radius: 50%;
+  background: rgba(19, 35, 74, 0.1);
+  font-size: 26px;
+  cursor: pointer;
+}
+.panel-ops { display: flex; flex-direction: column; gap: 4px; }
+.panel-op { display: flex; align-items: center; gap: 10px; padding: 8px 4px; font-size: 17px; cursor: pointer; }
+.panel-op input[type="checkbox"] { width: 26px; height: 26px; accent-color: var(--hoja); }
+.panel-rango { flex-direction: column; align-items: stretch; }
+.panel-rango input[type="range"] { width: 100%; height: 28px; }
+
+/* ---------------------------------------------------------------- Zoe, Zeus y sus globos */
+
+.guia, .guia-zeus { position: fixed; z-index: 20; pointer-events: none; }
+#guia .guia-pj {
+  position: fixed;
+  left: -260px;
+  bottom: 8px;
+  width: 200px;
+  height: 280px;
+  transition: left 1.5s cubic-bezier(0.3, 0.05, 0.7, 0.95); /* = MARCHA_MS de script.js: paso constante, sin rebote */
+}
+.guia-pj img { width: 100%; height: 100%; object-fit: contain; object-position: bottom center; }
+body.zoe-en #guia .guia-pj { left: 6px; }
+body.en-final #guia .guia-pj { left: 4px; bottom: 0; width: 220px; height: 300px; }
+.guia-3d-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; filter: drop-shadow(0 6px 8px rgba(0, 10, 40, 0.45)); }
+.guia-pj.guia-3d-lista > img { opacity: 0; }
+
+.guia-zeus .guia-pj {
+  position: fixed;
+  left: auto;
+  right: -260px;
+  bottom: 8px;
+  width: 180px;
+  height: 260px;
+  transition: right 1.5s cubic-bezier(0.3, 0.05, 0.7, 0.95);
+}
+body.zeus-en .guia-zeus .guia-pj { right: 6px; }
+body.en-final .guia-zeus .guia-pj { right: 4px; width: 200px; height: 280px; }
+
+/* Globo: sale del personaje hacia arriba y hacia el centro. */
+.nube {
+  position: absolute;
+  left: 62%;
+  bottom: 92%;
+  width: max-content;
+  max-width: min(330px, 34vw);
+  padding: 12px 16px;
+  border: 4px solid var(--cian);
+  border-radius: 22px;
+  background: #f4fbff;
+  color: var(--tinta);
+  font-size: clamp(16px, 1.45vw, 20px);
+  line-height: 1.3;
+  box-shadow: 0 8px 0 rgba(43, 35, 102, 0.25), 0 14px 26px rgba(43, 35, 102, 0.3);
+  animation: nubeEntra 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.nube::after {
+  content: "";
+  position: absolute;
+  left: 26px;
+  bottom: -15px;
+  width: 0; height: 0;
+  border: 11px solid transparent;
+  border-top-color: var(--cian);
+  border-bottom: 0;
+}
+.guia-zeus .nube { left: auto; right: 62%; max-width: min(460px, 40vw); }
+.guia-zeus .nube::after { left: auto; right: 26px; }
+.nube[hidden] { display: none; }
+
+/* Pista breve durante la partida (sin personajes en pantalla): arriba, bajo el título.
+   La escena escala con la altura (ENVELOP 1600 × 900), así que la posición va en vh. */
+#pista {
+  position: fixed;
+  left: 50%;
+  top: 10.6vh;
+  transform: translateX(-50%);
+  z-index: 1450;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(520px, 46vw);
+  padding: 8px 18px 8px 8px;
+  border: 4px solid var(--c1);
+  border-radius: 999px;
+  background: #fbf8ff;
+  box-shadow: 0 6px 0 rgba(5, 20, 60, 0.3), 0 12px 24px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+#pista[hidden] { display: none; }
+#pista img { width: 54px; height: 54px; object-fit: contain; }
+#pista p { margin: 0; font-size: clamp(17px, 1.6vw, 22px); line-height: 1.25; }
+#pista.sale { animation: pistaPop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1); }
+
+/* ---------------------------------------------------------------- botón de arranque */
+
+.comenzar-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 10, 40, 0.35);
+}
+.comenzar-wrap[hidden] { display: none; }
+.btn-comenzar {
+  position: relative;
+  min-width: min(80vw, 360px);
+  min-height: 96px;
+  padding: 18px 44px;
+  border: 6px solid #fff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #8ce99a 0%, #40c057 55%, #2f9e44 100%);
+  color: #fff;
+  font: inherit;
+  font-size: clamp(28px, 4.4vw, 42px);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  box-shadow: 0 8px 0 #2b8a3e, 0 18px 30px rgba(43, 138, 62, 0.35);
+  animation: comenzarPulso 1.4s ease-in-out infinite;
+}
+.btn-comenzar i { margin-right: 12px; }
+.btn-comenzar:focus-visible { outline: 4px solid #1565c0; outline-offset: 6px; }
+
+/* ---------------------------------------------------------------- cartel de cielo completado
+   Toma los colores del nivel: azul (1), dorado (2), rosa y violeta (3), arcoíris (4). */
+
+body.cielo-1 { --c1: #38d9ff; --c2: #74c0fc; }
+body.cielo-2 { --c1: #ffd43b; --c2: #ffa94d; }
+body.cielo-3 { --c1: #f783ac; --c2: #da77f2; }
+body.cielo-4 { --c1: #ff6b6b; --c2: #4dabf7; }
+
+.cartel {
+  position: fixed;
+  top: 2.2vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1250;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+  max-width: min(760px, 66vw);
+  padding: 12px 48px 14px;
+  border: 4px solid #ffffff;
+  border-radius: 30px;
+  background:
+    radial-gradient(120% 140% at 50% 0%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, var(--c1) 0%, var(--c2) 100%);
+  color: #fff;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.35), 0 0 34px var(--c1), 0 16px 30px rgba(43, 35, 102, 0.35);
+  animation: cartelEntra 0.55s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+body.cielo-4 .cartel { background: linear-gradient(90deg, #ff6b6b, #ffa94d, #ffd43b, #69db7c, #4dabf7, #b197fc); }
+.cartel[hidden] { display: none; }
+.cartel::before,
+.cartel::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin-top: -11px;
+  background: #fff7cc;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  filter: drop-shadow(0 0 6px #fff3bf);
+  animation: cartelChispa 1.4s ease-in-out infinite;
+}
+.cartel::before { left: 14px; }
+.cartel::after { right: 14px; animation-delay: 0.7s; }
+.cartel-etiqueta {
+  padding: 2px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--tinta);
+  font-size: clamp(13px, 1.25vw, 17px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.cartel-etiqueta:empty, .cartel-sub:empty { display: none; }
+.cartel strong {
+  display: block;
+  font-size: clamp(28px, 3.2vw, 44px);
+  line-height: 1.1;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 3px 0 rgba(43, 35, 102, 0.45), 0 0 18px rgba(255, 255, 255, 0.6);
+}
+.cartel-sub {
+  color: #ffffff;
+  font-size: clamp(16px, 1.5vw, 22px);
+  text-shadow: 0 2px 0 rgba(43, 35, 102, 0.35);
+}
+
+/* ---------------------------------------------------------------- escena final: mensaje grande */
+
+.mensaje-final {
+  position: fixed;
+  top: 3vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1260;
+  width: min(980px, 68vw);
+  text-align: center;
+  pointer-events: none;
+}
+.mensaje-final[hidden] { display: none; }
+.mensaje-final h1 {
+  margin: 0;
+  font-family: 'Fredoka', 'Arial Rounded MT Bold', Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(30px, 4.1vw, 62px);
+  line-height: 1.05;
+  color: #fff;
+  background: linear-gradient(90deg, #fff3bf, #ffffff 30%, #ffd6f0 60%, #d0ebff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 0 #7048e8) drop-shadow(0 0 18px rgba(255, 255, 255, 0.75));
+  animation: mensajeEntra 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both, mensajeBrilla 2.4s ease-in-out 1s infinite;
+}
+.mensaje-final p {
+  display: inline-block;
+  margin: 12px 0 0;
+  padding: 8px 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--tinta);
+  font-size: clamp(18px, 2vw, 30px);
+  box-shadow: 0 6px 0 rgba(112, 72, 232, 0.35);
+  animation: mensajeEntra 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) 0.6s both;
+}
+/* Tableta 4:3: el título no debe acercarse a los botones de arriba a la derecha. */
+@media (max-width: 1100px) {
+  .mensaje-final { width: 62vw; }
+  .mensaje-final h1 { font-size: 3.5vw; }
+  .mensaje-final p { font-size: 1.8vw; padding: 6px 18px; }
+}
+@keyframes mensajeEntra { from { opacity: 0; transform: translateY(-24px) scale(0.6); } }
+@keyframes mensajeBrilla { 0%, 100% { filter: drop-shadow(0 4px 0 #7048e8) drop-shadow(0 0 14px rgba(255, 255, 255, 0.6)); } 50% { filter: drop-shadow(0 4px 0 #7048e8) drop-shadow(0 0 30px rgba(255, 243, 191, 1)); } }
+
+/* Fundido entre niveles. */
+.fundido {
+  position: fixed;
+  inset: 0;
+  z-index: 1800;
+  background: #fff7ff;
+  opacity: 0;
+  pointer-events: none;
+}
+.fundido.va { animation: funde 0.7s ease; }
+@keyframes funde { 0% { opacity: 0; } 40% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ---------------------------------------------------------------- victoria compartida */
+
+.final {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  width: 100%;
+  height: 100%;
+}
+.final[hidden] { display: none !important; }
+#texto_final { white-space: pre-line; }
+
+body.alto-contraste #escenario canvas { filter: contrast(1.18) saturate(1.1); }
+
+/* ---------------------------------------------------------------- animaciones */
+
+@keyframes comenzarPulso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes pistaPop { from { transform: translateX(-50%) scale(0.8); opacity: 0; } }
+@keyframes nubeEntra { from { transform: scale(0.7); opacity: 0; } }
+@keyframes cartelEntra {
+  0% { transform: translateX(-50%) translateY(-30px) scaleY(0.2); opacity: 0; filter: brightness(2); }
+  60% { transform: translateX(-50%) translateY(4px) scaleY(1.05); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(0) scaleY(1); opacity: 1; filter: none; }
+}
+@keyframes cartelChispa { 0%, 100% { transform: scale(0.7) rotate(0deg); opacity: 0.6; } 50% { transform: scale(1.15) rotate(45deg); opacity: 1; } }
+@keyframes pfPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35) rotate(-8deg); }
+  70% { transform: scale(0.92) rotate(4deg); }
+  100% { transform: scale(1); }
+}
+
+/* Tableta horizontal (1024 × 768) y pantallas bajas: HUD un poco más compacto. */
+@media (max-width: 1100px), (max-height: 700px) {
+  #guia .guia-pj { width: 170px; height: 240px; }
+  .guia-zeus .guia-pj { width: 160px; height: 230px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantalla-inicio.is-out,
+  .pantalla-inicio.is-out .inicio-mancha,
+  .pantalla-inicio.is-out .inicio-contenido,
+  .btn-comenzar,
+  .nube,
+  .cartel,
+  .mensaje-final h1,
+  .mensaje-final p { animation: none !important; }
+  .pantalla-inicio.is-out { opacity: 0; }
+}

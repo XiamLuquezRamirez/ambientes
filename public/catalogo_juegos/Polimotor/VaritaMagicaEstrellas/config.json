@@ -1,0 +1,139 @@
+{
+  "nombre": "La Varita Mágica y las Estrellas en el Cielo",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 30,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "paso": 6,
+    "intentos": 60,
+    "holgura": 55,
+    "ventana": 95,
+    "atras": 60,
+    "subpaso": 16,
+    "saltoMax": 150,
+    "radioToque": 125,
+    "radioEstrella": 36,
+    "finTol": 28,
+    "inicioFinMin": 240,
+    "sepEstrellas": 120,
+    "lateralEstrellas": 0.16,
+    "demoVelocidad": 330,
+    "ayudaMs": 9000,
+    "ayudaRepetirMs": 12000,
+    "quietoMs": 4500,
+    "vozPausaMs": 2600,
+    "vozFueraMs": 9000,
+    "vozSoltarMs": 12000
+  },
+  "cielos": [
+    {
+      "id": 1,
+      "nombre": "La estrella viajera",
+      "estrellas": 5,
+      "ancho": 170,
+      "radioMin": 120,
+      "largo": [700, 1050],
+      "plantillas": ["ascendente", "descendente", "arco", "lateral"],
+      "respaldo": {"plantilla": "arco", "caja": [820, 200], "centro": [800, 455]},
+      "colores": ["#38d9ff", "#5ce1e6", "#74c0fc"],
+      "figura": "cometa",
+      "voz": "zoe",
+      "instruccion": "¡Sigue la curvita con tu dedito para prender todas las estrellas del cielo!",
+      "cartel": { "etiqueta": "Cielo 1", "titulo": "¡QUÉ BRILLANTE!", "sub": "Encendiste las estrellitas azules." },
+      "logro": "¡Qué brillante! Encendiste las estrellitas azules."
+    },
+    {
+      "id": 2,
+      "nombre": "El camino de la luna",
+      "estrellas": 6,
+      "ancho": 160,
+      "radioMin": 98,
+      "largo": [900, 1350],
+      "plantillas": ["arco-amplio", "curva-c", "ascendente-larga", "descendente-larga", "semicirculo"],
+      "respaldo": {"plantilla": "arco-amplio", "caja": [900, 340], "centro": [800, 460]},
+      "colores": ["#ffd43b", "#fcc419", "#ffa94d"],
+      "figura": "luna",
+      "voz": "zeus",
+      "instruccion": "¡Ahora el camino de la luna! Sigue la curva dorada.",
+      "cartel": { "etiqueta": "Cielo 2", "titulo": "¡QUÉ LINDO!", "sub": "La luna brilla con tu magia dorada." },
+      "logro": "¡Qué lindo! La luna brilla con tu magia dorada."
+    },
+    {
+      "id": 3,
+      "nombre": "Las nubes mágicas",
+      "estrellas": 7,
+      "ancho": 150,
+      "radioMin": 78,
+      "largo": [1100, 1600],
+      "plantillas": ["s-suave", "doble-arco", "ondulada", "ascendente-retorno", "descendente-retorno"],
+      "respaldo": {"plantilla": "s-suave", "caja": [980, 350], "centro": [800, 455]},
+      "colores": ["#f783ac", "#da77f2", "#b197fc"],
+      "figura": "arco",
+      "voz": "zoe",
+      "instruccion": "¡Hay estrellas escondidas entre las nubes! Sigue la curva rosada.",
+      "cartel": { "etiqueta": "Cielo 3", "titulo": "¡MAGIA ROSADA!", "sub": "Despertaste las estrellas escondidas entre las nubes." },
+      "logro": "¡Magia rosada! Despertaste las estrellas escondidas entre las nubes."
+    },
+    {
+      "id": 4,
+      "nombre": "El gran camino estelar",
+      "estrellas": 8,
+      "ancho": 145,
+      "radioMin": 68,
+      "largo": [1300, 2400],
+      "plantillas": ["espiral-abierta", "s-amplia", "onda-doble", "arco-dos-curvas"],
+      "respaldo": {"plantilla": "s-amplia", "caja": [940, 400], "centro": [800, 455]},
+      "colores": ["#ff6b6b", "#ffa94d", "#ffd43b", "#69db7c", "#4dabf7", "#b197fc"],
+      "figura": "constelacion",
+      "voz": "zeus",
+      "instruccion": "¡El gran camino estelar! Es el más largo. Ve despacito y llena el cielo de colores.",
+      "cartel": { "etiqueta": "Cielo 4", "titulo": "¡ERES UN MAGO DE LAS ESTRELLAS!", "sub": "¡Llenaste el cielo de colores!" },
+      "logro": "¡Eres un mago de las estrellas! ¡Llenaste el cielo de colores!"
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "La Varita Mágica y las Estrellas en el Cielo",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "introZeus": "¡Magia en el cielo! Toma la varita de Zoe con tu dedo, dibuja sobre la línea curva uniendo las estrellas y mira cómo se encienden una a una.",
+    "demoZeus": "¡Mira! La varita va por la curva y las estrellitas se encienden.",
+    "guiaZoe": "¡Sigue la curvita con tu dedito para prender todas las estrellas del cielo!",
+    "pistaVarita": "Pon tu dedito sobre la varita y llévala por la curva.",
+    "tocaVarita": "¡Primero toca la varita brillante!",
+    "fuera": "¡La curva está aquí! Vuelve con tu dedito.",
+    "soltar": "¡Tu estrellita te espera! Toca la varita para seguir.",
+    "estrella": ["¡Una estrellita!", "¡Brilla!", "¡Qué bonita luz!", "¡Otra más!", "¡Sigue así!"],
+    "finalTitulo": "¡LO LOGRASTE, PEQUEÑO MAGO!",
+    "finalTexto": "¡Encendiste todas las estrellas y llenaste el cielo de magia!",
+    "finalVoz": "¡Lo lograste, pequeño mago! ¡Encendiste todas las estrellas y llenaste el cielo de magia!",
+    "finalVozZeus": "¡El cielo de los pequeños magos brilla gracias a ti!",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe, mira el cielo! Las estrellas se quedaron sin luz."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Con mi varita mágica podemos despertarlas! Solo hay que seguir los caminos de luz."
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "3-4 años",
+      "titulo": "Trazado de curvas con la varita mágica"
+    }
+  ]
+}

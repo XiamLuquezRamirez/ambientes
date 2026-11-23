@@ -292,6 +292,19 @@
       ],
       "port": 8048,
       "autoPort": false
+    },
+    {
+      "name": "juegos-varita",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8049",
+        "--directory",
+        "public"
+      ],
+      "port": 8049,
+      "autoPort": false
     }
   ]
 }
