@@ -329,7 +329,9 @@
         }
 
         c.icono.setPosition(ix, iy);
-        c.icono.setScale(is / (c.icono.width || 240));
+        // Los SVG no son cuadrados: se escala por el lado largo para que quepan en el círculo.
+        var base = Math.max(c.icono.width || 240, c.icono.height || 240);
+        c.icono.setScale(is / base);
         c.icono.setAlpha(hecha ? 0.9 : 1);
 
         var fs = lay.modo === "fila" ? Math.min(h * 0.27, 30) : Math.min(h * 0.2, 24);
@@ -1129,6 +1131,16 @@
                         texturasFx();
                         var cargas = [fuenteLista()];
                         Object.keys(I.SVG).forEach(function (k) { cargas.push(cargarSvg("ico-" + k, I.SVG[k])); });
+                        Object.keys(I.archivos || {}).forEach(function (k) {
+                            cargas.push(fetch(I.archivos[k]).then(function (r) {
+                                if (!r.ok) throw new Error(String(r.status));
+                                return r.text();
+                            }).then(function (txt) {
+                                return cargarSvg("ico-" + k, txt);
+                            }).catch(function () {
+                                console.warn("[EscenarioUso] no se pudo cargar el icono", k);
+                            }));
+                        });
                         Promise.all(cargas).then(function () {
                             fondoG = sc.add.graphics();
                             fondoG.setDepth(0);

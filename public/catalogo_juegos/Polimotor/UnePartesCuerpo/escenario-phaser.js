@@ -418,7 +418,8 @@
         }
 
         c.icono.setPosition(ix, iy);
-        var base = c.icono.width || 240;
+        // Los SVG no son cuadrados: se escala por el lado largo para que quepan en el círculo.
+        var base = Math.max(c.icono.width || 240, c.icono.height || 240);
         c.icono.setScale(is / base);
         c.icono.setAlpha(1);
 
@@ -1004,9 +1005,15 @@
                         texturasFx();
                         var cargas = [fuenteLista()];
                         Object.keys(P.SVG).forEach(function (k) { cargas.push(cargarSvg("zeus-" + k, P.SVG[k])); });
-                        Object.keys(I.SVG).forEach(function (k) {
-                            // los íconos se rasterizan a 240 px (RES 2) para que se vean nítidos en tarjetas grandes
-                            cargas.push(cargarSvg("ico-" + k, I.SVG[k]));
+                        Object.keys(I.archivos || {}).forEach(function (k) {
+                            cargas.push(fetch(I.archivos[k]).then(function (r) {
+                                if (!r.ok) throw new Error(String(r.status));
+                                return r.text();
+                            }).then(function (txt) {
+                                return cargarSvg("ico-" + k, txt);
+                            }).catch(function () {
+                                console.warn("[EscenarioUne] no se pudo cargar el icono", k);
+                            }));
                         });
                         Promise.all(cargas).then(function () {
                             fondoG = sc.add.graphics();

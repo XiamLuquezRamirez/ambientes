@@ -778,6 +778,19 @@
                         texturasFx();
                         var cargas = [fuenteLista()];
                         Object.keys(I.SVG).forEach(function (k) { cargas.push(cargarSvg("ico-" + k, I.SVG[k], 120, 120)); });
+                        Object.keys(I.archivos || {}).forEach(function (k) {
+                            cargas.push(fetch(I.archivos[k]).then(function (r) {
+                                if (!r.ok) throw new Error(String(r.status));
+                                return r.text();
+                            }).then(function (txt) {
+                                var o = origen(txt);
+                                var largo = Math.max(o.w, o.h) || 120;
+                                // El globo escala como si el dibujo midiera 120 en su lado largo.
+                                return cargarSvg("ico-" + k, txt, 120 * o.w / largo, 120 * o.h / largo);
+                            }).catch(function () {
+                                console.warn("[EscenarioTopos] no se pudo cargar el icono", k);
+                            }));
+                        });
                         Object.keys(global.Topos.SVG).forEach(function (k) { cargas.push(cargarSvg("topo-" + k, global.Topos.SVG[k], 200, ALTO_TOPO)); });
                         Object.keys(DECO).forEach(function (k) { cargas.push(cargarSvg("deco-" + k, DECO[k])); });
                         Promise.all(cargas).then(function () {
