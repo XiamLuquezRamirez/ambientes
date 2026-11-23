@@ -1,0 +1,274 @@
+{
+  "nombre": "¡El Ensamblaje de la Nave!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 35,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "radioAcierto": 58,
+    "radioCasi": 150,
+    "radioCerca": 200,
+    "radioIman": 95,
+    "iman": 0.3,
+    "escalaBandeja": 0.72,
+    "ayudaMs": 12000,
+    "ayudaRepetirMs": 15000,
+    "vozPausaMs": 2200,
+    "fuerasParaPista": 2,
+    "casiParaPista": 2
+  },
+  "piezas": [
+    {
+      "id": "cabina",
+      "nombre": "Cabina de Cristal",
+      "voz": "la cabina de cristal",
+      "pista": "¡La cabina de cristal va al frente de la nave, donde se sienta el piloto!"
+    },
+    {
+      "id": "cono",
+      "nombre": "Punta Estelar",
+      "voz": "la punta estelar",
+      "pista": "¡La punta estelar es la nariz de la nave! Va arriba de todo."
+    },
+    {
+      "id": "antena",
+      "nombre": "Antena Radar",
+      "voz": "la antena radar",
+      "pista": "¡La antena va sobre el lomo de la nave, en el centro, para escuchar las estrellas!"
+    },
+    {
+      "id": "propulsor",
+      "nombre": "Propulsor",
+      "voz": "el propulsor",
+      "pista": "¡El propulsor empuja la nave! Va en la cola, abajo de todo."
+    },
+    {
+      "id": "panel-izq",
+      "nombre": "Panel Izquierdo",
+      "voz": "el panel solar izquierdo",
+      "pista": "¡Este panel solar tiene el brazo hacia la derecha! Va en el lado izquierdo de la nave."
+    },
+    {
+      "id": "panel-der",
+      "nombre": "Panel Derecho",
+      "voz": "el panel solar derecho",
+      "pista": "¡Este panel solar tiene el brazo hacia la izquierda! Va en el lado derecho de la nave."
+    },
+    {
+      "id": "aleta-izq",
+      "nombre": "Aleta Izquierda",
+      "voz": "la aleta izquierda",
+      "pista": "¡Esta aleta apunta hacia la izquierda! Es el ala completa del lado izquierdo."
+    },
+    {
+      "id": "aleta-der",
+      "nombre": "Aleta Derecha",
+      "voz": "la aleta derecha",
+      "pista": "¡Esta aleta apunta hacia la derecha! Es el ala completa del lado derecho."
+    },
+    {
+      "id": "turbina-izq",
+      "nombre": "Turbina Izquierda",
+      "voz": "la turbina izquierda",
+      "pista": "¡Esta turbina tiene su aleta pequeña hacia la izquierda! Va sobre el ala izquierda."
+    },
+    {
+      "id": "turbina-der",
+      "nombre": "Turbina Derecha",
+      "voz": "la turbina derecha",
+      "pista": "¡Esta turbina tiene su aleta pequeña hacia la derecha! Va sobre el ala derecha."
+    }
+  ],
+  "demo": {
+    "pieza": "cabina"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡El Ensamblaje de la Nave!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "introZoe": "¡Hola, súper ingeniero! Es hora de ensamblar nuestra nave de exploración. Toma cada pieza, arrástrala con pulso firme hasta su lugar en el plano holográfico y suéltala con precisión para encajarla.",
+    "demoZeus": "¡Mira! Tomo la cabina de cristal, la llevo hasta su contorno al frente de la nave y la suelto justo en el centro.",
+    "guiaZeus": "¡Mantén tu dedo firme en la pieza y llévala justo al centro del contorno!",
+    "aciertos": [
+      "¡Encajada!",
+      "¡Qué precisión!",
+      "¡Pieza asegurada!",
+      "¡Excelente pulso!"
+    ],
+    "casi": "¡Muy cerca! Intenta colocarla justo en el contorno.",
+    "otraPieza": "Busca el lugar que tiene la misma forma.",
+    "fuera": "¡Lleva la pieza hasta el plano de la nave!",
+    "ayudaZoe": "¡Mira la forma de cada pieza y busca su contorno en el plano!",
+    "listo": "¡Nave lista para despegar!",
+    "finalVoz": "¡SÚPER INGENIERO! Arrastraste y ensamblaste cada pieza de la nave con una precisión impecable.",
+    "finalVozZeus": "¡Nuestra exploradora está lista para viajar!",
+    "finalTitulo": "¡SÚPER INGENIERO!",
+    "finalTexto": "¡La nave está lista!",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola, amigos! Bienvenidos al taller espacial de Polimotor."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Hoy vamos a construir naves de exploración, pieza por pieza!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Arrastrar y encajar piezas con precisión"
+    }
+  ],
+  "nivelesJuego": [
+    {
+      "id": 1,
+      "titulo": "Nivel 1",
+      "nave": "chispa",
+      "nombreNave": "Exploradora Chispa",
+      "escala": 1,
+      "piezas": [
+        {
+          "id": "cabina",
+          "x": 0,
+          "y": -150,
+          "rot": 0
+        },
+        {
+          "id": "panel-izq",
+          "x": -220,
+          "y": 40,
+          "rot": 0
+        },
+        {
+          "id": "panel-der",
+          "x": 220,
+          "y": 40,
+          "rot": 0
+        },
+        {
+          "id": "propulsor",
+          "x": 0,
+          "y": 212,
+          "rot": 0
+        }
+      ],
+      "zoe": "¡Hola, súper ingeniero! Es hora de ensamblar nuestra nave de exploración. Toma cada pieza, arrástrala con pulso firme hasta su lugar en el plano holográfico y suéltala con precisión para encajarla.",
+      "listo": "¡La Exploradora Chispa está lista! Ahora viene la Nave Cometa.",
+      "cartel": {
+        "etiqueta": "Nivel 1 completado",
+        "titulo": "¡Exploradora Chispa lista!",
+        "sub": "Sigue la Nave Cometa"
+      }
+    },
+    {
+      "id": 2,
+      "titulo": "Nivel 2",
+      "nave": "cometa",
+      "nombreNave": "Nave Cometa",
+      "escala": 0.95,
+      "piezas": [
+        {
+          "id": "cono",
+          "x": 0,
+          "y": -238,
+          "rot": 0
+        },
+        {
+          "id": "cabina",
+          "x": 0,
+          "y": -92,
+          "rot": 0
+        },
+        {
+          "id": "aleta-izq",
+          "x": -188,
+          "y": 57,
+          "rot": 0
+        },
+        {
+          "id": "aleta-der",
+          "x": 188,
+          "y": 57,
+          "rot": 0
+        },
+        {
+          "id": "propulsor",
+          "x": 0,
+          "y": 228,
+          "rot": 0
+        }
+      ],
+      "zoe": "¡Ahora la Nave Cometa! Tiene cinco piezas: la punta estelar, la cabina, sus dos aletas y el propulsor. ¡Mira bien cada contorno!",
+      "listo": "¡La Nave Cometa está lista! Ahora viene la Gran Exploradora.",
+      "cartel": {
+        "etiqueta": "Nivel 2 completado",
+        "titulo": "¡Nave Cometa lista!",
+        "sub": "Sigue la Gran Exploradora"
+      }
+    },
+    {
+      "id": 3,
+      "titulo": "Nivel 3",
+      "nave": "gran",
+      "nombreNave": "Gran Exploradora",
+      "escala": 0.88,
+      "piezas": [
+        {
+          "id": "cono",
+          "x": 0,
+          "y": -296,
+          "rot": 0
+        },
+        {
+          "id": "cabina",
+          "x": 0,
+          "y": -150,
+          "rot": 0
+        },
+        {
+          "id": "antena",
+          "x": 0,
+          "y": 40,
+          "rot": 0
+        },
+        {
+          "id": "turbina-izq",
+          "x": -250,
+          "y": 30,
+          "rot": 0
+        },
+        {
+          "id": "turbina-der",
+          "x": 250,
+          "y": 30,
+          "rot": 0
+        },
+        {
+          "id": "propulsor",
+          "x": 0,
+          "y": 238,
+          "rot": 0
+        }
+      ],
+      "zoe": "¡La Gran Exploradora tiene seis piezas! Una turbina en cada ala y una antena sobre el lomo. Llévalas con pulso firme, una por una.",
+      "listo": "¡Nave lista para despegar!",
+      "cartel": {
+        "etiqueta": "Nivel 3 completado",
+        "titulo": "¡Lista para despegar!",
+        "sub": "Gran Exploradora"
+      }
+    }
+  ]
+}

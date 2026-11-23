@@ -1,0 +1,178 @@
+{
+  "nombre": "¡La Red de Tuberías!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 35,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "paso": 4,
+    "radioGema": 30,
+    "margen": 0.5,
+    "holgura": 0.55,
+    "velocidadMax": 1100,
+    "seguimiento": 18,
+    "toqueGema": 1.9,
+    "fueraMaxMs": 1800,
+    "grosorPared": 18,
+    "ayudaMs": 11000,
+    "ayudaRepetirMs": 14000,
+    "vozPausaMs": 2200,
+    "vozSoltarMs": 12000,
+    "vozFueraMs": 9000
+  },
+  "redes": [
+    {
+      "id": 1,
+      "nombre": "Conducto de práctica",
+      "ancho": 104,
+      "curva": 1.1,
+      "puntos": [[350, 460], [538, 460], [650, 290], [819, 290], [950, 560], [1215, 560]],
+      "checkpoints": [0.28, 0.55, 0.8],
+      "aleatoria": {
+        "picos": [2, 2],
+        "diagonal": [110, 170],
+        "meseta": [150, 200],
+        "entrada": [120, 190],
+        "salida": [130, 200],
+        "verticales": 0,
+        "banda": 0.42,
+        "checkpoints": 3
+      },
+      "voz": "zoe",
+      "instruccion": "¡Presiona la gema y llévala por la tubería hasta el reactor!",
+      "cartel": {
+        "etiqueta": "Nivel 1 completado",
+        "titulo": "¡Energía conectada!",
+        "sub": "Sigue la red de los zigzags"
+      },
+      "logro": "¡Energía conectada! Ahora viene una tubería con zigzags."
+    },
+    {
+      "id": 2,
+      "nombre": "Red de los zigzags",
+      "ancho": 96,
+      "curva": 1.0,
+      "puntos": [[350, 560], [472, 560], [575, 300], [688, 300], [791, 600], [903, 600], [1007, 330], [1215, 330]],
+      "checkpoints": [0.22, 0.44, 0.64, 0.82],
+      "aleatoria": {
+        "picos": [3, 3],
+        "diagonal": [90, 140],
+        "meseta": [140, 180],
+        "entrada": [90, 150],
+        "salida": [110, 170],
+        "verticales": 0,
+        "banda": 0.32,
+        "checkpoints": 4
+      },
+      "voz": "zeus",
+      "instruccion": "¡Esta tubería sube y baja! Sigue cada curva sin despegar tu dedo.",
+      "cartel": {
+        "etiqueta": "Nivel 2 completado",
+        "titulo": "¡Zigzag superado!",
+        "sub": "Sigue la red de los codos"
+      },
+      "logro": "¡Muy bien! Superaste los zigzags. Ahora vienen más codos."
+    },
+    {
+      "id": 3,
+      "nombre": "Red de los codos",
+      "ancho": 90,
+      "curva": 0.95,
+      "puntos": [[350, 300], [463, 300], [538, 640], [650, 640], [725, 250], [838, 250], [913, 620], [1025, 620], [1091, 420], [1215, 420]],
+      "checkpoints": [0.2, 0.42, 0.62, 0.84],
+      "aleatoria": {
+        "picos": [4, 4],
+        "diagonal": [60, 110],
+        "meseta": [125, 160],
+        "entrada": [80, 130],
+        "salida": [90, 140],
+        "verticales": 0.15,
+        "banda": 0.3,
+        "checkpoints": 4
+      },
+      "voz": "zoe",
+      "instruccion": "¡Más codos y más curvas! Ve despacio y con el dedo firme.",
+      "cartel": {
+        "etiqueta": "Nivel 3 completado",
+        "titulo": "¡Codos dominados!",
+        "sub": "Sigue la gran red del reactor"
+      },
+      "logro": "¡Excelente pulso! Ahora la gran red del reactor."
+    },
+    {
+      "id": 4,
+      "nombre": "Gran red del reactor",
+      "ancho": 84,
+      "curva": 0.9,
+      "puntos": [[350, 440], [444, 440], [444, 220], [594, 220], [650, 670], [755, 670], [800, 290], [910, 290], [968, 680], [1080, 680], [1130, 450], [1215, 450]],
+      "checkpoints": [0.17, 0.35, 0.53, 0.71, 0.87],
+      "aleatoria": {
+        "picos": [4, 5],
+        "diagonal": [35, 85],
+        "meseta": [112, 150],
+        "entrada": [50, 100],
+        "salida": [60, 110],
+        "verticales": 0.35,
+        "banda": 0.2,
+        "checkpoints": 5
+      },
+      "voz": "zeus",
+      "instruccion": "¡La gran red del reactor! Es la más larga. Mantén el contacto hasta el final.",
+      "cartel": {
+        "etiqueta": "Nivel 4 completado",
+        "titulo": "¡Reactor encendido!",
+        "sub": "Toda la red tiene energía"
+      },
+      "logro": "¡Reactor encendido!"
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡La Red de Tuberías!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "introZeus": "¡Alerta de conducción eléctrica! Necesitamos llevar la gema hasta el reactor. Presiona la gema con tu dedo y arrástrala por dentro de la tubería sin soltarla hasta llegar al final.",
+    "demoZeus": "¡Mira! Pongo mi dedo en la gema y la llevo por dentro del tubo. Si levanto el dedo, la gema vuelve a la última luz verde.",
+    "guiaZoe": "¡No despegues tu dedo de la pantalla mientras recorres la tubería!",
+    "pistaArrastra": "Pon tu dedo sobre la gema brillante y llévala por dentro de la tubería.",
+    "tocaGema": "¡Primero toca la gema brillante!",
+    "fuera": "¡Vuelve a la tubería! La gema te espera.",
+    "perdida": "¡La gema volvió a la luz verde! Tómala otra vez.",
+    "soltar": "¡No despegues tu dedo de la pantalla mientras recorres la tubería!",
+    "checkpoint": [
+      "¡Punto de control!",
+      "¡Luz verde!",
+      "¡Sigue así!",
+      "¡Qué buen pulso!"
+    ],
+    "finalVoz": "¡DOMINIO TÁCTIL TOTAL! Mantuviste el arrastre perfecto a través de todo el circuito de tuberías.",
+    "finalVozZeus": "¡El reactor está lleno de energía!",
+    "finalTitulo": "¡DOMINIO TÁCTIL TOTAL!",
+    "finalTexto": "¡El reactor está encendido!",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe, mira! El reactor del taller se quedó sin energía."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Hay que llevar la gema de luz por las tuberías, desde el generador hasta el reactor!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Conducir objetos sin soltar el contacto"
+    }
+  ]
+}

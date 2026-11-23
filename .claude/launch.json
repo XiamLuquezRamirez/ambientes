@@ -240,6 +240,58 @@
       ],
       "port": 8044,
       "autoPort": false
+    },
+    {
+      "name": "juegos-nave",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8045",
+        "--directory",
+        "public"
+      ],
+      "port": 8045,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-tuberias",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8046",
+        "--directory",
+        "public"
+      ],
+      "port": 8046,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-estacion",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8047",
+        "--directory",
+        "public"
+      ],
+      "port": 8047,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-tren",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8048",
+        "--directory",
+        "public"
+      ],
+      "port": 8048,
+      "autoPort": false
     }
   ]
 }

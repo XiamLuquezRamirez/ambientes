@@ -1,0 +1,195 @@
+{
+  "nombre": "El Tren de Colores y las Vías Mágicas",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 35,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "toqueInicio": 1.5,
+    "margen": 0.55,
+    "ventana": 2.2,
+    "atras": 1.6,
+    "velocidadMax": 9,
+    "finTolerancia": 0.08,
+    "separacionPuntos": 0.62,
+    "separacionTraviesas": 0.56,
+    "hitos": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "estrellaMs": 3000,
+    "ayudaMs": 10000,
+    "ayudaRepetirMs": 14000,
+    "vozPausaMs": 2200,
+    "vozSoltarMs": 11000,
+    "vozFueraMs": 8000
+  },
+  "vias": [
+    {
+      "id": 1,
+      "nombre": "Vía larga",
+      "color": "rojo",
+      "ancho": 1.9,
+      "voz": "zoe",
+      "instruccion": "¡El trenecito quiere viajar! Pon tu dedo sobre los puntos y deslízalo suavemente para construir las vías de color azul hasta la estación final.",
+      "cartel": {
+        "etiqueta": "Nivel 1 completado",
+        "titulo": "¡El tren rojo llegó!",
+        "sub": "Ahora tres estaciones"
+      },
+      "logro": "¡Muy bien! El tren rojo llegó a la estación.",
+      "estaciones": 2,
+      "desnivel": false,
+      "curvas": false,
+      "hueco": [
+        24,
+        28
+      ]
+    },
+    {
+      "id": 2,
+      "nombre": "Tres estaciones",
+      "color": "azul",
+      "ancho": 1.85,
+      "voz": "zeus",
+      "instruccion": "¡Ahora hay tres estaciones! Construye la vía de una estación a la otra, sin soltar el camino.",
+      "cartel": {
+        "etiqueta": "Nivel 2 completado",
+        "titulo": "¡El tren azul llegó!",
+        "sub": "Ahora cuatro estaciones"
+      },
+      "logro": "¡Qué bien! El tren azul llegó a su estación.",
+      "estaciones": 3,
+      "desnivel": false,
+      "curvas": false,
+      "hitos": [
+        0.33,
+        0.66
+      ],
+      "hueco": [
+        20,
+        27
+      ]
+    },
+    {
+      "id": 3,
+      "nombre": "Cuatro estaciones",
+      "color": "verde",
+      "ancho": 1.8,
+      "voz": "zoe",
+      "instruccion": "¡Cuatro estaciones! Desliza tu dedo derechito por los puntos de luz, de estación en estación.",
+      "cartel": {
+        "etiqueta": "Nivel 3 completado",
+        "titulo": "¡El tren verde llegó!",
+        "sub": "Ahora las vías con curvas"
+      },
+      "logro": "¡Excelente! El tren verde llegó a la última estación.",
+      "estaciones": 4,
+      "desnivel": true,
+      "curvas": false,
+      "hitos": [
+        0.33,
+        0.66
+      ],
+      "hueco": [
+        18,
+        25
+      ]
+    },
+    {
+      "id": 4,
+      "nombre": "Vías con curvas",
+      "color": "amarillo",
+      "ancho": 1.85,
+      "voz": "zeus",
+      "instruccion": "¡Las vías ahora tienen curvas! Sigue los puntos de luz despacito hasta cada estación.",
+      "cartel": {
+        "etiqueta": "Nivel 4 completado",
+        "titulo": "¡Todos los trenes llegaron!",
+        "sub": "¡Vamos al gran viaje!"
+      },
+      "logro": "¡Todos los trenes llegaron!",
+      "estaciones": 4,
+      "desnivel": true,
+      "curvas": true,
+      "hitos": [
+        0.33,
+        0.66
+      ],
+      "hueco": [
+        18,
+        24
+      ]
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "El Tren de Colores y las Vías Mágicas",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "introZoe": "¡El trenecito quiere viajar! Pon tu dedo sobre los puntos y deslízalo suavemente para construir las vías de color azul hasta la estación final.",
+    "demoZeus": "¡Mira! Pongo mi dedo en el punto de inicio y lo deslizo despacito por los puntos de luz. ¡Así se construye la vía!",
+    "guiaZeus": "¡Sigue los puntos de luz con tu dedo sin soltar el camino!",
+    "pistaInicio": "Pon tu dedo en el punto brillante del inicio y deslízalo por los puntos de luz.",
+    "tocaInicio": "¡Empieza en el punto brillante, junto al tren!",
+    "tocaDestino": "¡Primero construye la vía! Empieza junto al tren.",
+    "fuera": "¡Vuelve a los puntos de luz! La vía te espera.",
+    "adelante": "¡Despacito! Lleva tu dedo junto a la vía que estás construyendo.",
+    "soltar": "¡Sigue los puntos de luz con tu dedo sin soltar el camino!",
+    "retoma": "¡Sigue desde la estrellita brillante!",
+    "hito": [
+      "¡Muy bien!",
+      "¡Sigue así!",
+      "¡Ya casi llegas!"
+    ],
+    "finalVoz": "¡EXCELENTE MAQUINISTA! Trazaste las vías rectas y el tren llegó a su destino.",
+    "finalVozZeus": "¡Chu chuuu! ¡Todos los trenes de colores llegaron a la gran estación!",
+    "finalTitulo": "¡EXCELENTE MAQUINISTA!",
+    "finalTexto": "Trazaste las vías rectas y el tren llegó a su destino.",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe, mira! Los trenecitos de colores no pueden salir de la estación."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Les faltan las vías! Vamos a construirlas con el dedo, derechito, hasta la estación final."
+      }
+    ],
+    "tramoLlego": [
+      "¡Llegó a la estación! Ahora construye la vía hasta la siguiente.",
+      "¡Muy bien! Sigue con la próxima vía.",
+      "¡Ya casi! Falta la última vía."
+    ],
+    "tramoUltimo": "¡Ya casi! Falta la última vía."
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "3-4 años",
+      "titulo": "Trazar líneas rectas sin soltar"
+    }
+  ],
+  "ruta": {
+    "x0": -10.5,
+    "zMin": -1.5,
+    "zMax": 1.7,
+    "z0": 0.6,
+    "pendienteMax": 0.32,
+    "curvaMin": 1.6,
+    "curvaMax": 2.6,
+    "margenCurva": 1.2,
+    "antes": 7.5,
+    "despues": 3.2,
+    "radioMin": 2.6
+  }
+}

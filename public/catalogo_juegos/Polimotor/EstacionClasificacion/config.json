@@ -1,0 +1,349 @@
+{
+  "nombre": "¡La Estación de Clasificación!",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 35,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "visibles": 6,
+    "ayudaMs": 13000,
+    "ayudaRepetirMs": 16000,
+    "vozPausaMs": 2200,
+    "fuerasParaPista": 2,
+    "erroresParaAyuda": 2,
+    "nota": "Los objetos de cada nivel salen al azar en cada ronda (nivelesJuego[].generador)."
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "¡La Estación de Clasificación!",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "introZoe": "¡Vamos a organizar nuestra estación! Observa cada objeto, fíjate en sus características y arrástralo hasta el contenedor correcto. ¡Vamos a clasificar!",
+    "demoZeus": "¡Mira! Tomo {objeto}, miro su color y busco el contenedor del mismo color.",
+    "aciertos": [
+      "¡Clasificado!",
+      "¡Muy bien observado!",
+      "¡Al contenedor correcto!",
+      "¡Excelente!",
+      "¡Eso es!"
+    ],
+    "fuera": "¡Lleva el objeto hasta uno de los contenedores!",
+    "finalVoz": "¡EXCELENTE PENSAMIENTO LÓGICO! Analizaste los atributos y arrastraste cada elemento a su lugar exacto. ¡Completaste el tema de Arrastrar y Soltar!",
+    "finalVozZeus": "¡La estación quedó perfectamente organizada!",
+    "finalTitulo": "¡EXCELENTE PENSAMIENTO LÓGICO!",
+    "finalTexto": "Analizaste los atributos y arrastraste cada elemento a su lugar exacto.",
+    "finalCartel": {
+      "etiqueta": "Estación organizada",
+      "titulo": "¡EXCELENTE PENSAMIENTO LÓGICO!",
+      "sub": "¡Completaste el tema de Arrastrar y Soltar!"
+    },
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola, amigos! Bienvenidos a la estación de clasificación de Polimotor."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Hoy vamos a ordenar cada objeto en su contenedor!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Clasificar objetos por color, tamaño y forma"
+    }
+  ],
+  "nivelesJuego": [
+    {
+      "id": 1,
+      "criterio": "COLOR",
+      "criterios": [
+        "color"
+      ],
+      "celebracion": "colores",
+      "zoe": "¡Busca los colores! Lleva cada objeto azul o amarillo a su contenedor.",
+      "contenedores": [
+        {
+          "id": "azul",
+          "color": "azul",
+          "etiqueta": "AZUL",
+          "cuerpo": "#3498ff",
+          "iconos": [
+            "color"
+          ]
+        },
+        {
+          "id": "amarillo",
+          "color": "amarillo",
+          "etiqueta": "AMARILLO",
+          "cuerpo": "#ffcf32",
+          "iconos": [
+            "color"
+          ]
+        }
+      ],
+      "generador": {
+        "porContenedor": 4,
+        "formas": [
+          "cuadrado",
+          "circulo",
+          "estrella",
+          "triangulo",
+          "rectangulo"
+        ],
+        "colores": [
+          "azul",
+          "amarillo"
+        ],
+        "tamanos": [
+          "grande",
+          "pequeno"
+        ]
+      },
+      "pistas": {
+        "general": "Mira el color del objeto y busca el contenedor del mismo color.",
+        "concreta": "¡Este objeto es {color}! Llévalo al contenedor {color}."
+      },
+      "cartel": {
+        "etiqueta": "Nivel 1 completado",
+        "titulo": "¡AZUL Y AMARILLO!",
+        "sub": "¡Tus ojos detectaron todos los colores correctamente!"
+      },
+      "voz": "¡AZUL Y AMARILLO! ¡Tus ojos detectaron todos los colores correctamente!"
+    },
+    {
+      "id": 2,
+      "criterio": "TAMAÑO",
+      "criterios": [
+        "tamano"
+      ],
+      "celebracion": "tamanos",
+      "zoe": "¡Ahora observa el tamaño! Los objetos grandes van juntos y los pequeños también.",
+      "contenedores": [
+        {
+          "id": "grande",
+          "tamano": "grande",
+          "etiqueta": "GRANDE",
+          "cuerpo": "#8f9bab",
+          "iconos": [
+            "tamano"
+          ]
+        },
+        {
+          "id": "pequeno",
+          "tamano": "pequeno",
+          "etiqueta": "PEQUEÑO",
+          "cuerpo": "#8f9bab",
+          "iconos": [
+            "tamano"
+          ],
+          "escala": 0.72
+        }
+      ],
+      "generador": {
+        "porContenedor": 4,
+        "formas": [
+          "cuadrado",
+          "circulo",
+          "estrella",
+          "triangulo",
+          "rectangulo"
+        ],
+        "colores": [
+          "gris"
+        ],
+        "tamanos": [
+          "grande",
+          "pequeno"
+        ]
+      },
+      "pistas": {
+        "general": "¿Es grande o pequeño? Compáralo con la etiqueta del contenedor.",
+        "concreta": "¡Este objeto es {tamano}! Llévalo al contenedor {tamano}."
+      },
+      "cartel": {
+        "etiqueta": "Nivel 2 completado",
+        "titulo": "¡GRAN OBSERVADOR!",
+        "sub": "¡Reconociste los objetos grandes y pequeños!"
+      },
+      "voz": "¡GRAN OBSERVADOR! ¡Reconociste los objetos grandes y pequeños!"
+    },
+    {
+      "id": 3,
+      "criterio": "FORMA",
+      "criterios": [
+        "forma"
+      ],
+      "celebracion": "formas",
+      "zoe": "¡Mira la forma! Busca el contenedor que tenga la misma figura que tu objeto.",
+      "contenedores": [
+        {
+          "id": "cuadrado",
+          "forma": "cuadrado",
+          "etiqueta": "CUADRADO",
+          "cuerpo": "#12b886",
+          "iconos": [
+            "forma"
+          ]
+        },
+        {
+          "id": "circulo",
+          "forma": "circulo",
+          "etiqueta": "CÍRCULO",
+          "cuerpo": "#f76707",
+          "iconos": [
+            "forma"
+          ]
+        },
+        {
+          "id": "triangulo",
+          "forma": "triangulo",
+          "etiqueta": "TRIÁNGULO",
+          "cuerpo": "#7048e8",
+          "iconos": [
+            "forma"
+          ]
+        },
+        {
+          "id": "rectangulo",
+          "forma": "rectangulo",
+          "etiqueta": "RECTÁNGULO",
+          "cuerpo": "#1098ad",
+          "iconos": [
+            "forma"
+          ]
+        }
+      ],
+      "generador": {
+        "porContenedor": 3,
+        "formas": [
+          "cuadrado",
+          "circulo",
+          "triangulo",
+          "rectangulo"
+        ],
+        "colores": [
+          "azul",
+          "amarillo",
+          "rojo",
+          "verde",
+          "naranja",
+          "morado",
+          "turquesa"
+        ],
+        "tamanos": [
+          "grande",
+          "pequeno"
+        ]
+      },
+      "pistas": {
+        "general": "Mira la forma: busca el contenedor con la misma figura.",
+        "concreta": "¡Es un {forma}! Busca el contenedor del {forma}."
+      },
+      "cartel": {
+        "etiqueta": "Nivel 3 completado",
+        "titulo": "¡MAESTRO DE LAS FORMAS!",
+        "sub": "¡Cada figura encontró su lugar!"
+      },
+      "voz": "¡MAESTRO DE LAS FORMAS! ¡Cada figura encontró su lugar!"
+    },
+    {
+      "id": 4,
+      "criterio": "COLOR + TAMAÑO",
+      "criterios": [
+        "color",
+        "tamano"
+      ],
+      "celebracion": "doble",
+      "zoe": "¡Mira las dos etiquetas! Combina el color y el tamaño antes de soltar tu objeto.",
+      "contenedores": [
+        {
+          "id": "azul-grande",
+          "color": "azul",
+          "tamano": "grande",
+          "etiqueta": "AZUL + GRANDE",
+          "cuerpo": "#3498ff",
+          "iconos": [
+            "color",
+            "tamano"
+          ]
+        },
+        {
+          "id": "azul-pequeno",
+          "color": "azul",
+          "tamano": "pequeno",
+          "etiqueta": "AZUL + PEQUEÑO",
+          "cuerpo": "#39bfe3",
+          "iconos": [
+            "color",
+            "tamano"
+          ],
+          "escala": 0.84
+        },
+        {
+          "id": "amarillo-grande",
+          "color": "amarillo",
+          "tamano": "grande",
+          "etiqueta": "AMARILLO + GRANDE",
+          "cuerpo": "#ffcf32",
+          "iconos": [
+            "color",
+            "tamano"
+          ]
+        },
+        {
+          "id": "amarillo-pequeno",
+          "color": "amarillo",
+          "tamano": "pequeno",
+          "etiqueta": "AMARILLO + PEQUEÑO",
+          "cuerpo": "#f5de76",
+          "iconos": [
+            "color",
+            "tamano"
+          ],
+          "escala": 0.84
+        }
+      ],
+      "generador": {
+        "porContenedor": 3,
+        "formas": [
+          "cuadrado",
+          "circulo",
+          "estrella",
+          "triangulo",
+          "rectangulo"
+        ],
+        "colores": [
+          "azul",
+          "amarillo"
+        ],
+        "tamanos": [
+          "grande",
+          "pequeno"
+        ]
+      },
+      "pistas": {
+        "general": "Mira las dos etiquetas: el color y el tamaño.",
+        "color": "¡El tamaño está bien! Pero mira el color.",
+        "tamano": "¡El color está bien! Pero mira el tamaño.",
+        "concreta": "¡Es {color} y es {tamano}! Busca el contenedor {color} y {tamano}."
+      },
+      "cartel": {
+        "etiqueta": "Nivel 4 completado",
+        "titulo": "¡SÚPER CLASIFICADOR!",
+        "sub": "¡Combinaste el color y el tamaño como un experto!"
+      },
+      "voz": "¡SÚPER CLASIFICADOR! ¡Combinaste el color y el tamaño como un experto!"
+    }
+  ]
+}

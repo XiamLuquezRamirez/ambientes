@@ -98,43 +98,70 @@
      * crean dentro de esas llamadas, mientras los efectos se disparan en cualquier otro momento,
      * de modo que la ventana reparte bien sin tocar ninguno de los 18 archivos.
      */
-    var ganFondo = null, ganEfectos = null, ctxAudio = null;
+    var ganFondo = null, ganEfectos = null, ctxAudio = null, limitador = null;
     var enFondo = 0;             // > 0 mientras se está creando audio de fondo
     var connectParcheado = false;
 
     /**
-     * Prepara los dos buses sobre el contexto que ya creó el juego.
+     * Prepara los dos buses (y el limitador) de un contexto y devuelve su entrada.
      *
-     * Un juego puede usar varios AudioContext a lo largo de la partida (la intro 3D crea el suyo
-     * y lo cierra al terminar; luego el juego abre otro), así que los buses se rehacen cada vez
-     * que aparece un contexto distinto o el actual queda cerrado: si no, los sliders moverían la
-     * ganancia de un contexto muerto y no se oiría ningún cambio.
+     * Un juego puede usar varios AudioContext a la vez o uno tras otro (el de su `sonidos.js`,
+     * el de la intro 3D, el de TextoVoz…). Cada contexto tiene SUS buses y se guardan todos:
+     * antes solo se guardaban los del último contexto, y el módulo de sonidos, que leyó
+     * `destination` una sola vez, se quedaba conectado a unos buses abandonados cuya ganancia ya
+     * no se actualizaba (ni el refuerzo ni los sliders le llegaban).
      */
+    var porContexto = [];          // [{ ctx, fondo, efectos, limitador }]
     var creandoBuses = false;
+
+    function entradaDe(ctx) {
+        for (var i = 0; i < porContexto.length; i++) if (porContexto[i].ctx === ctx) return porContexto[i];
+        return null;
+    }
+
     function prepararBuses(ctx, destinoReal) {
-        if (!ctx || creandoBuses) return false;
-        if (ctxAudio === ctx && ctxAudio.state !== "closed" && ganFondo && ganEfectos) return true;
-        creandoBuses = true;
-        destinoDirecto++;                       // dentro de esta llamada, `destination` es el real
-        try {
-            var dest = destinoReal || ctx.destination;
-            var fondo = ctx.createGain();
-            var efectos = ctx.createGain();
-            fondo.gain.value = ganaciaFondo();
-            efectos.gain.value = ganaciaEfectos();
-            var conectar = connect0 || global.AudioNode.prototype.connect;
-            conectar.call(fondo, dest);
-            conectar.call(efectos, dest);
-            ctxAudio = ctx;
-            ganFondo = fondo;
-            ganEfectos = efectos;
-            return true;
-        } catch (e) {
-            return false;
-        } finally {
-            destinoDirecto--;
-            creandoBuses = false;
+        if (!ctx || creandoBuses || ctx.state === "closed") return null;
+        var e = entradaDe(ctx);
+        if (!e) {
+            creandoBuses = true;
+            destinoDirecto++;                       // dentro de esta llamada, `destination` es el real
+            try {
+                var dest = destinoReal || ctx.destination;
+                var fondo = ctx.createGain();
+                var efectos = ctx.createGain();
+                fondo.gain.value = nivelBusFondo();
+                efectos.gain.value = nivelBusEfectos();
+                var conectar = connect0 || global.AudioNode.prototype.connect;
+                // Limitador a la salida: deja subir los efectos (REFUERZO_EFECTOS) sin que los
+                // picos recorten. Si el navegador no lo tiene, los buses van directo al destino.
+                var salida = dest;
+                try {
+                    var lim = ctx.createDynamicsCompressor();
+                    lim.threshold.value = -1.5;
+                    lim.knee.value = 4;
+                    lim.ratio.value = 20;
+                    lim.attack.value = 0.001;
+                    lim.release.value = 0.15;
+                    conectar.call(lim, dest);
+                    salida = lim;
+                } catch (err) { /* sin limitador */ }
+                conectar.call(fondo, salida);
+                conectar.call(efectos, salida);
+                e = { ctx: ctx, fondo: fondo, efectos: efectos, limitador: salida !== dest ? salida : null };
+                porContexto.push(e);
+            } catch (err) {
+                return null;
+            } finally {
+                destinoDirecto--;
+                creandoBuses = false;
+            }
         }
+        // El último contexto que pidió `destination` es el "actual" (el que muestra buses()).
+        ctxAudio = ctx;
+        ganFondo = e.fondo;
+        ganEfectos = e.efectos;
+        limitador = e.limitador;
+        return e;
     }
 
     /**
@@ -183,8 +210,9 @@
                         try {
                             recordarContexto(this);
                             if (destinoDirecto > 0 || esDeHowler(this)) return real;
-                            if (!prepararBuses(this, real)) return real;
-                            return enFondo > 0 ? ganFondo : ganEfectos;
+                            var e = prepararBuses(this, real);
+                            if (!e) return real;
+                            return enFondo > 0 ? e.fondo : e.efectos;
                         } catch (e) {
                             return real;
                         }
@@ -287,20 +315,57 @@
     function ganaciaFondo() { return est.mudo ? 0 : est.fondo / 100; }
     function ganaciaEfectos() { return est.mudo ? 0 : est.efectos / 100; }
 
-    /** Lleva los dos niveles a los buses de Web Audio, con una rampa corta (sin chasquidos). */
+    /*
+     * Los efectos sintetizados de los `sonidos.js` salen mucho más bajos que la voz y que el
+     * sprite de PedniaAudio (que ya trae su propio refuerzo y limitador). En Web Audio el canal
+     * Efectos se multiplica por este factor; el limitador de prepararBuses() sujeta los picos.
+     * Los <audio> (voz) no pasan de 1 y se quedan con ganaciaEfectos(). Los efectos del sprite
+     * de Howler se refuerzan aparte (reforzarHowler), sin tocar la música del tema.
+     */
+    var REFUERZO_EFECTOS = 5;
+
+    /*
+     * ¿El `sonidos.js` regula sus dos canales por su cuenta (volumenEfectos)? Entonces toda su
+     * mezcla sale por UN bus de este archivo (el que tocara cuando leyó `destination`: el de
+     * efectos si armó la mezcla al primer sonido, el de fondo si la armó dentro de ambiente()).
+     * Si ese bus también aplicara el canal, el nivel se aplicaría dos veces (80 % × 80 % = 64 %)
+     * o, peor, los efectos quedarían al nivel de la música. Así que en ese caso los dos buses
+     * valen lo mismo (el refuerzo) y el canal lo aplica solo el módulo; su música se divide por
+     * el refuerzo (aplicar()) para que quede donde marca el slider.
+     */
+    function moduloPropio() {
+        return !!(sonidos && typeof sonidos.volumenEfectos === "function");
+    }
+
+    function nivelBusFondo() {
+        if (est.mudo) return 0;
+        return moduloPropio() ? REFUERZO_EFECTOS : est.fondo / 100;
+    }
+
+    function nivelBusEfectos() {
+        if (est.mudo) return 0;
+        return moduloPropio() ? REFUERZO_EFECTOS : est.efectos / 100 * REFUERZO_EFECTOS;
+    }
+
+    /**
+     * Lleva los dos niveles a los buses de TODOS los contextos vivos, con una rampa corta (sin
+     * chasquidos). Los de contextos cerrados se descartan.
+     */
     function aplicarBuses() {
-        if (!ctxAudio || ctxAudio.state === "closed") {
-            // El contexto murió (típico: el de la intro 3D, que se cierra al entrar al juego) y el
-            // módulo ya leyó `destination`, así que no volverá a pedirlo por su cuenta. Se busca
-            // el contexto vivo y se rehacen los buses sobre él; si no, los sliders no moverían nada.
-            rehacerSobreContextoVivo();
-            if (!ctxAudio || ctxAudio.state === "closed") return;
+        porContexto = porContexto.filter(function (e) { return e.ctx && e.ctx.state !== "closed"; });
+        if (!porContexto.length) rehacerSobreContextoVivo();
+        var f = nivelBusFondo(), ef = nivelBusEfectos();
+        porContexto.forEach(function (e) {
+            try {
+                var t = e.ctx.currentTime;
+                e.fondo.gain.setTargetAtTime(f, t, 0.05);
+                e.efectos.gain.setTargetAtTime(ef, t, 0.05);
+            } catch (err) { /* noop */ }
+        });
+        if (ctxAudio && ctxAudio.state === "closed" && porContexto.length) {
+            var ult = porContexto[porContexto.length - 1];
+            ctxAudio = ult.ctx; ganFondo = ult.fondo; ganEfectos = ult.efectos; limitador = ult.limitador;
         }
-        var t = ctxAudio.currentTime;
-        try {
-            if (ganFondo) ganFondo.gain.setTargetAtTime(ganaciaFondo(), t, 0.05);
-            if (ganEfectos) ganEfectos.gain.setTargetAtTime(ganaciaEfectos(), t, 0.05);
-        } catch (e) { /* noop */ }
     }
 
     /**
@@ -322,7 +387,9 @@
         if (sonidos) {
             // Cada método se aplica por separado: hay módulos sin música propia que solo traen
             // volumenEfectos().
-            if (typeof sonidos.volumenFondo === "function") sonidos.volumenFondo(est.mudo ? 0 : est.fondo);
+            // La música se compensa por el refuerzo que le dan los buses (ver moduloPropio()).
+            var kFondo = moduloPropio() ? REFUERZO_EFECTOS : 1;
+            if (typeof sonidos.volumenFondo === "function") sonidos.volumenFondo(est.mudo ? 0 : est.fondo / kFondo);
             if (typeof sonidos.volumenEfectos === "function") sonidos.volumenEfectos(est.mudo ? 0 : est.efectos);
             if (typeof sonidos.volumen === "function") sonidos.volumen(100);
             if (typeof sonidos.silenciar === "function") sonidos.silenciar(est.mudo);
@@ -343,6 +410,7 @@
             pa.agacharMusica(vFondo);
         }
         envolverPedniaAudio();
+        reforzarHowler();
 
         if (typeof alCambiar === "function") {
             try { alCambiar({ fondo: est.fondo, efectos: est.efectos, mudo: est.mudo }); } catch (e) { /* noop */ }
@@ -403,6 +471,49 @@
                 return archivo0.call(this, ruta, base * (loop ? ganaciaFondo() : ganaciaEfectos()), loop);
             };
         }
+    }
+
+    /*
+     * Efectos del sprite de PedniaAudio (Howler): los 17 juegos sin `sonidos.js` suenan solo por
+     * aquí. Howler no deja pasar de 1 el volumen de un sonido, y el nodo maestro lleva también la
+     * música del tema, así que se refuerza cada sonido suelto (no en bucle) en su propio nodo de
+     * ganancia, justo después de que Howler lo fija en play() o volume(). La música (en bucle)
+     * no cambia. El limitador de pednia-audio.js, detrás del maestro, sujeta los picos.
+     */
+    var REFUERZO_HOWLER = 3;
+    var howlParcheado = false;
+    function reforzarHowler() {
+        var Howl = global.Howl;
+        if (howlParcheado || !Howl || !Howl.prototype) return;
+        howlParcheado = true;
+        function subir(howl, id) {
+            try {
+                if (!howl._webAudio || typeof howl._soundById !== "function") return;
+                var snd = howl._soundById(id);
+                if (!snd || snd._loop || !snd._node || !snd._node.gain) return;
+                var v = snd._muted ? 0 : snd._volume;
+                var ctx = global.Howler && global.Howler.ctx;
+                if (ctx) snd._node.gain.setValueAtTime(v * REFUERZO_HOWLER, ctx.currentTime);
+            } catch (e) { /* noop: el sonido queda con el volumen de Howler */ }
+        }
+        var play0 = Howl.prototype.play;
+        Howl.prototype.play = function () {
+            var id = play0.apply(this, arguments);
+            if (typeof id === "number") subir(this, id);
+            return id;
+        };
+        var volumen0 = Howl.prototype.volume;
+        Howl.prototype.volume = function () {
+            var r = volumen0.apply(this, arguments);
+            var a = arguments;
+            if (a.length >= 2 && typeof a[0] === "number" && typeof a[1] === "number") {
+                subir(this, a[1]);
+            } else if (a.length === 1 && typeof a[0] === "number") {
+                var self = this;
+                (this._sounds || []).forEach(function (snd) { subir(self, snd._id); });
+            }
+            return r;
+        };
     }
 
     /**
@@ -643,7 +754,7 @@
          * (p. ej. enganchar un analizador a un bus y comprobar qué suena por cuál).
          */
         buses: function () {
-            return { ctx: ctxAudio, fondo: ganFondo, efectos: ganEfectos };
+            return { ctx: ctxAudio, fondo: ganFondo, efectos: ganEfectos, limitador: limitador, todos: porContexto.slice(), refuerzo: REFUERZO_EFECTOS, refuerzoHowler: REFUERZO_HOWLER, moduloPropio: moduloPropio() };
         },
 
         /** Niveles actuales en 0..100 más el estado de silencio. */

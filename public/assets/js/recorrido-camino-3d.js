@@ -2297,6 +2297,13 @@ const ALTURA_SUELO = 0.2;
             while (delta > Math.PI) delta -= Math.PI * 2;
             while (delta < -Math.PI) delta += Math.PI * 2;
             personaje.rotation.y = a.rot0 + delta * ease;
+        } else if (a.modo === 'subir') {
+            // Salto al cajón 1 del podio: arco de puerta (inicio) a desde (cima).
+            personaje.position.lerpVectors(a.puerta, a.desde, k);
+            personaje.position.y = a.puerta.y + (a.desde.y - a.puerta.y) * ease + Math.sin(Math.PI * k) * 0.9;
+            const dx = a.desde.x - a.puerta.x;
+            const dz = a.desde.z - a.puerta.z;
+            if (dx * dx + dz * dz > 0.04) personaje.rotation.y = Math.atan2(dx, dz);
         } else {
             const desde = a.modo === 'entrar' ? a.desde : a.puerta;
             const hacia = a.modo === 'entrar' ? a.puerta : a.desde;
@@ -2314,6 +2321,8 @@ const ALTURA_SUELO = 0.2;
                 personaje.position.copy(a.ancla);
                 if (mundo) personaje.position.y = mundo.altura(a.ancla.x, a.ancla.z) + ALTURA_SUELO;
                 personaje.rotation.y = a.rot1;
+            } else if (a.modo === 'subir') {
+                personaje.position.copy(a.desde);
             } else {
                 const hacia = a.modo === 'entrar' ? a.puerta : a.desde;
                 personaje.position.copy(hacia);
@@ -2548,9 +2557,51 @@ const ALTURA_SUELO = 0.2;
             decirAlLlegar(p);
         } else if (p && p.id === 'fin') {
             if (castilloGrupo) iniciarLoops(castilloGrupo);
-            celebrarEnMeta(p);
+            subirAlPodio(function () { celebrarEnMeta(p); });
         }
         if (cb) cb();
+    }
+
+    // En la meta el camino termina frente al arco: el personaje entra a la plaza,
+    // camina hasta el frente del podio (podio_frente del GLB) y salta al cajón 1
+    // (podio_punto). Si el modelo no trae esos puntos, celebra donde está.
+    function subirAlPodio(alTerminar) {
+        const meta = castilloGrupo;
+        const nPunto = meta && meta.getObjectByName('podio_punto');
+        const nFrente = meta && meta.getObjectByName('podio_frente');
+        if (!personaje || !nPunto || !nFrente) { alTerminar(); return; }
+        meta.updateMatrixWorld(true);
+        // podio_punto ya es la cara superior del cajón 1; 0.02 evita que se hunda.
+        const cima = nPunto.getWorldPosition(new THREE.Vector3());
+        cima.y += 0.02;
+        const pie = nFrente.getWorldPosition(new THREE.Vector3());
+        if (mundo) pie.y = mundo.altura(pie.x, pie.z) + ALTURA_SUELO;
+        const desde = personaje.position.clone();
+        const base = personaje.scale.x || 1;
+        const subir = function () {
+            entrandoSaliendo = true;
+            animCasa = {
+                modo: 'subir',
+                ini: performance.now(),
+                dur: 750,
+                desde: cima,
+                puerta: personaje.position.clone(),
+                base: base,
+                onFin: alTerminar,
+            };
+        };
+        const dist = Math.hypot(pie.x - desde.x, pie.z - desde.z);
+        if (dist < 0.35) { subir(); return; }
+        entrandoSaliendo = true;
+        animCasa = {
+            modo: 'salir',
+            ini: performance.now(),
+            dur: Math.max(900, (dist / 2.2) * 1000),
+            desde: pie,
+            puerta: desde,
+            base: base,
+            onFin: subir,
+        };
     }
 
     function fraseMediaParada(p) {
@@ -2795,7 +2846,12 @@ const ALTURA_SUELO = 0.2;
                 tono: 'si',
                 accion: function () {
                     preguntandoVideo = false;
-                    reproducirVideoParada(p);
+                    if (esImagenParada(p)) {
+                        reproducirImagenParada(p);
+                        programarCierreImagenAuto(p);
+                    } else if (!reproducirVideoParada(p)) {
+                        soltarTrasVideo();
+                    }
                 },
             },
             {
@@ -2821,16 +2877,26 @@ const ALTURA_SUELO = 0.2;
             if (esImagenParada(p)) {
                 reproducirImagenParada(p);
                 if (modoNav === 'auto') {
+                    // En automático se espera la respuesta a "¿ver de nuevo?"
+                    // antes de seguir caminando.
                     alCerrarVideo = fin;
-                    setTimeout(function () {
-                        if (paradaVideoActual !== p) return;
-                        finalizarVideoParada(false);
-                    }, 7000);
+                    programarCierreImagenAuto(p);
                     return;
                 }
             }
             fin();
         });
+    }
+
+    // En automático la imagen se cierra sola a los 7 s y luego se pregunta
+    // si se quiere ver de nuevo (igual que en los demás modos).
+    function programarCierreImagenAuto(p) {
+        if (modoNav !== 'auto') return;
+        const gen = generacionVideo;
+        setTimeout(function () {
+            if (paradaVideoActual !== p || gen !== generacionVideo) return;
+            finalizarVideoParada(true);
+        }, 7000);
     }
 
     function tipoMediaParada(p) {
@@ -2995,13 +3061,16 @@ const ALTURA_SUELO = 0.2;
                 this.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' }), '*');
             } catch (err) { /* noop */ }
         });
-        const preguntarAlSalir = !!(preguntar && modoNav !== 'auto' && paradaVideoActual && esVideoParada(paradaVideoActual));
+        // Siempre se pregunta si se quiere ver de nuevo el video o la imagen,
+        // sin importar la edad ni el modo de recorrido (también en automático).
+        const preguntarAlSalir = !!(preguntar && paradaVideoActual
+            && (esVideoParada(paradaVideoActual) || esImagenParada(paradaVideoActual)));
         salirNube(function () {
             $fs.find('iframe').each(function () { this.src = ''; });
             $('#rn3dVideoFsInner').empty();
             desactivarEscuchaEmbedVideo();
             if (preguntarAlSalir) preguntarSiReverVideo();
-            else if (modoNav === 'auto' && alCerrarVideo) soltarTrasVideo();
+            else if (alCerrarVideo) soltarTrasVideo();
         });
     }
 
@@ -4284,7 +4353,7 @@ const ALTURA_SUELO = 0.2;
         });
         ctx.$paso.on('click.rn3d', '[data-accion="cerrar-media-fs"]', function (e) {
             e.preventDefault();
-            finalizarVideoParada();
+            finalizarVideoParada(true);
         });
         ctx.$paso.on('click.rn3d', '[data-accion="iniciar-experiencia"]', function (e) { e.preventDefault(); iniciarExperiencia(); });
         ctx.$paso.on('click.rn3d', '#rnModalSalirKiosco', function (e) { e.preventDefault(); salirKiosco(); });
