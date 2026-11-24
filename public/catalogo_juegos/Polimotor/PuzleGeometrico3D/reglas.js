@@ -190,11 +190,13 @@
      * datos.destinos   [{ id, forma, orient, distancia, ocupado, habilitada }]
      * datos.radio      radio de acierto
      * datos.radioCasi  radio del "casi"
+     * datos.radioTolerancia  hasta dónde se acepta la pieza correcta soltada a medio camino o a
+     *                    medio encajar (entre radio y radioCasi)
      *
-     * 1. Entre las posiciones dentro del radio, la más cercana de su misma forma, vacía y habilitada:
-     *      girada → orientacion · si no → correcto.
-     * 2. Si no, la posición más cercana dentro del radio:
-     *      ocupada → ocupado · otra forma → otraForma · su forma pero sin habilitar → orden.
+     * 1. La posición más cercana de su misma forma, vacía y habilitada, dentro de la tolerancia
+     *    (aunque una vecina de otra forma quede más cerca del dedo): girada → orientacion · si no → correcto.
+     * 2. Si no, la posición más cercana dentro del radio: ocupada u otra forma → casi cuando su
+     *    posición está dentro del "casi"; si no, ocupado · otraForma · su forma sin habilitar → orden.
      * 3. Una posición habilitada de su forma dentro del "casi" → casi.
      * 4. Si no, fuera.
      */
@@ -204,19 +206,22 @@
         var radioCasi = Math.max(radio, num(d.radioCasi, 165));
         var lista = (d.destinos || []).filter(function (m) { return m && isFinite(m.distancia); })
             .slice().sort(function (a, b) { return a.distancia - b.distancia; });
-        var dentro = lista.filter(function (m) { return m.distancia <= radio; });
-        var suya = dentro.filter(function (m) { return m.forma === d.forma && !m.ocupado && m.habilitada; })[0];
+        var tolerancia = Math.min(radioCasi, Math.max(radio, num(d.radioTolerancia, radio + (radioCasi - radio) * 0.4)));
+        var posibles = lista.filter(function (m) { return m.forma === d.forma && !m.ocupado && m.habilitada; });
+        var suya = posibles.filter(function (m) { return m.distancia <= tolerancia; })[0];
         if (suya) {
             if (!orientacionOk(d.def, d.rot, suya.orient)) return { acierto: false, motivo: "orientacion", destino: suya.id };
             return { acierto: true, motivo: "correcto", destino: suya.id };
         }
-        var cerca = dentro[0];
+        var casi = posibles.filter(function (m) { return m.distancia <= radioCasi; })[0];
+        var cerca = lista.filter(function (m) { return m.distancia <= radio; })[0];
         if (cerca) {
+            // la pieza sirve y su lugar está a un paso: no se le dice que tiene otra forma
+            if (casi && (cerca.ocupado || cerca.forma !== d.forma)) return { acierto: false, motivo: "casi", destino: casi.id };
             if (cerca.ocupado) return { acierto: false, motivo: "ocupado", destino: cerca.id };
             if (cerca.forma !== d.forma) return { acierto: false, motivo: "otraForma", destino: cerca.id };
             return { acierto: false, motivo: "orden", destino: cerca.id };
         }
-        var casi = lista.filter(function (m) { return m.forma === d.forma && !m.ocupado && m.habilitada && m.distancia <= radioCasi; })[0];
         if (casi) return { acierto: false, motivo: "casi", destino: casi.id };
         return { acierto: false, motivo: "fuera", destino: null };
     }

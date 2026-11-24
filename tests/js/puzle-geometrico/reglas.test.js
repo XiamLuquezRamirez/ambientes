@@ -171,6 +171,30 @@ module.exports = {
             }
         },
         {
+            descripcion: 'pieza correcta a medio encajar: gana su lugar aunque una vecina de otra forma quede más cerca',
+            fn: function () {
+                var cfg = config();
+                var lista = R().piezasNivel(cfg, 0, null);
+                var col = { base: true };
+                var inf = lista[1];
+                var otra = lista[0]; // la base, ya puesta
+                function dest(dSuya, dOtra) {
+                    return lista.map(function (p) {
+                        var d = p.id === inf.id ? dSuya : (p.id === otra.id ? dOtra : 900);
+                        return { id: p.id, forma: p.forma, orient: p.orient, distancia: d, ocupado: !!col[p.id], habilitada: R().habilitada(p, lista, col) };
+                    });
+                }
+                var base = { forma: inf.forma, def: inf.def, rot: 0, radio: 70, radioCasi: 165, radioTolerancia: 115 };
+                function ev(dSuya, dOtra) { return R().evaluar(Object.assign({ destinos: dest(dSuya, dOtra) }, base)); }
+                var a = ev(100, 40);
+                igual(a.motivo, 'correcto', 'a medio camino con otra pieza más cerca');
+                igual(a.destino, inf.id, 'destino');
+                igual(ev(140, 40).motivo, 'casi', 'más lejos: casi, nunca otraForma');
+                igual(ev(140, 900).motivo, 'casi', 'casi sin vecinas');
+                igual(ev(300, 40).motivo, 'ocupado', 'lejos de su lugar y sobre una ocupada');
+            }
+        },
+        {
             descripcion: 'orientación: los prismas de la torre se cruzan y el giro tiene función real',
             fn: function () {
                 var cfg = config();

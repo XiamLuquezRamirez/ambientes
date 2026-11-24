@@ -16,6 +16,7 @@
   "juego": {
     "radioAcierto": 70,
     "radioCasi": 165,
+    "radioTolerancia": 115,
     "radioCerca": 230,
     "radioIman": 110,
     "iman": 0.3,

@@ -141,7 +141,8 @@
             var e = Math.max(0.8, Math.min(1.3, this.obra.esc));
             var acierto = num(jcfg().radioAcierto, 70) * e;
             var casi = Math.max(acierto + 40, num(jcfg().radioCasi, 165) * e);
-            return { acierto: acierto, casi: casi, cerca: Math.max(casi, num(jcfg().radioCerca, 230) * e), iman: Math.max(acierto, num(jcfg().radioIman, 110) * e) };
+            var tolerancia = Math.min(casi, Math.max(acierto, num(jcfg().radioTolerancia, 115) * e));
+            return { acierto: acierto, casi: casi, tolerancia: tolerancia, cerca: Math.max(casi, num(jcfg().radioCerca, 230) * e), iman: Math.max(acierto, num(jcfg().radioIman, 110) * e) };
         }
 
         // ---------------------------------------------------------------- entrada
@@ -243,7 +244,7 @@
             f.g.setPosition(x, y);
             f.estado = "soltada";
             this.apagarCercania(f);
-            var datos = { id: f.id, forma: f.forma, def: f.def, rot: f.rot, destinos: this.distancias(x, y), radio: r.acierto, radioCasi: r.casi };
+            var datos = { id: f.id, forma: f.forma, def: f.def, rot: f.rot, destinos: this.distancias(x, y), radio: r.acierto, radioCasi: r.casi, radioTolerancia: r.tolerancia };
             if (cb.soltar) avisar("soltar", datos);
             else this.devolver(f.id);
         }
