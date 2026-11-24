@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <radialGradient id="cielo" cx="50%" cy="40%" r="65%">
+      <stop offset="0" stop-color="#fff9db"/>
+      <stop offset="1" stop-color="#a5d8ff"/>
+    </radialGradient>
+  </defs>
+  <circle cx="120" cy="120" r="114" fill="url(#cielo)" stroke="#364fc7" stroke-width="8"/>
+  <ellipse cx="120" cy="196" rx="86" ry="16" fill="#8fd16a"/>
+  <!-- base -->
+  <path d="M40 160 L120 128 L200 160 L120 192 Z" fill="#ffa94d" stroke="#8a4b08" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M40 160 L120 192 L120 206 L40 174 Z" fill="#e8590c" stroke="#8a4b08" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M120 192 L200 160 L200 174 L120 206 Z" fill="#c2410c" stroke="#8a4b08" stroke-width="4" stroke-linejoin="round"/>
+  <!-- segundo bloque -->
+  <path d="M64 136 L120 114 L176 136 L120 158 Z" fill="#74c0fc" stroke="#1c4f8a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M64 136 L120 158 L120 176 L64 154 Z" fill="#339af0" stroke="#1c4f8a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M120 158 L176 136 L176 154 L120 176 Z" fill="#1c7ed6" stroke="#1c4f8a" stroke-width="4" stroke-linejoin="round"/>
+  <!-- tercer bloque -->
+  <path d="M86 112 L120 99 L154 112 L120 125 Z" fill="#8ce99a" stroke="#1b5e20" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M86 112 L120 125 L120 144 L86 131 Z" fill="#51cf66" stroke="#1b5e20" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M120 125 L154 112 L154 131 L120 144 Z" fill="#2f9e44" stroke="#1b5e20" stroke-width="4" stroke-linejoin="round"/>
+  <!-- cúspide -->
+  <path d="M96 100 L120 40 L120 112 Z" fill="#ffe066" stroke="#8a6d00" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M120 112 L120 40 L144 100 Z" fill="#fab005" stroke="#8a6d00" stroke-width="4" stroke-linejoin="round"/>
+  <!-- destellos -->
+  <path d="M120 18 L124 30 L136 34 L124 38 L120 50 L116 38 L104 34 L116 30 Z" fill="#fff" opacity="0.95"/>
+  <path d="M188 70 L190 77 L197 79 L190 81 L188 88 L186 81 L179 79 L186 77 Z" fill="#fff"/>
+  <path d="M52 84 L54 90 L60 92 L54 94 L52 100 L50 94 L44 92 L50 90 Z" fill="#fff"/>
+</svg>

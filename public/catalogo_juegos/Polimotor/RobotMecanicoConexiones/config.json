@@ -1,0 +1,271 @@
+{
+  "nombre": "El Robot Mecánico y sus Conexiones",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 30,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "radioAcierto": 64,
+    "radioCasi": 150,
+    "radioCerca": 215,
+    "radioIman": 105,
+    "iman": 0.32,
+    "pasoGiro": 90,
+    "giros": [90, 180, 270],
+    "ayudaMs": 13000,
+    "ayudaRepetirMs": 16000,
+    "vozPausaMs": 2300,
+    "fuerasParaPista": 2,
+    "casiParaPista": 2,
+    "giroParaPista": 1
+  },
+  "piezas": [
+    {
+      "id": "brazo-izq",
+      "tipo": "brazo",
+      "nombre": "Brazo izquierdo",
+      "voz": "el brazo izquierdo",
+      "pista": "¡El brazo izquierdo va en el hombro de tu izquierda! Se dobla hacia afuera.",
+      "grupo": "brazo-izq"
+    },
+    {
+      "id": "brazo-der",
+      "tipo": "brazo",
+      "nombre": "Brazo derecho",
+      "voz": "el brazo derecho",
+      "pista": "¡El brazo derecho va en el hombro de tu derecha! Busca la ranura redonda.",
+      "grupo": "brazo-der"
+    },
+    {
+      "id": "pierna-izq",
+      "tipo": "pierna",
+      "nombre": "Pierna izquierda",
+      "voz": "la pierna izquierda",
+      "pista": "¡La pierna izquierda va abajo del torso, a tu izquierda! Busca la ranura cuadrada.",
+      "grupo": "pierna-izq"
+    },
+    {
+      "id": "pierna-der",
+      "tipo": "pierna",
+      "nombre": "Pierna derecha",
+      "voz": "la pierna derecha",
+      "pista": "¡La pierna derecha va abajo del torso, a tu derecha! Busca la ranura cuadrada.",
+      "grupo": "pierna-der"
+    },
+    {
+      "id": "cabeza",
+      "tipo": "cabeza",
+      "nombre": "Cabeza con visera",
+      "voz": "la cabeza con visera",
+      "pista": "¡La cabeza va arriba del torso! La visera tiene que mirar hacia el frente, con los ojos arriba.",
+      "grupo": "cabeza"
+    },
+    {
+      "id": "mano-izq",
+      "tipo": "mano",
+      "nombre": "Mano izquierda",
+      "voz": "la mano izquierda",
+      "pista": "¡La mano izquierda se conecta al final del brazo izquierdo!",
+      "depende": "brazo-izq",
+      "grupo": "brazo-izq"
+    },
+    {
+      "id": "mano-der",
+      "tipo": "mano",
+      "nombre": "Mano derecha",
+      "voz": "la mano derecha",
+      "pista": "¡La mano derecha se conecta al final del brazo derecho!",
+      "depende": "brazo-der",
+      "grupo": "brazo-der"
+    },
+    {
+      "id": "pie-izq",
+      "tipo": "pie",
+      "nombre": "Pie izquierdo",
+      "voz": "el pie izquierdo",
+      "pista": "¡El pie izquierdo va abajo de la pierna izquierda! La punta mira hacia afuera.",
+      "depende": "pierna-izq",
+      "grupo": "pierna-izq"
+    },
+    {
+      "id": "pie-der",
+      "tipo": "pie",
+      "nombre": "Pie derecho",
+      "voz": "el pie derecho",
+      "pista": "¡El pie derecho va abajo de la pierna derecha! La punta mira hacia afuera.",
+      "depende": "pierna-der",
+      "grupo": "pierna-der"
+    },
+    {
+      "id": "antena",
+      "tipo": "antena",
+      "nombre": "Antena",
+      "voz": "la antena",
+      "pista": "¡La antena va encima de la cabeza, apuntando hacia el cielo!",
+      "depende": "cabeza",
+      "grupo": "cabeza"
+    },
+    {
+      "id": "modulo",
+      "tipo": "modulo",
+      "nombre": "Módulo de energía",
+      "voz": "el módulo de energía",
+      "pista": "¡El módulo de energía va en el centro del pecho! Gíralo hasta que su dibujo quede derecho.",
+      "depende": "cabeza",
+      "grupo": "modulo"
+    }
+  ],
+  "variantes": {
+    "tipos": [
+      { "id": "clasico", "nombre": "Robot Clásico", "saludo": "¡Hoy armaremos al Robot Clásico, con brazos de codo y piernas fuertes!" },
+      { "id": "explorador", "nombre": "Robot Explorador", "saludo": "¡Hoy armaremos al Robot Explorador, con brazos de esferas, piernas de resorte y orugas!" }
+    ],
+    "colores": [
+      { "id": "cielo", "cuerpo": "#4dabf7", "oscuro": "#1c6fb8", "acento": "#ffd43b", "articulacion": "#ffa94d" },
+      { "id": "naranja", "cuerpo": "#ff922b", "oscuro": "#c25e0a", "acento": "#3bc9db", "articulacion": "#748ffc" },
+      { "id": "menta", "cuerpo": "#38d9a9", "oscuro": "#0c8c6a", "acento": "#ff6b9a", "articulacion": "#ffd43b" },
+      { "id": "uva", "cuerpo": "#9775fa", "oscuro": "#5f3dc4", "acento": "#69db7c", "articulacion": "#ffa94d" },
+      { "id": "coral", "cuerpo": "#ff6b6b", "oscuro": "#c92a2a", "acento": "#74c0fc", "articulacion": "#ffe066" }
+    ],
+    "cabezas": ["redonda", "cuadrada", "capsula"],
+    "viseras": ["banda", "ojos", "ancha"],
+    "manos": ["pinza", "guante"],
+    "pies": ["bota", "rueda"],
+    "antenas": ["bola", "rayo", "doble"],
+    "modulos": ["rayo", "corazon", "gota"],
+    "laboratorios": [
+      { "id": "turquesa", "luz": "#3bdcff", "pared": "#22356e", "pared2": "#1a2858", "panel": "#2c4486" },
+      { "id": "violeta", "luz": "#c084fc", "pared": "#33296e", "pared2": "#261f57", "panel": "#3f3486" },
+      { "id": "ambar", "luz": "#ffc94d", "pared": "#2b3a5c", "pared2": "#1f2b47", "panel": "#3a4d73" }
+    ],
+    "paisajes": ["ciudad", "montanas", "planeta"]
+  },
+  "demo": {
+    "pieza": "brazo-izq"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "El Robot Mecánico y sus Conexiones",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "demoZoe": "¡Mira! Tomo el brazo izquierdo, lo llevo hasta su ranura redonda en el hombro y lo suelto. ¡Clic!",
+    "seleccion": [
+      "¡Muy bien! Ahora busca dónde podemos colocarla.",
+      "¡Buena elección! ¿Dónde va esa pieza?",
+      "¡Esa pieza! Busca la ranura que tiene su misma forma."
+    ],
+    "aciertos": [
+      "¡Excelente conexión!",
+      "¡Eso es! Ya casi lo tienes.",
+      "¡Clic! ¡Encajó perfecto!",
+      "¡Qué buen ingeniero!",
+      "¡Conexión lista!"
+    ],
+    "girar": [
+      "¡Intenta girarla un poquito para que encaje!",
+      "¡Casi! Gírala con los botones de las flechas.",
+      "¡Esa pieza está de lado! Dale vueltas hasta que quede derecha."
+    ],
+    "casi": "¡Muy cerca! Llévala justo encima de su ranura.",
+    "otraPieza": "Esa ranura es para otra pieza. Busca la que tiene su misma forma.",
+    "ocupado": "Esa ranura ya tiene su pieza. ¡Busca otra!",
+    "fuera": "¡Lleva la pieza hasta el robot!",
+    "dependencia": {
+      "brazo-izq": "¡Primero hay que poner el brazo izquierdo! La mano se conecta a él.",
+      "brazo-der": "¡Primero hay que poner el brazo derecho! La mano se conecta a él.",
+      "pierna-izq": "¡Primero hay que poner la pierna izquierda! El pie va debajo.",
+      "pierna-der": "¡Primero hay que poner la pierna derecha! El pie va debajo.",
+      "cabeza": "¡Primero hay que ponerle la cabeza al robot!"
+    },
+    "bloqueada": "Esa pieza todavía espera su turno. ¡Primero coloca la parte donde se conecta!",
+    "giroBien": "¡Así! Ahora quedó derecha.",
+    "ayudaZoe": "¡Mira la forma de cada pieza y busca su ranura en el robot!",
+    "escaner": "¡El escáner te muestra dónde va!",
+    "escanerSinPieza": "¡Toca una pieza y el escáner te dirá dónde va!",
+    "giroSinPieza": "¡Primero toca una pieza y después gírala con las flechas!",
+    "extremidad": {
+      "brazo-izq": "¡Brazo izquierdo completo!",
+      "brazo-der": "¡Brazo derecho completo!",
+      "pierna-izq": "¡Pierna izquierda completa!",
+      "pierna-der": "¡Pierna derecha completa!",
+      "cabeza": "¡La cabeza está lista!"
+    },
+    "finalVoz": "¡ENSAMBLAJE PERFECTO! Uniste todas las piezas mecánicas del robot con una habilidad de ingeniero experto.",
+    "finalTitulo": "¡ENSAMBLAJE PERFECTO!",
+    "finalTexto": "¡El robot cobró vida!",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola, amigos! Bienvenidos al laboratorio de robótica de Polimotor."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Hoy vamos a construir un robot, conectando cada una de sus piezas!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Ensamblajes sencillos: construir un robot"
+    }
+  ],
+  "nivelesJuego": [
+    {
+      "id": 1,
+      "titulo": "Construimos las extremidades",
+      "piezas": ["brazo-izq", "brazo-der", "pierna-izq", "pierna-der"],
+      "rotadas": 0,
+      "giro": false,
+      "final": "extremidades",
+      "zoe": "¡Hola, súper ingeniero! Nuestro robot necesita sus brazos y piernas para caminar. Toma cada pieza, fíjate en la forma, gírala si hace falta y ensámblala en su ranura.",
+      "listo": "¡Fantástico! Nuestro robot está cada vez más completo. ¡Mira cómo mueve sus brazos y piernas!",
+      "cartel": { "etiqueta": "Nivel 1 completado", "titulo": "¡Extremidades listas!", "sub": "Sigue: completamos la cabeza" }
+    },
+    {
+      "id": 2,
+      "titulo": "Completamos la cabeza",
+      "piezas": ["brazo-izq", "brazo-der", "pierna-izq", "pierna-der", "cabeza"],
+      "rotadas": 2,
+      "rotarPrimero": ["cabeza"],
+      "giro": true,
+      "final": "cabeza",
+      "zoe": "¡Ahora el robot necesita su cabeza con visera! Algunas piezas llegaron giradas: tócala y usa las flechas para girarla hasta que quede derecha.",
+      "listo": "¡Fantástico! El robot ya puede mirar. ¡Se le encendieron los ojos!",
+      "cartel": { "etiqueta": "Nivel 2 completado", "titulo": "¡Cabeza conectada!", "sub": "Sigue: manos y pies" }
+    },
+    {
+      "id": 3,
+      "titulo": "Agregamos manos y pies",
+      "piezas": ["brazo-izq", "brazo-der", "pierna-izq", "pierna-der", "cabeza", "mano-izq", "mano-der", "pie-izq", "pie-der"],
+      "rotadas": 3,
+      "rotarPrimero": ["mano-izq", "pie-der"],
+      "giro": true,
+      "final": "manos-pies",
+      "zoe": "¡Ahora le pondremos manos y pies! Las manos se conectan al final de los brazos y los pies debajo de las piernas. ¡Primero el brazo, después la mano!",
+      "listo": "¡Fantástico! Nuestro robot está cada vez más completo. ¡Ya puede mover las manos y dar pasitos!",
+      "cartel": { "etiqueta": "Nivel 3 completado", "titulo": "¡Manos y pies listos!", "sub": "Sigue: activamos el robot" }
+    },
+    {
+      "id": 4,
+      "titulo": "Activamos el robot",
+      "piezas": ["brazo-izq", "brazo-der", "pierna-izq", "pierna-der", "cabeza", "mano-izq", "mano-der", "pie-izq", "pie-der", "antena", "modulo"],
+      "rotadas": 4,
+      "rotarPrimero": ["modulo", "antena"],
+      "giro": true,
+      "final": "activacion",
+      "zoe": "¡Último reto! Once piezas, con la antena y el módulo de energía. La antena va sobre la cabeza y el módulo en el pecho. ¡Vamos a activar el robot!",
+      "listo": "¡Todas las piezas están conectadas! ¡Vamos a encender el robot!",
+      "cartel": { "etiqueta": "Nivel 4 completado", "titulo": "¡Robot listo!", "sub": "¡Activación!" }
+    }
+  ]
+}

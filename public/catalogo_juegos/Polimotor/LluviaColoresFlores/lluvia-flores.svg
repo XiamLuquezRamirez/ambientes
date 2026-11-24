@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd3ff"/><stop offset="1" stop-color="#e7f6ff"/></linearGradient>
+    <linearGradient id="nube" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dcd6ff"/></linearGradient>
+    <linearGradient id="cesped" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ad96f"/><stop offset="1" stop-color="#3f9d45"/></linearGradient>
+    <radialGradient id="centro" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#fff3bf"/><stop offset="1" stop-color="#fcc419"/></radialGradient>
+  </defs>
+  <rect x="6" y="6" width="228" height="228" rx="52" fill="url(#cielo)"/>
+  <path d="M6 190 Q60 170 120 182 Q180 194 234 176 L234 182 Q234 234 182 234 L58 234 Q6 234 6 182 Z" fill="url(#cesped)"/>
+  <g fill="url(#nube)" stroke="#c5bdf5" stroke-width="4">
+    <path d="M58 84 A26 26 0 0 1 84 52 A32 32 0 0 1 144 46 A26 26 0 0 1 182 70 A20 20 0 0 1 186 106 L62 106 A22 22 0 0 1 58 84 Z"/>
+  </g>
+  <ellipse cx="94" cy="80" rx="6" ry="7" fill="#3b2a5a"/><ellipse cx="142" cy="80" rx="6" ry="7" fill="#3b2a5a"/>
+  <path d="M108 90 Q118 100 128 90" stroke="#3b2a5a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <g>
+    <path d="M118 112 C120 118 126 124 126 130 A8 8 0 0 1 110 130 C110 124 116 118 118 112 Z" fill="#74c0fc"/>
+    <path d="M86 116 C88 121 93 126 93 131 A7 7 0 0 1 79 131 C79 126 84 121 86 116 Z" fill="#b197fc" opacity="0.85"/>
+    <path d="M152 116 C154 121 159 126 159 131 A7 7 0 0 1 145 131 C145 126 150 121 152 116 Z" fill="#ffd43b" opacity="0.85"/>
+  </g>
+  <rect x="114" y="186" width="9" height="36" rx="4.5" fill="#40c057"/>
+  <path d="M118 206 Q98 188 88 200 Q100 214 118 210 Z" fill="#51cf66" stroke="#2f9e44" stroke-width="2"/>
+  <g fill="#ff6b9d" stroke="#e64980" stroke-width="2.5">
+    <ellipse cx="118" cy="166" rx="9" ry="16"/>
+    <ellipse cx="118" cy="166" rx="9" ry="16" transform="rotate(60 118 184)"/>
+    <ellipse cx="118" cy="166" rx="9" ry="16" transform="rotate(120 118 184)"/>
+    <ellipse cx="118" cy="166" rx="9" ry="16" transform="rotate(180 118 184)"/>
+    <ellipse cx="118" cy="166" rx="9" ry="16" transform="rotate(240 118 184)"/>
+    <ellipse cx="118" cy="166" rx="9" ry="16" transform="rotate(300 118 184)"/>
+  </g>
+  <circle cx="118" cy="184" r="13" fill="url(#centro)" stroke="#f08c00" stroke-width="3"/>
+  <path d="M111 181 Q113.5 178 116 181" stroke="#3b2a5a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M120 181 Q122.5 178 125 181" stroke="#3b2a5a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M113 187 Q118 192 123 187" stroke="#3b2a5a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+</svg>

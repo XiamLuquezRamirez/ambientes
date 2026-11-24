@@ -1,0 +1,1764 @@
+{
+  "nombre": "La Máquina de Engranajes y Poleas",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 30,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "radioAcierto": 80,
+    "radioCasi": 175,
+    "radioCerca": 210,
+    "radioIman": 120,
+    "iman": 0.35,
+    "radioCorrea": 70,
+    "dientes": {
+      "grande": 20,
+      "mediano": 14,
+      "pequeno": 10
+    },
+    "poleas": {
+      "grande": 5.5,
+      "pequena": 3.6
+    },
+    "moduloBase": 12,
+    "holgura": 12,
+    "velocidadRaiz": 0.55,
+    "ayudaMs": 14000,
+    "ayudaRepetirMs": 17000,
+    "vozPausaMs": 2300,
+    "fuerasParaPista": 2,
+    "intentosParaPista": 2,
+    "ayudaPalancaMs": 9000
+  },
+  "nombres": {
+    "engranaje": {
+      "grande": {
+        "corto": "grande",
+        "voz": "la rueda más grande",
+        "con": "la rueda grande"
+      },
+      "mediano": {
+        "corto": "mediano",
+        "voz": "la rueda mediana",
+        "con": "la rueda mediana"
+      },
+      "pequeno": {
+        "corto": "pequeño",
+        "voz": "la rueda pequeña",
+        "con": "la rueda pequeña"
+      }
+    },
+    "polea": {
+      "grande": {
+        "corto": "polea grande",
+        "voz": "la polea grande",
+        "con": "la polea grande"
+      },
+      "pequena": {
+        "corto": "polea pequeña",
+        "voz": "la polea pequeña",
+        "con": "la polea pequeña"
+      }
+    },
+    "correa": {
+      "correa": {
+        "corto": "correa",
+        "voz": "la correa",
+        "con": "la correa"
+      }
+    }
+  },
+  "nivelesJuego": [
+    {
+      "id": "1a",
+      "grado": 1,
+      "maquina": "ventilador",
+      "ejes": [
+        {
+          "id": "inferior",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 820,
+          "y": 575,
+          "lugar": "el eje de abajo, en el centro"
+        },
+        {
+          "id": "derecho",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "inferior",
+          "angulo": -48,
+          "lugar": "el eje de arriba a la derecha"
+        },
+        {
+          "id": "izquierdo",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "inferior",
+          "angulo": -135,
+          "lugar": "el eje de arriba a la izquierda"
+        }
+      ],
+      "correas": [],
+      "fijos": {
+        "poleas": [
+          {
+            "id": "f-eje",
+            "talla": "pequena",
+            "sobre": "inferior",
+            "aparece": "inferior"
+          },
+          {
+            "id": "f-ventilador",
+            "talla": "grande",
+            "x": 1140,
+            "y": 610,
+            "aparece": "inferior"
+          }
+        ],
+        "correas": [
+          {
+            "id": "f-c1",
+            "entre": [
+              "f-eje",
+              "f-ventilador"
+            ],
+            "aparece": "inferior"
+          }
+        ]
+      },
+      "marcha": "¡Mira! Las ruedas que se tocan giran al revés, y la pequeña gira más rápido que la grande.",
+      "listo": "¡La primera máquina funciona! La polea mueve el ventilador.",
+      "nombre": "La primera máquina",
+      "modulo": 12,
+      "tablero": {
+        "x0": 490,
+        "y0": 150,
+        "x1": 1290,
+        "y1": 770
+      },
+      "zeus": "¡La gran máquina de engranajes está detenida! Toma cada rueda dentada, arrástrala hasta su eje y ensámblala de modo que los dientes de los engranajes encajen unos con otros.",
+      "zoe": "¡Busca la rueda más grande! Va en el eje de abajo, en el centro.",
+      "cartel": {
+        "etiqueta": "Nivel 1 completado",
+        "titulo": "¡La primera máquina!"
+      }
+    },
+    {
+      "id": "1b",
+      "grado": 1,
+      "maquina": "cinta",
+      "cintaHasta": 1240,
+      "ejes": [
+        {
+          "id": "g",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 900,
+          "y": 525
+        },
+        {
+          "id": "m",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": -132
+        },
+        {
+          "id": "s",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "g",
+          "angulo": -45
+        }
+      ],
+      "correas": [],
+      "fijos": {
+        "poleas": [
+          {
+            "id": "f-eje",
+            "talla": "pequena",
+            "sobre": "g",
+            "aparece": "g"
+          },
+          {
+            "id": "f-cinta",
+            "talla": "pequena",
+            "x": 560,
+            "y": 718,
+            "aparece": "g"
+          }
+        ],
+        "correas": [
+          {
+            "id": "f-c1",
+            "entre": [
+              "f-eje",
+              "f-cinta"
+            ],
+            "aparece": "g"
+          }
+        ]
+      },
+      "marcha": "¡Mira! Las ruedas que se tocan giran al revés, y la pequeña gira más rápido que la grande.",
+      "listo": "¡La correa mueve la cinta transportadora!"
+    },
+    {
+      "id": "1c",
+      "grado": 1,
+      "maquina": "ventilador",
+      "ejes": [
+        {
+          "id": "g",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 720,
+          "y": 560
+        },
+        {
+          "id": "m",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": -60
+        },
+        {
+          "id": "s",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "g",
+          "angulo": -140
+        }
+      ],
+      "correas": [],
+      "fijos": {
+        "poleas": [
+          {
+            "id": "f-eje",
+            "talla": "pequena",
+            "sobre": "g",
+            "aparece": "g"
+          },
+          {
+            "id": "f-ventilador",
+            "talla": "grande",
+            "x": 1120,
+            "y": 600,
+            "aparece": "g"
+          }
+        ],
+        "correas": [
+          {
+            "id": "f-c1",
+            "entre": [
+              "f-eje",
+              "f-ventilador"
+            ],
+            "aparece": "g"
+          }
+        ]
+      },
+      "marcha": "¡Mira! Las ruedas que se tocan giran al revés, y la pequeña gira más rápido que la grande.",
+      "listo": "¡La polea mueve el ventilador!"
+    },
+    {
+      "id": "1d",
+      "grado": 1,
+      "maquina": "ventilador",
+      "ejes": [
+        {
+          "id": "g",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 860,
+          "y": 470
+        },
+        {
+          "id": "m",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": 40
+        },
+        {
+          "id": "s",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "g",
+          "angulo": 160
+        }
+      ],
+      "correas": [],
+      "fijos": {
+        "poleas": [
+          {
+            "id": "f-eje",
+            "talla": "pequena",
+            "sobre": "g",
+            "aparece": "g"
+          },
+          {
+            "id": "f-ventilador",
+            "talla": "grande",
+            "x": 1150,
+            "y": 300,
+            "aparece": "g"
+          }
+        ],
+        "correas": [
+          {
+            "id": "f-c1",
+            "entre": [
+              "f-eje",
+              "f-ventilador"
+            ],
+            "aparece": "g"
+          }
+        ]
+      },
+      "marcha": "¡Mira! Las ruedas que se tocan giran al revés, y la pequeña gira más rápido que la grande.",
+      "listo": "¡La polea mueve el ventilador!"
+    },
+    {
+      "id": "1e",
+      "grado": 1,
+      "maquina": "ventilador",
+      "ejes": [
+        {
+          "id": "g",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 820,
+          "y": 600
+        },
+        {
+          "id": "m",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": 180
+        },
+        {
+          "id": "s",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "g",
+          "angulo": 0
+        }
+      ],
+      "correas": [],
+      "fijos": {
+        "poleas": [
+          {
+            "id": "f-eje",
+            "talla": "pequena",
+            "sobre": "g",
+            "aparece": "g"
+          },
+          {
+            "id": "f-ventilador",
+            "talla": "grande",
+            "x": 640,
+            "y": 320,
+            "aparece": "g"
+          }
+        ],
+        "correas": [
+          {
+            "id": "f-c1",
+            "entre": [
+              "f-eje",
+              "f-ventilador"
+            ],
+            "aparece": "g"
+          }
+        ]
+      },
+      "marcha": "¡Mira! Las ruedas que se tocan giran al revés, y la pequeña gira más rápido que la grande.",
+      "listo": "¡La polea mueve el ventilador!"
+    },
+    {
+      "id": "2a",
+      "grado": 2,
+      "maquina": "cinta",
+      "ejes": [
+        {
+          "id": "centro",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 830,
+          "y": 555,
+          "lugar": "el eje grande del centro"
+        },
+        {
+          "id": "izquierda",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "centro",
+          "angulo": -160,
+          "lugar": "el eje de la izquierda"
+        },
+        {
+          "id": "derecha",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "centro",
+          "angulo": -25,
+          "lugar": "el eje de la derecha"
+        },
+        {
+          "id": "arriba",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "derecha",
+          "angulo": -105,
+          "lugar": "el eje de arriba, junto a la rueda mediana"
+        }
+      ],
+      "correas": [],
+      "fijos": {
+        "poleas": [
+          {
+            "id": "f-eje",
+            "talla": "pequena",
+            "sobre": "izquierda",
+            "aparece": "izquierda"
+          },
+          {
+            "id": "f-cinta",
+            "talla": "pequena",
+            "x": 560,
+            "y": 738,
+            "aparece": "izquierda"
+          }
+        ],
+        "correas": [
+          {
+            "id": "f-c1",
+            "entre": [
+              "f-eje",
+              "f-cinta"
+            ],
+            "aparece": "izquierda"
+          }
+        ]
+      },
+      "marcha": "¡La rueda grande mueve a las medianas, y la mediana mueve a la pequeña! ¡La cinta transportadora ya trabaja!",
+      "listo": "¡Cuatro ruedas girando juntas!",
+      "nombre": "La máquina de cuatro ruedas",
+      "modulo": 11,
+      "tablero": {
+        "x0": 480,
+        "y0": 140,
+        "x1": 1300,
+        "y1": 790
+      },
+      "zeus": "¡Ahora la máquina de cuatro ruedas! La rueda grande del centro mueve a todas las demás.",
+      "zoe": "¡Empieza otra vez por la rueda más grande!",
+      "cartel": {
+        "etiqueta": "Nivel 2 completado",
+        "titulo": "¡Cuatro ruedas en marcha!"
+      }
+    },
+    {
+      "id": "2b",
+      "grado": 2,
+      "maquina": "ventilador",
+      "ejes": [
+        {
+          "id": "g",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 830,
+          "y": 470
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": 150
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": -30
+        },
+        {
+          "id": "s",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "g",
+          "angulo": 70
+        }
+      ],
+      "correas": [],
+      "fijos": {
+        "poleas": [
+          {
+            "id": "f-eje",
+            "talla": "pequena",
+            "sobre": "m2",
+            "aparece": "m2"
+          },
+          {
+            "id": "f-ventilador",
+            "talla": "grande",
+            "x": 1130,
+            "y": 630,
+            "aparece": "m2"
+          }
+        ],
+        "correas": [
+          {
+            "id": "f-c1",
+            "entre": [
+              "f-eje",
+              "f-ventilador"
+            ],
+            "aparece": "m2"
+          }
+        ]
+      },
+      "marcha": "¡La rueda grande mueve a las medianas, y cada rueda gira al revés que la que la empuja!",
+      "listo": "¡La polea mueve el ventilador!"
+    },
+    {
+      "id": "2c",
+      "grado": 2,
+      "maquina": "cinta",
+      "cintaHasta": 1250,
+      "ejes": [
+        {
+          "id": "g",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 760,
+          "y": 550
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": -60
+        },
+        {
+          "id": "s",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m1",
+          "angulo": -10
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": 170
+        }
+      ],
+      "correas": [],
+      "fijos": {
+        "poleas": [
+          {
+            "id": "f-eje",
+            "talla": "pequena",
+            "sobre": "m2",
+            "aparece": "m2"
+          },
+          {
+            "id": "f-cinta",
+            "talla": "pequena",
+            "x": 640,
+            "y": 740,
+            "aparece": "m2"
+          }
+        ],
+        "correas": [
+          {
+            "id": "f-c1",
+            "entre": [
+              "f-eje",
+              "f-cinta"
+            ],
+            "aparece": "m2"
+          }
+        ]
+      },
+      "marcha": "¡La rueda grande mueve a las medianas, y cada rueda gira al revés que la que la empuja!",
+      "listo": "¡La correa mueve la cinta transportadora!"
+    },
+    {
+      "id": "2d",
+      "grado": 2,
+      "maquina": "ventilador",
+      "ejes": [
+        {
+          "id": "g",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 900,
+          "y": 520
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": -150
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": 30
+        },
+        {
+          "id": "s",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m1",
+          "angulo": 150
+        }
+      ],
+      "correas": [],
+      "fijos": {
+        "poleas": [
+          {
+            "id": "f-eje",
+            "talla": "pequena",
+            "sobre": "g",
+            "aparece": "g"
+          },
+          {
+            "id": "f-ventilador",
+            "talla": "grande",
+            "x": 1150,
+            "y": 290,
+            "aparece": "g"
+          }
+        ],
+        "correas": [
+          {
+            "id": "f-c1",
+            "entre": [
+              "f-eje",
+              "f-ventilador"
+            ],
+            "aparece": "g"
+          }
+        ]
+      },
+      "marcha": "¡La rueda grande mueve a las medianas, y cada rueda gira al revés que la que la empuja!",
+      "listo": "¡La polea mueve el ventilador!"
+    },
+    {
+      "id": "2e",
+      "grado": 2,
+      "maquina": "cinta",
+      "ejes": [
+        {
+          "id": "g",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 680,
+          "y": 550
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": -90
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g",
+          "angulo": 0
+        },
+        {
+          "id": "s",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m2",
+          "angulo": -60
+        }
+      ],
+      "correas": [],
+      "fijos": {
+        "poleas": [
+          {
+            "id": "f-eje",
+            "talla": "pequena",
+            "sobre": "g",
+            "aparece": "g"
+          },
+          {
+            "id": "f-cinta",
+            "talla": "pequena",
+            "x": 560,
+            "y": 740,
+            "aparece": "g"
+          }
+        ],
+        "correas": [
+          {
+            "id": "f-c1",
+            "entre": [
+              "f-eje",
+              "f-cinta"
+            ],
+            "aparece": "g"
+          }
+        ]
+      },
+      "marcha": "¡La rueda grande mueve a las medianas, y cada rueda gira al revés que la que la empuja!",
+      "listo": "¡La correa mueve la cinta transportadora!"
+    },
+    {
+      "id": "3a",
+      "grado": 3,
+      "maquina": "noria",
+      "ejes": [
+        {
+          "id": "g1",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 720,
+          "y": 600,
+          "lugar": "el eje grande de abajo"
+        },
+        {
+          "id": "g2",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "padre": "g1",
+          "angulo": -30,
+          "lugar": "el otro eje grande, a la derecha"
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g1",
+          "angulo": 180,
+          "lugar": "el eje de la izquierda"
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g2",
+          "angulo": -95,
+          "lugar": "el eje de arriba"
+        },
+        {
+          "id": "s1",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m1",
+          "angulo": -90,
+          "lugar": "el eje pequeño de arriba a la izquierda"
+        },
+        {
+          "id": "p1",
+          "tipo": "polea",
+          "talla": "pequena",
+          "sobre": "g2",
+          "lugar": "el centro de la segunda rueda grande"
+        },
+        {
+          "id": "p2",
+          "tipo": "polea",
+          "talla": "grande",
+          "x": 1180,
+          "y": 385,
+          "lugar": "la estación de poleas"
+        }
+      ],
+      "correas": [
+        {
+          "id": "c1",
+          "entre": [
+            "p1",
+            "p2"
+          ],
+          "lugar": "las dos poleas"
+        }
+      ],
+      "fijos": {
+        "poleas": [],
+        "correas": []
+      },
+      "marcha": "¡Los engranajes giran, la correa corre y la polea mueve la noria!",
+      "listo": "¡El circuito de engranajes y poleas funciona!",
+      "nombre": "El circuito de engranajes y poleas",
+      "modulo": 9,
+      "tablero": {
+        "x0": 470,
+        "y0": 130,
+        "x1": 1310,
+        "y1": 780
+      },
+      "estacion": {
+        "x0": 1050,
+        "y0": 250,
+        "x1": 1300,
+        "y1": 520,
+        "titulo": "POLEAS"
+      },
+      "zeus": "¡Este circuito tiene engranajes y poleas! Primero las ruedas dentadas, después las poleas y al final la correa.",
+      "zoe": "¡Hay dos ruedas grandes! La primera va en el eje grande de abajo.",
+      "cartel": {
+        "etiqueta": "Nivel 3 completado",
+        "titulo": "¡Circuito conectado!"
+      }
+    },
+    {
+      "id": "3b",
+      "grado": 3,
+      "maquina": "noria",
+      "estacion": {
+        "x0": 1040,
+        "y0": 420,
+        "x1": 1300,
+        "y1": 700,
+        "titulo": "POLEAS"
+      },
+      "ejes": [
+        {
+          "id": "g1",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 640,
+          "y": 560
+        },
+        {
+          "id": "g2",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "padre": "g1",
+          "angulo": -20
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g1",
+          "angulo": 120
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g2",
+          "angulo": -110
+        },
+        {
+          "id": "s1",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m2",
+          "angulo": -170
+        },
+        {
+          "id": "p1",
+          "tipo": "polea",
+          "talla": "pequena",
+          "sobre": "g2"
+        },
+        {
+          "id": "p2",
+          "tipo": "polea",
+          "talla": "grande",
+          "x": 1170,
+          "y": 560
+        }
+      ],
+      "correas": [
+        {
+          "id": "c1",
+          "entre": [
+            "p1",
+            "p2"
+          ]
+        }
+      ],
+      "fijos": {
+        "poleas": [],
+        "correas": []
+      },
+      "marcha": "¡Los engranajes giran, la correa corre y la polea hace trabajar la máquina!",
+      "listo": "¡La correa mueve la noria!"
+    },
+    {
+      "id": "3c",
+      "grado": 3,
+      "maquina": "noria",
+      "ejes": [
+        {
+          "id": "g1",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 760,
+          "y": 620
+        },
+        {
+          "id": "g2",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "padre": "g1",
+          "angulo": -90
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g1",
+          "angulo": 170
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g2",
+          "angulo": -150
+        },
+        {
+          "id": "s1",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m1",
+          "angulo": -110
+        },
+        {
+          "id": "p1",
+          "tipo": "polea",
+          "talla": "pequena",
+          "sobre": "g2"
+        },
+        {
+          "id": "p2",
+          "tipo": "polea",
+          "talla": "grande",
+          "x": 1180,
+          "y": 385
+        }
+      ],
+      "correas": [
+        {
+          "id": "c1",
+          "entre": [
+            "p1",
+            "p2"
+          ]
+        }
+      ],
+      "fijos": {
+        "poleas": [],
+        "correas": []
+      },
+      "marcha": "¡Los engranajes giran, la correa corre y la polea hace trabajar la máquina!",
+      "listo": "¡La correa mueve la noria!"
+    },
+    {
+      "id": "3d",
+      "grado": 3,
+      "maquina": "noria",
+      "ejes": [
+        {
+          "id": "g1",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 900,
+          "y": 600
+        },
+        {
+          "id": "g2",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "padre": "g1",
+          "angulo": -150
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g1",
+          "angulo": 20
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g2",
+          "angulo": -90
+        },
+        {
+          "id": "s1",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m2",
+          "angulo": 180
+        },
+        {
+          "id": "p1",
+          "tipo": "polea",
+          "talla": "pequena",
+          "sobre": "g1"
+        },
+        {
+          "id": "p2",
+          "tipo": "polea",
+          "talla": "grande",
+          "x": 1180,
+          "y": 385
+        }
+      ],
+      "correas": [
+        {
+          "id": "c1",
+          "entre": [
+            "p1",
+            "p2"
+          ]
+        }
+      ],
+      "fijos": {
+        "poleas": [],
+        "correas": []
+      },
+      "marcha": "¡Los engranajes giran, la correa corre y la polea hace trabajar la máquina!",
+      "listo": "¡La correa mueve la noria!"
+    },
+    {
+      "id": "3e",
+      "grado": 3,
+      "maquina": "ventilador",
+      "maquinaEje": "p2",
+      "estacion": {
+        "x0": 1040,
+        "y0": 430,
+        "x1": 1300,
+        "y1": 740,
+        "titulo": "POLEAS"
+      },
+      "ejes": [
+        {
+          "id": "g1",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 700,
+          "y": 600
+        },
+        {
+          "id": "g2",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "padre": "g1",
+          "angulo": -45
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g1",
+          "angulo": -160
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g2",
+          "angulo": -100
+        },
+        {
+          "id": "s1",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m1",
+          "angulo": -80
+        },
+        {
+          "id": "p1",
+          "tipo": "polea",
+          "talla": "pequena",
+          "sobre": "g2"
+        },
+        {
+          "id": "p2",
+          "tipo": "polea",
+          "talla": "grande",
+          "x": 1170,
+          "y": 580
+        }
+      ],
+      "correas": [
+        {
+          "id": "c1",
+          "entre": [
+            "p1",
+            "p2"
+          ]
+        }
+      ],
+      "fijos": {
+        "poleas": [],
+        "correas": []
+      },
+      "marcha": "¡Los engranajes giran, la correa corre y la polea hace trabajar la máquina!",
+      "listo": "¡La polea mueve el ventilador!"
+    },
+    {
+      "id": "4a",
+      "grado": 4,
+      "maquina": "fabrica",
+      "cintaHasta": 800,
+      "ejes": [
+        {
+          "id": "g1",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 700,
+          "y": 610,
+          "lugar": "el eje principal de abajo"
+        },
+        {
+          "id": "g2",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "padre": "g1",
+          "angulo": -35,
+          "lugar": "el otro eje grande, a la derecha"
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g1",
+          "angulo": 180,
+          "lugar": "el eje mediano de la izquierda"
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g2",
+          "angulo": -80,
+          "lugar": "el eje mediano de arriba"
+        },
+        {
+          "id": "s1",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m1",
+          "angulo": -90,
+          "lugar": "el eje pequeño de la izquierda"
+        },
+        {
+          "id": "s2",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m2",
+          "angulo": -20,
+          "lugar": "el eje pequeño de arriba a la derecha"
+        },
+        {
+          "id": "p1",
+          "tipo": "polea",
+          "talla": "pequena",
+          "sobre": "g2",
+          "lugar": "el centro de la segunda rueda grande"
+        },
+        {
+          "id": "p2",
+          "tipo": "polea",
+          "talla": "grande",
+          "x": 1110,
+          "y": 480,
+          "lugar": "la polea grande de la estación"
+        },
+        {
+          "id": "p3",
+          "tipo": "polea",
+          "talla": "pequena",
+          "x": 1250,
+          "y": 728,
+          "lugar": "la polea pequeña de la estación"
+        }
+      ],
+      "correas": [
+        {
+          "id": "c1",
+          "entre": [
+            "p1",
+            "p2"
+          ],
+          "lugar": "la rueda grande y la polea grande"
+        },
+        {
+          "id": "c2",
+          "entre": [
+            "p2",
+            "p3"
+          ],
+          "lugar": "las dos poleas de la estación"
+        }
+      ],
+      "fijos": {
+        "poleas": [],
+        "correas": []
+      },
+      "marcha": "¡Toda la fábrica se mueve! Engranajes, poleas, correas, cintas y brazos robóticos.",
+      "listo": "¡La gran fábrica mecánica está en marcha!",
+      "nombre": "La gran fábrica mecánica",
+      "modulo": 8,
+      "tablero": {
+        "x0": 460,
+        "y0": 120,
+        "x1": 1320,
+        "y1": 790
+      },
+      "estacion": {
+        "x0": 1010,
+        "y0": 400,
+        "x1": 1310,
+        "y1": 775,
+        "titulo": "POLEAS"
+      },
+      "zeus": "¡La gran fábrica mecánica! Ensambla todos los engranajes, coloca las poleas y conecta las dos correas.",
+      "zoe": "¡Vamos paso a paso, empezando por la rueda más grande!",
+      "cartel": {
+        "etiqueta": "Nivel 4 completado",
+        "titulo": "¡La gran fábrica!"
+      }
+    },
+    {
+      "id": "4b",
+      "grado": 4,
+      "maquina": "fabrica",
+      "cintaHasta": 1000,
+      "estacion": {
+        "x0": 470,
+        "y0": 420,
+        "x1": 760,
+        "y1": 775,
+        "titulo": "POLEAS"
+      },
+      "ejes": [
+        {
+          "id": "g1",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 1010,
+          "y": 560
+        },
+        {
+          "id": "g2",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "padre": "g1",
+          "angulo": -145
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g1",
+          "angulo": 10
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g2",
+          "angulo": -80
+        },
+        {
+          "id": "s1",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m1",
+          "angulo": -70
+        },
+        {
+          "id": "s2",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m2",
+          "angulo": -160
+        },
+        {
+          "id": "p1",
+          "tipo": "polea",
+          "talla": "pequena",
+          "sobre": "g2"
+        },
+        {
+          "id": "p2",
+          "tipo": "polea",
+          "talla": "grande",
+          "x": 560,
+          "y": 500
+        },
+        {
+          "id": "p3",
+          "tipo": "polea",
+          "talla": "pequena",
+          "x": 520,
+          "y": 728
+        }
+      ],
+      "correas": [
+        {
+          "id": "c1",
+          "entre": [
+            "p1",
+            "p2"
+          ]
+        },
+        {
+          "id": "c2",
+          "entre": [
+            "p2",
+            "p3"
+          ]
+        }
+      ],
+      "fijos": {
+        "poleas": [],
+        "correas": []
+      },
+      "marcha": "¡Toda la fábrica se mueve! Engranajes, poleas, correas y máquinas trabajan juntos.",
+      "listo": "¡La gran fábrica mecánica está en marcha!"
+    },
+    {
+      "id": "4c",
+      "grado": 4,
+      "maquina": "noria",
+      "maquinaEje": "p3",
+      "estacion": {
+        "x0": 1010,
+        "y0": 140,
+        "x1": 1310,
+        "y1": 540,
+        "titulo": "POLEAS"
+      },
+      "ejes": [
+        {
+          "id": "g1",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 680,
+          "y": 620
+        },
+        {
+          "id": "g2",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "padre": "g1",
+          "angulo": -25
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g1",
+          "angulo": -120
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g2",
+          "angulo": -95
+        },
+        {
+          "id": "s1",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m1",
+          "angulo": -110
+        },
+        {
+          "id": "s2",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m2",
+          "angulo": -100
+        },
+        {
+          "id": "p1",
+          "tipo": "polea",
+          "talla": "pequena",
+          "sobre": "g2"
+        },
+        {
+          "id": "p2",
+          "tipo": "polea",
+          "talla": "grande",
+          "x": 1080,
+          "y": 470
+        },
+        {
+          "id": "p3",
+          "tipo": "polea",
+          "talla": "pequena",
+          "x": 1200,
+          "y": 260
+        }
+      ],
+      "correas": [
+        {
+          "id": "c1",
+          "entre": [
+            "p1",
+            "p2"
+          ]
+        },
+        {
+          "id": "c2",
+          "entre": [
+            "p2",
+            "p3"
+          ]
+        }
+      ],
+      "fijos": {
+        "poleas": [],
+        "correas": []
+      },
+      "marcha": "¡Toda la fábrica se mueve! Engranajes, poleas, correas y máquinas trabajan juntos.",
+      "listo": "¡La gran fábrica funciona y la noria da vueltas!"
+    },
+    {
+      "id": "4d",
+      "grado": 4,
+      "maquina": "fabrica",
+      "cintaHasta": 800,
+      "ejes": [
+        {
+          "id": "g1",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 700,
+          "y": 430
+        },
+        {
+          "id": "g2",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "padre": "g1",
+          "angulo": 30
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g1",
+          "angulo": -150
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g2",
+          "angulo": -60
+        },
+        {
+          "id": "s1",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m1",
+          "angulo": 110
+        },
+        {
+          "id": "s2",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m2",
+          "angulo": -40
+        },
+        {
+          "id": "p1",
+          "tipo": "polea",
+          "talla": "pequena",
+          "sobre": "g2"
+        },
+        {
+          "id": "p2",
+          "tipo": "polea",
+          "talla": "grande",
+          "x": 1150,
+          "y": 470
+        },
+        {
+          "id": "p3",
+          "tipo": "polea",
+          "talla": "pequena",
+          "x": 1250,
+          "y": 728
+        }
+      ],
+      "correas": [
+        {
+          "id": "c1",
+          "entre": [
+            "p1",
+            "p2"
+          ]
+        },
+        {
+          "id": "c2",
+          "entre": [
+            "p2",
+            "p3"
+          ]
+        }
+      ],
+      "fijos": {
+        "poleas": [],
+        "correas": []
+      },
+      "marcha": "¡Toda la fábrica se mueve! Engranajes, poleas, correas y máquinas trabajan juntos.",
+      "listo": "¡La gran fábrica mecánica está en marcha!"
+    },
+    {
+      "id": "4e",
+      "grado": 4,
+      "maquina": "ventilador",
+      "maquinaEje": "p3",
+      "estacion": {
+        "x0": 1010,
+        "y0": 420,
+        "x1": 1310,
+        "y1": 775,
+        "titulo": "POLEAS"
+      },
+      "ejes": [
+        {
+          "id": "g1",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "x": 640,
+          "y": 580
+        },
+        {
+          "id": "g2",
+          "tipo": "engranaje",
+          "talla": "grande",
+          "padre": "g1",
+          "angulo": -40
+        },
+        {
+          "id": "m1",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g1",
+          "angulo": 90
+        },
+        {
+          "id": "m2",
+          "tipo": "engranaje",
+          "talla": "mediano",
+          "padre": "g2",
+          "angulo": -110
+        },
+        {
+          "id": "s1",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m1",
+          "angulo": 180
+        },
+        {
+          "id": "s2",
+          "tipo": "engranaje",
+          "talla": "pequeno",
+          "padre": "m2",
+          "angulo": -10
+        },
+        {
+          "id": "p1",
+          "tipo": "polea",
+          "talla": "pequena",
+          "sobre": "g2"
+        },
+        {
+          "id": "p2",
+          "tipo": "polea",
+          "talla": "grande",
+          "x": 1060,
+          "y": 500
+        },
+        {
+          "id": "p3",
+          "tipo": "polea",
+          "talla": "pequena",
+          "x": 1180,
+          "y": 640
+        }
+      ],
+      "correas": [
+        {
+          "id": "c1",
+          "entre": [
+            "p1",
+            "p2"
+          ]
+        },
+        {
+          "id": "c2",
+          "entre": [
+            "p2",
+            "p3"
+          ]
+        }
+      ],
+      "fijos": {
+        "poleas": [],
+        "correas": []
+      },
+      "marcha": "¡Toda la fábrica se mueve! Engranajes, poleas, correas y máquinas trabajan juntos.",
+      "listo": "¡La gran fábrica funciona y el ventilador sopla!"
+    }
+  ],
+  "variantes": {
+    "colores": {
+      "grande": [
+        "#ffc425",
+        "#ffb020",
+        "#ffd23f"
+      ],
+      "mediano": [
+        "#3b8cf0",
+        "#2f7ee6",
+        "#4c9bff"
+      ],
+      "pequeno": [
+        "#43c25a",
+        "#37b24d",
+        "#51cf66"
+      ],
+      "polea": [
+        "#ff8a3d",
+        "#f76707",
+        "#ff922b"
+      ]
+    },
+    "decoraciones": [
+      "rayos",
+      "agujeros",
+      "estrella"
+    ],
+    "tableros": [
+      {
+        "id": "azul",
+        "placa": "#3d6fb6",
+        "oscuro": "#24457e",
+        "claro": "#6f9de0"
+      },
+      {
+        "id": "turquesa",
+        "placa": "#2f8f9d",
+        "oscuro": "#1c5f69",
+        "claro": "#5fc0cc"
+      },
+      {
+        "id": "indigo",
+        "placa": "#4a5fc1",
+        "oscuro": "#2d3b85",
+        "claro": "#7d8ff0"
+      }
+    ],
+    "luces": [
+      "#ffd43b",
+      "#69db7c",
+      "#4dd4f0",
+      "#ff8787",
+      "#b197fc"
+    ]
+  },
+  "demo": {
+    "eje": "inferior"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "La Máquina de Engranajes y Poleas",
+    "botonComenzar": "¡EMPEZAR!",
+    "demoZoe": "¡Mira! Tomo la rueda más grande, la llevo hasta su eje y la suelto cuando el aro brilla en verde. ¡Encaja!",
+    "consejoZeus": "¡Acerca los dientes de los engranajes para que puedan abrazarse y girar juntos!",
+    "seleccion": [
+      "¡Esa pieza todavía no va! Mira las sombras de los ejes.",
+      "¡Buena elección! Mira el eje que brilla.",
+      "¡Esa! ¿En qué eje cabe?"
+    ],
+    "aciertoSigue": "¡Muy bien! Ahora vamos con {pieza}.",
+    "aciertos": [
+      "¡Encajó perfecto!",
+      "¡Fíjate en los dientes de las ruedas!",
+      "¡Qué buen mecánico!",
+      "¡Los dientes se abrazan!"
+    ],
+    "casiListo": "¡Ya casi está lista nuestra máquina!",
+    "ahoraPoleas": "¡Ahora coloca las poleas!",
+    "ahoraCorrea": "¡Ahora conecta las poleas con la correa!",
+    "correaLista": "¡La correa une las dos poleas!",
+    "otraTalla": "¡Esa rueda es de otro tamaño! Mira la sombra del eje.",
+    "otraPolea": "¡Esa polea es de otro tamaño! Busca la otra.",
+    "otraPieza": "¡Ahí va otra clase de pieza! Mira la sombra.",
+    "orden": "¡Primero va la rueda que la hace girar!",
+    "ordenPolea": "¡Primero pon la rueda grande y después la polea en su centro!",
+    "ordenCorrea": "¡La correa va cuando las dos poleas estén puestas!",
+    "ocupado": "¡Ese eje ya tiene su pieza! Busca un eje libre.",
+    "casi": "¡Muy cerca! Llévala justo encima del eje.",
+    "fuera": "¡Lleva la pieza hasta el tablero mecánico!",
+    "ayudaZoe": "¡Mira el eje que brilla: ahí va la pieza que necesitamos!",
+    "todoListo": "¡Todas las piezas están en su lugar! Baja la palanca roja para poner en marcha la máquina.",
+    "palancaFalta": "¡La palanca se mueve cuando todas las piezas estén en su lugar!",
+    "zeusAnima": [
+      "¡Así se ensambla!",
+      "¡Bravo, mecánico!",
+      "¡Qué máquina tan fuerte!"
+    ],
+    "finalVoz": "¡EXCELENTE MECÁNICO! Ensamblaste los engranajes haciendo que toda la máquina cobre vida y movimiento. ¡Completaste el Tema de Ensamblajes Sencillos!",
+    "finalTitulo": "¡EXCELENTE MECÁNICO!",
+    "finalTexto": "Completaste el Tema de Ensamblajes Sencillos",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡La gran máquina de engranajes está detenida!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Toma cada rueda dentada, arrástrala hasta su eje y ensámblala de modo que los dientes de los engranajes encajen unos con otros."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Acerca los dientes de los engranajes para que puedan abrazarse y girar juntos!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Ensamblajes sencillos: engranajes y poleas"
+    }
+  ]
+}

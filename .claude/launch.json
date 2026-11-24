@@ -305,6 +305,58 @@
       ],
       "port": 8049,
       "autoPort": false
+    },
+    {
+      "name": "juegos-lluvia",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8050",
+        "--directory",
+        "public"
+      ],
+      "port": 8050,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-robot",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8051",
+        "--directory",
+        "public"
+      ],
+      "port": 8051,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-puzle",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8052",
+        "--directory",
+        "public"
+      ],
+      "port": 8052,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-maquina",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8053",
+        "--directory",
+        "public"
+      ],
+      "port": 8053,
+      "autoPort": false
     }
   ]
 }
