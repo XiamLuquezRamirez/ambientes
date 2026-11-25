@@ -150,6 +150,41 @@ module.exports = {
                     });
                 }
             }
+        },
+        {
+            descripcion: 'las coordenadas de las estrellas son al azar (cambian de una partida a otra)',
+            fn: function () {
+                var R = modulo(), cfg = config();
+                [0, 1, 2, 3].forEach(function (i) {
+                    var vistas = {};
+                    for (var s = 1; s <= 40; s++) vistas[R.prepararNivel(cfg.rondas[i], cfg.juego, R.azar(s)).estrellas[0].x] = true;
+                    cierto(Object.keys(vistas).length > 20, 'nivel ' + (i + 1) + ' con posiciones variadas');
+                });
+            }
+        },
+        {
+            descripcion: 'niveles 3 y 4: las estrellas se mecen un poquito sin salir del recorrido ni juntar sus zonas',
+            fn: function () {
+                var R = modulo(), cfg = config();
+                for (var s = 1; s <= 60; s++) {
+                    var nv = niveles(R, cfg, s);
+                    igual(nv[0].deriva, 0, 'nivel 1 quieto');
+                    igual(nv[1].deriva, 0, 'nivel 2 quieto');
+                    cierto(nv[2].deriva > 0 && nv[2].deriva <= 12, 'nivel 3 se mece poquito');
+                    cierto(nv[3].deriva > 0 && nv[3].deriva <= 12, 'nivel 4 se mece poquito');
+                    [nv[2], nv[3]].forEach(function (n) {
+                        for (var t = 0; t < 12000; t += 97) {
+                            var xs = n.estrellas.map(function (e) { return R.posicionEstrella(e, t); });
+                            xs.forEach(function (x, i) {
+                                cierto(x >= n.minX && x <= n.maxX, 'dentro del recorrido');
+                                if (i) cierto(x - xs[i - 1] > 2 * n.tolerancia, 'zonas separadas');
+                                // la captura sigue a la estrella donde está ahora
+                                igual(R.evaluarCaptura(x + n.tolerancia - 2, n, {}, 0, t).estrella, n.estrellas[i], 'captura en movimiento');
+                            });
+                        }
+                    });
+                }
+            }
         }
     ]
 };

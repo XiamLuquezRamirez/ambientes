@@ -262,6 +262,7 @@
             this.REPOSO = num(j.ganchoY, 300);
             this.anim = new Animador();
             this.t = 0;
+            this.tE = 0;              // reloj de las estrellas que se mecen (niveles 3 y 4)
             this.gen = 0;
             this.pausado = false;
             this.entradaOn = false;
@@ -583,7 +584,7 @@
                 self.estrellas.forEach(function (s) {
                     var v = Math.max(0, Math.min(1, (t - s.retraso) / 520));
                     if (v > 0 && s.visible === 0) {
-                        self.burbujas.soltar(s.d.x, s.d.y, { n: 4, dispersion: 40, escala: 0.25 });
+                        self.burbujas.soltar(self.xEstrella(s), s.d.y, { n: 4, dispersion: 40, escala: 0.25 });
                         sonar("aparece");
                     }
                     s.visible = v > 0 ? rebote(v) : 0;
@@ -611,7 +612,7 @@
             var meta = null;
             for (var i = 0; i < lista.length && !meta; i++) {
                 var e = dir > 0 ? lista[i] : lista[lista.length - 1 - i];
-                if ((e.x - this.ganchoX) * dir > 60) meta = e;
+                if ((R().posicionEstrella(e, this.tE) - this.ganchoX) * dir > 60) meta = e;
             }
             if (!meta) meta = dir > 0 ? lista[lista.length - 1] : lista[0];
             var punto = { x: meta.x, y: 560 };
@@ -621,7 +622,7 @@
                 var vigia = setInterval(function () {
                     if (gen !== self.gen) { clearInterval(vigia); resolve(); return; }
                     if (self.pausado) return;
-                    var listo = Math.abs(self.ganchoX - meta.x) < 8;
+                    var listo = Math.abs(self.ganchoX - R().posicionEstrella(meta, self.tE)) < 8;
                     if (!listo && Date.now() - t0 > 14000) listo = true;
                     if (!listo) return;
                     clearInterval(vigia);
@@ -650,7 +651,7 @@
             avisar("lanza", { demo: demo });
             sonar("polea");
             var x0 = this.ganchoX;
-            var res = R().evaluarCaptura(x0, nv, mk.capturadas, this.ayudaOn ? 6 : 0);
+            var res = R().evaluarCaptura(x0, nv, mk.capturadas, this.ayudaOn ? 6 : 0, this.tE);
             var star = res.estrella ? this.estrellaDe(res.estrella.id) : null;
             await esperar(this.anim, 240);
             if (!vivo()) return;
@@ -734,6 +735,9 @@
             this.tQuieto = 0;
         }
 
+        /** x actual de una estrella (se mece un poquito en los niveles 3 y 4). */
+        xEstrella(s) { return R().posicionEstrella(s.d, this.tE); }
+
         estrellaDe(id) {
             for (var i = 0; i < this.estrellas.length; i++) if (this.estrellas[i].d.id === id) return this.estrellas[i];
             return null;
@@ -746,8 +750,8 @@
             s.pop = 1;
             s.halo.setAlpha(0);
             // la estrella queda donde estaba y se acomoda bajo el gancho mientras sube (sin saltos)
-            s.offX = s.d.x - (this.ganchoX - 8 - Math.sin(this.gancho.rotation) * GANCHO_AGARRE);
-            var x = s.d.x, y = s.d.y;
+            s.offX = this.xEstrella(s) - (this.ganchoX - 8 - Math.sin(this.gancho.rotation) * GANCHO_AGARRE);
+            var x = this.xEstrella(s), y = s.d.y;
             sonar("chapoteo");
             this.burbujas.soltar(x, y, { n: 14, dispersion: 90, escala: 0.32, vel: 110, vx: 30 });
             this.particulas.emitir(x, y, { n: 18, vel: 260, vida: 800, escala: 0.4, tintes: BRILLOS.concat([0xffd43b]) });
@@ -984,7 +988,7 @@
             var nv = this.nivel;
             if (!nv) return;
             var activa = this.estado === "moviendo" || this.estado === "espera" || this.estado === "detenido";
-            var cerca = activa ? R().cercana(this.ganchoX, nv, this.marcador.capturadas) : null;
+            var cerca = activa ? R().cercana(this.ganchoX, nv, this.marcador.capturadas, 1, this.tE) : null;
             var id = cerca ? cerca.id : null;
             if (id !== this.cercaId) {
                 this.cercaId = id;
@@ -1027,6 +1031,7 @@
             var dt = Math.min(50, delta || 16);
             if (this.pausado) return;
             this.t += dt;
+            this.tE += dt;
             var t = this.t;
             this.anim.update(dt);
 
@@ -1079,10 +1084,14 @@
                     s.img.setScale(base * late * s.visible);
                     s.img.setAlpha(Math.min(1, s.visible * 1.5));
                     s.img.setRotation(s.d.giro * Math.PI / 180 + Math.sin(t / 700 + s.fase) * 0.05);
-                    s.img.setPosition(s.d.x, s.d.y);
+                    var ex = self.xEstrella(s);
+                    var ey = s.d.y + (s.d.deriva ? Math.sin(self.tE / 700 + s.fase) * 3 : 0);
+                    s.img.setPosition(ex, ey);
+                    s.halo.setPosition(ex, ey);
+                    s.sombra.setPosition(ex, s.d.y + s.d.r * 0.72);
                     s.sombra.setAlpha(0.8 * Math.min(1, s.visible));
                     s.halo.setAlpha(s.brillo * (0.8 + Math.sin(t / 140) * 0.2)).setScale(s.halo.base * (1 + s.brillo * 0.15));
-                    if (!reducido && Math.random() < dt / 4200) self.burbujas.soltar(s.d.x + azarEn(-20, 20), s.d.y - 20, { n: 1, escala: 0.15, vel: 50 });
+                    if (!reducido && Math.random() < dt / 4200) self.burbujas.soltar(self.xEstrella(s) + azarEn(-20, 20), s.d.y - 20, { n: 1, escala: 0.15, vel: 50 });
                 } else if (s.estado === "atrapada") {
                     s.pop = Math.max(0, s.pop - dt / 500);
                     var ang = self.gancho.rotation;
@@ -1286,7 +1295,7 @@
                 if (!escena || !escena.nivel) return null;
                 var libres = escena.estrellas.filter(function (s) { return s.estado === "libre"; });
                 var s = typeof i === "number" ? libres[i] : null;
-                var x = s ? s.d.x + (dx || 0) : (dx || 0);
+                var x = s ? escena.xEstrella(s) + (dx || 0) : (dx || 0);
                 escena.fase = faseParaX(escena.nivel, x);
                 escena.colocarBarca();
                 return { x: escena.ganchoX, estrella: s ? s.d.id : null };
@@ -1323,7 +1332,7 @@
                 guia: Math.round(escena.guiaAlpha * 100) / 100,
                 cerca: escena.cercaId,
                 enRed: escena.enRed.length,
-                estrellas: escena.estrellas.map(function (s) { return { id: s.d.id, x: s.d.x, color: s.d.color, estado: s.estado, visible: s.img.visible }; }),
+                estrellas: escena.estrellas.map(function (s) { return { id: s.d.id, x: Math.round(escena.xEstrella(s)), color: s.d.color, estado: s.estado, visible: s.img.visible }; }),
                 deco: escena.deco.length,
                 peces: escena.peces.length
             };

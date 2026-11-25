@@ -53,14 +53,23 @@
         return out;
     }
 
-    /** Distancia mínima entre estrellas: las zonas de captura nunca se tocan (un toque = una sola estrella). */
+    /**
+     * Distancia mínima entre estrellas: las zonas de captura nunca se tocan (un toque = una sola estrella), ni siquiera
+     * cuando dos estrellas que se mecen se acercan a la vez.
+     */
     function separacionMinima(nivel) {
-        return Math.max(2 * nivel.tolerancia + 20, 2 * nivel.radio + 12);
+        return Math.max(2 * nivel.tolerancia + 12, 2 * nivel.radio + 8) + 2 * (nivel.deriva || 0);
+    }
+
+    /** x de una estrella en el instante t (ms). Desde el nivel 3 se mece un poquito de lado a lado; sin t, su centro. */
+    function posicionEstrella(e, t) {
+        if (!e.deriva || t == null) return e.x;
+        return e.x + e.deriva * Math.sin(t * Math.PI * 2 / e.derivaMs + e.derivaFase);
     }
 
     /**
-     * Nivel listo para la escena. Las estrellas se reparten en huecos iguales a lo ancho del recorrido del gancho,
-     * con un pequeño desplazamiento al azar que nunca rompe la separación mínima.
+     * Nivel listo para la escena. Las estrellas caen en coordenadas al azar a lo ancho del recorrido del gancho: el
+     * espacio que sobra después de la separación mínima se reparte al azar entre los bordes y los huecos.
      */
     function prepararNivel(ronda, juego, rnd) {
         var r = ronda || {}, j = juego || {};
@@ -93,26 +102,34 @@
             ganchoY: num(j.ganchoY, 300),
             sueloY: num(j.sueloY, 768),
             faseInicial: rnd() * Math.PI * 2,
+            deriva: Math.max(0, num(r.deriva, 0)),
+            derivaMs: Math.max(2000, num(r.derivaMs, 5000)),
             estrellas: []
         };
-        var pad = 8;
+        // la estrella, aun meciéndose, nunca sale del recorrido del gancho
+        var pad = nivel.deriva + 3;
         var a = minX + pad, b = maxX - pad;
-        var paso = n > 1 ? (b - a) / (n - 1) : 0;
         var sep = separacionMinima(nivel);
-        var juego2 = n > 1 ? Math.max(0, (paso - sep) / 2 - 1) : Math.max(0, (b - a) / 2 - 10);
+        var sobra = Math.max(0, (b - a) - (n - 1) * sep);
+        // reparto al azar del espacio sobrante: borde izquierdo, cada hueco y borde derecho
+        var pesos = [];
+        var suma = 0;
+        for (var w = 0; w <= n; w++) { var pw = rnd() + 0.05; pesos.push(pw); suma += pw; }
         var cols = colores(n, rnd);
         var alturas = barajar([-16, 10, -4, 16, -10, 4, -14, 12], rnd);
+        var x = a;
         for (var i = 0; i < n; i++) {
-            var x = n > 1 ? a + paso * i : centro;
-            x += (rnd() * 2 - 1) * Math.min(juego2, 40);
-            x = Math.max(minX + 2, Math.min(maxX - 2, x));
+            x += (i ? sep : 0) + sobra * pesos[i] / suma;
             nivel.estrellas.push({
                 id: "e" + (i + 1),
-                x: Math.round(x),
+                x: Math.round(Math.max(a, Math.min(b, x)) * 10) / 10,
                 y: Math.round(nivel.sueloY + alturas[i % alturas.length]),
                 color: cols[i],
                 r: radio,
-                giro: Math.round((rnd() * 2 - 1) * 18)
+                giro: Math.round((rnd() * 2 - 1) * 18),
+                deriva: nivel.deriva,
+                derivaMs: nivel.derivaMs * (0.85 + rnd() * 0.3),
+                derivaFase: rnd() * Math.PI * 2
             });
         }
         return nivel;
@@ -124,12 +141,13 @@
         if (!nivel || !nivel.estrellas || !nivel.estrellas.length) return ["sin estrellas"];
         var sep = separacionMinima(nivel);
         nivel.estrellas.forEach(function (e, i) {
-            if (e.x < nivel.minX - 0.5 || e.x > nivel.maxX + 0.5) m.push(e.id + " fuera del recorrido del gancho");
+            var d = e.deriva || 0;
+            if (e.x - d < nivel.minX - 0.5 || e.x + d > nivel.maxX + 0.5) m.push(e.id + " fuera del recorrido del gancho");
             if (e.x - e.r < VISIBLE.x0 || e.x + e.r > VISIBLE.x1) m.push(e.id + " fuera de la vista");
             if (e.x < ZONA_ESTRELLAS.x0 || e.x > ZONA_ESTRELLAS.x1) m.push(e.id + " detrás de Zoe o Zeus");
             for (var k = i + 1; k < nivel.estrellas.length; k++) {
                 var o = nivel.estrellas[k];
-                if (Math.abs(o.x - e.x) < sep) m.push(e.id + " y " + o.id + " demasiado cerca");
+                if (Math.abs(o.x - e.x) < sep - 0.5) m.push(e.id + " y " + o.id + " demasiado cerca");
             }
         });
         if (nivel.minX < VISIBLE.x0 || nivel.maxX > VISIBLE.x1) m.push("el gancho sale de la vista");
@@ -155,29 +173,30 @@
         return nivel.estrellas.filter(function (e) { return !c[e.id]; });
     }
 
-    function masCercana(x, nivel, capturadas) {
-        var mejor = null, dmin = Infinity;
+    function masCercana(x, nivel, capturadas, t) {
+        var mejor = null, dmin = Infinity, mx = 0;
         disponibles(nivel, capturadas).forEach(function (e) {
-            var d = Math.abs(e.x - x);
-            if (d < dmin) { dmin = d; mejor = e; }
+            var ex = posicionEstrella(e, t);
+            var d = Math.abs(ex - x);
+            if (d < dmin) { dmin = d; mejor = e; mx = ex; }
         });
-        return { estrella: mejor, dx: mejor ? mejor.x - x : Infinity };
+        return { estrella: mejor, dx: mejor ? mx - x : Infinity };
     }
 
     /**
      * El niño tocó con el gancho en x: devuelve la estrella que atrapa (la más cercana, si está dentro de la
      * tolerancia del nivel) o null. Una estrella ya pescada no se vuelve a atrapar.
      */
-    function evaluarCaptura(x, nivel, capturadas, extra) {
-        var c = masCercana(x, nivel, capturadas);
+    function evaluarCaptura(x, nivel, capturadas, extra, t) {
+        var c = masCercana(x, nivel, capturadas, t);
         var tol = nivel.tolerancia + (Number(extra) || 0);
         if (c.estrella && Math.abs(c.dx) <= tol) return { tipo: "captura", estrella: c.estrella, dx: c.dx };
         return { tipo: "fallo", estrella: null, dx: c.dx, cercana: c.estrella };
     }
 
     /** Estrella cerca del gancho para la guía punteada (radio un poco mayor que la tolerancia). */
-    function cercana(x, nivel, capturadas, k) {
-        var c = masCercana(x, nivel, capturadas);
+    function cercana(x, nivel, capturadas, k, t) {
+        var c = masCercana(x, nivel, capturadas, t);
         var lim = nivel.radioGuia * (k || 1);
         return c.estrella && Math.abs(c.dx) <= lim ? c.estrella : null;
     }
@@ -216,6 +235,7 @@
         prepararNivel: prepararNivel,
         validarNivel: validarNivel,
         separacionMinima: separacionMinima,
+        posicionEstrella: posicionEstrella,
         posicionGancho: posicionGancho,
         avanzarFase: avanzarFase,
         velocidadGancho: velocidadGancho,
