@@ -1,0 +1,259 @@
+{
+  "nombre": "El Puzle Geométrico 3D",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 30,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor"
+  },
+  "juego": {
+    "radioAcierto": 70,
+    "radioCasi": 165,
+    "radioTolerancia": 115,
+    "radioCerca": 230,
+    "radioIman": 110,
+    "iman": 0.3,
+    "pasoGiro": 90,
+    "ayudaMs": 14000,
+    "ayudaRepetirMs": 17000,
+    "vozPausaMs": 2300,
+    "fuerasParaPista": 2,
+    "casiParaPista": 2
+  },
+  "formas": {
+    "losa-grande": { "tipo": "caja", "w": 3, "d": 3, "h": 0.8, "nombre": "Bloque grande", "voz": "el bloque más grande" },
+    "losa-media": { "tipo": "caja", "w": 2.2, "d": 2.2, "h": 0.8, "nombre": "Bloque mediano", "voz": "el bloque mediano" },
+    "losa-chica": { "tipo": "caja", "w": 1.5, "d": 1.5, "h": 0.75, "nombre": "Bloque pequeño", "voz": "el bloque pequeño" },
+    "cubo-1": { "tipo": "caja", "w": 1, "d": 1, "h": 1, "nombre": "Cubo", "voz": "el cubo" },
+    "piramide-1": { "tipo": "piramide", "w": 1, "d": 1, "h": 1.15, "nombre": "Pirámide", "voz": "la pirámide puntiaguda" },
+    "cono-1": { "tipo": "cono", "w": 1, "d": 1, "h": 1.2, "nombre": "Cono", "voz": "el cono puntiagudo" },
+
+    "cubo-base": { "tipo": "caja", "w": 2, "d": 2, "h": 1.6, "nombre": "Cubo grande", "voz": "el cubo grande" },
+    "cubo-soporte": { "tipo": "caja", "w": 1.6, "d": 1.6, "h": 1.3, "nombre": "Cubo mediano", "voz": "el cubo mediano" },
+    "barra-torre": { "tipo": "caja", "w": 2.4, "d": 1.1, "h": 0.65, "nombre": "Prisma rectangular", "voz": "el prisma rectangular largo" },
+    "cubo-alto": { "tipo": "caja", "w": 1.2, "d": 1.2, "h": 1.15, "nombre": "Cubo pequeño", "voz": "el cubo pequeño" },
+    "techo-torre": { "tipo": "prisma", "w": 1.2, "d": 1.2, "h": 0.95, "nombre": "Prisma triangular", "voz": "el prisma triangular" },
+    "piramide-torre": { "tipo": "piramide", "w": 1.2, "d": 1.2, "h": 1.2, "nombre": "Pirámide", "voz": "la pirámide" },
+
+    "bloque-castillo": { "tipo": "caja", "w": 2, "d": 2, "h": 1, "nombre": "Bloque cuadrado", "voz": "el bloque cuadrado grande" },
+    "bloque-lado": { "tipo": "caja", "w": 2, "d": 1, "h": 1, "nombre": "Bloque largo", "voz": "el bloque largo" },
+    "muro": { "tipo": "caja", "w": 2, "d": 1, "h": 0.7, "nombre": "Prisma rectangular bajito", "voz": "el prisma rectangular bajito" },
+    "torre-redonda": { "tipo": "cilindro", "w": 1, "d": 1, "h": 2.1, "nombre": "Cilindro", "voz": "el cilindro" },
+    "cubierta": { "tipo": "prisma", "w": 2, "d": 1, "h": 0.9, "nombre": "Prisma triangular", "voz": "el prisma triangular" },
+
+    "base-templo": { "tipo": "caja", "w": 2, "d": 3, "h": 0.7, "nombre": "Base ancha", "voz": "la base ancha" },
+    "base-ala": { "tipo": "caja", "w": 3, "d": 1, "h": 0.7, "nombre": "Base larga", "voz": "la base larga" },
+    "escalon": { "tipo": "caja", "w": 2, "d": 2, "h": 0.6, "nombre": "Soporte cuadrado", "voz": "el soporte cuadrado" },
+    "escalon-ala": { "tipo": "caja", "w": 2, "d": 0.8, "h": 0.6, "nombre": "Soporte rectangular", "voz": "el soporte rectangular" },
+    "columna": { "tipo": "cilindro", "w": 0.62, "d": 0.62, "h": 1.6, "nombre": "Columna", "voz": "la columna cilíndrica" },
+    "dintel": { "tipo": "caja", "w": 3.6, "d": 1, "h": 0.5, "nombre": "Prisma superior", "voz": "el prisma superior largo" },
+    "fronton": { "tipo": "prisma", "w": 3.6, "d": 1, "h": 0.9, "nombre": "Prisma triangular", "voz": "el prisma triangular de la cubierta" },
+    "cuspide-templo": { "tipo": "piramide", "w": 0.7, "d": 0.7, "h": 0.85, "nombre": "Pirámide de la cúspide", "voz": "la pirámide de la cúspide" },
+    "cono-templo": { "tipo": "cono", "w": 0.7, "d": 0.7, "h": 0.9, "nombre": "Cono de la cúspide", "voz": "el cono de la cúspide" }
+  },
+  "variantes": {
+    "paletas": [
+      { "id": "caramelo", "colores": ["#ff6b6b", "#ffa94d", "#ffd43b", "#69db7c", "#4dabf7", "#9775fa", "#f783ac", "#38d9a9"] },
+      { "id": "mar", "colores": ["#3bc9db", "#4dabf7", "#748ffc", "#63e6be", "#ffd43b", "#ff8787", "#b197fc", "#ffa94d"] },
+      { "id": "bosque", "colores": ["#8ce99a", "#40c057", "#ffd43b", "#ff922b", "#e8590c", "#74c0fc", "#c0eb75", "#f06595"] },
+      { "id": "atardecer", "colores": ["#ff8787", "#ff922b", "#fcc419", "#f783ac", "#da77f2", "#4dabf7", "#66d9e8", "#94d82d"] },
+      { "id": "gema", "colores": ["#845ef7", "#5c7cfa", "#22b8cf", "#20c997", "#fab005", "#fa5252", "#e64980", "#82c91e"] }
+    ],
+    "decoraciones": ["liso", "puntos", "rayas", "estrella", "ladrillos", "rombos"],
+    "cielos": [
+      { "id": "manana", "arriba": "#7fd3ff", "abajo": "#e3f6ff", "monte": "#9ad4a8", "monte2": "#c4e8c2", "pasto": "#8fd16a", "pasto2": "#6fbf4f" },
+      { "id": "pastel", "arriba": "#a5b4ff", "abajo": "#fde2ff", "monte": "#b6c8f0", "monte2": "#dbe4ff", "pasto": "#9ddf7a", "pasto2": "#78c95a" },
+      { "id": "brisa", "arriba": "#66d9e8", "abajo": "#fff3bf", "monte": "#a9e3b5", "monte2": "#d3f9d8", "pasto": "#94d82d", "pasto2": "#74b816" }
+    ],
+    "estaciones": [
+      { "id": "naranja", "marco": "#ff922b", "oscuro": "#c25e0a", "luz": "#ffe066" },
+      { "id": "azul", "marco": "#4dabf7", "oscuro": "#1c6fb8", "luz": "#a5f3ff" },
+      { "id": "uva", "marco": "#9775fa", "oscuro": "#5f3dc4", "luz": "#ffd8f0" }
+    ],
+    "arboles": ["#51cf66", "#94d82d", "#20c997", "#ffa94d", "#f783ac"],
+    "techos": ["#ff6b6b", "#4dabf7", "#ffa94d", "#9775fa", "#f06595"]
+  },
+  "demo": {
+    "pieza": "base"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "El Puzle Geométrico 3D",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "zeusPresenta": "¡Constructor de mundos! Vamos a armar figuras en tres dimensiones. Recuerda que los bloques más grandes van abajo en la base y las piezas puntiagudas van arriba.",
+    "zoeInstruye": "¡Primero los cimientos grandes abajo y el triángulo pequeño hasta arriba!",
+    "demoZoe": "¡Mira! Tomo el bloque más grande, lo llevo hasta la guía brillante de la base y lo suelto. ¡Encaja!",
+    "seleccion": [
+      "¡Mira la forma de la pieza antes de colocarla!",
+      "¡Buena elección! Busca la guía brillante.",
+      "¡Esa pieza! ¿Dónde va en la construcción?"
+    ],
+    "aciertos": [
+      "¡Muy bien! Ahora vamos a construir un poquito más arriba.",
+      "¡La construcción está creciendo!",
+      "¡Encajó perfecto!",
+      "¡Qué buen constructor!",
+      "¡Bloque en su lugar!"
+    ],
+    "capa": [
+      "¡Excelente! Ya tenemos una nueva capa.",
+      "¡Otra capa lista! La construcción está creciendo.",
+      "¡Capa completa! Subimos un poquito más."
+    ],
+    "zeusAnima": [
+      "¡Así se construye!",
+      "¡Bravo, constructor!",
+      "¡Qué estructura tan fuerte!"
+    ],
+    "girar": [
+      "¡Intenta girarla para que coincida!",
+      "¡Casi! Gírala con las flechas hasta que se parezca a la guía.",
+      "¡Mira la guía! La pieza tiene que quedar acostada igual."
+    ],
+    "giroBien": "¡Así! Ahora coincide con la guía.",
+    "casi": "¡Muy cerca! Llévala justo encima de la guía brillante.",
+    "otraForma": "Esa pieza no tiene la forma que necesitamos ahí. ¡Busca otra!",
+    "orden": "¡Primero los cimientos! Construimos de abajo hacia arriba.",
+    "ocupado": "Ahí ya hay un bloque. ¡Busca la guía brillante!",
+    "fuera": "¡Lleva la pieza hasta la construcción!",
+    "base": "¡Busca el bloque que necesitamos para la base!",
+    "ayudaZoe": "¡Mira la guía brillante: te muestra la forma y el lugar del bloque!",
+    "ayudaBoton": "¡La guía brilla donde va el siguiente bloque!",
+    "giroSinPieza": "¡Primero toca una pieza y después gírala con las flechas!",
+    "noGira": "¡Esta pieza se ve igual por todos lados! No hace falta girarla.",
+    "finalVoz": "¡ARQUITECTO GENIAL! Construiste la figura en tres dimensiones uniendo cada bloque en su orden correcto.",
+    "finalTitulo": "¡ARQUITECTO GENIAL!",
+    "finalTexto": "Construiste el mundo de las construcciones mágicas",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola, amigos! Bienvenidos al taller mágico de construcción de Polimotor."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Hoy vamos a armar figuras en tres dimensiones, bloque por bloque, desde abajo hasta arriba!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Ensamblajes sencillos: construir figuras sólidas"
+    }
+  ],
+  "nivelesJuego": [
+    {
+      "id": 1,
+      "clave": "piramide",
+      "grado": 1,
+      "nombre": "La Pirámide Mágica",
+      "escala": 1.32,
+      "giro": false,
+      "rotadas": 0,
+      "zeus": "¡Constructor de mundos! Vamos a armar una gran pirámide tridimensional. Recuerda que los bloques más grandes van abajo en la base y las piezas puntiagudas van arriba.",
+      "zoe": "¡Primero los cimientos grandes abajo y el triángulo pequeño hasta arriba!",
+      "listo": "¡Lo lograste! La pirámide mágica brilla con luz dorada en su cúspide.",
+      "cartel": { "etiqueta": "Nivel 1 completado", "titulo": "¡Pirámide Mágica!", "sub": "Sigue: la Torre de los Bloques" },
+      "piezas": [
+        { "id": "base", "forma": "losa-grande", "pos": [0, 0, 0], "orient": 0, "capa": 0, "nombre": "Bloque de base", "pista": "¡La base es el bloque más grande! Va abajo de todo." },
+        { "id": "inferior", "forma": "losa-media", "pos": [0.4, 0.4, 0.8], "orient": 0, "capa": 1, "nombre": "Soporte inferior", "pista": "¡Ahora el bloque mediano, encima de la base!" },
+        { "id": "intermedio", "forma": "losa-chica", "pos": [0.75, 0.75, 1.6], "orient": 0, "capa": 2, "nombre": "Soporte intermedio", "pista": "¡Sigue el bloque pequeño! Cada vez más chiquitos hacia arriba." },
+        { "id": "superior", "forma": "cubo-1", "pos": [1, 1, 2.35], "orient": 0, "capa": 3, "nombre": "Bloque superior", "pista": "¡El cubo va casi en la punta!" },
+        { "id": "cuspide", "forma": "piramide-1", "alternativas": ["piramide-1", "cono-1"], "pos": [1, 1, 3.35], "orient": 0, "capa": 4, "nombre": "Cúspide", "pista": "¡La pieza puntiaguda va hasta arriba, en la cúspide!" }
+      ]
+    },
+    {
+      "id": 2,
+      "clave": "torre",
+      "grado": 2,
+      "nombre": "La Torre de los Bloques",
+      "escala": 1.02,
+      "giro": true,
+      "rotadas": 1,
+      "zeus": "¡Ahora una torre muy alta! Los prismas largos se cruzan: uno acostado hacia un lado y el otro girado hacia el otro.",
+      "zoe": "¡Mira la guía! Si la pieza no coincide, gírala con las flechas de abajo.",
+      "listo": "¡Qué torre tan alta! ¡Las flores del bosque se encendieron!",
+      "cartel": { "etiqueta": "Nivel 2 completado", "titulo": "¡Torre de los Bloques!", "sub": "Sigue: el Castillo Geométrico" },
+      "piezas": [
+        { "id": "cubo-base", "forma": "cubo-base", "pos": [0, 0, 0], "orient": 0, "capa": 0, "nombre": "Cubo de base", "pista": "¡El cubo más grande es la base de la torre!" },
+        { "id": "cubo-soporte", "forma": "cubo-soporte", "pos": [0.2, 0.2, 1.6], "orient": 0, "capa": 1, "nombre": "Cubo de soporte", "pista": "¡El cubo mediano va encima del cubo grande!" },
+        { "id": "prisma-a", "forma": "barra-torre", "pos": [-0.2, 0.45, 2.9], "orient": 0, "capa": 2, "nombre": "Prisma rectangular", "pista": "¡Un prisma largo va acostado encima del cubo! Fíjate hacia dónde apunta la guía." },
+        { "id": "prisma-b", "forma": "barra-torre", "pos": [0.45, -0.2, 3.55], "orient": 1, "capa": 3, "nombre": "Segundo prisma rectangular", "pista": "¡El otro prisma largo se cruza! Gíralo para que apunte hacia el otro lado." },
+        { "id": "superior", "forma": "cubo-alto", "pos": [0.4, 0.4, 4.2], "orient": 0, "capa": 4, "nombre": "Bloque superior", "pista": "¡El cubo pequeño va encima de los prismas cruzados!" },
+        { "id": "remate", "forma": "techo-torre", "alternativas": ["techo-torre", "piramide-torre"], "pos": [0.4, 0.4, 5.35], "orient": 0, "capa": 5, "nombre": "Pieza de remate", "pista": "¡La pieza de remate va arriba de todo!" }
+      ]
+    },
+    {
+      "id": 3,
+      "clave": "castillo",
+      "grado": 3,
+      "nombre": "El Castillo Geométrico",
+      "escala": 1.18,
+      "giro": true,
+      "rotadas": 3,
+      "rotarPrimero": ["lado-izq", "cubierta-izq"],
+      "zeus": "¡A construir un castillo! Primero toda la base, después los muros y las torres, y al final las cubiertas.",
+      "zoe": "¡Las dos torres son cilindros iguales! Y las cubiertas son prismas triangulares.",
+      "listo": "¡El castillo está listo! Mira las banderas ondeando en sus torres.",
+      "cartel": { "etiqueta": "Nivel 3 completado", "titulo": "¡Castillo Geométrico!", "sub": "Sigue: el Gran Templo de las Formas" },
+      "piezas": [
+        { "id": "centro", "forma": "bloque-castillo", "pos": [1, 0, 0], "orient": 0, "capa": 0, "nombre": "Bloque de base central", "pista": "¡El bloque cuadrado grande va en el centro de la base!" },
+        { "id": "lado-izq", "forma": "bloque-lado", "pos": [0, 0, 0], "orient": 1, "capa": 0, "nombre": "Bloque lateral izquierdo", "pista": "¡Un bloque largo va a la izquierda de la base! Gíralo como la guía." },
+        { "id": "lado-der", "forma": "bloque-lado", "pos": [3, 0, 0], "orient": 1, "capa": 0, "nombre": "Bloque lateral derecho", "pista": "¡El otro bloque largo va a la derecha de la base!" },
+        { "id": "muro-atras", "forma": "muro", "pos": [1, 0, 1], "orient": 0, "capa": 1, "nombre": "Prisma rectangular de soporte", "pista": "¡Un prisma bajito va encima del bloque central, atrás!" },
+        { "id": "muro-frente", "forma": "muro", "pos": [1, 1, 1], "orient": 0, "capa": 1, "nombre": "Segundo prisma rectangular de soporte", "pista": "¡El otro prisma bajito va adelante, junto al primero!" },
+        { "id": "torre-izq", "forma": "torre-redonda", "pos": [0, 0.5, 1], "orient": 0, "capa": 1, "nombre": "Cilindro de torre izquierda", "pista": "¡Un cilindro es la torre de la izquierda!" },
+        { "id": "torre-der", "forma": "torre-redonda", "pos": [3, 0.5, 1], "orient": 0, "capa": 1, "nombre": "Cilindro de torre derecha", "pista": "¡El otro cilindro es la torre de la derecha!" },
+        { "id": "cubierta-izq", "forma": "cubierta", "pos": [1, 0, 1.7], "orient": 1, "capa": 2, "nombre": "Cubierta izquierda", "pista": "¡Un prisma triangular cubre el lado izquierdo de los muros!" },
+        { "id": "cubierta-der", "forma": "cubierta", "pos": [2, 0, 1.7], "orient": 1, "capa": 2, "nombre": "Cubierta derecha", "pista": "¡El otro prisma triangular cubre el lado derecho!" }
+      ]
+    },
+    {
+      "id": 4,
+      "clave": "templo",
+      "grado": 4,
+      "nombre": "El Gran Templo de las Formas",
+      "escala": 1.1,
+      "giro": true,
+      "rotadas": 4,
+      "rotarPrimero": ["base-izq", "dintel", "fronton"],
+      "zeus": "¡El último gran reto! El templo mágico tiene bases, soportes, dos columnas y una cubierta con su cúspide.",
+      "zoe": "¡Capa por capa! Primero las tres bases, luego los tres soportes, las columnas y arriba la cubierta.",
+      "listo": "¡El gran templo está terminado! ¡La cúspide brilla con una luz especial!",
+      "cartel": { "etiqueta": "Nivel 4 completado", "titulo": "¡Gran Templo de las Formas!", "sub": "¡El mundo se ilumina!" },
+      "piezas": [
+        { "id": "base-centro", "forma": "base-templo", "pos": [1, 0, 0], "orient": 0, "capa": 0, "nombre": "Base central", "pista": "¡La base ancha va en el centro, abajo de todo!" },
+        { "id": "base-izq", "forma": "base-ala", "pos": [0, 0, 0], "orient": 1, "capa": 0, "nombre": "Base lateral izquierda", "pista": "¡Una base larga va a la izquierda! Gírala como la guía." },
+        { "id": "base-der", "forma": "base-ala", "pos": [3, 0, 0], "orient": 1, "capa": 0, "nombre": "Base lateral derecha", "pista": "¡La otra base larga va a la derecha!" },
+        { "id": "soporte-centro", "forma": "escalon", "pos": [1, 0.5, 0.7], "orient": 0, "capa": 1, "nombre": "Soporte rectangular central", "pista": "¡El soporte cuadrado va en el centro, encima de la base!" },
+        { "id": "soporte-izq", "forma": "escalon-ala", "pos": [0.2, 0.5, 0.7], "orient": 1, "capa": 1, "nombre": "Soporte rectangular izquierdo", "pista": "¡Un soporte rectangular va a la izquierda, encima de la base larga!" },
+        { "id": "soporte-der", "forma": "escalon-ala", "pos": [3, 0.5, 0.7], "orient": 1, "capa": 1, "nombre": "Soporte rectangular derecho", "pista": "¡El otro soporte rectangular va a la derecha!" },
+        { "id": "columna-izq", "forma": "columna", "pos": [0.29, 1.19, 1.3], "orient": 0, "capa": 2, "nombre": "Cilindro izquierdo", "pista": "¡Una columna cilíndrica va parada a la izquierda!" },
+        { "id": "columna-der", "forma": "columna", "pos": [3.09, 1.19, 1.3], "orient": 0, "capa": 2, "nombre": "Cilindro derecho", "pista": "¡La otra columna va parada a la derecha!" },
+        { "id": "dintel", "forma": "dintel", "pos": [0.2, 1.0, 2.9], "orient": 0, "capa": 3, "nombre": "Prisma superior", "pista": "¡El prisma largo va acostado encima de las dos columnas!" },
+        { "id": "fronton", "forma": "fronton", "pos": [0.2, 1.0, 3.4], "orient": 0, "capa": 4, "nombre": "Prisma triangular de cubierta", "pista": "¡El prisma triangular es el techo! Va encima del prisma largo." },
+        { "id": "cuspide", "forma": "cuspide-templo", "alternativas": ["cuspide-templo", "cono-templo"], "pos": [1.65, 1.15, 3.72], "orient": 0, "capa": 5, "incrustada": true, "nombre": "Pieza de cúspide", "pista": "¡La cúspide puntiaguda corona el templo, arriba de todo!" }
+      ]
+    },
+    {"clave": "faro", "grado": 1, "mundo": "piramide", "nombre": "El Faro Mágico", "escala": 1.1, "giro": false, "rotadas": 0, "zeus": "¡Constructor de mundos! Vamos a armar un faro que alumbra el mar. Primero la base grande, después los cilindros, la lámpara y el techo puntiagudo.", "zoe": "¡Lo más grande va abajo y lo puntiagudo hasta arriba!", "listo": "¡Lo lograste! La lámpara del faro se encendió.", "cartel": {"titulo": "¡Faro Mágico!"}},
+    {"clave": "pastel", "grado": 1, "mundo": "piramide", "nombre": "El Pastel Gigante", "escala": 1.1, "giro": false, "rotadas": 0, "zeus": "¡Vamos a armar un pastel de cumpleaños de tres pisos! Los pisos más anchos van abajo y la vela va arriba de todo.", "zoe": "¡Primero el plato, después los pisos del más grande al más chiquito!", "listo": "¡Qué pastel tan rico! Ya podemos soplar la vela.", "cartel": {"titulo": "¡Pastel Gigante!"}},
+    {"clave": "robot", "grado": 1, "mundo": "piramide", "nombre": "El Robot de Bloques", "escala": 1.1, "giro": false, "rotadas": 0, "zeus": "¡Vamos a construir un robot amigo! Empieza por los pies y sube: cuerpo, cuello, cabeza y antena.", "zoe": "¡Los pies van abajo y la antena puntiaguda va arriba!", "listo": "¡El robot cobró vida! Mira cómo brilla su antena.", "cartel": {"titulo": "¡Robot de Bloques!"}},
+    {"clave": "puente", "grado": 2, "mundo": "torre", "nombre": "El Puente de las Columnas", "escala": 1.1, "giro": true, "rotadas": 1, "zeus": "¡Ahora un puente! Dos pilares, dos columnas y una viga larga que las une. La viga tiene que quedar acostada como la guía.", "zoe": "¡Si la viga no coincide, gírala con las flechas de abajo!", "listo": "¡El puente está listo! Ya se puede cruzar.", "cartel": {"titulo": "¡Puente de las Columnas!"}},
+    {"clave": "casita", "grado": 2, "mundo": "torre", "nombre": "La Casita del Bosque", "escala": 1.1, "giro": true, "rotadas": 1, "zeus": "¡Vamos a armar una casita! El piso, dos paredes, el techo plano, el tejado y la chimenea.", "zoe": "¡El techo y el tejado son largos: gíralos si no coinciden con la guía!", "listo": "¡Qué casita tan bonita! Sale humito por la chimenea.", "cartel": {"titulo": "¡Casita del Bosque!"}},
+    {"clave": "molino", "grado": 2, "mundo": "torre", "nombre": "El Molino de Viento", "escala": 1.1, "giro": true, "rotadas": 1, "zeus": "¡Un molino de viento! Sus dos aspas largas se cruzan: una hacia un lado y la otra hacia el otro.", "zoe": "¡Mira la guía! Gira las aspas con las flechas de abajo.", "listo": "¡El molino ya gira con el viento!", "cartel": {"titulo": "¡Molino de Viento!"}},
+    {"clave": "fortaleza", "grado": 3, "mundo": "castillo", "nombre": "La Fortaleza de las Cuatro Torres", "escala": 1.1, "giro": true, "rotadas": 3, "zeus": "¡A construir una fortaleza! Primero la base, luego cuatro torres en las esquinas, las murallas y las puntas.", "zoe": "¡Las cuatro torres son cilindros iguales! Las murallas van acostadas encima.", "listo": "¡La fortaleza está lista! Ningún dragón podrá entrar.", "cartel": {"titulo": "¡Fortaleza de las Cuatro Torres!"}},
+    {"clave": "tren", "grado": 3, "mundo": "torre", "nombre": "El Tren Geométrico", "escala": 1.1, "giro": true, "rotadas": 3, "zeus": "¡Todos a bordo! Primero los tres vagones, después la cabina, la caldera y la carga, y arriba sus techos.", "zoe": "¡Los vagones son iguales! Gíralos si no coinciden con la guía.", "listo": "¡El tren está listo para salir! ¡Chu-chu!", "cartel": {"titulo": "¡Tren Geométrico!"}},
+    {"clave": "acueducto", "grado": 3, "mundo": "templo", "nombre": "El Acueducto de Piedra", "escala": 1.1, "giro": true, "rotadas": 3, "zeus": "¡Vamos a construir un acueducto! Tres pilares, tres columnas, dos vigas y un techo muy largo.", "zoe": "¡Las vigas y el techo son largos: fíjate hacia dónde apunta la guía!", "listo": "¡El acueducto está terminado! El agua ya puede pasar.", "cartel": {"titulo": "¡Acueducto de Piedra!"}},
+    {"clave": "gran-castillo", "grado": 4, "mundo": "castillo", "nombre": "El Gran Castillo Real", "escala": 1.1, "giro": true, "rotadas": 4, "zeus": "¡El último gran reto! Un castillo real con base, muros, dos torres, cubiertas y techos puntiagudos en las torres.", "zoe": "¡Capa por capa! Primero la base, luego los muros y las torres, las cubiertas y los techos.", "listo": "¡El gran castillo real está listo! Mira las banderas.", "cartel": {"titulo": "¡Gran Castillo Real!"}},
+    {"clave": "escalonada", "grado": 4, "mundo": "templo", "nombre": "La Pirámide Escalonada", "escala": 1.1, "giro": true, "rotadas": 4, "zeus": "¡El último gran reto! Una pirámide de escalones: cada escalón tiene varias franjas, y arriba el cubo, el cilindro y la punta.", "zoe": "¡Primero todas las franjas de abajo! Gira las del tercer escalón como la guía.", "listo": "¡La pirámide escalonada brilla con luz dorada!", "cartel": {"titulo": "¡Pirámide Escalonada!"}},
+    {"clave": "torre-reloj", "grado": 4, "mundo": "templo", "nombre": "La Torre del Reloj", "escala": 1.1, "giro": true, "rotadas": 4, "zeus": "¡El último gran reto! Una torre del reloj con escalones, columnas, dos barras cruzadas, el reloj, el campanario y la punta.", "zoe": "¡Capa por capa, de abajo hacia arriba! Las barras se cruzan.", "listo": "¡Tic tac! La torre del reloj está terminada.", "cartel": {"titulo": "¡Torre del Reloj!"}}
+  ]
+}

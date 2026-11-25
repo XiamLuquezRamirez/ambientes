@@ -2058,6 +2058,11 @@
     let ttsToken = 0;
     let ttsKeepAlive = null;
     let ttsPlayer = null;
+    // Igual que los juegos (texto_voz.js): si el servidor de voz no contesta rápido,
+    // hablar con la voz del navegador en vez de quedarse en silencio.
+    const TTS_ESPERA_MS = 700;
+    const TTS_SERVIDOR_CAIDO_MS = 60000;
+    let ttsServidorCaidoHasta = 0;
     let fbHideTimer = null;
     const FB_HIDE_MS = 3000;
 
@@ -2219,10 +2224,19 @@
             if (typeof onEnd === 'function') onEnd();
         };
 
-        if (!ttsUrl) {
+        if (!ttsUrl || Date.now() < ttsServidorCaidoHasta) {
             hablarConNavegador(t, myToken, onEnd, pj);
             return;
         }
+
+        let yaHablo = false;
+        const usarNavegador = function () {
+            if (myToken !== ttsToken || yaHablo) return;
+            yaHablo = true;
+            clearTimeout(timerRapido);
+            hablarConNavegador(t, myToken, onEnd, pj);
+        };
+        const timerRapido = setTimeout(usarNavegador, TTS_ESPERA_MS);
 
         const ajaxOpts = ttsGet
             ? {
@@ -2239,13 +2253,15 @@
                 headers: { 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
             };
 
-        $.ajax(ajaxOpts).done(function (res) {
-            if (myToken !== ttsToken) return;
+        $.ajax(Object.assign({ timeout: 25000 }, ajaxOpts)).done(function (res) {
+            if (myToken !== ttsToken || yaHablo) return;
             const src = res && res.data && res.data.url;
             if (!src) {
-                hablarConNavegador(t, myToken, onEnd, pj);
+                usarNavegador();
                 return;
             }
+            yaHablo = true;
+            clearTimeout(timerRapido);
             const player = asegurarTtsPlayer();
             try {
                 player.onended = null;
@@ -2271,8 +2287,8 @@
                 });
             }
         }).fail(function () {
-            if (myToken !== ttsToken) return;
-            hablarConNavegador(t, myToken, onEnd, pj);
+            ttsServidorCaidoHasta = Date.now() + TTS_SERVIDOR_CAIDO_MS;
+            usarNavegador();
         });
     }
 

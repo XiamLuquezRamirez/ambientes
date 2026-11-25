@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <radialGradient id="fondo" cx="50%" cy="40%" r="65%">
+      <stop offset="0" stop-color="#6fb7ff"/>
+      <stop offset="1" stop-color="#2f6fc4"/>
+    </radialGradient>
+  </defs>
+  <rect x="8" y="8" width="224" height="224" rx="48" fill="url(#fondo)"/>
+  <rect x="8" y="8" width="224" height="224" rx="48" fill="none" stroke="#ffd43b" stroke-width="8"/>
+  <!-- correa entre la polea y el engranaje grande -->
+  <path d="M 168 70 L 104 128 M 186 88 L 122 146" stroke="#2d3142" stroke-width="9" stroke-linecap="round"/>
+  <!-- engranaje grande (amarillo, 12 dientes) -->
+  <g transform="translate(108 140)">
+    <g fill="#ffc425" stroke="#9c6b00" stroke-width="4" stroke-linejoin="round">
+      <path d="M -8 -62 L 8 -62 L 10 -50 L 22 -46 L 31 -54 L 43 -44 L 36 -34 L 42 -22 L 54 -21 L 56 -5 L 45 -1 L 44 12 L 54 19 L 48 34 L 36 31 L 29 41 L 34 52 L 21 60 L 14 50 L 1 52 L -4 63 L -19 59 L -18 47 L -29 41 L -39 49 L -49 37 L -41 28 L -46 16 L -58 14 L -59 -2 L -47 -5 L -44 -17 L -53 -25 L -44 -39 L -33 -34 L -24 -42 L -26 -54 L -11 -60 Z"/>
+    </g>
+    <circle r="30" fill="#ffe066"/>
+    <circle r="15" fill="#d7dde6" stroke="#5c6677" stroke-width="3"/>
+    <circle r="6" fill="#2a3140"/>
+  </g>
+  <!-- engranaje mediano (azul) -->
+  <g transform="translate(64 72)">
+    <path fill="#3b8cf0" stroke="#1c4f91" stroke-width="4" stroke-linejoin="round" d="M -6 -40 L 6 -40 L 8 -31 L 18 -27 L 26 -33 L 34 -25 L 28 -17 L 32 -7 L 41 -5 L 41 7 L 32 9 L 28 19 L 33 27 L 25 35 L 17 29 L 7 33 L 5 42 L -7 42 L -9 33 L -19 29 L -27 35 L -35 27 L -29 19 L -33 9 L -42 7 L -42 -5 L -33 -7 L -29 -17 L -35 -25 L -27 -33 L -19 -27 L -9 -31 Z"/>
+    <circle r="11" fill="#d7dde6" stroke="#5c6677" stroke-width="3"/>
+    <circle r="4.5" fill="#2a3140"/>
+  </g>
+  <!-- polea naranja -->
+  <circle cx="176" cy="78" r="30" fill="#4a5262"/>
+  <circle cx="176" cy="78" r="25" fill="#ff8a3d" stroke="#2d3142" stroke-width="5"/>
+  <circle cx="176" cy="78" r="9" fill="#d7dde6"/>
+  <circle cx="176" cy="78" r="3.5" fill="#2a3140"/>
+  <!-- engranaje pequeño (verde) -->
+  <g transform="translate(186 176)">
+    <path fill="#43c25a" stroke="#1f7a32" stroke-width="4" stroke-linejoin="round" d="M -5 -27 L 5 -27 L 7 -19 L 15 -15 L 21 -20 L 27 -13 L 21 -7 L 23 1 L 30 3 L 28 12 L 21 12 L 16 19 L 19 26 L 10 30 L 6 23 L -3 24 L -6 31 L -15 28 L -13 21 L -20 15 L -27 18 L -30 9 L -23 6 L -24 -3 L -30 -8 L -25 -16 L -18 -12 L -11 -18 Z"/>
+    <circle r="7" fill="#d7dde6" stroke="#5c6677" stroke-width="2.5"/>
+  </g>
+  <!-- chispas -->
+  <path d="M 200 130 l 4 -12 l 4 12 l 12 4 l -12 4 l -4 12 l -4 -12 l -12 -4 Z" fill="#fff3bf"/>
+  <path d="M 34 170 l 3 -8 l 3 8 l 8 3 l -8 3 l -3 8 l -3 -8 l -8 -3 Z" fill="#fff3bf"/>
+</svg>

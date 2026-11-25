@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="fondo" cx="0.5" cy="0.45" r="0.7"><stop offset="0" stop-color="#3d1675"/><stop offset="1" stop-color="#0d0733"/></radialGradient>
+    <radialGradient id="rosa" cx="0.5" cy="0.42" r="0.6"><stop offset="0" stop-color="#ff9ad2"/><stop offset="1" stop-color="#d4116f"/></radialGradient>
+    <radialGradient id="turq" cx="0.5" cy="0.42" r="0.6"><stop offset="0" stop-color="#7ff7f0"/><stop offset="1" stop-color="#0b9fb5"/></radialGradient>
+    <radialGradient id="viol" cx="0.5" cy="0.42" r="0.6"><stop offset="0" stop-color="#d3a6ff"/><stop offset="1" stop-color="#6d22d6"/></radialGradient>
+    <radialGradient id="halo"><stop offset="0" stop-color="#fff3a6" stop-opacity="0.9"/><stop offset="1" stop-color="#ffb300" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#fondo)"/>
+  <circle cx="128" cy="128" r="112" fill="#1a0a40" stroke="#ffd84a" stroke-width="4"/>
+  <circle cx="128" cy="128" r="104" fill="url(#rosa)"/>
+  <circle cx="128" cy="128" r="88" fill="#1a0a40"/>
+  <circle cx="128" cy="128" r="84" fill="url(#turq)"/>
+  <circle cx="128" cy="128" r="70" fill="#1a0a40"/>
+  <circle cx="128" cy="128" r="66" fill="url(#viol)"/>
+  <circle cx="128" cy="128" r="56" fill="#ffc928"/>
+  <circle cx="128" cy="128" r="52" fill="#1f0d4d"/>
+  <circle cx="128" cy="128" r="56" fill="url(#halo)"/>
+  <path d="M128 82 L139.5 112.2 L171.8 113.8 L146.6 134.1 L155 165.2 L128 147.5 L101 165.2 L109.4 134.1 L84.2 113.8 L116.5 112.2 Z" fill="#ffc61a" stroke="#c97800" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M128 82 L139.5 112.2 L128 128 Z M171.8 113.8 L146.6 134.1 L128 128 Z M84.2 113.8 L116.5 112.2 L128 128 Z" fill="#fff3a6"/>
+  <ellipse cx="117" cy="104" rx="7" ry="4" fill="#fff" opacity="0.85" transform="rotate(-30 117 104)"/>
+  <g fill="#fff3bf">
+    <circle cx="128" cy="20" r="5"/><circle cx="204" cy="52" r="5"/><circle cx="236" cy="128" r="5"/><circle cx="204" cy="204" r="5"/>
+    <circle cx="128" cy="236" r="5"/><circle cx="52" cy="204" r="5"/><circle cx="20" cy="128" r="5"/><circle cx="52" cy="52" r="5"/>
+  </g>
+</svg>

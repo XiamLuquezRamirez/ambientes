@@ -448,6 +448,8 @@
         }
     }
 
+    let ttsServidorCaidoHasta = 0;
+
     function hablarNavegadorConstructor(texto, personaje, token, onEnd) {
         if (!window.speechSynthesis) {
             if (typeof onEnd === 'function') onEnd();
@@ -474,23 +476,35 @@
             if (token !== ttsPreviewToken) return;
             reproducirSecuenciaConstructor(lineas, idx + 1);
         };
-        if (!urls.tts) {
+        if (!urls.tts || Date.now() < ttsServidorCaidoHasta) {
             hablarNavegadorConstructor(linea.texto, linea.personaje, token, siguiente);
             return;
         }
+        // Como en los juegos: si el servidor de voz no contesta rápido, voz del navegador.
+        let yaHablo = false;
+        const usarNavegador = function () {
+            if (token !== ttsPreviewToken || yaHablo) return;
+            yaHablo = true;
+            clearTimeout(timerRapido);
+            hablarNavegadorConstructor(linea.texto, linea.personaje, token, siguiente);
+        };
+        const timerRapido = setTimeout(usarNavegador, 700);
         $.ajax({
             url: urls.tts,
             method: 'POST',
+            timeout: 25000,
             data: JSON.stringify({ texto: linea.texto, personaje: linea.personaje }),
             contentType: 'application/json',
             headers: { 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
         }).done(function (res) {
-            if (token !== ttsPreviewToken) return;
+            if (token !== ttsPreviewToken || yaHablo) return;
             const src = res && res.data && res.data.url;
             if (!src) {
-                hablarNavegadorConstructor(linea.texto, linea.personaje, token, siguiente);
+                usarNavegador();
                 return;
             }
+            yaHablo = true;
+            clearTimeout(timerRapido);
             if (!ttsPreviewPlayer) ttsPreviewPlayer = new Audio();
             ttsPreviewPlayer.onended = siguiente;
             ttsPreviewPlayer.onerror = function () {
@@ -505,8 +519,8 @@
                 });
             }
         }).fail(function () {
-            if (token !== ttsPreviewToken) return;
-            hablarNavegadorConstructor(linea.texto, linea.personaje, token, siguiente);
+            ttsServidorCaidoHasta = Date.now() + 60000;
+            usarNavegador();
         });
     }
 

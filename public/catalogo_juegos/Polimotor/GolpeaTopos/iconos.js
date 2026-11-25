@@ -310,13 +310,27 @@
         return SVG[id] ? "data:image/svg+xml;charset=utf-8," + encodeURIComponent(SVG[id]) : "";
     }
 
-    // Partes del cuerpo: los dibujos compartidos de Polimotor (comun/partes-cuerpo.js), más claros para
-    // niños, reemplazan a los de este archivo (los objetos y órganos propios del juego no se tocan).
+    // Estas partes salen del mismo SVG que las tarjetas de Une las Partes. El resto (corazón,
+    // cerebro, pulmones y los objetos) sigue siendo el dibujo de este archivo.
+    var ARCHIVOS = {
+        cabeza: "iconos/cabeza.svg?v=20261123b",
+        ojos: "iconos/ojos.svg?v=20261123b",
+        orejas: "iconos/orejas.svg?v=20261123b",
+        brazo: "iconos/brazo.svg?v=20261123b",
+        pierna: "iconos/pierna.svg?v=20261123b",
+        nariz: "iconos/nariz.svg?v=20261123b",
+        boca: "iconos/boca.svg?v=20261123b",
+        pie: "iconos/pie.svg?v=20261123b",
+        mano: "iconos/mano.svg?v=20261123b"
+    };
+
     if (global.PartesCuerpo) {
         Object.keys(SVG).forEach(function (k) {
+            if (ARCHIVOS[k]) return;
             if (global.PartesCuerpo.SVG[k]) SVG[k] = global.PartesCuerpo.SVG[k];
         });
     }
+    Object.keys(ARCHIVOS).forEach(function (k) { delete SVG[k]; });
 
-    global.IconosTopos = { SVG: SVG, dataUrl: dataUrl };
+    global.IconosTopos = { SVG: SVG, archivos: ARCHIVOS, dataUrl: dataUrl };
 })(window);

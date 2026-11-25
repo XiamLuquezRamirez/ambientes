@@ -1,0 +1,288 @@
+{
+  "nombre": "La lluvia de colores y las flores del jardín",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 30,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "intentos": 40,
+    "subpaso": 14,
+    "ventana": 90,
+    "vuelta": 120,
+    "vueltaAdelante": 45,
+    "saltoMax": 240,
+    "finTol": 34,
+    "minToque": 18,
+    "radioNube": 120,
+    "radioNubeY": 92,
+    "arranque": 46,
+    "metaEsperaMs": 900,
+    "demoMs": 2200,
+    "ayudaMs": 9000,
+    "ayudaRepetirMs": 12000,
+    "vozPausaMs": 2600,
+    "vozFueraMs": 8000,
+    "vozReintentoMs": 7000
+  },
+  "jardines": [
+    {
+      "id": 1,
+      "nombre": "Las primeras gotitas",
+      "flores": 2,
+      "sepMin": 380,
+      "largo": [
+        260,
+        300
+      ],
+      "difLargo": 0,
+      "tolerancia": 120,
+      "radioPunto": 17,
+      "sepPuntos": 56,
+      "escalaNube": 1.12,
+      "escalaFlor": 1.05,
+      "tiposFlor": [
+        "margarita",
+        "tulipan",
+        "girasol"
+      ],
+      "adornos": 3,
+      "tiposAdorno": [
+        "hongo",
+        "piedras",
+        "arbusto",
+        "hierba"
+      ],
+      "mariposas": 0,
+      "nubesDeco": 2,
+      "color": "#74c0fc",
+      "voz": "zoe",
+      "instruccion": "¡Desde la nube bien arriba... baja el dedito hasta tocar la flor!",
+      "cartel": {
+        "etiqueta": "Nivel 1",
+        "titulo": "¡LAS PRIMERAS GOTITAS!",
+        "sub": "Tus flores ya sonríen."
+      },
+      "logro": "¡Muy bien! ¡Tus primeras flores ya sonríen!"
+    },
+    {
+      "id": 2,
+      "nombre": "Un jardín más colorido",
+      "flores": 3,
+      "sepMin": 290,
+      "largo": [
+        290,
+        380
+      ],
+      "difLargo": 40,
+      "tolerancia": 105,
+      "radioPunto": 15,
+      "sepPuntos": 48,
+      "escalaNube": 1.05,
+      "escalaFlor": 1,
+      "tiposFlor": [
+        "margarita",
+        "tulipan",
+        "girasol",
+        "campanita",
+        "cosmos"
+      ],
+      "adornos": 4,
+      "tiposAdorno": [
+        "hongo",
+        "piedras",
+        "arbusto",
+        "mariquita",
+        "florecitas",
+        "hierba"
+      ],
+      "mariposas": 2,
+      "nubesDeco": 3,
+      "color": "#ff8cc6",
+      "voz": "zeus",
+      "instruccion": "¡Ahora son tres flores! Empieza en la nube y baja hasta la flor.",
+      "cartel": {
+        "etiqueta": "Nivel 2",
+        "titulo": "¡QUÉ COLORIDO!",
+        "sub": "El jardín se llena de colores."
+      },
+      "logro": "¡Qué colorido! El jardín se llena de flores."
+    },
+    {
+      "id": 3,
+      "nombre": "La lluvia mágica",
+      "flores": 4,
+      "sepMin": 240,
+      "largo": [
+        300,
+        420
+      ],
+      "difLargo": 70,
+      "tolerancia": 80,
+      "radioPunto": 13,
+      "sepPuntos": 44,
+      "escalaNube": 1,
+      "escalaFlor": 1,
+      "tiposFlor": [
+        "margarita",
+        "tulipan",
+        "girasol",
+        "campanita",
+        "cosmos"
+      ],
+      "adornos": 4,
+      "tiposAdorno": [
+        "hongo",
+        "piedras",
+        "arbusto",
+        "mariquita",
+        "caracol",
+        "florecitas",
+        "hierba"
+      ],
+      "mariposas": 3,
+      "nubesDeco": 3,
+      "arcoiris": true,
+      "color": "#b197fc",
+      "voz": "zoe",
+      "instruccion": "¡La lluvia mágica! Los caminos tienen curvas: empieza arriba, en la nube, y sigue las gotitas hasta la flor.",
+      "cartel": {
+        "etiqueta": "Nivel 3",
+        "titulo": "¡LLUVIA MÁGICA!",
+        "sub": "Cuatro flores felices."
+      },
+      "logro": "¡Lluvia mágica! ¡Cuatro flores felices!",
+      "curva": {
+        "tipos": [
+          "arco",
+          "ganchoAlto",
+          "ganchoBajo"
+        ],
+        "amp": [
+          110,
+          150
+        ],
+        "ampMin": 95,
+        "sep": 120
+      }
+    },
+    {
+      "id": 4,
+      "nombre": "El gran jardín de colores",
+      "flores": 5,
+      "sepMin": 220,
+      "largo": [
+        310,
+        440
+      ],
+      "difLargo": 90,
+      "tolerancia": 64,
+      "radioPunto": 12,
+      "sepPuntos": 42,
+      "escalaNube": 0.92,
+      "escalaFlor": 0.95,
+      "tiposFlor": [
+        "margarita",
+        "tulipan",
+        "girasol",
+        "campanita",
+        "cosmos"
+      ],
+      "adornos": 5,
+      "tiposAdorno": [
+        "hongo",
+        "piedras",
+        "arbusto",
+        "mariquita",
+        "caracol",
+        "florecitas",
+        "hierba"
+      ],
+      "libreFlor": 70,
+      "mariposas": 5,
+      "nubesDeco": 4,
+      "arcoiris": true,
+      "color": "#ffa94d",
+      "voz": "zeus",
+      "instruccion": "¡El gran jardín de colores! Los caminos se mueven como una serpiente: baja despacito desde cada nube hasta su flor.",
+      "cartel": {
+        "etiqueta": "Nivel 4",
+        "titulo": "¡EL GRAN JARDÍN!",
+        "sub": "¡Regaste todas las flores!"
+      },
+      "logro": "¡El gran jardín está listo!",
+      "x0": 338,
+      "x1": 1262,
+      "curva": {
+        "tipos": [
+          "ese",
+          "eseLarga",
+          "eseAlta"
+        ],
+        "amp": [
+          105,
+          130
+        ],
+        "ampMin": 100,
+        "sep": 115
+      }
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "La lluvia de colores y las flores del jardín",
+    "botonComenzar": "¡Comenzar a jugar!",
+    "introZeus": "¡Las flores necesitan agua para crecer!",
+    "introZoe": "Coloca tu dedo en la nube de arriba y baja trazando una línea recta hasta la flor para hacerla sonreír.",
+    "demoZeus": "¡Mira! Desde la nube, la gotita baja hasta la flor.",
+    "guiaZoe": "¡Desde la nube bien arriba... baja el dedito hasta tocar la flor!",
+    "pistaNube": "¡Comienza en la nube y baja despacito!",
+    "tocaNube": "¡Comienza en la nube y baja despacito!",
+    "bajaDedo": "¡Ahora baja el dedito hasta la flor!",
+    "fuera": "¡Sigue las gotitas hasta la flor!",
+    "reintento": [
+      "¡Vamos a intentarlo otra vez!",
+      "¡Comienza en la nube y baja despacito!",
+      "¡Sigue las gotitas hasta la flor!"
+    ],
+    "levanta": "¡Llegaste! Levanta el dedito.",
+    "acierto": [
+      "¡Muy bien! ¡Esa flor ya está feliz!",
+      "¡Qué bonito trazado!",
+      "¡Lo estás haciendo genial!",
+      "¡Una gotita de magia!",
+      "¡Mira cómo crece tu flor!"
+    ],
+    "finalTitulo": "¡FANTÁSTICO TRABAJO!",
+    "finalTexto": "¡Ayudaste a todas las flores a crecer!",
+    "finalVoz": "¡FANTÁSTICO TRABAJO! ¡Trazaste todas las líneas hacia abajo y el jardín floreció por completo!",
+    "finalVozZeus": "¡Mira cuántas flores felices!",
+    "victoria": "¡FANTÁSTICO TRABAJO!",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe, mira el jardín! Las flores están tristes y agachadas."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Tienen sed! Las nubes de colores nos van a ayudar a regarlas."
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "3-4 años",
+      "titulo": "Trazos verticales de arriba hacia abajo"
+    }
+  ]
+}

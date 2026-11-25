@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="f" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#2c4486"/><stop offset="1" stop-color="#1a2858"/></radialGradient>
+    <radialGradient id="h" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#3bdcff" stop-opacity="0.55"/><stop offset="1" stop-color="#3bdcff" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="48" fill="url(#f)" stroke="#14213d" stroke-width="6"/>
+  <circle cx="128" cy="124" r="100" fill="url(#h)"/>
+  <ellipse cx="128" cy="222" rx="84" ry="14" fill="#4c5c80" stroke="#14213d" stroke-width="4"/>
+  <!-- piernas -->
+  <rect x="94" y="168" width="26" height="46" rx="12" fill="#4dabf7" stroke="#14213d" stroke-width="5"/>
+  <rect x="136" y="168" width="26" height="46" rx="12" fill="#4dabf7" stroke="#14213d" stroke-width="5"/>
+  <path d="M 80 214 Q 80 204 94 204 L 120 204 L 120 220 L 84 220 Q 80 220 80 214 Z" fill="#ffd43b" stroke="#14213d" stroke-width="4"/>
+  <path d="M 176 214 Q 176 204 162 204 L 136 204 L 136 220 L 172 220 Q 176 220 176 214 Z" fill="#ffd43b" stroke="#14213d" stroke-width="4"/>
+  <!-- torso -->
+  <rect x="78" y="104" width="100" height="74" rx="24" fill="#4dabf7" stroke="#14213d" stroke-width="6"/>
+  <rect x="98" y="114" width="60" height="30" rx="10" fill="#10223f" stroke="#14213d" stroke-width="4"/>
+  <path d="M 108 126 q 6 -8 12 0 M 136 126 q 6 -8 12 0" fill="none" stroke="#7ff3ff" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="128" cy="160" r="12" fill="#10223f" stroke="#14213d" stroke-width="4"/>
+  <path d="M 131 150 L 122 162 L 128 162 L 125 171 L 135 158 L 129 158 Z" fill="#ffd43b"/>
+  <!-- brazo izquierdo encajado y brazo derecho llegando con chispa -->
+  <path d="M 78 118 L 58 150 L 56 176" fill="none" stroke="#14213d" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 78 118 L 58 150 L 56 176" fill="none" stroke="#4dabf7" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="78" cy="118" r="11" fill="#ffa94d" stroke="#14213d" stroke-width="4"/>
+  <circle cx="56" cy="182" r="10" fill="#ffa94d" stroke="#14213d" stroke-width="4"/>
+  <g transform="translate(14,-14)">
+    <path d="M 178 118 L 198 150 L 200 176" fill="none" stroke="#14213d" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 178 118 L 198 150 L 200 176" fill="none" stroke="#4dabf7" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="178" cy="118" r="11" fill="#ffa94d" stroke="#14213d" stroke-width="4"/>
+  </g>
+  <circle cx="178" cy="118" r="9" fill="#bfefff" stroke="#14213d" stroke-width="3" stroke-dasharray="4 3"/>
+  <path d="M 188 96 L 192 106 L 202 108 L 192 112 L 188 122 L 184 112 L 174 108 L 184 106 Z" fill="#fff9db"/>
+  <!-- cabeza con visera y antena -->
+  <rect x="88" y="44" width="80" height="58" rx="24" fill="#4dabf7" stroke="#14213d" stroke-width="6"/>
+  <rect x="100" y="58" width="56" height="24" rx="12" fill="#10223f" stroke="#14213d" stroke-width="4"/>
+  <circle cx="115" cy="70" r="6" fill="#7ff3ff"/>
+  <circle cx="141" cy="70" r="6" fill="#7ff3ff"/>
+  <line x1="128" y1="44" x2="128" y2="24" stroke="#14213d" stroke-width="9" stroke-linecap="round"/>
+  <line x1="128" y1="44" x2="128" y2="24" stroke="#ced4da" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="128" cy="20" r="9" fill="#ffd43b" stroke="#14213d" stroke-width="4"/>
+  <circle cx="128" cy="20" r="20" fill="none" stroke="#ffd43b" stroke-width="3" opacity="0.6"/>
+  <circle cx="128" cy="20" r="30" fill="none" stroke="#ffd43b" stroke-width="2" opacity="0.3"/>
+</svg>

@@ -1,0 +1,204 @@
+{
+  "nombre": "La Gran Diana de Estrellas",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 25,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "dianaX": 800,
+    "dianaY": 462,
+    "radioDiana": 300,
+    "radioCentro": 172,
+    "toleranciaZona": 1.28,
+    "toqueMaxMovimiento": 44,
+    "toqueMaxMs": 1800,
+    "celebracionMs": 1500,
+    "pausaTrasAciertoMs": 700,
+    "pausaTrasApagarMs": 1300,
+    "vozPausaMs": 2600,
+    "vozFueraMs": 5200,
+    "fuerasParaAyuda": 2
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "nombre": "MI PRIMERA ESTRELLA",
+      "estrellas": 3,
+      "radioEstrella": 108,
+      "visibleMs": 9000,
+      "ayudaMs": 4200,
+      "extraMs": 4500,
+      "parpadeo": 0.12,
+      "halo": 1.25,
+      "dedoGuia": true,
+      "tema": "feria",
+      "voz": "zoe",
+      "instruccion": "¡Pon tu dedito justo en el centro de la estrella dorada!",
+      "cartel": {
+        "etiqueta": "Nivel 1",
+        "titulo": "MI PRIMERA ESTRELLA",
+        "sub": "Tres estrellas doradas"
+      },
+      "logro": "¡La diana brilla para ti!",
+      "despedida": "zoe",
+      "invita": "¡Vamos a la feria brillante!",
+      "escalaDiana": 1.0,
+      "movimiento": {
+        "amplitud": 0,
+        "periodoMs": 0
+      }
+    },
+    {
+      "id": 2,
+      "nombre": "LA FERIA BRILLANTE",
+      "estrellas": 4,
+      "radioEstrella": 94,
+      "visibleMs": 6500,
+      "ayudaMs": 3200,
+      "extraMs": 2500,
+      "parpadeo": 0.18,
+      "halo": 1.1,
+      "dedoGuia": false,
+      "tema": "brillante",
+      "voz": "zeus",
+      "instruccion": "¡Mira la estrella dorada y tócala!",
+      "cartel": {
+        "etiqueta": "Nivel 2",
+        "titulo": "LA FERIA BRILLANTE",
+        "sub": "Cuatro estrellas doradas"
+      },
+      "logro": "¡Qué feria tan brillante!",
+      "despedida": "zeus",
+      "invita": "¡Ahora, las estrellas mágicas!",
+      "escalaDiana": 0.88,
+      "movimiento": {
+        "amplitud": 30,
+        "periodoMs": 7000
+      }
+    },
+    {
+      "id": 3,
+      "nombre": "LAS ESTRELLAS MÁGICAS",
+      "estrellas": 5,
+      "radioEstrella": 84,
+      "visibleMs": 5000,
+      "ayudaMs": 2500,
+      "extraMs": 2000,
+      "parpadeo": 0.26,
+      "halo": 1.05,
+      "dedoGuia": false,
+      "tema": "magica",
+      "voz": "zoe",
+      "instruccion": "¡Toca el centro de cada estrella mágica!",
+      "cartel": {
+        "etiqueta": "Nivel 3",
+        "titulo": "LAS ESTRELLAS MÁGICAS",
+        "sub": "Cinco estrellas doradas"
+      },
+      "logro": "¡Los puestos de la feria brillan!",
+      "despedida": "ambos",
+      "invita": "¡Llegó el gran festival!",
+      "escalaDiana": 0.78,
+      "movimiento": {
+        "amplitud": 50,
+        "periodoMs": 5600
+      }
+    },
+    {
+      "id": 4,
+      "nombre": "EL GRAN FESTIVAL DE ESTRELLAS",
+      "estrellas": 6,
+      "radioEstrella": 76,
+      "visibleMs": 4000,
+      "ayudaMs": 2000,
+      "extraMs": 1500,
+      "parpadeo": 0.3,
+      "halo": 1.0,
+      "dedoGuia": false,
+      "tema": "festival",
+      "voz": "zeus",
+      "instruccion": "¡El gran festival! Toca cada estrella dorada.",
+      "cartel": {
+        "etiqueta": "Nivel 4",
+        "titulo": "EL GRAN FESTIVAL DE ESTRELLAS",
+        "sub": "Seis estrellas doradas"
+      },
+      "logro": "¡Toda la feria se ilumina!",
+      "despedida": "ambos",
+      "invita": "",
+      "escalaDiana": 0.7,
+      "movimiento": {
+        "amplitud": 70,
+        "periodoMs": 4600
+      }
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "La Gran Diana de Estrellas",
+    "tituloJuego": "JUEGO 2",
+    "subtituloJuego": "TOQUE DE PRECISIÓN · MODO ESTÁTICO",
+    "botonComenzar": "EMPEZAR",
+    "introZeus": "¡Juego de precisión extrema!",
+    "introZoe": "Mira cómo aparece la gran estrella dorada en el centro de la diana. Toca con tu dedo exactamente sobre ella antes de que se apague.",
+    "instruccionZoe": "¡Pon tu dedito justo en el centro de la estrella dorada!",
+    "demoFin": "¡Ahora tú!",
+    "centroExacto": "¡Centro exacto!",
+    "muyBien": "¡Muy bien! ¡Lo lograste!",
+    "apoyo": [
+      "¡Mira la estrella dorada!",
+      "¡Toca el centro!",
+      "¡Muy bien, otra estrella!",
+      "¡Lo estás haciendo genial!",
+      "¡Vamos por otra!"
+    ],
+    "acierto": [
+      "¡Centro exacto!",
+      "¡Muy bien, otra estrella!",
+      "¡Lo estás haciendo genial!",
+      "¡Muy bien! ¡Lo lograste!"
+    ],
+    "fuera": [
+      "¡Mira la estrella dorada!",
+      "¡Toca el centro!"
+    ],
+    "ayuda": "¡Toca el centro!",
+    "mantener": "¡Toca y suelta!",
+    "otra": "¡Vamos por otra!",
+    "cierreTitulo": "¡PULSO DE ORO!",
+    "cierre": "¡PULSO DE ORO! Tocaste el centro de todas las dianas con una precisión fantástica.",
+    "finalTitulo": "¡PULSO DE ORO!",
+    "finalSub": "¡ERES UN EXPERTO EN PRECISIÓN!",
+    "finalZoe": "¡PULSO DE ORO! ¡Eres un experto en precisión!",
+    "finalZeus": "¡Toda la feria brilla gracias a ti!",
+    "victoria": "¡ERES UN EXPERTO EN PRECISIÓN!",
+    "pausa": "Pausa",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe! ¡Mira cuántas luces! Llegamos a la Feria Mágica de las Estrellas."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Y ahí está la gran diana! Cuando aparezca la estrella dorada en el centro, la tocamos con el dedito."
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "3-4 años",
+      "titulo": "Toque de precisión en blanco estático"
+    }
+  ]
+}

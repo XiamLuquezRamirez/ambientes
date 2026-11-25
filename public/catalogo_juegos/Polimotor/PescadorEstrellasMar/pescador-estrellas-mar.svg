@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="agua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fe0e6"/><stop offset="1" stop-color="#1a86c2"/></linearGradient>
+    <linearGradient id="oro" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b8740a"/><stop offset="0.4" stop-color="#ffe680"/><stop offset="1" stop-color="#c98200"/></linearGradient>
+    <radialGradient id="est" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#ffc6de"/><stop offset="0.55" stop-color="#ff6fae"/><stop offset="1" stop-color="#c92a6f"/></radialGradient>
+    <clipPath id="c"><circle cx="120" cy="120" r="112"/></clipPath>
+  </defs>
+  <circle cx="120" cy="120" r="116" fill="#ffffff"/>
+  <g clip-path="url(#c)">
+    <rect width="240" height="240" fill="url(#agua)"/>
+    <rect width="240" height="58" fill="#bdeeff"/>
+    <path d="M0 58 Q30 50 60 58 T120 58 T180 58 T240 58 L240 70 L0 70 Z" fill="#e3fafc"/>
+    <path d="M0 196 Q60 182 120 192 T240 188 L240 240 L0 240 Z" fill="#fbe6b4"/>
+    <path d="M40 54 L150 52 Q148 72 128 78 L64 78 Q46 72 40 54 Z" fill="#c77b30" stroke="#6b3408" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M38 52 L152 50 L150 60 L40 62 Z" fill="#ff8a5c" stroke="#6b3408" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M110 50 L110 14 L172 14" fill="none" stroke="#7a3d0c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="170" cy="16" r="9" fill="#ffc21a" stroke="#7a3d0c" stroke-width="4"/>
+    <path d="M170 24 L170 118" stroke="#6b3408" stroke-width="5" stroke-dasharray="2 0"/>
+    <path d="M170 126 L170 182" stroke="#fff3a6" stroke-width="5" stroke-dasharray="10 8" stroke-linecap="round"/>
+    <circle cx="170" cy="120" r="8" fill="none" stroke="url(#oro)" stroke-width="5"/>
+    <path d="M170 128 L170 150 C170 168 150 172 147 156" fill="none" stroke="#7a4300" stroke-width="10" stroke-linecap="round"/>
+    <path d="M170 128 L170 150 C170 168 150 172 147 156" fill="none" stroke="url(#oro)" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="40" cy="120" r="7" fill="none" stroke="#fff" stroke-width="3" opacity="0.8"/>
+    <circle cx="54" cy="96" r="4" fill="none" stroke="#fff" stroke-width="2.5" opacity="0.8"/>
+    <circle cx="210" cy="140" r="5" fill="none" stroke="#fff" stroke-width="2.5" opacity="0.8"/>
+    <path d="M168 168 L178 190 L202 192 L184 207 L190 230 L168 217 L146 230 L152 207 L134 192 L158 190 Z" fill="url(#est)" stroke="#c92a6f" stroke-width="7" stroke-linejoin="round"/>
+    <circle cx="162" cy="198" r="4" fill="#2a1430"/><circle cx="175" cy="198" r="4" fill="#2a1430"/>
+    <path d="M161 207 Q168.5 214 176 207" fill="none" stroke="#2a1430" stroke-width="3" stroke-linecap="round"/>
+    <path d="M72 172 L80 190 L99 191 L85 203 L90 221 L72 211 L54 221 L59 203 L45 191 L64 190 Z" fill="#ffd43b" stroke="#d08a00" stroke-width="6" stroke-linejoin="round"/>
+    <circle cx="67" cy="196" r="3.5" fill="#2a1430"/><circle cx="77" cy="196" r="3.5" fill="#2a1430"/>
+  </g>
+  <circle cx="120" cy="120" r="112" fill="none" stroke="#ffffff" stroke-width="8"/>
+</svg>

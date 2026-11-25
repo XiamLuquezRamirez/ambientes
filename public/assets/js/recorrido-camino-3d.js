@@ -988,9 +988,9 @@ const ALTURA_SUELO = 0.2;
         return null;
     }
 
-    // Distancia y altura del plano de seguimiento, con el zoom que la cámara tiene ahora.
+    // Distancia y altura del plano de seguimiento. El zoom se aplica aparte, al dibujar.
     function planoPorDefecto() {
-        const z = zoomCam || 1;
+        const z = 1;
         return {
             dist: (usaMapaGlb ? 22 : 28) * z,
             alt: (usaMapaGlb ? 8 : 11) * z,
@@ -1144,8 +1144,7 @@ const ALTURA_SUELO = 0.2;
                 const est = tocables.length ? estacionPorId(tocables[0]) : null;
                 if (est) foco = p.clone().lerp(est.grupo.position, 0.42);
             }
-            const z0 = zoomCam;
-            const plano = encuadreArranque(foco, z0);
+            const plano = encuadreArranque(foco, 1);
             const posLejos = plano.pos;
             const tgtLejos = plano.mira;
 
@@ -1187,7 +1186,7 @@ const ALTURA_SUELO = 0.2;
         if (mezclaHabla < 0.001) mezclaHabla = 0;
         if (mezclaHabla > 0.999) mezclaHabla = 1;
 
-        const z = zoomCam;
+        const z = 1;
         const distBase = (usaMapaGlb ? 22 : 28) * z;
         const altBase = (usaMapaGlb ? 8 : 11) * z;
         const distCerca = (usaMapaGlb ? 12 : 15) * z;
@@ -1264,6 +1263,28 @@ const ALTURA_SUELO = 0.2;
     // 1 es la distancia base. Más alto aleja la cámara; más bajo la acerca.
     const ZOOM_INICIAL = 1;
     zoomCam = ZOOM_INICIAL;
+    // Zoom que se ve: sigue a zoomCam con suavidad.
+    let zoomVisto = ZOOM_INICIAL;
+    const _camSinZoom = new THREE.Vector3();
+
+    // Acercar/alejar vale en todos los modos de cámara (seguimiento, botones, viajes,
+    // meta): solo para dibujar, se corre la cámara sobre la línea hacia lo que mira.
+    // camPos y camera.position quedan sin zoom para no acumularlo entre cuadros.
+    function ponerZoomAlDibujar() {
+        zoomVisto += (zoomCam - zoomVisto) * 0.12;
+        if (Math.abs(zoomCam - zoomVisto) < 0.001) zoomVisto = zoomCam;
+        _camSinZoom.copy(camera.position);
+        if (eligiendoPersonaje || pasoAlCentro || Math.abs(zoomVisto - 1) < 0.001) return false;
+        camera.position.sub(camTarget).multiplyScalar(zoomVisto).add(camTarget);
+        camera.updateMatrixWorld();
+        return true;
+    }
+
+    function quitarZoomAlDibujar(puesto) {
+        if (!puesto) return;
+        camera.position.copy(_camSinZoom);
+        camera.updateMatrixWorld();
+    }
 
     function encuadreArranque(foco, z) {
         const parque = parqueGrupo && parqueGrupo.position
@@ -3698,9 +3719,12 @@ const ALTURA_SUELO = 0.2;
         }
         if (modoNav === 'botones') moverConStick(dt);
         sincronizarControles();
-        actualizarCamara(false); actualizarEtiquetaSiguiente(); actualizarBocadillo();
+        actualizarCamara(false);
+        const conZoom = ponerZoomAlDibujar();
+        actualizarEtiquetaSiguiente(); actualizarBocadillo();
         pulsarSalidaAlFin(now);
         renderer.render(scene, camera);
+        quitarZoomAlDibujar(conZoom);
         rafId = requestAnimationFrame(animar);
     }
 
@@ -4861,6 +4885,46 @@ const ALTURA_SUELO = 0.2;
         despejarEntradasCaminos();
     }
 
+    // El arco de meta del GLB está al frente de la plaza (z = 6,5) y tapa al niño
+    // cuando celebra en el podio. Se lleva al fondo, detrás del trofeo. Las piezas
+    // se cuelgan de un grupo que se corre: así la animacion_loop (globos, estrellas)
+    // sigue moviéndolas en su lugar nuevo. La línea de meta del piso se queda al frente.
+    const ARCO_META_Z = 6.5;
+    const ARCO_META_Z_FONDO = -7.2;
+    function arcoMetaAlFondo(castillo) {
+        const raiz = castillo.getObjectByName('meta_final');
+        if (!raiz || raiz.userData.arcoAlFondo) return;
+        const esArco = /^(pilar_|globo_|viga_)/;
+        const piezas = raiz.children.filter((o) => esArco.test(o.name)
+            // GLTFLoader renombra los repetidos: letrero, letrero_1… Los del arco están en z ≈ 6,5.
+            || (/^letrero(_\d+)?$/.test(o.name) && Math.abs(o.position.z - ARCO_META_Z) < 0.3));
+        if (!piezas.length) return;
+        const dz = ARCO_META_Z_FONDO - ARCO_META_Z;
+        const arco = new THREE.Group();
+        arco.name = 'arco_meta';
+        arco.position.z = dz;
+        raiz.add(arco);
+        piezas.forEach((o) => arco.add(o));
+        // La estrella del centro quedaba justo delante del letrero: los banderines
+        // del fondo ya se juntan sobre el arco.
+        ['estrella_poste_3', 'estrella_grande_3'].forEach((n) => {
+            const o = raiz.getObjectByName(n);
+            if (o) o.visible = false;
+        });
+        // Los banderines de los lados iban del arco a los postes 1 y 5 (z ≈ -3,92).
+        // Se estiran en z sobre ese extremo para que lleguen al arco nuevo.
+        const zPoste = -3.916;
+        const k = (ARCO_META_Z_FONDO - zPoste) / (ARCO_META_Z - zPoste);
+        ['banderines_arco_der', 'banderines_arco_izq'].forEach((n) => {
+            const o = raiz.getObjectByName(n);
+            if (!o) return;
+            o.scale.z = k;
+            o.position.z = zPoste * (1 - k);
+        });
+        raiz.userData.arcoAlFondo = true;
+        castillo.updateMatrixWorld(true);
+    }
+
     async function colocarCastillo() {
         if (!grupoCasas || !curva) return;
         // 0 = el frente del modelo (su +Z) mira hacia el camino. Suma o resta 90 si queda de lado.
@@ -4877,6 +4941,7 @@ const ALTURA_SUELO = 0.2;
             return;
         }
         if (!grupoCasas || !scene) return;
+        arcoMetaAlFondo(castillo);
         const fin = curva.getPoint(1);
         const tang = curva.getTangent(1);
         tang.y = 0;
