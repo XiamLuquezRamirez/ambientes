@@ -2,7 +2,7 @@
  * EscenarioPescador — escena Phaser 4 de "El Pescador de Estrellas de Mar" (window.EscenarioPescador).
  *
  * Dibuja el fondo marino por capas (cielo con nubes, superficie con ondas y destellos, rayos de luz, arrecife lejano,
- * siluetas de peces, peces de colores, burbujas, algas que se mecen, corales, rocas, conchas, arena), la barca de Zoe y
+ * peces lejanos, peces de colores (estilo del Viaje del Pez, marinos.js), burbujas, algas que se mecen, corales, rocas, conchas, arena), la barca de Zoe y
  * Zeus con su pescante, la polea, la cuerda, el gancho dorado, la red con las estrellas pescadas y las estrellas de mar
  * del fondo (parpadean, laten y se alegran).
  *
@@ -46,7 +46,6 @@
     function num(v, d) { var n = Number(v); return isFinite(n) ? n : d; }
     function elegir(l) { return l[Math.floor(Math.random() * l.length)]; }
 
-    var CORALES = [0xff8fab, 0xffa94d, 0xb197fc, 0xff6fae, 0x63e6be, 0xffd43b, 0x74c0fc, 0xf783ac];
     var PECES = [0xffd43b, 0xff922b, 0x74c0fc, 0xf783ac, 0x63e6be, 0xb197fc, 0xff6b6b, 0x8ce99a];
     var BRILLOS = [0xffffff, 0xfff3bf, 0xc5f6fa, 0xffe066, 0xffc9e3];
 
@@ -248,6 +247,16 @@
         return i;
     }
 
+    /** Tamaño de diseño de un dibujo (el de su SVG). */
+    function tam(key) {
+        var c = D().lienzo(key), r = D().res(key);
+        return c ? { w: c.width / r, h: c.height / r } : { w: 100, h: 100 };
+    }
+
+    /** Escala para que el dibujo mida ese alto (o ese ancho) en el mundo. */
+    function kAlto(key, alto) { return alto / tam(key).h; }
+    function kAncho(key, ancho) { return ancho / tam(key).w; }
+
     // ------------------------------------------------------------------ escena
 
     var EscenaMar = Phaser ? class extends Phaser.Scene {
@@ -316,14 +325,38 @@
                 ry.setRotation(ry.rot0);
                 this.rayos.push(ry);
             }
-            this.lejano = img(this, W / 2, 760, "arrecifeLejano", 1).setOrigin(0.5, 1).setDepth(2).setTint(0x1f6fae).setAlpha(0.45);
+            // silueta del arrecife lejano en tramos seguidos (como en el Viaje del Pez), apoyada sobre la arena
+            this.lejanos = [];
+            for (var lj = 0; lj < 5; lj++) {
+                var par = lj % 2 === 1;
+                var lt = img(this, -60 + lj * 400, 760, "arrecifeLejano", par ? 0.7 : 0.85).setOrigin(0, 1).setDepth(2)
+                    .setTint(par ? 0x1c6f99 : 0x175d85).setAlpha(par ? 0.5 : 0.36).setFlipX(par);
+                this.lejanos.push(lt);
+            }
+            // bosque de algas lejano: oscuro y tenue, detrás de todo
+            for (var aj = 0; aj < 16; aj++) {
+                var kl = aj % 3 === 0 ? "alga" : "algaLarga";
+                var alj = img(this, (aj + azarEn(0.1, 0.9)) * W / 16, 752, kl, kAlto(kl, azarEn(150, 280))).setOrigin(0.5, 1).setDepth(2.1)
+                    .setTint(elegir([0x1b6e7a, 0x22808a, 0x175f73])).setAlpha(0.55);
+                alj.fase = Math.random() * 6;
+                alj.vel = azarEn(0.6, 1.2);
+                this.lejanos.push(alj);
+            }
+            // peces lejanos: las mismas especies, pequeñas y teñidas del color del agua
             this.siluetas = [];
+            var lejanas = ["pezCirujano", "pezAngel", "pezMariposa", "pececito"];
             for (var s = 0; s < 4; s++) {
-                var si = img(this, azarEn(0, W), azarEn(420, 620), "silueta", azarEn(0.4, 0.7)).setDepth(2.2).setTint(0x1c5f99).setAlpha(0.35);
+                var ks = lejanas[s % lejanas.length];
+                var si = img(this, azarEn(0, W), azarEn(420, 620), ks, kAncho(ks, azarEn(38, 52))).setDepth(2.2).setTint(0x8fc9e6).setAlpha(0.5);
                 si.vel = azarEn(14, 26) * (Math.random() < 0.5 ? -1 : 1);
-                si.setFlipX(si.vel > 0);
+                si.setFlipX(si.vel < 0);
                 this.siluetas.push(si);
             }
+            // una tortuga marina que cruza tranquila a lo lejos
+            var tor = img(this, azarEn(0, W), azarEn(440, 560), "tortuga", kAncho("tortuga", 120)).setDepth(2.4).setAlpha(0.9);
+            tor.vel = azarEn(12, 18) * (Math.random() < 0.5 ? -1 : 1);
+            tor.setFlipX(tor.vel < 0);
+            this.siluetas.push(tor);
 
             // ---------------- arena (lecho marino)
             this.arena = img(this, W / 2, H, "arena", 1).setOrigin(0.5, 1).setDepth(4);
@@ -482,7 +515,8 @@
             for (var i = 0; i + 1 < xs.length; i++) huecos.push((xs[i] + xs[i + 1]) / 2);
             huecos.push(xs[0] - 110, xs[xs.length - 1] + 110, 330, 1270, 250, 1350);
             huecos = huecos.map(function (h) { return Math.max(200, Math.min(1400, h)); });
-            var corales = ["coralRama", "coralAbanico", "coralTubo", "coralCerebro"];
+            var corales = ["coralAbanico", "coralTubos", "anemona", "coralTubos"];
+            var LUZ_CORAL = { coralAbanico: 0xcc5de8, coralTubos: 0xffa94d, anemona: 0xf783ac };
 
             // capa de atrás (detrás de las estrellas): algas y corales en los huecos
             var nAlg = T.algas, nCor = T.corales;
@@ -490,24 +524,25 @@
             for (var c = 0; c < nCor; c++) {
                 var hx = orden[c % orden.length] + azarEn(-14, 14);
                 var key = corales[c % corales.length];
-                var co = img(this, hx, 716 + azarEn(-4, 6), key, azarEn(0.42, 0.6)).setOrigin(0.5, 1).setDepth(4.5).setTint(elegir(CORALES));
-                co.luz = img(this, hx, 676, "luz", 1.6).setDepth(4.45).setBlendMode(Phaser.BlendModes.ADD).setTint(co.tintTopLeft || 0xffffff).setAlpha(0);
+                var co = img(this, hx, 716 + azarEn(-4, 6), key, kAlto(key, key === "anemona" ? azarEn(70, 95) : azarEn(95, 135))).setOrigin(0.5, 0.97).setDepth(4.5).setFlipX(Math.random() < 0.5);
+                co.luz = img(this, hx, 676, "luz", 1.6).setDepth(4.45).setBlendMode(Phaser.BlendModes.ADD).setTint(LUZ_CORAL[key]).setAlpha(0);
                 co.fase = Math.random() * 6;
                 co.tipo = "coral";
                 this.deco.push(co);
             }
             for (var a = 0; a < nAlg; a++) {
                 var ax = a < huecos.length ? huecos[(a * 3 + 1) % huecos.length] + azarEn(-30, 30) : azarEn(220, 1380);
-                var al = img(this, ax, 714 + azarEn(-4, 6), Math.random() < 0.7 ? "alga" : "algaFina", azarEn(0.65, 0.95)).setOrigin(0.5, 1).setDepth(4.4);
-                if (al.texture.key === "algaFina") al.setTint(elegir([0x8ce99a, 0x63e6be, 0xb2f2bb])).setAlpha(0.9);
+                var ka = Math.random() < 0.6 ? "alga" : "algaLarga";
+                var al = img(this, ax, 714 + azarEn(-4, 6), ka, kAlto(ka, azarEn(180, 290))).setOrigin(0.5, 1).setDepth(4.4)
+                    .setTint(elegir([0xffffff, 0xd3f9d8, 0x96f2d7, 0xd8f5a2, 0xffd8a8])).setFlipX(Math.random() < 0.5);
                 al.fase = Math.random() * 6;
                 al.vel = azarEn(0.7, 1.2);
                 al.impulso = 0;
                 al.tipo = "alga";
                 this.deco.push(al);
             }
-            [[260, 0.7], [1340, 0.75]].forEach(function (q, k) {
-                var ro = img(self, q[0] + azarEn(-30, 30), 740, "roca", q[1]).setOrigin(0.5, 1).setDepth(4.3).setFlipX(k === 1);
+            [[260, 160, "roca"], [1340, 190, "rocaPlana"]].forEach(function (q, k) {
+                var ro = img(self, q[0] + azarEn(-30, 30), 744, q[2], kAncho(q[2], q[1])).setOrigin(0.5, 0.92).setDepth(4.3).setFlipX(k === 1);
                 ro.tipo = "roca";
                 self.deco.push(ro);
             });
@@ -517,9 +552,9 @@
                 var px = azarEn(220, 1380);
                 var cerca = xs.some(function (x) { return Math.abs(x - px) < 80; });
                 var py = cerca ? azarEn(866, 890) : azarEn(820, 885);
-                var tipo = elegir(["concha", "caracol", "piedra", "concha"]);
-                var co2 = img(this, px, py, tipo, azarEn(0.32, 0.5)).setDepth(5).setRotation(azarEn(-0.4, 0.4));
-                if (tipo !== "piedra") co2.setTint(elegir([0xffc9de, 0xffe8cc, 0xfff3bf, 0xe5dbff, 0xffffff]));
+                var tipo = elegir(["concha", "caracol", "rocaPlana", "concha", "caracol"]);
+                var co2 = img(this, px, py, tipo, kAncho(tipo, tipo === "rocaPlana" ? azarEn(50, 70) : azarEn(38, 54))).setDepth(5)
+                    .setRotation(tipo === "rocaPlana" ? 0 : azarEn(-0.3, 0.3)).setFlipX(Math.random() < 0.5);
                 co2.tipo = "suelo";
                 this.deco.push(co2);
             }
@@ -533,7 +568,7 @@
                 this.deco.push(cof);
             }
             for (var m = 0; m < T.medusas; m++) {
-                var me = img(this, azarEn(300, 1300), azarEn(380, 560), "medusa", azarEn(0.45, 0.65)).setDepth(2.6).setBlendMode(Phaser.BlendModes.ADD).setTint(elegir([0xff8cc6, 0xb197fc, 0x66d9e8])).setAlpha(0.55);
+                var me = img(this, azarEn(300, 1300), azarEn(380, 560), "medusa", kAlto("medusa", azarEn(80, 120))).setDepth(2.6).setAlpha(azarEn(0.6, 0.8));
                 me.fase = Math.random() * 6;
                 me.y0 = me.y;
                 me.tipo = "medusa";
@@ -541,21 +576,23 @@
             }
 
             // capa de delante: solo en los bordes (no tapan estrellas)
-            [[150, 900, "alga", 1.15], [70, 900, "coralRama", 0.7], [1450, 900, "alga", 1.1], [1540, 900, "coralAbanico", 0.65]].forEach(function (q) {
-                var fr = img(self, q[0] + azarEn(-20, 20), q[1], q[2], q[3]).setOrigin(0.5, 1).setDepth(25);
-                if (q[2] !== "alga") fr.setTint(elegir(CORALES));
+            [[150, 900, "algaLarga", 380], [70, 900, "coralTubos", 160], [1450, 900, "alga", 340], [1540, 900, "coralAbanico", 140]].forEach(function (q) {
+                var fr = img(self, q[0] + azarEn(-20, 20), q[1], q[2], kAlto(q[2], q[3])).setOrigin(0.5, 1).setDepth(25);
                 fr.fase = Math.random() * 6;
                 fr.vel = azarEn(0.6, 1);
                 fr.impulso = 0;
-                fr.tipo = q[2] === "alga" ? "alga" : "coral";
+                fr.tipo = q[2] === "alga" || q[2] === "algaLarga" ? "alga" : "coral";
                 self.frente.push(fr);
             });
 
-            // peces de colores
+            // peces de colores (las especies del Viaje del Pez; el pececito se tiñe). Miran a la derecha.
+            var especies = ["pezCirujano", "pezAngel", "pececito", "pezGlobo", "pezMariposa", "pececito"];
             for (var p = 0; p < T.peces; p++) {
-                var pz = img(this, azarEn(0, W), azarEn(380, 650), "pez", azarEn(0.38, 0.6)).setDepth(9).setTint(PECES[p % PECES.length]);
+                var ke = especies[p % especies.length];
+                var pz = img(this, azarEn(0, W), azarEn(380, 650), ke, kAncho(ke, ke === "pececito" ? azarEn(48, 64) : azarEn(62, 92))).setDepth(9);
+                if (ke === "pececito") pz.setTint(PECES[p % PECES.length]);
                 pz.vel = azarEn(35, 70) * (Math.random() < 0.5 ? -1 : 1);
-                pz.setFlipX(pz.vel > 0);
+                pz.setFlipX(pz.vel < 0);
                 pz.y0 = pz.y;
                 pz.fase = Math.random() * 6;
                 pz.salto = 0;
@@ -1121,6 +1158,9 @@
                 d.y = self.SUP + Math.sin(d.x / 90 + t / 700) * 5 + 6;
                 d.setAlpha(0.3 + 0.7 * Math.max(0, Math.sin(t / 260 + d.fase)));
             });
+            this.lejanos.forEach(function (o) {
+                if (o.fase !== undefined) o.setRotation(Math.sin(t / 1300 * o.vel + o.fase) * 0.05);
+            });
             this.siluetas.forEach(function (si) {
                 si.x += si.vel * dt / 1000;
                 if (si.x > W + 100) si.x = -100;
@@ -1135,7 +1175,7 @@
                     var tx = b.x + Math.cos(p.angRodea) * 260, ty = self.SUP + 130 + Math.sin(p.angRodea) * 60;
                     p.x += (tx - p.x) * Math.min(1, dt / 300);
                     p.y += (ty - p.y) * Math.min(1, dt / 300);
-                    p.setFlipX(Math.sin(p.angRodea) < 0);
+                    p.setFlipX(Math.sin(p.angRodea) > 0);
                     if (p.rodea <= 0) p.y0 = Math.max(380, Math.min(650, p.y + 200));
                 } else {
                     p.x += p.vel * dt / 1000;
@@ -1144,7 +1184,7 @@
                     p.salto = Math.max(0, p.salto - dt / 700);
                     p.giro = Math.max(0, p.giro - dt / 700);
                     p.y += ((p.y0 + Math.sin(t / 600 + p.fase) * 10 - Math.sin(p.salto * Math.PI) * 60) - p.y) * Math.min(1, dt / 120);
-                    p.setFlipX(p.vel > 0);
+                    p.setFlipX(p.vel < 0);
                 }
                 p.setRotation(p.giro > 0 ? (1 - p.giro) * Math.PI * 2 : Math.sin(t / 300 + p.fase) * 0.06);
             });

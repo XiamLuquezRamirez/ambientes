@@ -2,9 +2,10 @@
  * DibujosPescador — dibujos propios de "El Pescador de Estrellas de Mar" (window.DibujosPescador).
  *
  * Todo es SVG propio rasterizado UNA vez a <canvas> por preparar(); la escena los convierte en texturas.
- * Las piezas que cambian de color (peces, corales, conchas, burbujas, chispas, banderines, medusas) se dibujan en
- * blanco o gris claro y Phaser las tiñe. Las estrellas de mar, la barca, el gancho, la polea y el cofre llevan su
- * color propio. Cada estrella tiene tres caras: normal, ojos cerrados (parpadeo) y sorpresa (al ser atrapada).
+ * Los peces y la decoración del fondo (algas, corales, rocas, conchas, caracoles, medusas, arrecife lejano y
+ * burbujas) vienen de marinos.js, con el estilo sin bordes del Viaje del Pez y su color propio (solo el pececito y
+ * el arrecife lejano se tiñen). Las piezas de luz (chispas, halos, banderines) se dibujan en blanco y Phaser las
+ * tiñe. Las estrellas de mar, la barca, el gancho, la polea y el cofre llevan su color propio. Cada estrella tiene tres caras: normal, ojos cerrados (parpadeo) y sorpresa (al ser atrapada).
  */
 (function (global) {
     "use strict";
@@ -198,134 +199,48 @@
             '<ellipse cx="17" cy="28" rx="3" ry="6" fill="#fff" opacity="0.9"/>');
     }
 
-    // ------------------------------------------------------------------ vida marina (se tiñe)
+    // ------------------------------------------------------------------ vida marina y decoración (estilo del Viaje del Pez)
 
-    function pez() {
-        return svg(140, 90,
-            '<path d="M104 45 L136 18 Q128 45 136 72 Z" fill="#e8eef5" stroke="#9aa8b8" stroke-width="3" stroke-linejoin="round"/>' +
-            '<path d="M60 18 Q76 2 92 20 Z" fill="#e8eef5" stroke="#9aa8b8" stroke-width="3" stroke-linejoin="round"/>' +
-            '<ellipse cx="62" cy="46" rx="50" ry="30" fill="#ffffff" stroke="#9aa8b8" stroke-width="3"/>' +
-            '<path d="M70 20 Q78 46 70 72" fill="none" stroke="#d5dde6" stroke-width="6"/>' +
-            '<path d="M84 24 Q91 46 84 68" fill="none" stroke="#d5dde6" stroke-width="5"/>' +
-            '<path d="M60 58 Q70 70 80 60" fill="#f1f4f8" stroke="#9aa8b8" stroke-width="2.5"/>' +
-            '<circle cx="34" cy="40" r="10" fill="#fff" stroke="#24304a" stroke-width="2.5"/><circle cx="32" cy="41" r="5.5" fill="#1a2238"/><circle cx="30" cy="38" r="2" fill="#fff"/>' +
-            '<path d="M14 52 Q20 56 26 52" fill="none" stroke="#24304a" stroke-width="3" stroke-linecap="round"/>');
+    /** SVG de marinos.js con su tamaño de diseño (el del viewBox, o el que se pida). */
+    function marino(clave, w, h) {
+        var t = global.MarinosPescador.SVG[clave];
+        var m = /viewBox="0 0 ([\d.]+) ([\d.]+)"/.exec(t);
+        return t.replace("<svg ", '<svg width="' + (w || m[1]) + '" height="' + (h || m[2]) + '" ');
     }
 
-    function silueta() {
-        return svg(120, 60, '<path d="M8 30 Q40 2 84 24 L116 6 Q108 30 116 54 L84 36 Q40 58 8 30 Z" fill="#ffffff"/>');
-    }
-
-    function alga() {
-        return svg(110, 320,
-            '<path d="M55 318 C40 250 72 210 52 150 C36 100 66 60 54 6" fill="none" stroke="#2b8a3e" stroke-width="12" stroke-linecap="round"/>' +
-            '<path d="M55 318 C40 250 72 210 52 150 C36 100 66 60 54 6" fill="none" stroke="#69db7c" stroke-width="6" stroke-linecap="round"/>' +
-            '<path d="M54 250 C20 236 10 200 26 182 C40 204 52 220 54 250 Z" fill="#51cf66" stroke="#2b8a3e" stroke-width="4"/>' +
-            '<path d="M56 200 C92 186 102 150 86 132 C72 154 60 172 56 200 Z" fill="#69db7c" stroke="#2b8a3e" stroke-width="4"/>' +
-            '<path d="M52 140 C20 126 14 92 30 74 C42 96 50 112 52 140 Z" fill="#51cf66" stroke="#2b8a3e" stroke-width="4"/>' +
-            '<path d="M56 90 C86 76 92 44 78 28 C66 48 58 62 56 90 Z" fill="#8ce99a" stroke="#2b8a3e" stroke-width="4"/>');
-    }
-
-    function algaFina() {
-        return svg(70, 260,
-            '<path d="M20 258 C10 190 34 150 22 90 C14 50 30 24 26 4" fill="none" stroke="#e6fcf5" stroke-width="9" stroke-linecap="round"/>' +
-            '<path d="M44 258 C54 200 34 160 46 110 C54 76 42 50 48 26" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>');
-    }
-
-    function coralRama() {
-        return svg(200, 220,
-            '<g fill="none" stroke-linecap="round" stroke-linejoin="round">' +
-            '<path d="M100 218 L100 140 L60 96 L52 40 M100 140 L142 90 L150 30 M60 96 L24 74 M142 90 L180 70 M100 160 L100 60 L96 14" stroke="#9aa8b8" stroke-width="26"/>' +
-            '<path d="M100 218 L100 140 L60 96 L52 40 M100 140 L142 90 L150 30 M60 96 L24 74 M142 90 L180 70 M100 160 L100 60 L96 14" stroke="#ffffff" stroke-width="18"/>' +
-            '<path d="M96 200 L96 150 L58 106 M98 70 L94 24" stroke="#e9eef4" stroke-width="6"/></g>' +
-            '<g fill="#ffffff" stroke="#9aa8b8" stroke-width="3"><circle cx="52" cy="40" r="11"/><circle cx="150" cy="30" r="11"/><circle cx="24" cy="74" r="10"/><circle cx="180" cy="70" r="10"/><circle cx="96" cy="14" r="11"/></g>');
-    }
-
-    function coralAbanico() {
-        var r = "";
-        for (var i = 0; i < 9; i++) {
-            var a = Math.PI + 0.25 + i * (Math.PI - 0.5) / 8;
-            r += '<path d="M100 196 Q' + f1(100 + Math.cos(a) * 50) + " " + f1(196 + Math.sin(a) * 90) + " " + f1(100 + Math.cos(a) * 92) + " " + f1(196 + Math.sin(a) * 170) + '" fill="none" stroke="#c7d0db" stroke-width="5" stroke-linecap="round"/>';
-        }
-        return svg(200, 200,
-            '<path d="M100 196 C10 190 4 70 40 34 C70 6 130 6 160 34 C196 70 190 190 100 196 Z" fill="#ffffff" stroke="#9aa8b8" stroke-width="5"/>' + r +
-            '<path d="M92 198 L108 198 L104 180 L96 180 Z" fill="#9aa8b8"/>');
-    }
-
-    function coralTubo() {
-        var t = "";
-        [[40, 120, 22], [80, 70, 26], [124, 96, 24], [160, 140, 20]].forEach(function (q) {
-            t += '<rect x="' + (q[0] - q[2] / 2) + '" y="' + q[1] + '" width="' + q[2] + '" height="' + (200 - q[1]) + '" rx="' + (q[2] / 2) + '" fill="#ffffff" stroke="#9aa8b8" stroke-width="4"/>' +
-                '<ellipse cx="' + q[0] + '" cy="' + (q[1] + 6) + '" rx="' + (q[2] / 2 - 2) + '" ry="6" fill="#b6c2cf"/>';
-        });
-        return svg(200, 204, t);
-    }
-
-    function coralCerebro() {
-        return svg(180, 120,
-            '<path d="M8 116 C4 50 50 10 90 10 C130 10 176 50 172 116 Z" fill="#ffffff" stroke="#9aa8b8" stroke-width="5"/>' +
-            '<path d="M30 100 C40 70 60 80 70 56 C80 34 110 40 116 62 C122 82 146 76 152 100" fill="none" stroke="#c7d0db" stroke-width="5" stroke-linecap="round"/>' +
-            '<path d="M50 40 C70 30 84 50 104 34 M44 76 C56 92 76 88 90 100 M120 92 C130 80 150 86 160 74" fill="none" stroke="#c7d0db" stroke-width="5" stroke-linecap="round"/>');
-    }
-
-    function roca() {
-        return svg(220, 130,
-            '<path d="M8 128 C4 80 30 40 74 34 C96 10 150 14 170 44 C206 54 220 98 212 128 Z" fill="#6f8fb5" stroke="#3e5a80" stroke-width="5"/>' +
-            '<path d="M40 70 C60 50 84 50 96 40 M132 36 C150 40 164 56 170 70" fill="none" stroke="#9fb8d6" stroke-width="7" stroke-linecap="round"/>' +
-            '<ellipse cx="150" cy="100" rx="18" ry="8" fill="#5a7aa0"/><ellipse cx="70" cy="104" rx="12" ry="6" fill="#5a7aa0"/>');
-    }
-
-    function piedra() {
-        return svg(90, 60,
-            '<ellipse cx="45" cy="34" rx="42" ry="24" fill="#a9b8c9" stroke="#6c7f96" stroke-width="4"/>' +
-            '<ellipse cx="34" cy="24" rx="14" ry="6" fill="#d5dfea" opacity="0.8"/>');
-    }
-
-    function concha() {
-        var r = "";
-        for (var i = 0; i < 7; i++) {
-            var a = Math.PI + 0.35 + i * (Math.PI - 0.7) / 6;
-            r += '<path d="M50 72 L' + f1(50 + Math.cos(a) * 44) + " " + f1(72 + Math.sin(a) * 60) + '" stroke="#c7d0db" stroke-width="4" stroke-linecap="round"/>';
-        }
-        return svg(100, 90,
-            '<path d="M50 74 C6 74 0 30 22 14 C36 2 64 2 78 14 C100 30 94 74 50 74 Z" fill="#ffffff" stroke="#9aa8b8" stroke-width="4"/>' + r +
-            '<path d="M36 72 L64 72 L60 86 L40 86 Z" fill="#ffffff" stroke="#9aa8b8" stroke-width="4" stroke-linejoin="round"/>');
-    }
-
-    function caracol() {
-        return svg(100, 80,
-            '<path d="M14 72 C4 40 30 8 60 12 C86 16 96 46 80 62 C66 76 44 66 46 50 C48 38 62 38 64 48" fill="#ffffff" stroke="#9aa8b8" stroke-width="5" stroke-linecap="round"/>' +
-            '<path d="M14 72 L92 72" stroke="#9aa8b8" stroke-width="5" stroke-linecap="round"/>');
-    }
-
+    /** Cofre del tesoro abierto, sin bordes (volumen con degradados, como el resto del fondo). */
     function cofre() {
         return svg(200, 170,
-            '<path d="M24 64 Q100 -6 176 64 Z" fill="#a0522d" stroke="#5c2b0c" stroke-width="6" stroke-linejoin="round"/>' +
-            '<path d="M40 60 Q100 8 160 60" fill="none" stroke="#ffd43b" stroke-width="8"/>' +
-            '<circle cx="70" cy="70" r="13" fill="#ffd43b" stroke="#b8740a" stroke-width="3"/><circle cx="96" cy="66" r="14" fill="#ffe066" stroke="#b8740a" stroke-width="3"/>' +
-            '<circle cx="124" cy="70" r="13" fill="#ffd43b" stroke="#b8740a" stroke-width="3"/><circle cx="110" cy="58" r="9" fill="#fff" stroke="#c7d0db" stroke-width="3"/>' +
-            '<circle cx="84" cy="56" r="8" fill="#ff8cc6" stroke="#c2255c" stroke-width="3"/>' +
-            '<rect x="20" y="72" width="160" height="86" rx="10" fill="#b5652a" stroke="#5c2b0c" stroke-width="6"/>' +
-            '<path d="M20 98 L180 98 M20 132 L180 132" stroke="#8a4a14" stroke-width="4"/>' +
-            '<rect x="48" y="72" width="14" height="86" fill="#ffd43b" stroke="#b8740a" stroke-width="3"/><rect x="138" y="72" width="14" height="86" fill="#ffd43b" stroke="#b8740a" stroke-width="3"/>' +
-            '<rect x="86" y="92" width="28" height="30" rx="6" fill="#ffd43b" stroke="#b8740a" stroke-width="4"/><circle cx="100" cy="104" r="5" fill="#5c2b0c"/>');
-    }
-
-    function medusa() {
-        return svg(120, 170,
-            '<path d="M10 70 C10 20 110 20 110 70 Q96 62 84 72 Q72 62 60 72 Q48 62 36 72 Q24 62 10 70 Z" fill="#ffffff" opacity="0.85"/>' +
-            '<path d="M30 72 C24 100 40 120 30 160 M54 74 C60 110 46 130 56 166 M78 74 C72 110 88 130 78 162 M98 72 C104 100 92 124 100 150" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>' +
-            '<ellipse cx="44" cy="42" rx="12" ry="7" fill="#ffffff" opacity="0.95"/>');
+            '<defs>' +
+            '<linearGradient id="ma" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9894a"/><stop offset=".55" stop-color="#a0522d"/><stop offset="1" stop-color="#5c2b0c"/></linearGradient>' +
+            '<linearGradient id="ta" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c0703a"/><stop offset="1" stop-color="#6b3410"/></linearGradient>' +
+            '<linearGradient id="or" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e8a10c"/><stop offset=".4" stop-color="#fff3bf"/><stop offset=".6" stop-color="#ffd43b"/><stop offset="1" stop-color="#d08a00"/></linearGradient>' +
+            '<radialGradient id="mo" cx=".38" cy=".32" r=".7"><stop offset="0" stop-color="#fffbe6"/><stop offset=".55" stop-color="#ffd43b"/><stop offset="1" stop-color="#e67700"/></radialGradient>' +
+            '<radialGradient id="pe" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#f1f3f5"/><stop offset="1" stop-color="#b8c4d2"/></radialGradient>' +
+            '<radialGradient id="ge" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ffdeeb"/><stop offset=".55" stop-color="#f06595"/><stop offset="1" stop-color="#a61e4d"/></radialGradient>' +
+            '<radialGradient id="so" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#08305a" stop-opacity=".4"/><stop offset="1" stop-color="#08305a" stop-opacity="0"/></radialGradient>' +
+            '<linearGradient id="vol" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".38" stop-color="#fff" stop-opacity="0"/><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>' +
+            '</defs>' +
+            '<ellipse cx="100" cy="162" rx="96" ry="9" fill="url(#so)"/>' +
+            // tapa abierta (detrás) con su borde dorado
+            '<path d="M22 66 Q100 -8 178 66 Z" fill="url(#ta)"/><path d="M22 66 Q100 -8 178 66 Z" fill="url(#vol)"/>' +
+            '<path d="M34 62 Q100 4 166 62 L160 64 Q100 14 40 64 Z" fill="url(#or)"/>' +
+            '<path d="M46 50 Q76 22 112 18 Q78 30 46 50 Z" fill="#fff" opacity=".35"/>' +
+            // tesoro que asoma: monedas, perla y gema
+            '<circle cx="70" cy="72" r="13" fill="url(#mo)"/><circle cx="96" cy="67" r="14" fill="url(#mo)"/><circle cx="124" cy="72" r="13" fill="url(#mo)"/>' +
+            '<circle cx="110" cy="58" r="9" fill="url(#pe)"/><circle cx="84" cy="57" r="8" fill="url(#ge)"/>' +
+            '<g fill="#fff" opacity=".85"><circle cx="66" cy="67" r="3"/><circle cx="92" cy="61" r="3.2"/><circle cx="120" cy="67" r="3"/><circle cx="107" cy="55" r="2.4"/></g>' +
+            // caja con tablas en relieve, herrajes y cerradura
+            '<rect x="20" y="74" width="160" height="84" rx="12" fill="url(#ma)"/><rect x="20" y="74" width="160" height="84" rx="12" fill="url(#vol)"/>' +
+            '<g fill="#5c2b0c" opacity=".35"><rect x="20" y="98" width="160" height="5"/><rect x="20" y="130" width="160" height="5"/></g>' +
+            '<g fill="#fff" opacity=".18"><rect x="20" y="103" width="160" height="3"/><rect x="20" y="135" width="160" height="3"/></g>' +
+            '<rect x="46" y="74" width="16" height="84" fill="url(#or)"/><rect x="138" y="74" width="16" height="84" fill="url(#or)"/>' +
+            '<rect x="84" y="90" width="32" height="34" rx="9" fill="url(#mo)"/>' +
+            '<path d="M100 100 a5 5 0 1 1 -0.1 0 Z M97 106 L103 106 L102 116 L98 116 Z" fill="#6b3410"/>' +
+            '<path d="M28 82 Q60 76 104 78 Q60 82 28 90 Z" fill="#fff" opacity=".3"/>');
     }
 
     // ------------------------------------------------------------------ luz, burbujas y brillos
-
-    function burbuja() {
-        return svg(64, 64,
-            '<defs><radialGradient id="b" cx="0.5" cy="0.5" r="0.5"><stop offset="0.6" stop-color="#ffffff" stop-opacity="0.05"/><stop offset="0.92" stop-color="#ffffff" stop-opacity="0.55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.9"/></radialGradient></defs>' +
-            '<circle cx="32" cy="32" r="29" fill="url(#b)" stroke="#ffffff" stroke-width="2.5" stroke-opacity="0.85"/>' +
-            '<ellipse cx="22" cy="20" rx="8" ry="5" fill="#ffffff" opacity="0.9" transform="rotate(-35 22 20)"/>');
-    }
 
     function chispa() {
         return svg(64, 64,
@@ -377,17 +292,6 @@
             '<ellipse cx="800" cy="300" rx="900" ry="140" fill="#b7f4ff" opacity="0.18"/>');
     }
 
-    /** Arrecife lejano (siluetas azuladas) detrás de todo. */
-    function arrecifeLejano() {
-        var rnd = semilla(17), d = "";
-        for (var i = 0; i < 26; i++) {
-            var x = i * 64 + rnd() * 30, h = 50 + rnd() * 110, w = 30 + rnd() * 40;
-            if (i % 3 === 0) d += '<path d="M' + f1(x) + " 300 L" + f1(x + 6) + " " + f1(300 - h) + " Q" + f1(x + w / 2) + " " + f1(300 - h - 30) + " " + f1(x + w) + " " + f1(300 - h) + " L" + f1(x + w + 4) + ' 300 Z" fill="#ffffff"/>';
-            else d += '<ellipse cx="' + f1(x) + '" cy="300" rx="' + f1(w) + '" ry="' + f1(h * 0.7) + '" fill="#ffffff"/>';
-        }
-        return svg(1600, 300, d);
-    }
-
     /** Lecho marino: arena con dunas suaves, ondas y piedritas. */
     function arena() {
         var rnd = semilla(5), deco = "";
@@ -414,7 +318,7 @@
     function lista() {
         var l = [
             ["mar", mar(), 0.5],
-            ["arrecifeLejano", arrecifeLejano(), 0.5],
+            ["arrecifeLejano", marino("arrecifeLejano"), 1],
             ["arena", arena(), 0.6],
             ["rayo", rayo(), 0.6],
             ["nube", nube(), 1],
@@ -424,21 +328,24 @@
             ["red", red(), 1.4],
             ["banderin", banderin(), 1.4],
             ["farol", farol(), 1.4],
-            ["pez", pez(), 1.2],
-            ["silueta", silueta(), 1],
-            ["alga", alga(), 1],
-            ["algaFina", algaFina(), 1],
-            ["coralRama", coralRama(), 1],
-            ["coralAbanico", coralAbanico(), 1],
-            ["coralTubo", coralTubo(), 1],
-            ["coralCerebro", coralCerebro(), 1],
-            ["roca", roca(), 1],
-            ["piedra", piedra(), 1],
-            ["concha", concha(), 1.2],
-            ["caracol", caracol(), 1.2],
+            ["pececito", marino("pececito"), 1.6],
+            ["pezCirujano", marino("pezCirujano"), 1.4],
+            ["pezAngel", marino("pezAngel"), 1.4],
+            ["pezGlobo", marino("pezGlobo"), 1.4],
+            ["pezMariposa", marino("pezMariposa"), 1.4],
+            ["tortuga", marino("tortuga"), 1.2],
+            ["alga", marino("alga"), 1.9],
+            ["algaLarga", marino("algaLarga"), 1.7],
+            ["coralAbanico", marino("coralAbanico"), 1.6],
+            ["coralTubos", marino("coralTubos"), 1.7],
+            ["anemona", marino("anemona"), 1.6],
+            ["roca", marino("roca"), 1.2],
+            ["rocaPlana", marino("rocaPlana"), 1.2],
+            ["concha", marino("concha"), 0.6],
+            ["caracol", marino("caracol"), 1],
             ["cofre", cofre(), 1.2],
-            ["medusa", medusa(), 1],
-            ["burbuja", burbuja(), 1.5],
+            ["medusa", marino("medusa"), 1.3],
+            ["burbuja", marino("burbuja", 64, 64), 1.5],
             ["chispa", chispa(), 1.5],
             ["luz", luz(), 1],
             ["halo", halo(), 1.2],
