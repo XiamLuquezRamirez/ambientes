@@ -10,9 +10,10 @@
     "use strict";
 
     var W = 1600, H = 900;
-    // Lo que se ve siempre, también en una pantalla 4:3 (ENVELOP recorta los lados), sin la zona de Zoe y Zeus.
+    // Lo que se ve siempre, también en una pantalla 4:3 (ENVELOP recorta los lados). Durante la partida Zoe y Zeus no
+    // están en pantalla: las estrellas usan casi todo el ancho, sin llegar a los botones de accesibilidad y volumen.
     var VISIBLE = { x0: 230, x1: 1370 };
-    var ZONA_ESTRELLAS = { x0: 440, x1: 1160 };
+    var ZONA_ESTRELLAS = { x0: 360, x1: 1220 };
     var COLORES = ["rosa", "naranja", "turquesa", "morado", "amarillo"];
     var GUIAS = ["persistente", "intermitente", "breve", "contextual"];
 
@@ -144,7 +145,7 @@
             var d = e.deriva || 0;
             if (e.x - d < nivel.minX - 0.5 || e.x + d > nivel.maxX + 0.5) m.push(e.id + " fuera del recorrido del gancho");
             if (e.x - e.r < VISIBLE.x0 || e.x + e.r > VISIBLE.x1) m.push(e.id + " fuera de la vista");
-            if (e.x < ZONA_ESTRELLAS.x0 || e.x > ZONA_ESTRELLAS.x1) m.push(e.id + " detrás de Zoe o Zeus");
+            if (e.x < ZONA_ESTRELLAS.x0 || e.x > ZONA_ESTRELLAS.x1) m.push(e.id + " fuera de la zona de estrellas");
             for (var k = i + 1; k < nivel.estrellas.length; k++) {
                 var o = nivel.estrellas[k];
                 if (Math.abs(o.x - e.x) < sep - 0.5) m.push(e.id + " y " + o.id + " demasiado cerca");

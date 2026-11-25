@@ -579,6 +579,7 @@ async function entrar(i, opciones) {
     document.body.classList.add("demo-lock");
     var presentacion = nivelIdx === 0 && o.boton !== false;
     if (presentacion) document.body.classList.add("presentando");
+    else { zoe(false); zeus(false); }
     var demoOn = acc().mostrarIntro !== false;
 
     try {
@@ -599,6 +600,9 @@ async function entrar(i, opciones) {
             }
             if (!vivo(tk)) return;
             await decir(textos().introZoe, otro, "senala", 4500);
+            if (!vivo(tk)) return;
+            // terminada la demostración, Zoe y Zeus salen caminando y dejan todo el mar libre
+            await Promise.all([zoe(false), zeus(false)]);
             if (!vivo(tk)) return;
             if (demoOn) {
                 // la pesca de la mano no cuenta: el nivel vuelve a empezar con todas sus estrellas
@@ -629,8 +633,7 @@ async function entrar(i, opciones) {
     ocultarCartel();
     await sinPausa();
     if (!vivo(tk)) return;
-    zoe(true);
-    zeus(true);
+    // durante la partida Zoe y Zeus no están en pantalla (solo sus voces); vuelven en la celebración final
     document.body.classList.add("jugando");
     e.entrada(true);
     jugando = true;
@@ -866,7 +869,7 @@ function ocultarCartel() {
 // ------------------------------------------------------------------ arranque
 
 document.addEventListener("DOMContentLoaded", function () {
-    gameConfig = JSON.parse(readText("config.json?v=20261125b"));
+    gameConfig = JSON.parse(readText("config.json?v=20261125c"));
     var introCrudo = readText("../../intro.json");
     introConfig = introCrudo ? JSON.parse(introCrudo) : { personajes: [] };
     introConfig.conversacion = textos().conversacion || [];

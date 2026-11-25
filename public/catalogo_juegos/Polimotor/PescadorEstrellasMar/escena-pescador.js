@@ -61,7 +61,7 @@
     // Barca: textura 400 × 290 con la línea de flotación en (200, 230); la polea en (360, 44).
     var BARCA_ORIGEN_Y = 230 / 290;
     var POLEA_LOCAL = { x: 160, y: -186 };
-    var RED_LOCAL = { x: -84, y: -36 };
+    var RED_LOCAL = { x: 46, y: -36 };   // la red cuelga cerca del pescante: siempre a la vista aunque la barca llegue al borde
     var RED_ESC = 0.85;
     var HUECOS_RED = [[-32, 46], [0, 58], [32, 46], [-18, 84], [18, 84], [0, 110], [-40, 20], [40, 20]];
     var GANCHO_AGARRE = 132;     // del aro a la curva del gancho
