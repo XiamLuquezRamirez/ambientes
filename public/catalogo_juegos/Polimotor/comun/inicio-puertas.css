@@ -1,0 +1,243 @@
+/*
+ * Salida "puertas del aula" de la pantalla ¡Empecemos! (Polimotor). Al final, la variante
+ * "acercamiento" (se elige con data-transicion en la etiqueta de inicio-puertas.js).
+ * La portada se parte en dos hojas que giran hacia fuera y dejan ver la intro 3D, que
+ * inicio-puertas.js ya mostró y cargó debajo. Mientras el aula carga, las puertas siguen
+ * cerradas con el botón atenuado y "Preparando el aula…".
+ * Va después del style.css del juego: anula su mancha circular y su salida por desvanecido.
+ */
+
+/* Las hojas pintan el fondo de la portada (color + trazo) partido por la mitad. */
+body .pantalla-inicio.con-puertas {
+  background: transparent !important;
+  perspective: 1600px;
+}
+
+body .pantalla-inicio.con-puertas::before {
+  display: none;
+}
+
+body .pantalla-inicio .inicio-mancha {
+  display: none !important;
+}
+
+.inicio-puerta {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 50%;
+  overflow: hidden;
+  background: var(--juego-color);
+  backface-visibility: hidden;
+  pointer-events: none;
+  /* Capa propia ya pintada antes del clic: si se crea al empezar a girar, el primer cuadro
+     puede salir sin pintar y se ve un parpadeo. */
+  will-change: transform, opacity;
+}
+
+/* Lo mismo para lo que se anima al abrir. */
+body .pantalla-inicio.con-puertas .inicio-contenido {
+  will-change: opacity;
+}
+
+/* Fijo (no ligado a esperando-inicio): quitarlo al ocultar la portada cambiaría de capa el
+   canvas en plena intro. */
+#intro3d-root #three-container {
+  will-change: transform;
+}
+
+#intro3d-root #phaser-container {
+  will-change: opacity;
+}
+
+.inicio-puerta::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 200%;
+  background: var(--fondo-portada) center / cover no-repeat;
+  opacity: var(--fondo-portada-opacidad);
+}
+
+.inicio-puerta--izq {
+  left: 0;
+  transform-origin: 0 50%;
+}
+
+.inicio-puerta--izq::before {
+  left: 0;
+}
+
+.inicio-puerta--der {
+  right: 0;
+  transform-origin: 100% 50%;
+}
+
+.inicio-puerta--der::before {
+  right: 0;
+}
+
+/* Botón pulsado: hundido breve (scale individual; el transform del botón está fijado). */
+body .pantalla-inicio #btn-empecemos.puertas-pulsado {
+  animation: puertasBotonPulsado 0.22s ease-out;
+}
+
+/* Clic antes de que cargue el aula. */
+body .pantalla-inicio.puertas-esperando #btn-empecemos {
+  animation: none;
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.inicio-preparando {
+  margin: 0;
+  font-family: 'Fredoka Inicio', 'Fredoka', sans-serif;
+  font-size: clamp(16px, 2vw, 22px);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.pantalla-inicio.puertas-esperando .inicio-preparando {
+  opacity: 1;
+}
+
+/* Apertura: el contenido se apaga y las hojas giran; los script.js añaden .is-out. */
+body .pantalla-inicio.con-puertas.is-out {
+  pointer-events: none;
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+body .pantalla-inicio.con-puertas.is-out .inicio-contenido {
+  animation: none !important;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+body .pantalla-inicio.con-puertas.is-out #btn-empecemos {
+  animation: none !important;
+  opacity: 1;
+}
+
+body .pantalla-inicio.con-puertas.is-out .inicio-puerta--izq {
+  animation: puertaAbreIzq 1.1s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+}
+
+body .pantalla-inicio.con-puertas.is-out .inicio-puerta--der {
+  animation: puertaAbreDer 1.1s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+}
+
+/* El aula se acerca un poco mientras se abren las puertas: sensación de entrar al salón. */
+html.puertas-abriendo #intro3d-root #three-container {
+  animation: puertasAulaAcerca 1.3s ease-out both;
+}
+
+/*
+ * La intro (intro3d/js/intro.js) arranca con un destello blanco al 65 % que se apaga en 650 ms
+ * y lava toda el aula. inicio-puertas.js pone .intro-sin-destello hasta que ese destello
+ * termina (según el arranque real de la escena Phaser) y la capa vuelve con un fundido corto.
+ * Los globos de diálogo salen después, cuando llegan los personajes.
+ */
+#intro3d-root #phaser-container {
+  transition: opacity 0.25s ease;
+}
+
+html.intro-sin-destello #intro3d-root #phaser-container {
+  opacity: 0;
+  transition: none;
+}
+
+@keyframes puertasBotonPulsado {
+  0%, 100% { scale: 1; }
+  45% { scale: 0.92; }
+}
+
+/*
+ * Abren hacia dentro (se alejan del espectador): la izquierda gira +, la derecha −. Hacia
+ * fuera, el canto libre pasaría por detrás del punto de vista de la perspectiva y se recorta.
+ * Con perspectiva, una hoja girada ~100° aún se proyecta hacia el centro y deja una franja en
+ * el borde; por eso giran hasta 115° y se desvanecen en el último tramo.
+ */
+@keyframes puertaAbreIzq {
+  0% { transform: rotateY(0deg); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: rotateY(115deg); opacity: 0; }
+}
+
+@keyframes puertaAbreDer {
+  0% { transform: rotateY(0deg); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: rotateY(-115deg); opacity: 0; }
+}
+
+@keyframes puertasAulaAcerca {
+  from { transform: scale(1.06); }
+  to { transform: scale(1); }
+}
+
+/*
+ * Variante "acercamiento" (inicio-puertas.js con data-transicion="acercamiento"): sin hojas;
+ * la portada entera crece y se desvanece mientras el aula se acerca desde atrás, como si la
+ * cámara entrara al salón. El aula no se desvanece desde 0: debajo está el fondo azul oscuro
+ * de #intro3d-root y oscurecería el paso.
+ */
+body .pantalla-inicio.con-acercamiento {
+  will-change: transform, opacity;
+}
+
+body .pantalla-inicio.con-acercamiento.is-out {
+  pointer-events: none;
+  /* Curva que arranca en el acto: una ease-in se sentiría como retraso tras el clic. */
+  animation: acercamientoPortada 0.8s cubic-bezier(0.25, 0.1, 0.4, 1) forwards !important;
+}
+
+/* Título, icono y botón viajan con la portada: sin las salidas propias de cada style.css
+   (el botón desaparecía de golpe y el título se apagaba antes que el fondo). */
+body .pantalla-inicio.con-acercamiento.is-out .inicio-contenido,
+body .pantalla-inicio.con-acercamiento.is-out #btn-empecemos {
+  animation: none !important;
+  opacity: 1;
+}
+
+html.transicion-acercamiento.puertas-abriendo #intro3d-root #three-container {
+  animation: acercamientoAula 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes acercamientoPortada {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(1.25); opacity: 0; }
+}
+
+@keyframes acercamientoAula {
+  from { transform: scale(1.12); }
+  to { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body .pantalla-inicio.con-acercamiento.is-out {
+    animation: none !important;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  html.transicion-acercamiento.puertas-abriendo #intro3d-root #three-container {
+    animation: none;
+  }
+
+  body .pantalla-inicio.con-puertas.is-out .inicio-puerta--izq,
+  body .pantalla-inicio.con-puertas.is-out .inicio-puerta--der {
+    animation: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  html.puertas-abriendo #intro3d-root #three-container,
+  body .pantalla-inicio #btn-empecemos.puertas-pulsado {
+    animation: none;
+  }
+}

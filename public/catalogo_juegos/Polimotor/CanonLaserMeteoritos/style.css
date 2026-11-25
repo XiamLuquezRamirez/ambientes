@@ -1,0 +1,837 @@
+/* El Cañón Láser y los Meteoritos en Movimiento — chrome del juego. La escena (espacio, meteoritos, cañón, rueda y
+   botón DISPARAR) la dibuja Phaser.
+   Los botones redondos de reiniciar, salir, accesibilidad y volumen los pinta comun/interfaz.css. */
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('../../fonts/Fredoka-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('../../fonts/Fredoka-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --tinta: #14154a;
+  --crema: #fbfdff;
+  --turquesa: #20c3b0;
+  --turquesa-osc: #12897c;
+  --zoe: #f783ac;
+  --zeus: #fab005;
+  --hoja: #37b24d;
+  --c1: #ff8fab;
+  --cartel: #0ca678;
+  --letter-spacing: 1px;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #070b2e;
+  font-family: 'Fredoka', 'Arial Rounded MT Bold', Arial, sans-serif;
+  font-weight: 600;
+  letter-spacing: var(--letter-spacing);
+  color: var(--tinta);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------------------------------------------------------- portada compartida */
+
+.pantalla-inicio {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  overflow: hidden;
+}
+.pantalla-inicio[hidden] { display: none !important; }
+.pantalla-inicio.is-out { pointer-events: none; animation: inicioDisuelve 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.pantalla-inicio.is-out .inicio-contenido { animation: inicioContenidoSalida 0.28s linear forwards; }
+.pantalla-inicio.is-out .btn-empecemos { animation: none; opacity: 0; }
+.pantalla-inicio.is-out .inicio-mancha { animation: pinturaExpande 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; }
+
+@keyframes inicioContenidoSalida { to { opacity: 0; } }
+@keyframes pinturaExpande { from { clip-path: circle(0px at 50% 50%); } to { clip-path: circle(150vmax at 50% 50%); } }
+@keyframes inicioDisuelve { 0%, 58% { opacity: 1; } 100% { opacity: 0; } }
+
+body.esperando-inicio #principal,
+body.esperando-inicio .control-flotante,
+body.esperando-inicio .controles-arriba,
+body.esperando-inicio #pista,
+body.intro3d-activa #principal,
+body.intro3d-activa .control-flotante,
+body.intro3d-activa .controles-arriba,
+body.intro3d-activa #pista {
+  visibility: hidden;
+}
+
+/* ---------------------------------------------------------------- escena */
+
+#principal { position: fixed; inset: 0; z-index: 1; }
+
+#escenario {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #070b2e;
+  touch-action: none;
+}
+#escenario canvas { display: block; touch-action: none; }
+body.demo-lock #escenario { pointer-events: none; }
+
+/* ---------------------------------------------------------------- título del juego */
+
+.titulo-juego {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  z-index: 30;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 3px;
+  width: max-content;
+  max-width: min(760px, 56vw);
+  pointer-events: none;
+  text-align: center;
+  transition: transform 0.6s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+.titulo-kicker {
+  padding: 0 18px;
+  border: 4px solid #fff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ff9fc8, #e64980);
+  color: #fff;
+  font-weight: 700;
+  font-size: clamp(20px, 2.2vw, 32px);
+  line-height: 1.15;
+  text-shadow: 0 3px 0 #a61e4d;
+  box-shadow: 0 0 18px rgba(255, 79, 163, 0.75), 0 5px 0 rgba(166, 30, 77, 0.45);
+}
+.titulo-nombre {
+  display: block;
+  padding: 4px 22px 6px;
+  border: 4px solid #fff;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #4dd9ff, #1c7ed6);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: clamp(17px, 1.9vw, 28px);
+  line-height: 1.1;
+  text-shadow: 0 3px 0 #1864ab, 0 0 12px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 22px rgba(34, 227, 214, 0.75), 0 5px 0 rgba(24, 100, 171, 0.45);
+}
+.titulo-salto { flex-basis: 100%; height: 0; }
+body:not(.presentando) .titulo-salto { display: none; }
+.titulo-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 3px solid #4dd9ff;
+  color: #1864ab;
+  font-size: clamp(12px, 1.1vw, 16px);
+  font-weight: 700;
+}
+.titulo-sub i { color: #f59f00; }
+
+/* El título solo se ve en la presentación; en la partida y en el final no se muestra. */
+body:not(.presentando) .titulo-juego { display: none; }
+
+/* ---------------------------------------------------------------- indicador de nivel */
+
+/* Arriba a la derecha, debajo de reiniciar y salir: la barca navega por todo el cielo de la izquierda y el centro. */
+.nivel-ind {
+  position: fixed;
+  top: 80px;
+  right: 14px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 6px 12px 7px;
+  border: 4px solid #fff;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(214, 245, 255, 0.95));
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(43, 184, 216, 0.6), 0 10px 18px rgba(11, 59, 92, 0.3);
+  pointer-events: none;
+}
+.nivel-etq { font-size: clamp(16px, 1.5vw, 22px); color: #1864ab; font-weight: 700; line-height: 1; }
+.nivel-etq b { color: #e64980; }
+.nivel-estrellas { display: flex; gap: 4px; font-size: clamp(16px, 1.4vw, 21px); }
+.nivel-estrella { color: #c5e4f3; -webkit-text-stroke: 1px #74c0fc; transition: color 0.3s, transform 0.3s; }
+.nivel-estrella.hecha { color: #fcc419; -webkit-text-stroke: 1px #e67700; }
+.nivel-estrella.actual { color: #ffe8a1; -webkit-text-stroke: 1px #f59f00; animation: estrellaLate 1.1s ease-in-out infinite; }
+.nivel-nombre { max-width: 170px; text-align: right; font-size: clamp(11px, 0.95vw, 14px); line-height: 1.15; color: #0b7285; }
+.nivel-nombre:empty { display: none; }
+body.presentando .nivel-ind { opacity: 0; }
+body.en-final .nivel-ind { opacity: 0; }
+
+/* ---------------------------------------------------------------- HUD */
+
+.controles-arriba {
+  position: fixed;
+  top: 12px;
+  right: 14px;
+  z-index: 1500;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-round, .menu-acc-fab {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+}
+
+.control-flotante { position: fixed; bottom: 14px; z-index: 1500; }
+#menu-vol { right: 14px; }
+#menu-acc { right: 84px; }
+
+.panel-flotante {
+  position: absolute;
+  right: 0;
+  bottom: 74px;
+  width: min(320px, calc(100vw - 28px));
+  max-height: min(68vh, 460px);
+  overflow: auto;
+  padding: 12px 14px 14px;
+  border-radius: 20px;
+  background: var(--crema);
+  box-shadow: 0 12px 28px rgba(5, 10, 40, 0.4);
+}
+.panel-flotante[hidden] { display: none; }
+.panel-cab { display: flex; align-items: center; justify-content: space-between; font-size: 20px; }
+.panel-cerrar {
+  width: 42px; height: 42px;
+  border: 0; border-radius: 50%;
+  background: rgba(19, 35, 74, 0.1);
+  font-size: 26px;
+  cursor: pointer;
+}
+.panel-ops { display: flex; flex-direction: column; gap: 4px; }
+.panel-op { display: flex; align-items: center; gap: 10px; padding: 8px 4px; font-size: 17px; cursor: pointer; }
+.panel-op input[type="checkbox"] { width: 26px; height: 26px; accent-color: var(--hoja); }
+.panel-rango { flex-direction: column; align-items: stretch; }
+.panel-rango input[type="range"] { width: 100%; height: 28px; }
+
+/* ---------------------------------------------------------------- Zoe, Zeus y sus globos */
+
+.guia, .guia-zeus { position: fixed; z-index: 20; pointer-events: none; }
+#guia .guia-pj {
+  position: fixed;
+  left: -260px;
+  bottom: 8px;
+  width: 200px;
+  height: 280px;
+  transition: left 1.5s cubic-bezier(0.3, 0.05, 0.7, 0.95); /* = MARCHA_MS de script.js */
+}
+.guia-pj img { width: 100%; height: 100%; object-fit: contain; object-position: bottom center; }
+body.zoe-en #guia .guia-pj { left: 6px; }
+.guia-3d-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; filter: drop-shadow(0 6px 8px rgba(0, 10, 40, 0.45)); }
+.guia-pj.guia-3d-lista > img { opacity: 0; }
+
+.guia-zeus .guia-pj {
+  position: fixed;
+  left: auto;
+  right: -260px;
+  bottom: 8px;
+  width: 180px;
+  height: 260px;
+  transition: right 1.5s cubic-bezier(0.3, 0.05, 0.7, 0.95);
+}
+body.zeus-en .guia-zeus .guia-pj { right: 6px; }
+/* Zoe y Zeus tienen siempre el mismo tamaño y lugar (presentación, partida, cambio de nivel y final):
+   si cambiaran con la clase del body, saltarían cada vez que empieza o termina un nivel. */
+body.jugando .nube { max-width: min(260px, 20vw); font-size: clamp(14px, 1.2vw, 17px); }
+
+/* Globo de diálogo: sale del personaje hacia arriba (como en la referencia: Zoe rosa, Zeus amarillo). */
+.nube {
+  position: absolute;
+  left: 40%;
+  bottom: 96%;
+  width: max-content;
+  max-width: min(340px, 30vw);
+  padding: 10px 16px 12px;
+  border: 4px solid var(--zoe);
+  border-radius: 24px;
+  background: #fff5f8;
+  color: var(--tinta);
+  font-size: clamp(15px, 1.35vw, 19px);
+  line-height: 1.3;
+  box-shadow: 0 7px 0 rgba(230, 73, 128, 0.25), 0 14px 26px rgba(43, 35, 102, 0.25);
+  animation: nubeEntra 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.nube::after {
+  content: "";
+  position: absolute;
+  left: 26px;
+  bottom: -15px;
+  width: 0; height: 0;
+  border: 11px solid transparent;
+  border-top-color: var(--zoe);
+  border-bottom: 0;
+}
+.nube-nombre { display: block; color: #e64980; font-size: 0.95em; }
+.guia-zeus .nube { left: auto; right: 40%; border-color: var(--zeus); background: #fffbea; box-shadow: 0 7px 0 rgba(245, 159, 0, 0.3), 0 14px 26px rgba(43, 35, 102, 0.25); }
+.guia-zeus .nube::after { left: auto; right: 26px; border-top-color: var(--zeus); }
+.guia-zeus .nube-nombre { color: #e67700; }
+.nube[hidden] { display: none; }
+
+/* Pista breve en la partida (sin personajes en pantalla): Zoe a la izquierda, Zeus a la derecha. */
+#pista {
+  position: fixed;
+  left: 14px;
+  top: 33vh;
+  z-index: 1450;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(330px, 26vw);
+  padding: 8px 16px 8px 8px;
+  border: 4px solid var(--zoe);
+  border-radius: 26px;
+  background: #fff5f8;
+  box-shadow: 0 6px 0 rgba(230, 73, 128, 0.25), 0 12px 24px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+#pista.es-zeus { left: auto; right: 14px; border-color: var(--zeus); background: #fffbea; box-shadow: 0 6px 0 rgba(245, 159, 0, 0.3), 0 12px 24px rgba(0, 0, 0, 0.2); }
+#pista[hidden] { display: none; }
+#pista img { width: 52px; height: 52px; object-fit: contain; flex: none; }
+#pista p { margin: 0; font-size: clamp(15px, 1.4vw, 20px); line-height: 1.25; }
+#pista b { display: block; color: #e64980; font-size: 0.85em; }
+#pista.es-zeus b { color: #e67700; }
+#pista.sale { animation: pistaPop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1); }
+
+/* ---------------------------------------------------------------- botón de arranque */
+
+/* Sobre el lecho marino, como en la referencia (la escena escala con la altura: posición en vh). */
+.comenzar-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 5vh;
+  z-index: 1200;
+  flex-direction: column;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.comenzar-wrap[hidden] { display: none; }
+.btn-comenzar {
+  position: relative;
+  min-width: min(80vw, 340px);
+  min-height: 10vh;
+  padding: 0.8vh 48px;
+  border: 6px solid #fff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #b2f2bb 0%, #51cf66 45%, #2f9e44 100%);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  font-size: clamp(28px, 4.6vh, 44px);
+  text-shadow: 0 3px 0 rgba(0, 80, 20, 0.45);
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 8px 0 #2b8a3e, 0 0 34px rgba(255, 243, 191, 0.9), 0 18px 30px rgba(11, 59, 92, 0.35);
+  animation: comenzarPulso 1.4s ease-in-out infinite;
+}
+.btn-comenzar i {
+  display: inline-grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-right: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #2f9e44;
+  font-size: 26px;
+  vertical-align: middle;
+  text-shadow: none;
+}
+.btn-comenzar:focus-visible { outline: 4px solid #1565c0; outline-offset: 6px; }
+
+/* ---------------------------------------------------------------- cartel de nivel (color por nivel) */
+
+body.nivel-1 { --c1: #66d9e8; --cartel: #0c8599; }
+body.nivel-2 { --c1: #ff8cc6; --cartel: #d6336c; }
+body.nivel-3 { --c1: #ffd43b; --cartel: #1864ab; }
+body.nivel-4 { --c1: #b197fc; --cartel: #6741d9; }
+
+/* En el agua abierta, debajo de la barca (deja ver la red y las estrellas). */
+.cartel {
+  position: fixed;
+  top: 52%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1250;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+  max-width: min(760px, 70vw);
+  padding: 12px 52px 16px;
+  border: 5px solid #ffffff;
+  border-radius: 32px;
+  background: var(--cartel);
+  color: #fff;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.35), 0 0 34px var(--c1), 0 16px 30px rgba(43, 35, 102, 0.35);
+}
+.cartel.entra { animation: cartelEntra 0.55s cubic-bezier(0.2, 1.5, 0.4, 1); }
+.cartel[hidden] { display: none; }
+.cartel::before,
+.cartel::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  background: #fff7cc;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  filter: drop-shadow(0 0 6px #fff3bf);
+  animation: cartelChispa 1.4s ease-in-out infinite;
+}
+.cartel::before { left: 14px; }
+.cartel::after { right: 14px; animation-delay: 0.7s; }
+.cartel-etiqueta {
+  padding: 2px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--tinta);
+  font-size: clamp(13px, 1.25vw, 17px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.cartel-etiqueta:empty, .cartel-sub:empty { display: none; }
+.cartel strong {
+  display: block;
+  font-size: clamp(28px, 3.2vw, 46px);
+  line-height: 1.1;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 3px 0 rgba(43, 35, 102, 0.45), 0 0 18px rgba(255, 255, 255, 0.6);
+}
+.cartel-sub {
+  color: #ffffff;
+  font-size: clamp(16px, 1.5vw, 22px);
+  text-shadow: 0 2px 0 rgba(43, 35, 102, 0.35);
+}
+
+/* ---------------------------------------------------------------- festín final: mensaje grande */
+
+.mensaje-final {
+  position: fixed;
+  top: 36vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1260;
+  width: min(980px, 64vw);
+  text-align: center;
+  pointer-events: none;
+}
+.mensaje-final[hidden] { display: none; }
+.mensaje-final h1 {
+  margin: 0;
+  font-family: 'Fredoka', 'Arial Rounded MT Bold', Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(34px, 4.6vw, 66px);
+  line-height: 1.05;
+  color: #fff;
+  background: linear-gradient(90deg, #ffe066, #ffffff 30%, #c3fae8 60%, #d0ebff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 0 #1864ab) drop-shadow(0 0 18px rgba(255, 255, 255, 0.75));
+  animation: mensajeEntra 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both, mensajeBrilla 2.4s ease-in-out 1s infinite;
+}
+.mensaje-final p {
+  display: inline-block;
+  margin: 10px 0 0;
+  padding: 8px 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--tinta);
+  font-size: clamp(18px, 2vw, 30px);
+  font-weight: 700;
+  box-shadow: 0 0 22px rgba(255, 212, 59, 0.8), 0 6px 0 rgba(194, 37, 92, 0.45);
+  animation: mensajeEntra 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) 0.6s both;
+}
+@media (max-width: 1100px) {
+  .mensaje-final { width: 60vw; }
+  .mensaje-final h1 { font-size: 4vw; }
+  .mensaje-final p { font-size: 1.9vw; padding: 6px 18px; }
+}
+@keyframes mensajeEntra { from { opacity: 0; transform: translateY(-24px) scale(0.6); } }
+@keyframes mensajeBrilla { 0%, 100% { filter: drop-shadow(0 4px 0 #1864ab) drop-shadow(0 0 14px rgba(255, 255, 255, 0.6)); } 50% { filter: drop-shadow(0 4px 0 #1864ab) drop-shadow(0 0 30px rgba(197, 246, 250, 1)); } }
+
+/* ---------------------------------------------------------------- cómo jugar (presentación) */
+
+.pasos {
+  position: fixed;
+  left: 50%;
+  top: 30vh;
+  z-index: 1210;
+  transform: translateX(-50%);
+  width: min(560px, 58vw);
+  padding: 12px 22px 14px;
+  border: 5px solid #ffffff;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(225, 248, 255, 0.96));
+  color: var(--tinta);
+  box-shadow: 0 0 0 5px rgba(77, 217, 255, 0.5), 0 14px 28px rgba(11, 59, 92, 0.35);
+  pointer-events: none;
+  animation: instruccionEntra 0.6s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.pasos[hidden] { display: none; }
+.pasos p { margin: 0; }
+.pasos-voz { color: #e8590c; font-size: clamp(14px, 1.3vw, 18px); font-weight: 700; }
+.pasos-frase { margin: 2px 0 8px !important; color: #1864ab; font-size: clamp(18px, 1.9vw, 26px); font-weight: 700; line-height: 1.15; }
+.pasos-titulo { display: block; padding-top: 6px; border-top: 3px dashed #99e9f2; color: #0c8599; font-size: clamp(14px, 1.3vw, 18px); }
+.pasos-lista { margin: 6px 0 0; padding: 0; list-style: none; counter-reset: paso; }
+.pasos-lista li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 0;
+  font-size: clamp(14px, 1.35vw, 19px);
+  line-height: 1.2;
+  counter-increment: paso;
+}
+.pasos-lista li::before {
+  content: counter(paso);
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #1c7ed6;
+  color: #fff;
+  font-weight: 700;
+}
+.pasos-lista li span { flex: 1; }
+.pasos-lista li i { flex: none; color: #1c7ed6; font-size: 1.3em; }
+
+.comenzar-zoe {
+  margin: 12px 0 0;
+  padding: 4px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #d6336c;
+  font-size: clamp(15px, 1.5vw, 21px);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(11, 59, 92, 0.25);
+}
+.comenzar-zoe:empty { display: none; }
+
+@keyframes instruccionEntra { from { opacity: 0; transform: translate(-50%, 20px) scale(0.8); } }
+
+/* ---------------------------------------------------------------- progreso del nivel (estrellitas) */
+
+.progreso {
+  position: fixed;
+  top: 178px;
+  right: 14px;
+  z-index: 30;
+  display: flex;
+  gap: 3px;
+  padding: 4px 10px;
+  border: 4px solid #ffffff;
+  border-radius: 999px;
+  background: rgba(11, 114, 133, 0.55);
+  box-shadow: 0 6px 14px rgba(11, 59, 92, 0.3);
+  pointer-events: none;
+}
+.progreso:empty { display: none; }
+.progreso img { width: clamp(22px, 1.9vw, 30px); height: clamp(22px, 1.9vw, 30px); opacity: 0.4; filter: grayscale(1) brightness(1.6); transition: opacity 0.3s, filter 0.3s; }
+.progreso img.llena { opacity: 1; filter: none; animation: progresoPop 0.55s cubic-bezier(0.2, 1.6, 0.4, 1); }
+body.presentando .progreso, body.en-final .progreso, body.sin-progreso .progreso { display: none; }
+@keyframes progresoPop { 0% { transform: scale(0.3); } 100% { transform: scale(1); } }
+
+/* ---------------------------------------------------------------- pausa */
+
+.btn-pausa {
+  position: fixed;
+  top: 12px;
+  right: 150px;
+  z-index: 1500;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border: 6px solid #ffffff;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #74c0fc, #1c7ed6 70%);
+  color: #ffffff;
+  font-size: 22px;
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+.btn-pausa:active { transform: translateY(2px); }
+.btn-pausa:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+body.esperando-inicio .btn-pausa, body.intro3d-activa .btn-pausa, body.presentando .btn-pausa, body.en-final .btn-pausa { visibility: hidden; }
+
+.pausa {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: grid;
+  place-items: center;
+  background: rgba(11, 59, 92, 0.45);
+}
+.pausa[hidden] { display: none; }
+.pausa-caja {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 46px;
+  border: 6px solid #fff;
+  border-radius: 32px;
+  background: linear-gradient(180deg, #e3fafc, #99e9f2);
+  box-shadow: 0 16px 30px rgba(11, 59, 92, 0.4);
+}
+.pausa-caja strong { font-size: clamp(30px, 4vw, 52px); color: #0b7285; }
+.btn-seguir {
+  padding: 8px 34px;
+  border: 5px solid #fff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #8ce99a, #2f9e44);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  font-size: clamp(22px, 2.6vw, 32px);
+  box-shadow: 0 6px 0 #2b8a3e;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- victoria compartida */
+
+.final {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  width: 100%;
+  height: 100%;
+}
+.final[hidden] { display: none !important; }
+#texto_final { white-space: pre-line; }
+
+body.alto-contraste #escenario canvas { filter: contrast(1.2) saturate(1.15); }
+
+/* ---------------------------------------------------------------- animaciones */
+
+@keyframes comenzarPulso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes pistaPop { from { transform: scale(0.8); opacity: 0; } }
+@keyframes nubeEntra { from { transform: scale(0.7); opacity: 0; } }
+@keyframes estrellaLate { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+@keyframes cartelEntra {
+  0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; filter: brightness(2); }
+  60% { transform: translate(-50%, -50%) scale(1.06); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; filter: none; }
+}
+@keyframes cartelChispa { 0%, 100% { transform: scale(0.7) rotate(0deg); opacity: 0.6; } 50% { transform: scale(1.15) rotate(45deg); opacity: 1; } }
+
+/* Tableta horizontal (1024 × 768) y pantallas bajas. */
+@media (max-width: 1100px), (max-height: 700px) {
+  #guia .guia-pj { width: 170px; height: 240px; }
+  .guia-zeus .guia-pj { width: 160px; height: 230px; }
+  .nivel-nombre { max-width: 150px; }
+  .pasos { top: 26vh; width: 62vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantalla-inicio.is-out,
+  .pantalla-inicio.is-out .inicio-mancha,
+  .pantalla-inicio.is-out .inicio-contenido,
+  .btn-comenzar,
+  .nube,
+  .cartel,
+  .nivel-estrella.actual,
+  .mensaje-final h1,
+  .mensaje-final p,
+  .pasos,
+  .progreso img.llena { animation: none !important; }
+  .pantalla-inicio.is-out { opacity: 0; }
+}
+
+/* ================================================================ cabina espacial (propio de este juego) */
+
+/* Título de la presentación: neón espacial. */
+.titulo-kicker { background: linear-gradient(180deg, #ffd43b, #f08c00); text-shadow: 0 3px 0 #a14d00; box-shadow: 0 0 18px rgba(255, 212, 59, 0.8), 0 5px 0 rgba(161, 77, 0, 0.45); }
+.titulo-nombre { background: linear-gradient(180deg, #7048e8, #3b1d9e); border-color: #c5f6fa; text-shadow: 0 3px 0 #1b1464, 0 0 12px rgba(255, 255, 255, 0.5); box-shadow: 0 0 24px rgba(99, 230, 255, 0.8), 0 5px 0 rgba(27, 20, 100, 0.55); }
+.titulo-sub { border-color: #63e6ff; color: #3b1d9e; }
+.titulo-sub i { color: #f08c00; }
+.titulo-juego { max-width: min(860px, 62vw); }
+
+/* Cómo jugar (presentación), a la izquierda sobre Zoe. */
+.pasos {
+  left: 14px;
+  top: 34vh;
+  transform: none;
+  width: min(330px, 27vw);
+  padding: 10px 16px 12px;
+  border: 4px solid #63e6ff;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(36, 28, 110, 0.94), rgba(16, 20, 72, 0.94));
+  color: #e7f5ff;
+  box-shadow: 0 0 18px rgba(99, 230, 255, 0.55), 0 12px 24px rgba(0, 0, 0, 0.35);
+  animation: pasosEntra 0.6s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.pasos-cab { display: block; color: #ffe066; font-size: clamp(15px, 1.4vw, 20px); letter-spacing: 1px; }
+.pasos-cab i { color: #ffd43b; }
+.pasos-lista li { color: #e7f5ff; font-size: clamp(13px, 1.2vw, 17px); }
+.pasos-lista li::before { background: linear-gradient(180deg, #ffd43b, #f08c00); color: #2b1600; }
+.pasos-lista li i { color: #63e6ff; }
+body:not(.presentando) .pasos { display: none; }
+@keyframes pasosEntra { from { opacity: 0; transform: translateX(-30px) scale(0.85); } }
+
+/* Nivel y objetivos: arriba a la izquierda. */
+.nivel-ind {
+  top: 12px;
+  left: 14px;
+  right: auto;
+  align-items: flex-start;
+  padding: 6px 12px 8px;
+  border: 4px solid #63e6ff;
+  background: linear-gradient(180deg, rgba(36, 28, 110, 0.92), rgba(16, 20, 72, 0.92));
+  box-shadow: 0 0 16px rgba(99, 230, 255, 0.5), 0 8px 16px rgba(0, 0, 0, 0.35);
+}
+.nivel-etq { display: flex; align-items: center; gap: 8px; color: #e7f5ff; }
+.nivel-etq b { color: #ffe066; }
+.nivel-estrella { color: #3b3f8f; -webkit-text-stroke: 1px #748ffc; }
+.nivel-nombre { max-width: 230px; text-align: left; color: #99e9f2; }
+
+.progreso {
+  position: static;
+  margin-top: 2px;
+  padding: 3px 8px;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  background: rgba(7, 11, 46, 0.6);
+  box-shadow: none;
+}
+.progreso img { width: clamp(24px, 2.1vw, 32px); height: clamp(24px, 2.1vw, 32px); opacity: 0.9; filter: grayscale(0.35) brightness(1.35); }
+.progreso img.llena { opacity: 1; filter: drop-shadow(0 0 6px #ffe066); }
+body.presentando .nivel-ind { opacity: 1; }
+body.presentando .nivel-ind, body.en-final .nivel-ind { visibility: hidden; }
+
+/* PUNTOS ESTELARES: arriba a la derecha, debajo de reiniciar y salir. */
+.puntos {
+  position: fixed;
+  top: 80px;
+  right: 14px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px 6px 10px;
+  border: 4px solid #63e6ff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(36, 28, 110, 0.94), rgba(16, 20, 72, 0.94));
+  color: #e7f5ff;
+  box-shadow: 0 0 16px rgba(99, 230, 255, 0.55), 0 8px 16px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.puntos-estrella { color: #ffd43b; font-size: clamp(20px, 1.8vw, 28px); filter: drop-shadow(0 0 6px #ffd43b); }
+.puntos-etq { font-size: clamp(12px, 1.05vw, 16px); font-weight: 700; letter-spacing: 1px; color: #99e9f2; }
+.puntos-num { font-size: clamp(24px, 2.4vw, 36px); line-height: 1; color: #ffe066; text-shadow: 0 0 10px rgba(255, 224, 102, 0.8); font-variant-numeric: tabular-nums; }
+.puntos.sube { animation: puntosSube 0.6s cubic-bezier(0.2, 1.6, 0.4, 1); }
+.puntos.sube .puntos-estrella { animation: estrellaGira 0.7s ease-out; }
+body.en-final .puntos { visibility: hidden; }
+@keyframes puntosSube { 0% { transform: scale(1); } 40% { transform: scale(1.14); box-shadow: 0 0 30px rgba(255, 224, 102, 0.9); } 100% { transform: scale(1); } }
+@keyframes estrellaGira { from { transform: rotate(0) scale(1.6); } to { transform: rotate(360deg) scale(1); } }
+
+/* Pausa: a la izquierda de reiniciar y salir. */
+.btn-pausa { right: 150px; background: radial-gradient(circle at 35% 30%, #9775fa, #5f3dc4 70%); }
+body.presentando .btn-pausa { visibility: hidden; }
+
+/* Panel de comunicación de la cabina (voces de Zoe y Zeus durante la partida). */
+/* Arriba al centro, por encima de los carriles de los meteoritos (el título ya no está en la partida). */
+#pista, #pista.es-zeus {
+  top: 12px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  max-width: min(520px, 42vw);
+  border-color: #f783ac;
+  background: rgba(255, 245, 248, 0.97);
+}
+#pista.es-zeus { border-color: #ffd43b; background: #fffbea; }
+#pista img { width: 44px; height: 44px; }
+#pista.sale { animation: pistaBaja 0.35s cubic-bezier(0.2, 1.4, 0.4, 1); }
+@keyframes pistaBaja { from { transform: translate(-50%, -20px) scale(0.85); opacity: 0; } }
+
+/* Botón EMPEZAR naranja-dorado, como el de la referencia. */
+.btn-comenzar {
+  background: linear-gradient(180deg, #fff3bf 0%, #ffb21e 45%, #e8590c 100%);
+  box-shadow: 0 8px 0 #a63e00, 0 0 34px rgba(255, 212, 59, 0.9), 0 18px 30px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 3px 0 rgba(120, 40, 0, 0.5);
+}
+.btn-comenzar i { color: #e8590c; }
+/* Sobre el campo espacial, por encima del cañón. */
+.comenzar-wrap { bottom: auto; top: 46vh; }
+
+/* Cartel de nivel: neón por nivel. */
+body.nivel-1 { --c1: #ffd43b; --cartel: #5f3dc4; }
+body.nivel-2 { --c1: #4dabf7; --cartel: #1864ab; }
+body.nivel-3 { --c1: #ff922b; --cartel: #862e9c; }
+body.nivel-4 { --c1: #f783ac; --cartel: #c2255c; }
+.cartel { top: 40%; }
+
+/* Gran final. */
+.mensaje-final { top: 22vh; }
+.mensaje-final h1 { filter: drop-shadow(0 4px 0 #3b1d9e) drop-shadow(0 0 18px rgba(255, 255, 255, 0.75)); }
+.final-datos { display: flex; justify-content: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
+.final-datos span {
+  padding: 6px 18px;
+  border: 3px solid #63e6ff;
+  border-radius: 999px;
+  background: rgba(16, 20, 72, 0.9);
+  color: #e7f5ff;
+  font-size: clamp(16px, 1.6vw, 24px);
+  font-weight: 700;
+  box-shadow: 0 0 16px rgba(99, 230, 255, 0.6);
+  animation: mensajeEntra 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) 1s both;
+}
+.final-datos b { color: #ffe066; }
+.final-datos i { color: #ffd43b; }
+
+#escenario { background: #070b2e; }
+
+@media (max-width: 1100px), (max-height: 700px) {
+  .pasos { top: 33vh; width: 31vw; }
+  .puntos { top: 76px; }
+}
+
+/* Globos de Zoe y Zeus más compactos: dejan ver el meteorito de la demostración. */
+.nube { max-width: min(290px, 23vw); font-size: clamp(13px, 1.15vw, 17px); padding: 8px 14px 10px; }
+
+/* Pista de teclado (solo con ratón): sin número, un poco más tenue. */
+.pasos-lista li.pasos-teclado { counter-increment: none; margin-top: 8px; padding-top: 6px; border-top: 2px dashed rgba(99, 230, 255, 0.45); color: #99e9f2; font-size: clamp(12px, 1.05vw, 15px); }
+.pasos-lista li.pasos-teclado::before { content: "8"; background: #3b5bdb; color: #fff; font-size: 16px; }
+
+/* Objetivo con coraza (2 disparos): anillo plateado en la miniatura. */
+.progreso img.doble { border-radius: 50%; box-shadow: 0 0 0 3px #bac8ff, 0 0 8px #91a7ff; }

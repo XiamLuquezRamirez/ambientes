@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="cielo" cx="0.5" cy="0.3" r="0.85"><stop offset="0" stop-color="#3b2aa0"/><stop offset="0.6" stop-color="#16195e"/><stop offset="1" stop-color="#070b2e"/></radialGradient>
+    <radialGradient id="met" cx="0.38" cy="0.34" r="0.75"><stop offset="0" stop-color="#ffe27a"/><stop offset="0.5" stop-color="#c98a1b"/><stop offset="1" stop-color="#7a4a08"/></radialGradient>
+    <linearGradient id="estela" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffb703" stop-opacity="0"/><stop offset="1" stop-color="#ffd43b" stop-opacity="0.95"/></linearGradient>
+    <linearGradient id="tubo" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1e2a7a"/><stop offset="0.45" stop-color="#9db7ff"/><stop offset="1" stop-color="#2b3a8f"/></linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#cielo)"/>
+  <circle cx="44" cy="40" r="2.5" fill="#fff"/><circle cx="210" cy="30" r="2" fill="#fff"/><circle cx="226" cy="96" r="2.5" fill="#d0ebff"/><circle cx="30" cy="120" r="2" fill="#fff3bf"/><circle cx="120" cy="22" r="1.8" fill="#fff"/>
+  <path d="M24 70 Q110 40 164 66 L160 98 Q100 92 24 70 Z" fill="url(#estela)"/>
+  <circle cx="176" cy="80" r="44" fill="#ffd43b" opacity="0.25"/>
+  <path d="M176 46 Q206 50 210 80 Q208 112 176 116 Q144 112 142 82 Q146 50 176 46 Z" fill="url(#met)" stroke="#7a4a08" stroke-width="4"/>
+  <path d="M156 80 L170 86 L176 74 L192 82" stroke="#fff1a1" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M120 196 L170 104" stroke="#63e6ff" stroke-width="5" stroke-dasharray="12 9" stroke-linecap="round" opacity="0.9"/>
+  <ellipse cx="112" cy="222" rx="76" ry="20" fill="#1c2a78" stroke="#4dd9ff" stroke-width="5"/>
+  <g transform="rotate(30 112 206)">
+    <rect x="96" y="128" width="32" height="80" rx="12" fill="url(#tubo)" stroke="#0b1450" stroke-width="4"/>
+    <rect x="92" y="148" width="40" height="9" rx="4.5" fill="#2fe3ff" stroke="#0b1450" stroke-width="3"/>
+    <rect x="90" y="122" width="44" height="20" rx="8" fill="url(#tubo)" stroke="#0b1450" stroke-width="4"/>
+  </g>
+  <path d="M74 222 Q74 186 112 180 Q150 186 150 222 Z" fill="#4c6ef5" stroke="#0b1450" stroke-width="4"/>
+  <circle cx="112" cy="204" r="9" fill="#ffe066"/>
+</svg>

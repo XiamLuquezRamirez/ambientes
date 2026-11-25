@@ -1,0 +1,267 @@
+{
+  "nombre": "El Cañón Láser y los Meteoritos en Movimiento",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 25,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "pivoteX": 800,
+    "pivoteY": 800,
+    "largoCanon": 145,
+    "limiteGrados": 70,
+    "diaX": 548,
+    "diaY": 806,
+    "diaRadio": 96,
+    "botonX": 1052,
+    "botonY": 800,
+    "botonRadio": 84,
+    "radioProyectil": 13,
+    "puntosDorado": 100,
+    "puntosNormal": 50,
+    "bonusPreciso": 20,
+    "fallosParaAyuda": 2,
+    "fallosParaAsistir": 3,
+    "quietoParaAyudaMs": 10000,
+    "pausaEntreMeteoritosMs": 700,
+    "vozPausaMs": 2600,
+    "vozFalloMs": 5000,
+    "puntosExtraCoraza": 50,
+    "puntosCoraza": 10
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "nombre": "MI PRIMER DISPARO ESTELAR",
+      "meteoritos": 5,
+      "dorados": 5,
+      "resistentes": 1,
+      "simultaneos": 1,
+      "carriles": [
+        290,
+        400
+      ],
+      "alturaVar": 30,
+      "tamanos": [
+        62,
+        80
+      ],
+      "velMin": 62,
+      "velMax": 78,
+      "diagonal": 0,
+      "vaiven": 0,
+      "velProyectil": 1250,
+      "recargaMs": 650,
+      "tolerancia": 1.45,
+      "miraAlfa": 1,
+      "direccion": false,
+      "tema": "nebulosa",
+      "voz": "zeus",
+      "instruccion": "¡Piloto estelar! Gira el cañón hacia el meteorito y toca DISPARAR cuando tu mira esté lista.",
+      "instruccion2": "¡Muy bien! Mira la línea de luz para saber hacia dónde va tu disparo.",
+      "cartel": {
+        "etiqueta": "Nivel 1",
+        "titulo": "MI PRIMER DISPARO ESTELAR",
+        "sub": "Cinco meteoritos dorados"
+      },
+      "logro": "¡Cinco meteoritos dorados convertidos en estrellas!",
+      "despedida": "zeus",
+      "invita": "¡Ahora protege la galaxia azul!"
+    },
+    {
+      "id": 2,
+      "nombre": "PROTEGE LA GALAXIA AZUL",
+      "meteoritos": 7,
+      "dorados": 3,
+      "resistentes": 2,
+      "simultaneos": 2,
+      "carriles": [
+        225,
+        480
+      ],
+      "alturaVar": 20,
+      "tamanos": [
+        52,
+        72
+      ],
+      "velMin": 82,
+      "velMax": 100,
+      "diagonal": 60,
+      "vaiven": 0,
+      "velProyectil": 1250,
+      "recargaMs": 700,
+      "tolerancia": 1.28,
+      "miraAlfa": 0.9,
+      "direccion": false,
+      "tema": "galaxiaAzul",
+      "voz": "zoe",
+      "instruccion": "¡Apunta hacia el meteorito y observa su trayectoria!",
+      "cartel": {
+        "etiqueta": "Nivel 2",
+        "titulo": "PROTEGE LA GALAXIA AZUL",
+        "sub": "Siete meteoritos"
+      },
+      "logro": "¡El planeta azul brilla de alegría!",
+      "despedida": "zeus",
+      "invita": "¡Vamos al campo de asteroides!"
+    },
+    {
+      "id": 3,
+      "nombre": "DEFENSA DEL CAMPO DE ASTEROIDES",
+      "meteoritos": 9,
+      "dorados": 3,
+      "resistentes": 2,
+      "simultaneos": 2,
+      "carriles": [
+        225,
+        500
+      ],
+      "alturaVar": 12,
+      "tamanos": [
+        46,
+        66
+      ],
+      "velMin": 92,
+      "velMax": 122,
+      "diagonal": 70,
+      "vaiven": 12,
+      "velProyectil": 1200,
+      "recargaMs": 720,
+      "tolerancia": 1.16,
+      "miraAlfa": 0.66,
+      "direccion": true,
+      "tema": "asteroides",
+      "voz": "zeus",
+      "instruccion": "¡Observa hacia dónde se mueve y dispara un poquito antes!",
+      "cartel": {
+        "etiqueta": "Nivel 3",
+        "titulo": "DEFENSA DEL CAMPO DE ASTEROIDES",
+        "sub": "Nueve meteoritos"
+      },
+      "logro": "¡El campo de asteroides se ilumina!",
+      "despedida": "ambos",
+      "invita": "¡Llegó el momento del gran defensor estelar!"
+    },
+    {
+      "id": 4,
+      "nombre": "EL GRAN DEFENSOR ESTELAR",
+      "meteoritos": 11,
+      "dorados": 3,
+      "resistentes": 3,
+      "simultaneos": 3,
+      "carriles": [
+        182,
+        362,
+        542
+      ],
+      "alturaVar": 0,
+      "tamanos": [
+        44,
+        58
+      ],
+      "velMin": 95,
+      "velMax": 140,
+      "diagonal": 30,
+      "vaiven": 8,
+      "velProyectil": 1200,
+      "recargaMs": 750,
+      "tolerancia": 1.1,
+      "miraAlfa": 0.55,
+      "direccion": true,
+      "tema": "supernova",
+      "voz": "zoe",
+      "instruccion": "¡Once meteoritos de luz! Ajusta el cañón, observa y dispara en el momento justo.",
+      "cartel": {
+        "etiqueta": "Nivel 4",
+        "titulo": "EL GRAN DEFENSOR ESTELAR",
+        "sub": "Once meteoritos"
+      },
+      "logro": "¡La galaxia está a salvo!",
+      "despedida": "ambos",
+      "invita": ""
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "El Cañón Láser y los Meteoritos en Movimiento",
+    "tituloJuego": "JUEGO 1",
+    "subtituloJuego": "PUNTERÍA — ÁNGULO VARIABLE",
+    "botonComenzar": "EMPEZAR",
+    "introZeus": "¡Defensa estelar, súper piloto! Los meteoritos de luz se acercan. Rota el cañón láser calculando su dirección, apunta hacia el blanco en movimiento y toca el botón de disparo para desintegrarlos.",
+    "introZoe": "¡Gira el cañón un poco más arriba para que el láser alcance al meteorito en el aire!",
+    "pasosTitulo": "CÓMO JUGAR",
+    "pasosTeclado": "En el computador: flechas ← → para girar y ESPACIO para disparar",
+    "pasos": [
+      "Desliza el dedo en la rueda para girar el cañón",
+      "Mira la línea de luz: así va tu disparo",
+      "Toca DISPARAR en el momento justo. ¡Los de coraza necesitan dos!"
+    ],
+    "acierto": [
+      "¡Impacto perfecto!",
+      "¡Meteorito destruido!",
+      "¡Qué buena puntería!",
+      "¡Buen trabajo, piloto!"
+    ],
+    "preciso": "¡Impacto perfecto!",
+    "consejos": {
+      "arriba": "¡Gira el cañón un poco más arriba para que el láser alcance al meteorito en el aire!",
+      "izquierda": "¡Gira un poquito más hacia la izquierda!",
+      "derecha": "¡Gira un poquito más hacia la derecha!",
+      "anticipa": "¡Observa hacia dónde se mueve! Dispara un poquito antes.",
+      "espera": "¡Espera un poquito a que llegue a tu mira!",
+      "general": "¡Ajusta tu puntería e inténtalo de nuevo!"
+    },
+    "fallo": [
+      "¡Inténtalo de nuevo!",
+      "¡Ajusta tu puntería!",
+      "¡Mira hacia dónde se mueve!"
+    ],
+    "quieto": [
+      "¡Prepara el cañón!",
+      "¡Apunta hacia el meteorito!",
+      "¡Observa su trayectoria!"
+    ],
+    "enMira": "¡Ahora puedes disparar!",
+    "otro": "¡Ahí viene otro meteorito!",
+    "cierreTitulo": "¡NIVEL SUPERADO!",
+    "cierreNivel": "¡Qué buena puntería, piloto! ¡La galaxia brilla con tus disparos!",
+    "cierre": "¡IMPECABLE DEFENSOR ESTELAR! Calculaste los ángulos y disparaste con una precisión de francotirador galáctico.",
+    "finalTitulo": "¡IMPECABLE DEFENSOR ESTELAR!",
+    "finalSub": "¡LA GALAXIA ESTÁ A SALVO!",
+    "finalZeus": "¡La galaxia está a salvo gracias a ti!",
+    "victoria": "¡IMPECABLE DEFENSOR ESTELAR!\n¡LA GALAXIA ESTÁ A SALVO!",
+    "pausa": "Pausa",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe! ¡Mira el cielo! Unos meteoritos de luz están cruzando nuestra galaxia."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Vamos a la base estelar! Con el cañón láser los convertiremos en polvo de estrellas."
+      }
+    ],
+    "corazaAviso": "¡Ese meteorito tiene coraza! Necesita dos disparos.",
+    "corazaRota": [
+      "¡Le rompiste la coraza! ¡Un disparo más!",
+      "¡La coraza se rompió! ¡Otra vez!",
+      "¡Ya casi! ¡Dispara otra vez!"
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Puntería con ángulo variable"
+    }
+  ]
+}

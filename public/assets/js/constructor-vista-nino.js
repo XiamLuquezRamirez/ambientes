@@ -2087,7 +2087,36 @@
             const p = player.play();
             if (p && typeof p.catch === 'function') p.catch(function () { /* noop */ });
         } catch (e) { /* noop */ }
+        desbloquearVozNavegador();
     }
+
+    // Chrome bloquea speechSynthesis.speak() fuera de un toque ("not-allowed") hasta
+    // que se habla una vez dentro de un gesto. Sin servidor TTS esa es la única voz,
+    // así que se prepara en el gesto y, si algo quedó bloqueado, se repite al tocar.
+    let vozNavegadorLista = false;
+    let vozNavegadorPendiente = null;
+
+    function desbloquearVozNavegador() {
+        if (!window.speechSynthesis || vozNavegadorLista) return;
+        try {
+            const u = new SpeechSynthesisUtterance(' ');
+            u.volume = 0;
+            u.onend = function () { vozNavegadorLista = true; };
+            window.speechSynthesis.speak(u);
+            vozNavegadorLista = true;
+        } catch (e) { /* noop */ }
+    }
+
+    ['pointerdown', 'touchend', 'keydown'].forEach(function (ev) {
+        document.addEventListener(ev, function () {
+            desbloquearVozNavegador();
+            const pend = vozNavegadorPendiente;
+            if (!pend) return;
+            vozNavegadorPendiente = null;
+            if (pend.token !== ttsToken) return;
+            hablarConNavegador(pend.texto, pend.token, pend.onEnd, pend.personaje, true);
+        }, true);
+    });
 
     function vozNaturalEspanol() {
         if (!window.speechSynthesis) return null;
@@ -2117,6 +2146,7 @@
 
     function detenerVoz() {
         ttsToken += 1;
+        vozNavegadorPendiente = null;
         if (ttsKeepAlive) {
             clearInterval(ttsKeepAlive);
             ttsKeepAlive = null;
@@ -2136,17 +2166,21 @@
         $body.find('.vn-tts-replay').removeClass('is-speaking');
     }
 
-    function hablarConNavegador(t, myToken, onEnd, personaje) {
+    function hablarConNavegador(t, myToken, onEnd, personaje, sinVozElegida) {
         if (!window.speechSynthesis) {
             if (typeof onEnd === 'function') onEnd();
             return;
         }
+        if (myToken !== ttsToken) return;
         if (ttsKeepAlive) {
             clearInterval(ttsKeepAlive);
             ttsKeepAlive = null;
         }
+        $body.find('.vn-tts-replay').addClass('is-speaking');
         const u = new SpeechSynthesisUtterance(t);
-        const voice = vozNaturalEspanol();
+        // La voz preferida suele ser de red (Google/Online): si falla, se repite
+        // con la voz local por defecto del sistema.
+        const voice = sinVozElegida ? null : vozNaturalEspanol();
         u.lang = (voice && voice.lang) ? voice.lang : 'es-MX';
         if (voice) u.voice = voice;
         u.rate = ttsRatePerfil();
@@ -2161,8 +2195,24 @@
             $body.find('.vn-tts-replay').removeClass('is-speaking');
             if (typeof onEnd === 'function') onEnd();
         };
-        u.onerror = function () {
+        u.onerror = function (ev) {
             if (myToken !== ttsToken) return;
+            const err = ev && ev.error;
+            if (err === 'interrupted' || err === 'canceled') return;
+            if (ttsKeepAlive) {
+                clearInterval(ttsKeepAlive);
+                ttsKeepAlive = null;
+            }
+            if (err === 'not-allowed') {
+                // Sin gesto previo: hablar en cuanto el niño toque la pantalla.
+                vozNavegadorLista = false;
+                vozNavegadorPendiente = { texto: t, token: myToken, onEnd: onEnd, personaje: personaje };
+                return;
+            }
+            if (!sinVozElegida && voice) {
+                hablarConNavegador(t, myToken, onEnd, personaje, true);
+                return;
+            }
             $body.find('.vn-tts-replay').removeClass('is-speaking');
             if (typeof onEnd === 'function') onEnd();
         };
@@ -2273,7 +2323,11 @@
             player.src = src;
             try { player.playbackRate = ttsRatePerfil(); } catch (e) { /* noop */ }
             player.onended = terminar;
-            player.onerror = terminar;
+            player.onerror = function () {
+                if (myToken !== ttsToken) return;
+                player.onerror = null;
+                hablarConNavegador(t, myToken, onEnd, pj);
+            };
             const p = player.play();
             if (p && typeof p.then === 'function') {
                 p.then(function () {

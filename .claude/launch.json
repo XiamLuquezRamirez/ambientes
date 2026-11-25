@@ -396,6 +396,19 @@
       ],
       "port": 8056,
       "autoPort": false
+    },
+    {
+      "name": "juegos-canon",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8057",
+        "--directory",
+        "public"
+      ],
+      "port": 8057,
+      "autoPort": false
     }
   ]
 }
