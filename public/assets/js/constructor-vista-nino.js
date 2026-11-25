@@ -2147,6 +2147,7 @@
     function detenerVoz() {
         ttsToken += 1;
         vozNavegadorPendiente = null;
+        liberarVoz();
         if (ttsKeepAlive) {
             clearInterval(ttsKeepAlive);
             ttsKeepAlive = null;
@@ -2235,6 +2236,39 @@
         }, 250);
     }
 
+    // Voz en curso (incluye la espera del audio del servidor): el avance
+    // automático espera a que termine para no cortar la frase a la mitad.
+    let vozOcupadaToken = null;
+    let vozEsperas = [];
+
+    function liberarVoz(token) {
+        if (token !== undefined && token !== vozOcupadaToken) return;
+        vozOcupadaToken = null;
+        // Diferido: en una secuencia la línea siguiente arranca dentro del onEnd.
+        setTimeout(function () {
+            if (vozOcupadaToken !== null) return;
+            const esperas = vozEsperas;
+            vozEsperas = [];
+            esperas.forEach(function (fn) { fn(); });
+        }, 0);
+    }
+
+    function esperarFinVoz(cb, maxMs) {
+        if (vozOcupadaToken === null) {
+            cb();
+            return;
+        }
+        let hecho = false;
+        const correr = function () {
+            if (hecho) return;
+            hecho = true;
+            clearTimeout(tope);
+            cb();
+        };
+        const tope = setTimeout(correr, maxMs || 25000);
+        vozEsperas.push(correr);
+    }
+
     function hablarTexto(texto, onEnd, personaje, opts) {
         const t = String(texto || '').replace(/\s+/g, ' ').trim();
         if (!t) {
@@ -2247,6 +2281,12 @@
             ttsToken += 1;
         }
         const myToken = ttsToken;
+        vozOcupadaToken = myToken;
+        const onEndUsuario = onEnd;
+        onEnd = function () {
+            liberarVoz(myToken);
+            if (typeof onEndUsuario === 'function') onEndUsuario();
+        };
         if (!encadenar && ttsKeepAlive) {
             clearInterval(ttsKeepAlive);
             ttsKeepAlive = null;
@@ -2620,32 +2660,49 @@
         }
     }
 
+    let avanceEsperaId = 0;
+
     function cancelarAvanceAutomatico() {
+        avanceEsperaId += 1;
         if (!bloqueAvanceTimer) return;
         clearTimeout(bloqueAvanceTimer);
         bloqueAvanceTimer = null;
     }
 
+    // Cumplido el tiempo mínimo, espera además a que termine la voz en curso.
+    function programarTrasVoz(fn) {
+        const espera = ++avanceEsperaId;
+        bloqueAvanceTimer = setTimeout(() => {
+            bloqueAvanceTimer = null;
+            esperarFinVoz(() => {
+                if (espera !== avanceEsperaId) return;
+                // Pausa corta para que la frase no empalme con el cambio de bloque.
+                bloqueAvanceTimer = setTimeout(() => {
+                    bloqueAvanceTimer = null;
+                    if (espera === avanceEsperaId) fn();
+                }, 400);
+            });
+        }, BLOQUE_AVANCE_MS);
+    }
+
     function programarAvanceAutomatico() {
         cancelarAvanceAutomatico();
         const bloqueIdx = index;
-        bloqueAvanceTimer = setTimeout(() => {
-            bloqueAvanceTimer = null;
+        programarTrasVoz(() => {
             if (index !== bloqueIdx) return;
             const bloque = bloques[index];
             const extra = perfilHonra('auto_avance') && perfilV('auto_avance', false);
             if (!bloque || (!extra && !['pregunta', 'reto'].includes(bloque.tipo))) return;
             if (!bloqueEstaCompleto(bloque)) return;
             alClicSiguiente();
-        }, BLOQUE_AVANCE_MS);
+        });
     }
 
     function programarAvanceRetoPaso($box) {
         cancelarAvanceAutomatico();
         const bloqueIdx = index;
         const pasoIdx = retoPaso;
-        bloqueAvanceTimer = setTimeout(() => {
-            bloqueAvanceTimer = null;
+        programarTrasVoz(() => {
             if (index !== bloqueIdx || retoPaso !== pasoIdx) return;
             const total = Number($box.data('total-pasos')) || 1;
             if (retoPaso < total - 1) {
@@ -2656,7 +2713,7 @@
             $box.data('locked', true);
             alCompletarActividad();
             programarAvanceAutomatico();
-        }, BLOQUE_AVANCE_MS);
+        });
     }
 
     function actualizarNavBloque() {

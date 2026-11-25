@@ -1287,6 +1287,8 @@ export async function armarMundo(scene, { modesto = false, ambiente = '', escala
             }
         },
         actualizar: (dt, t) => fauna.update(dt, t),
+        // Para el sonido ambiente: qué animal es y su objeto 3D (posición viva).
+        animales: () => fauna.lista.map((a) => ({ nombre: a.nombre, o: a.o })),
         destruir: () => {
             obra.destruir();
             fauna.destruir();

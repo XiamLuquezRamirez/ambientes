@@ -10,7 +10,8 @@
  * como <script type="module">.
  */
 import * as THREE from 'three';
-import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR, CLIP_CELEBRAR } from './mapa-mundo.js?v=20261008a';
+import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR, CLIP_CELEBRAR } from './mapa-mundo.js?v=20261125a';
+import { crearSonidoAmbiente } from './sonido-ambiente-mundo.js?v=20261125a';
 
 // Altura del suelo. El terreno queda en 0; este número es donde pisa el personaje.
 // Súbelo si se hunde en la arena. Bájalo si flota. La malla del sendero no se mueve con esto.
@@ -70,6 +71,7 @@ const ALTURA_SUELO = 0.2;
     let equipoModesto = false; // tablet/móvil: recorta calidad para ganar fluidez
     let usaMapaGlb = false;
     let mundo = null;
+    let sonidoAmbiente = null;
     let cargaId = 0;
     let mixer = null;
     let accionesPersonaje = null;
@@ -115,61 +117,192 @@ const ALTURA_SUELO = 0.2;
 
 
     // ===================== Voz (TTS del servidor, igual que el player) =====================
+    // Si el servidor de voz no contesta rápido (o no está), habla el navegador.
+    const TTS_ESPERA_MS = 700;
+    const TTS_SERVIDOR_CAIDO_MS = 60000;
+    let ttsServidorCaidoHasta = 0;
+    let narracionToken = 0;
+    let vozNavegadorLista = false;
+    let vozNavegadorPendiente = null;
+    let vozKeepAlive = null;
+
+    function vozEspanolNavegador() {
+        const sintesis = window.speechSynthesis;
+        if (!sintesis) return null;
+        let mejor = null;
+        let puntos = -1;
+        (sintesis.getVoices() || []).forEach(function (v) {
+            const lang = String(v.lang || '').toLowerCase().replace('_', '-');
+            const nombre = String(v.name || '').toLowerCase();
+            if (!lang.startsWith('es') && !/spanish|español/.test(nombre)) return;
+            let p = 10;
+            if (lang.indexOf('co') >= 0) p += 20;
+            else if (lang.indexOf('mx') >= 0) p += 16;
+            else if (lang.indexOf('us') >= 0 || lang.indexOf('419') >= 0) p += 12;
+            if (/google|natural|neural|online/.test(nombre)) p += 12;
+            if (p > puntos) { puntos = p; mejor = v; }
+        });
+        return mejor;
+    }
+
+    // Chrome bloquea speechSynthesis.speak() hasta que se habla dentro de un toque.
+    function desbloquearVozNavegador() {
+        if (!window.speechSynthesis || vozNavegadorLista) return;
+        try {
+            const u = new SpeechSynthesisUtterance(' ');
+            u.volume = 0;
+            window.speechSynthesis.speak(u);
+            vozNavegadorLista = true;
+        } catch (e) { /* noop */ }
+    }
+
+    if (window.speechSynthesis) {
+        try { window.speechSynthesis.getVoices(); } catch (e) { /* noop */ }
+    }
+    ['pointerdown', 'touchend', 'keydown'].forEach(function (ev) {
+        document.addEventListener(ev, function () {
+            desbloquearVozNavegador();
+            const pend = vozNavegadorPendiente;
+            vozNavegadorPendiente = null;
+            if (pend && pend.token === narracionToken) {
+                hablarConNavegador(pend.texto, pend.token, pend.alTerminar, pend.alEmpezar, true);
+            }
+        }, true);
+    });
+
     function detenerNarracion() {
+        narracionToken += 1;
         narrando = false;
+        vozNavegadorPendiente = null;
+        if (vozKeepAlive) { clearInterval(vozKeepAlive); vozKeepAlive = null; }
+        if (window.speechSynthesis) {
+            try { window.speechSynthesis.cancel(); } catch (e) { /* noop */ }
+        }
         if (!audioNarracion) return;
         try {
+            audioNarracion.onended = null;
+            audioNarracion.onerror = null;
             audioNarracion.pause();
             audioNarracion.currentTime = 0;
         } catch (e) { /* noop */ }
         audioNarracion = null;
     }
 
-    function hablar(texto, alTerminar) {
+    function duracionEstimadaVoz(texto) {
+        return 1500 + String(texto || '').length * 85;
+    }
+
+    function hablarConNavegador(texto, token, alTerminar, alEmpezar, sinVozElegida) {
+        if (token !== narracionToken) return;
+        const sintesis = window.speechSynthesis;
+        const fin = function () {
+            if (token !== narracionToken) return;
+            if (vozKeepAlive) { clearInterval(vozKeepAlive); vozKeepAlive = null; }
+            narrando = false;
+            if (alTerminar) alTerminar();
+        };
+        if (!sintesis || !window.SpeechSynthesisUtterance) { fin(); return; }
+        const u = new SpeechSynthesisUtterance(texto);
+        const voz = sinVozElegida ? null : vozEspanolNavegador();
+        u.lang = voz && voz.lang ? voz.lang : 'es-MX';
+        if (voz) u.voice = voz;
+        u.rate = 0.95;
+        u.pitch = 1.1;
+        u.onstart = function () {
+            if (token === narracionToken && alEmpezar) alEmpezar(duracionEstimadaVoz(texto));
+        };
+        u.onend = fin;
+        u.onerror = function (ev) {
+            if (token !== narracionToken) return;
+            const err = ev && ev.error;
+            if (err === 'interrupted' || err === 'canceled') return;
+            if (err === 'not-allowed') {
+                // Sin gesto previo: habla en cuanto el niño toque la pantalla.
+                vozNavegadorLista = false;
+                vozNavegadorPendiente = { texto, token, alTerminar, alEmpezar };
+                return;
+            }
+            if (!sinVozElegida && voz) { hablarConNavegador(texto, token, alTerminar, alEmpezar, true); return; }
+            fin();
+        };
+        try {
+            sintesis.speak(u);
+            if (sintesis.paused) sintesis.resume();
+        } catch (e) { fin(); return; }
+        if (vozKeepAlive) clearInterval(vozKeepAlive);
+        vozKeepAlive = setInterval(function () {
+            if (token !== narracionToken) { clearInterval(vozKeepAlive); vozKeepAlive = null; return; }
+            if (sintesis.speaking && sintesis.paused) {
+                try { sintesis.resume(); } catch (e) { /* noop */ }
+            }
+        }, 250);
+    }
+
+    // alEmpezar(msEstimados) avisa cuando la voz por fin suena, para que el
+    // diálogo no se cierre contando el tiempo que tardó en llegar el audio.
+    function hablar(texto, alTerminar, alEmpezar) {
         if (!texto) {
             if (alTerminar) alTerminar();
             return;
         }
+        detenerNarracion();
+        narrando = true;
+        const token = narracionToken;
         const urlTts = String(ctx.$app?.data('url-tts') || '');
-        if (!urlTts || !$) {
-            if (alTerminar) alTerminar();
+
+        if (!urlTts || !$ || Date.now() < ttsServidorCaidoHasta) {
+            hablarConNavegador(texto, token, alTerminar, alEmpezar);
             return;
         }
 
-        detenerNarracion();
-        narrando = true;
+        let yaHablo = false;
+        const usarNavegador = function () {
+            if (token !== narracionToken || yaHablo) return;
+            yaHablo = true;
+            clearTimeout(timerRapido);
+            hablarConNavegador(texto, token, alTerminar, alEmpezar);
+        };
+        const timerRapido = setTimeout(usarNavegador, TTS_ESPERA_MS);
 
         $.ajax({
             url: urlTts,
             method: 'GET',
             data: { texto },
             dataType: 'json',
+            timeout: 25000,
         }).done(function (res) {
+            if (token !== narracionToken || yaHablo) return;
             const audioUrl = res?.data?.url;
-            if (!audioUrl) {
-                narrando = false;
-                if (alTerminar) alTerminar();
-                return;
-            }
-            audioNarracion = new Audio(audioUrl);
-            audioNarracion.onended = function () {
+            if (!audioUrl) { usarNavegador(); return; }
+            yaHablo = true;
+            clearTimeout(timerRapido);
+            const audio = new Audio(audioUrl);
+            audioNarracion = audio;
+            audio.onplaying = function () {
+                if (token !== narracionToken || !alEmpezar) return;
+                const ms = isFinite(audio.duration) && audio.duration > 0
+                    ? audio.duration * 1000
+                    : duracionEstimadaVoz(texto);
+                alEmpezar(ms);
+            };
+            audio.onended = function () {
+                if (token !== narracionToken) return;
                 narrando = false;
                 audioNarracion = null;
                 if (alTerminar) alTerminar();
             };
-            audioNarracion.onerror = function () {
-                narrando = false;
+            const respaldo = function () {
+                if (token !== narracionToken) return;
+                audio.onended = null;
+                audio.onerror = null;
                 audioNarracion = null;
-                if (alTerminar) alTerminar();
+                hablarConNavegador(texto, token, alTerminar, alEmpezar);
             };
-            audioNarracion.play().catch(function () {
-                narrando = false;
-                audioNarracion = null;
-                if (alTerminar) alTerminar();
-            });
+            audio.onerror = respaldo;
+            audio.play().catch(respaldo);
         }).fail(function () {
-            narrando = false;
-            if (alTerminar) alTerminar();
+            ttsServidorCaidoHasta = Date.now() + TTS_SERVIDOR_CAIDO_MS;
+            usarNavegador();
         });
     }
 
@@ -2036,12 +2169,15 @@ const ALTURA_SUELO = 0.2;
         cont.className = 'rn3d-juegos-capa';
         ctx.$paso[0].appendChild(cont);
         const color = (camino && camino.ambiente && camino.ambiente.color_hex) || '';
+        // Los juegos traen su música: el ambiente del mundo se calla mientras tanto.
+        if (sonidoAmbiente) sonidoAmbiente.pausar();
         window.BancoJuegos.abrir({
             $paso: window.jQuery(cont),
             color,
             onVolver: function () {
                 juegosAbiertos = false;
                 cont.remove();
+                if (sonidoAmbiente) sonidoAmbiente.reanudar();
                 // Devolver el personaje a donde estaba antes de ir a la carpa.
                 if (posAntesDeCarpa && personaje) {
                     personaje.position.copy(posAntesDeCarpa.pos);
@@ -2841,12 +2977,20 @@ const ALTURA_SUELO = 0.2;
             return;
         }
         pintarOpcionesDialogo(null);
+        // Tope de seguridad por si la voz nunca avisa que terminó. Se cuenta desde
+        // que la voz empieza a sonar, no desde que sale el bocadillo: si el audio
+        // tarda en llegar, antes se cerraba (y se cortaba la frase) a media voz.
+        let tope = setTimeout(cerrar, 30000);
         hablar(texto, function () {
+            clearTimeout(tope);
             const falta = durMin - (performance.now() - tIni);
             if (falta > 0) setTimeout(cerrar, falta);
             else cerrar();
+        }, function (msVoz) {
+            if (cerrado || token !== dialogoToken) return;
+            clearTimeout(tope);
+            tope = setTimeout(cerrar, Math.max(14000, msVoz + 4000));
         });
-        setTimeout(cerrar, 14000);
     }
 
     function soltarTrasVideo() {
@@ -2952,6 +3096,7 @@ const ALTURA_SUELO = 0.2;
         $fs.removeClass('rn3d-video-fs--sale');
         $fs.prop('hidden', false).attr('aria-hidden', 'false').addClass('rn3d-video-fs--activo');
         document.body.classList.add('rn3d-video-reproduciendo');
+        if (!esImg && sonidoAmbiente) sonidoAmbiente.pausar();
         prepararEntradaMedia(medio || null);
     }
 
@@ -2999,6 +3144,7 @@ const ALTURA_SUELO = 0.2;
         if (inner) inner.classList.remove('rn3d-media-entra', 'rn3d-media-sale');
         $fs.prop('hidden', true).attr('aria-hidden', 'true').removeClass('rn3d-video-fs--activo rn3d-video-fs--sale');
         document.body.classList.remove('rn3d-video-reproduciendo');
+        if (sonidoAmbiente && !$('body').hasClass('rn-player-activo') && !juegosAbiertos) sonidoAmbiente.reanudar();
     }
 
     function desactivarEscuchaEmbedVideo() {
@@ -3250,6 +3396,7 @@ const ALTURA_SUELO = 0.2;
         $('#rnCaminoModalPlayer').prop('hidden', true);
         $('body').removeClass('rn-player-activo');
         experienciaCargada = null;
+        if (sonidoAmbiente) sonidoAmbiente.reanudar();
     }
 
     function volverAlMapaDesdeExperiencia() {
@@ -3316,6 +3463,8 @@ const ALTURA_SUELO = 0.2;
 
         $player.prop('hidden', false).attr('aria-hidden', 'false').addClass('rn-player--camino-overlay');
         $('body').addClass('rn-player-activo');
+        // La experiencia trae su propio audio: el ambiente del mundo se calla.
+        if (sonidoAmbiente) sonidoAmbiente.pausar();
 
         if (experienciaCargada) {
             if (window.VistaNino && typeof window.VistaNino.iniciar === 'function') {
@@ -3558,9 +3707,14 @@ const ALTURA_SUELO = 0.2;
                 if (falta > 0) setTimeout(seguir, falta);
                 else seguir();
             };
-            hablar(saludo, alFin);         // el gesto del botón desbloquea el audio
-            // respaldo por si la voz no notifica nunca
-            setTimeout(() => { if (gen === cancelarArranque && dialogoEnCurso) seguir(); }, 9000);
+            // respaldo por si la voz no notifica nunca: 9 s si no empezó a sonar;
+            // si ya suena, su duración (antes se cortaba a media voz si tardaba).
+            let saludoSonando = false;
+            hablar(saludo, alFin, (msVoz) => {   // el gesto del botón desbloquea el audio
+                saludoSonando = true;
+                setTimeout(() => { if (gen === cancelarArranque && dialogoEnCurso) seguir(); }, msVoz + 3000);
+            });
+            setTimeout(() => { if (gen === cancelarArranque && dialogoEnCurso && !saludoSonando) seguir(); }, 9000);
         });
     }
 
@@ -3594,6 +3748,7 @@ const ALTURA_SUELO = 0.2;
         const dt = ultimoNow ? Math.min(0.1, (now - ultimoNow) / 1000) : 0.016;
         ultimoNow = now;
         if (mundo) mundo.actualizar(dt, now / 1000);
+        if (sonidoAmbiente) sonidoAmbiente.actualizar(camera, narrando || mostrandoBocadillo);
         if (grupoCasas) {
             for (let i = 0; i < grupoCasas.children.length; i++) {
                 const mx = grupoCasas.children[i].userData.mixer;
@@ -4001,8 +4156,20 @@ const ALTURA_SUELO = 0.2;
                             if (falta > 0) luegoEleccion(viajar, falta);
                             else viajar();
                         };
-                        hablar(saludo, cerrarHabla);
-                        luegoEleccion(cerrarHabla, 9000);
+                        // El tope de 9 s solo vale si la voz no empezó; si ya suena,
+                        // se espera su duración para no cortarla a la mitad.
+                        let saludoSonando = false;
+                        let saludoCerrado = false;
+                        const cerrarHablaUna = function () {
+                            if (saludoCerrado) return;
+                            saludoCerrado = true;
+                            cerrarHabla();
+                        };
+                        hablar(saludo, cerrarHablaUna, function (msVoz) {
+                            saludoSonando = true;
+                            luegoEleccion(cerrarHablaUna, msVoz + 3000);
+                        });
+                        luegoEleccion(function () { if (!saludoSonando) cerrarHablaUna(); }, 9000);
                     });
                 });
             });
@@ -4399,6 +4566,16 @@ const ALTURA_SUELO = 0.2;
             }
             mundo = listo;
             usaMapaGlb = true;
+            if (sonidoAmbiente) sonidoAmbiente.destruir();
+            sonidoAmbiente = crearSonidoAmbiente({
+                animales: () => (mundo && mundo.animales ? mundo.animales() : []),
+                // Perfil con el refuerzo sonoro apagado (sensibilidad auditiva): sin ambiente.
+                activo: () => {
+                    const pf = window.PedniaPerfil;
+                    if (!pf || !pf.activo || typeof pf.v !== 'function') return true;
+                    return pf.v('refuerzo_sonido', true) !== false;
+                },
+            });
             if (!mundo.curva) throw new Error('El camino del mapa no tiene eje.');
             curva = mundo.curva;
             asignarPosicionesSobreCamino();
@@ -5196,6 +5373,10 @@ const ALTURA_SUELO = 0.2;
         }
         accionesPersonaje = null;
         clipActual = '';
+        if (sonidoAmbiente) {
+            sonidoAmbiente.destruir();
+            sonidoAmbiente = null;
+        }
         if (mundo) {
             mundo.destruir();
             mundo = null;

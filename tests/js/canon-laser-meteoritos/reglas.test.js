@@ -175,6 +175,32 @@ module.exports = {
             }
         },
         {
+            descripcion: 'cada meteorito vuela con velocidad variable: acelera y frena suave, nunca se detiene, y difieren entre sí',
+            fn: function () {
+                var R = modulo(), cfg = config();
+                cfg.rondas.forEach(function (r, i) {
+                    var rnd = R.azar(40 + i), bases = {};
+                    for (var k = 0; k < 6; k++) {
+                        var m = { carril: r.carriles[0] };
+                        R.nuevaPasada(m, k % 2 ? 1 : -1, r, rnd);
+                        bases[Math.round(m.vel)] = 1;
+                        var vmin = Infinity, vmax = 0, prev = null;
+                        for (var t = 0; t < 9000; t += 100) {
+                            var v = Math.abs(R.velocidadPasada(m, t).x);
+                            vmin = Math.min(vmin, v);
+                            vmax = Math.max(vmax, v);
+                            if (prev != null) cierto(Math.abs(v - prev) < m.vel * 0.25, 'sin tirones');
+                            prev = v;
+                        }
+                        cierto(vmin > 0.4 * m.vel, 'nunca se detiene');
+                        cierto(vmax / vmin > 1.25, 'la velocidad cambia de verdad en el nivel ' + (i + 1));
+                        cierto(vmax <= r.velMax * (1 + r.variacionVel[1]) + 1, 'sin pasar el tope');
+                    }
+                    cierto(Object.keys(bases).length >= 4, 'cada meteorito con su propia velocidad');
+                });
+            }
+        },
+        {
             descripcion: 'consejos amables según el fallo y asistencia con tope',
             fn: function () {
                 var R = modulo();

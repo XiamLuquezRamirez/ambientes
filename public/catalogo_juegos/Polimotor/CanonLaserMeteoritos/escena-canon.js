@@ -614,7 +614,7 @@
             var dir = o.dir || (Math.random() < 0.5 ? 1 : -1);
             var rondaMov = o.ronda || nv.ronda;
             R().nuevaPasada(m, dir, rondaMov, Math.random);
-            if (!m.demo) m.t = azarEn(0, 0.3) * m.largo / m.vel * 1000;
+            this.desdeLosLados(m);
             m.estela = img(this, 0, 0, "estela", 1).setOrigin(1, 0.5).setDepth(7).setBlendMode(Phaser.BlendModes.ADD).setTint(TINTE_MET[m.tipo] || 0xffb703).setAlpha(0.85);
             m.halo = img(this, 0, 0, "luz", m.radio / 26).setDepth(7.5).setBlendMode(Phaser.BlendModes.ADD).setTint(TINTE_MET[m.tipo] || 0xffb703).setAlpha(m.tipo === "dorado" ? 0.55 : 0.4);
             m.img = img(this, 0, 0, "met_" + m.tipo, m.radio / 80).setDepth(8);
@@ -635,10 +635,23 @@
             m.tChispa = 0;
             this.activos.push(m);
             this.moverMeteorito(m, 0);
-            this.portal(m.x, m.y, m);
             if (!m.demo) avisar("entra", { tipo: m.tipo, coraza: m.golpes > 1 });
             sonar("entra");
             return m;
+        }
+
+        /**
+         * La pasada empieza y termina justo fuera de lo que se ve (en 4:3 los lados están recortados; en 16:9 no):
+         * el meteorito siempre entra por un lado de la pantalla y sale por el otro, nunca aparece ya adentro.
+         */
+        desdeLosLados(m) {
+            var izq = aMundo(0, 0), der = aMundo(global.innerWidth || W, 0);
+            var x0 = Math.max(0, izq.x) - m.radio * 1.4 - 30;
+            var x1 = Math.min(W, der.x) + m.radio * 1.4 + 30;
+            m.desdeX = m.dir > 0 ? x0 : x1;
+            m.hastaX = m.dir > 0 ? x1 : x0;
+            m.largo = Math.sqrt(Math.pow(m.hastaX - m.desdeX, 2) + Math.pow(m.hastaY - m.desdeY, 2));
+            m.t = 0;
         }
 
         /** Un carril al azar entre los que no usa otro meteorito en pantalla. */
@@ -657,9 +670,9 @@
                 var r2 = m.demo ? { velMin: m.vel, velMax: m.vel } : this.nivel.ronda;
                 var dir = -m.dir;
                 R().nuevaPasada(m, dir, r2, Math.random);
+                this.desdeLosLados(m);
                 pos = R().posicionPasada(m, 0);
                 m.edad = 0;
-                this.portal(pos.x, pos.y, m);
             }
             var vel = R().velocidadPasada(m, m.t);
             m.x = pos.x;
@@ -683,7 +696,9 @@
             }
             m.halo.setPosition(m.x, m.y);
             m.estela.setPosition(m.x, m.y).setRotation(ang);
-            m.estela.setScale(m.radio * 3.4 / 360 / D().res("estela"), m.radio * 1.5 / 120 / D().res("estela"));
+            // la estela se estira cuando acelera y se acorta cuando frena (se ve el cambio de velocidad)
+            var rapidez = Math.sqrt(vel.x * vel.x + vel.y * vel.y) / Math.max(1, m.vel);
+            m.estela.setScale(m.radio * 3.4 / 360 / D().res("estela") * Math.max(0.55, Math.min(1.7, rapidez)), m.radio * 1.5 / 120 / D().res("estela"));
             // la estela vibra un poquito (energía)
             m.estela.setAlpha((0.7 + Math.sin(this.t / 90 + m.radio) * 0.12) * vis);
             m.halo.setAlpha(((m.tipo === "dorado" ? 0.5 : 0.36) + Math.sin(this.t / 300 + m.radio) * 0.1) * vis);
