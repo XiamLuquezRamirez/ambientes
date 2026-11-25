@@ -25,12 +25,58 @@
         { tinte: 0xe0c8ff, laser: 0xff5fd0 },
         { tinte: 0xffe6b0, laser: 0xff4d4d }
     ];
+    // Dibujo del diseñador (1280x720): nicho circular de la caja, panel del teclado y suelo ya vienen en el fondo.
+    var ARTE = { w: 1280, h: 720, cx: 298, cy: 348, R: 214, suelo: 602, tx: 862, ty: 402, tw: 430, th: 318, pla: { x: 862, y: 154, w: 354 }, baliza: { x: 576, y: 262 }, cams: [[282, 62], [1002, 62]] };
+    var TESORO = [['oro', 1.35, 0.3], ['diamante', 1.15, 0.12], ['corona', 1.1, 0.1], ['trofeo', 0.95, 0.05]];
     var VUELTA = 5.2;   // radianes que hay que girar la rueda (≈ 300°)
 
     function rg(i) { var x = Math.sin(i * 127.1 + 11.7) * 43758.5453; return x - Math.floor(x); }
     function mezTinte(a, b, t) { var c = C.Interpolate.ColorWithColor(C.ValueToColor(a), C.ValueToColor(b), 100, Math.max(0, Math.min(1, t)) * 100); return C.GetColor(c.r, c.g, c.b); }
 
     var escena = {
+        precargar: function () {
+            if (!this.textures.exists('cf_fondo')) this.load.svg('cf_fondo', 'img/diseno/fondo.svg', { width: 1280, height: 720 });
+            if (!this.textures.exists('cf_arte')) this.load.svg('cf_arte', 'img/diseno/arte.svg', { width: 1400, height: 821 });
+        },
+
+        prepararArte: function () {
+            var A = global.CajaFuerteArte;
+            var tex = this.textures.exists('cf_arte') ? this.textures.get('cf_arte') : null;
+            this.arteOk = !!(A && tex && this.textures.exists('cf_fondo') && this.scale.width >= 900);
+            if (!this.arteOk || tex.__cfMarcos) return;
+            Object.keys(A.frames).forEach(function (n) { var m = A.frames[n]; tex.add(n, 0, m.x, m.y, m.w, m.h); });
+            tex.__cfMarcos = true;
+        },
+
+        /** Imagen de un marco de la hoja, centrada en (x, y) y con un ancho dado en pantalla. */
+        pieza: function (nom, x, y, ancho) {
+            var m = global.CajaFuerteArte.frames[nom];
+            var im = this.add.image(x, y, 'cf_arte', nom);
+            im.setDisplaySize(ancho, ancho * m.bh / m.bw);
+            return im;
+        },
+
+        /** Placa de la parte de arriba de la caja: sobre ella van las lámparas del código. */
+        montarPlaca: function (keep) {
+            var L = this.L;
+            this.placa = keep(this.pieza('placa', ARTE.pla.x * L.sx, ARTE.pla.y * L.sy, ARTE.pla.w * L.kk).setDepth(4));
+        },
+
+        /** Puerta redonda del diseño con la rueda aparte (gira con el dedo). */
+        montarCajaArte: function (keep) {
+            var L = this.L, R = L.R;
+            this.interior = keep(this.add.graphics().setDepth(6));
+            this.brilloG = keep(this.add.graphics().setDepth(7));
+            var puerta = keep(this.add.container(L.cx - R, L.cy).setDepth(8));
+            var kb = R / 214.5;
+            var base = this.pieza('puerta', R, 0, 500 * kb);
+            var rueda = this.add.container(R, 0);
+            rueda.add(this.pieza('rueda', 0, 0, 98 * kb));
+            puerta.add([base, rueda]);
+            this.puerta = puerta; this.rueda = rueda;
+            puerta.setScale(this.abierta ? 0.15 : 1, 1);
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.ranuras = [];
@@ -56,15 +102,31 @@
             L.tam = Math.max(78, Math.min(120, (L.der - L.cx - L.R * 1.6) / 3.2, H * 0.17));
             L.teclado = { x: Math.round((L.cx + L.R * 1.6 + L.der) / 2), y: Math.round(H * 0.58) };
             L.bocina = { x: 48, y: Math.round(H * 0.2), r: Math.max(24, Math.min(32, hueco * 0.28)) };
+            if (this.arteOk) {
+                var sx = W / ARTE.w, sy = H / ARTE.h, kk = Math.min(sx, sy);
+                L.sx = sx; L.sy = sy; L.kk = kk;
+                L.suelo = Math.round(ARTE.suelo * sy); L.R = Math.round(ARTE.R * kk);
+                L.cx = Math.round(ARTE.cx * sx); L.cy = Math.round(ARTE.cy * sy);
+                L.tam = Math.max(78, Math.min(120, (L.der - L.cx - L.R * 1.6) / 3.2, H * 0.17));
+                L.teclado = { x: Math.round(ARTE.tx * sx), y: Math.round(ARTE.ty * sy) };
+            }
             return L;
         },
 
         armar: function (reubicar) {
+            this.prepararArte();
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
-            var clave = 'caja_fondo_' + L.W + 'x' + L.H;
-            K.textura(this, clave, L.W, L.H, function (x, w, h) { pintarSala(x, w, h, L); });
-            this.fondoImg = keep(this.add.image(0, 0, clave).setOrigin(0, 0).setDepth(1).setTint(this.tinteActual));
+            if (this.tesoroImg && this.tesoroImg.active) this.tesoroImg.destroy();
+            this.tesoroImg = null;
+            if (this.arteOk) {
+                this.fondoImg = keep(this.add.image(0, 0, 'cf_fondo').setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(1));
+                this.montarPlaca(keep);
+            } else {
+                var clave = 'caja_fondo_' + L.W + 'x' + L.H;
+                K.textura(this, clave, L.W, L.H, function (x, w, h) { pintarSala(x, w, h, L); });
+                this.fondoImg = keep(this.add.image(0, 0, clave).setOrigin(0, 0).setDepth(1).setTint(this.tinteActual));
+            }
             this.salaG = keep(this.add.graphics().setDepth(2));
             this.lasersG = keep(this.add.graphics().setDepth(3));
             this.montarCaja(keep);
@@ -79,6 +141,7 @@
         },
 
         montarCaja: function (keep) {
+            if (this.arteOk) return this.montarCajaArte(keep);
             var L = this.L, R = L.R;
             var g = keep(this.add.graphics().setDepth(5));
             g.fillStyle(0x000000, 0.25); g.fillEllipse(L.cx, L.suelo + 4, R * 3, R * 0.3);
@@ -128,8 +191,16 @@
             if (!n) { this.celdas = []; return; }
             var w = Math.min(L.R * 2.2, n * L.R * 0.62 + L.R * 0.2), h = L.R * 0.56;
             var x0 = L.cx - w / 2, y0 = L.cy - L.R * 1.62;
+            if (this.arteOk) {
+                // Las lámparas van dentro de la placa del diseño.
+                w = Math.min(ARTE.pla.w * 0.93 * L.kk, n * 118 * L.kk + 20); h = 110 * L.kk;
+                x0 = ARTE.pla.x * L.sx - w / 2; y0 = ARTE.pla.y * L.sy - h / 2;
+                g.fillStyle(0x0b1b24, 1); g.fillRoundedRect(x0 - 4, y0 - 4, w + 8, h + 8, 8);
+                if (this.alarma > 0.01) { g.lineStyle(4, 0xff6b6b, 0.9); g.strokeRoundedRect(x0 - 4, y0 - 4, w + 8, h + 8, 8); }
+            } else {
             g.fillStyle(0x0b1b24, 1); g.fillRoundedRect(x0 - 8, y0 - 6, w + 16, h + 12, 12);
             g.lineStyle(4, this.alarma > 0.01 ? 0xff6b6b : 0x74c0fc, 1); g.strokeRoundedRect(x0 - 8, y0 - 6, w + 16, h + 12, 12);
+            }
             this.celdas = [];
             for (var i = 0; i < n; i++) {
                 var cw = w / n;
@@ -146,6 +217,7 @@
 
         montarTeclado: function (keep) {
             var L = this.L, T = L.teclado;
+            if (this.arteOk) { this.tecladoBox = { w: ARTE.tw * L.kk, h: ARTE.th * L.kk }; return; }   // el panel ya viene en el fondo
             var g = keep(this.add.graphics().setDepth(5));
             var w = Math.min(L.der - L.cx - L.R * 1.6 - 10, L.tam * 3.6), h = L.tam * 2.7;
             g.fillStyle(0x000000, 0.3); g.fillRoundedRect(T.x - w / 2 + 4, T.y - h / 2 + 8, w, h, 20);
@@ -219,7 +291,7 @@
             var nueva = SALAS[(i < 0 ? 0 : i) % 4];
             this.sala = (i < 0 ? 0 : i) % 4;
             var desde = this.tinteActual, o = { t: 0 };
-            this.tweens.add({ targets: o, t: 1, duration: 900, onUpdate: function () { self.tinteActual = mezTinte(desde, nueva.tinte, o.t); if (self.fondoImg && self.fondoImg.active) self.fondoImg.setTint(self.tinteActual); } });
+            this.tweens.add({ targets: o, t: 1, duration: 900, onUpdate: function () { self.tinteActual = mezTinte(desde, nueva.tinte, o.t); if (!self.arteOk && self.fondoImg && self.fondoImg.active) self.fondoImg.setTint(self.tinteActual); } });
         },
 
         alSonar: function (id, k) {
@@ -363,6 +435,17 @@
         dibujarInterior: function () {
             var L = this.L, g = this.interior, R = L.R, cx = L.cx, cy = L.cy;
             g.clear();
+            if (this.arteOk) {
+                g.fillStyle(0xffd43b, 0.2); g.fillCircle(cx, cy, R * 0.92);
+                g.fillStyle(0xffd43b, 0.2); g.fillCircle(cx, cy, R * 0.7);
+                g.fillStyle(0xfff3bf, 0.25); g.fillCircle(cx, cy - R * 0.1, R * 0.4);
+                var td = TESORO[this.sala % 4];
+                if (this.tesoroImg && this.tesoroImg.active) this.tesoroImg.destroy();
+                var ti = this.pieza(td[0], cx, cy + R * td[2], R * td[1]).setDepth(6.5);
+                ti.by = ti.y; ti.sx0 = ti.scaleX; ti.sy0 = ti.scaleY;
+                this.tesoroImg = ti;
+                return;
+            }
             g.fillStyle(0x2b2000, 1); g.fillCircle(cx, cy, R * 0.96);
             g.fillStyle(0xffd43b, 0.18); g.fillCircle(cx, cy, R * 0.9);
             g.fillStyle(0xffd43b, 0.2); g.fillCircle(cx, cy, R * 0.7);
@@ -405,6 +488,8 @@
             await tw(this, { targets: this.puerta, scaleX: 1, duration: 450, ease: 'Cubic.easeInOut' });
             this.abierta = 0;
             this.interior.clear();
+            if (this.tesoroImg && this.tesoroImg.active) this.tesoroImg.destroy();
+            this.tesoroImg = null;
             this.cerrojos = 1;
         },
 
@@ -481,6 +566,15 @@
             }
             // Cámaras de seguridad y focos.
             var sg = this.salaG; sg.clear();
+            if (this.arteOk) {   // las cámaras ya están en el fondo: solo se anima su haz de luz
+                ARTE.cams.forEach(function (c, k) {
+                    var lx = c[0] * L.sx, ly = c[1] * L.sy, ang = Math.PI / 2 + Math.sin(s * 0.9 + k * 2) * 0.5;
+                    sg.fillStyle(alarma ? 0xff0000 : 0xfff3bf, alarma ? 0.2 : 0.08);
+                    sg.fillTriangle(lx, ly, lx + Math.cos(ang - 0.28) * L.H, ly + Math.sin(ang - 0.28) * L.H, lx + Math.cos(ang + 0.28) * L.H, ly + Math.sin(ang + 0.28) * L.H);
+                    sg.fillStyle(Math.sin(s * 4 + k) > 0 || alarma ? 0xff3b3b : 0x5a1010, 1); sg.fillCircle(lx + (k ? -16 : 16), ly - 14, 3);
+                });
+            }
+            if (!this.arteOk) {
             var cams = [{ x: L.W * 0.05, y: L.H * 0.075, dir: 1 }, { x: L.der - 34, y: L.H * 0.075, dir: -1 }];
             cams.forEach(function (c, k) {
                 var ang = (c.dir > 0 ? Math.PI * 0.35 : Math.PI * 0.65) + Math.sin(s * 0.9 + k * 2) * 0.45;
@@ -492,9 +586,12 @@
                 sg.fillStyle(0x39434f, 1); sg.fillCircle(lx, ly, 10); sg.fillStyle(0x10243a, 1); sg.fillCircle(lx, ly, 6); sg.fillStyle(0x74c0fc, 0.8); sg.fillCircle(lx - 2, ly - 2, 2);
                 sg.fillStyle(Math.sin(s * 4 + k) > 0 || alarma ? 0xff3b3b : 0x5a1010, 1); sg.fillCircle(c.x - c.dir * 14, c.y + 4, 3);
             });
-            // Baliza de alarma sobre el teclado.
+            }
+
+// Baliza de alarma sobre el teclado.
             var bg = this.balizaG; bg.clear();
             var bx = L.teclado.x, by = L.teclado.y - L.tam * 1.35 - 34;
+            if (this.arteOk) { bx = ARTE.baliza.x * L.sx; by = ARTE.baliza.y * L.sy; }
             var r = alarma ? s * 7 : s * 1.2;
             bg.fillStyle(0x39434f, 1); bg.fillRoundedRect(bx - 22, by + 6, 44, 12, 4);
             bg.fillStyle(alarma ? 0xff3b3b : 0x3b82c4, alarma ? 1 : 0.9); bg.fillRoundedRect(bx - 16, by - 12, 32, 22, { tl: 14, tr: 14, bl: 3, br: 3 });
@@ -536,6 +633,10 @@
             if (this.fiesta) {
                 var fb = this.balizaG;
                 for (var f2 = 0; f2 < 5; f2++) { fb.fillStyle([0xff6b6b, 0xffd43b, 0x69db7c, 0x4dabf7, 0xcc5de8][f2], 0.15); var fx = L.W * (0.15 + f2 * 0.18) + Math.sin(s * 1.5 + f2) * 40; fb.fillTriangle(fx - 6, 0, fx + 6, 0, fx + 120 * Math.sin(s + f2), L.suelo); }
+            }
+            if (this.tesoroImg && this.tesoroImg.active) {   // el tesoro flota y respira
+                this.tesoroImg.y = this.tesoroImg.by + Math.sin(s * 2) * R * 0.02;
+                this.tesoroImg.setScale(this.tesoroImg.sx0 * (1 + 0.015 * Math.sin(s * 3)), this.tesoroImg.sy0 * (1 + 0.015 * Math.sin(s * 3)));
             }
             // Lámpara del código encendida un instante mientras suena (la dibuja la pantalla).
             if (this.lampara != null && this.celdas && time - this.lamparaT < 450) {

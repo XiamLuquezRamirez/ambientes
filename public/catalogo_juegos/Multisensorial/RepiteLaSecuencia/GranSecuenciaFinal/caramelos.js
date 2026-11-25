@@ -27,7 +27,7 @@
         5: [[0.24, 0.40, -0.22], [0.52, 0.46, 0.2], [0.82, 0.40, -0.18], [0.36, 0.72, 0.18], [0.72, 0.84, -0.2]],
         6: [[0.22, 0.38, -0.2], [0.46, 0.46, 0.2], [0.72, 0.38, -0.2], [0.30, 0.68, 0.2], [0.58, 0.74, -0.18], [0.84, 0.84, 0.18]]
     };
-    var REBOTADORES = [[], [], [[0.55, 0.30], [0.70, 0.62]], [[0.62, 0.28], [0.20, 0.60], [0.52, 0.64]]];
+    var REBOTADORES = [[], [], [[0.50, 0.64], [0.70, 0.62]], [[0.80, 0.62], [0.20, 0.60], [0.52, 0.64]]];   // ninguno sobre la ruta de la fila de arriba: la bola sale arriba y solo baja
     var PAL = [
         { fondo: [0xffd6e7, 0xfff0f6], franja: 0xffb3d1, deco: 'piruletas', suelo: 0x7a4a2a },
         { fondo: [0xc9f2e0, 0xf0fff8], franja: 0x9be3c3, deco: 'galletas', suelo: 0x7a4a2a },
@@ -104,7 +104,7 @@
             L.salida = { x: Math.round(W * 0.195), y: Math.round(H * 0.3) };
             if (this.arteOk) {
                 L.maq = { x: Math.round(W * ARTE.maq[0] / ARTE.w), y: Math.round(H * ARTE.maq[1] / ARTE.h) };
-                L.salida = { x: Math.round(W * 0.195), y: Math.round(H * 283 / ARTE.h) };   // a la altura de la ranura de la máquina
+                L.salida = { x: Math.round(W * 0.195), y: Math.round(H * 0.3) };   // la boca sale del costado del globo, bien arriba: la bola solo baja, y las teclas de arriba deben quedar por debajo
             }
             L.goma = { x: 58, y: H - 62, r: 38 };
             L.bocina = { x: 48, y: Math.round(H * 0.17), r: 30 };
@@ -196,8 +196,8 @@
                 this.maquina = { cont: ca, r: ra, bolas: this.add.container(0, 0), mani: this.add.graphics() };
                 ca.add([this.maquina.bolas, this.maquina.mani]);
                 // Boca: un tubo rojo que sale de la ranura de la máquina; cada bola asoma por su extremo.
-                var hT = Math.round(L.k * 58), lar = L.salida.x + 26 - L.maq.x;
-                var bo = keep(this.add.container(L.maq.x, L.salida.y).setDepth(9));
+                var hT = Math.round(L.k * 58), bx0 = Math.round(L.W * 190 / ARTE.w), lar = L.salida.x + 26 - bx0;
+                var bo = keep(this.add.container(bx0, L.salida.y).setDepth(9));
                 var bg = this.add.graphics();
                 bg.fillStyle(0x000000, 0.2); bg.fillRoundedRect(2, -hT / 2 + 6, lar, hT, 14);
                 bg.fillStyle(0xb81d2b, 1); bg.fillRoundedRect(0, -hT / 2, lar, hT, 14);
