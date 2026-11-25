@@ -1,0 +1,255 @@
+{
+  "nombre": "Alimenta al Monstruito Tragabolas",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 30,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "toqueMax": 16,
+    "minSubida": 60,
+    "anguloMaxGrados": 78,
+    "autoSubida": 200,
+    "correa": 100,
+    "ventanaMs": 170,
+    "vueloMinMs": 560,
+    "vueloMaxMs": 900,
+    "falloLateralMin": 120,
+    "fallosParaGuia": 2,
+    "guiaRepetirMs": 3600,
+    "ayudaMs": 10000,
+    "ayudaRepetirMs": 13000,
+    "vozPausaMs": 2600,
+    "vozFalloMs": 5200,
+    "vozCortoMs": 6500,
+    "colores": [
+      {
+        "id": "amarillo",
+        "hex": "#ffd43b"
+      },
+      {
+        "id": "azul",
+        "hex": "#4dabf7"
+      },
+      {
+        "id": "verde",
+        "hex": "#69db7c"
+      },
+      {
+        "id": "morado",
+        "hex": "#b197fc"
+      },
+      {
+        "id": "naranja",
+        "hex": "#ffa94d"
+      },
+      {
+        "id": "rosado",
+        "hex": "#f783ac"
+      }
+    ]
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "nombre": "¡HOLA, MONSTRUITO!",
+      "bolas": 3,
+      "radioBola": 62,
+      "variacionTamano": 0,
+      "bandeja": "recta",
+      "separacion": 190,
+      "bandejaY": 772,
+      "monstruoX": [
+        680,
+        920
+      ],
+      "bocaY": [
+        346,
+        362
+      ],
+      "escalaMonstruo": 0.84,
+      "asistGrados": 34,
+      "margenBoca": 46,
+      "tema": "manana",
+      "voz": "zoe",
+      "instruccion": "¡Vamos a darle una bolita!",
+      "cartel": {
+        "etiqueta": "Nivel 1",
+        "titulo": "¡HOLA, MONSTRUITO!",
+        "sub": "Tres bolitas de colores"
+      },
+      "logro": "¡Qué gran puntería!",
+      "invita": "¡Vamos por más bolitas!"
+    },
+    {
+      "id": 2,
+      "nombre": "¡MÁS BOLITAS!",
+      "bolas": 4,
+      "radioBola": 60,
+      "variacionTamano": 0.07,
+      "bandeja": "arco",
+      "separacion": 172,
+      "bandejaY": 768,
+      "monstruoX": [
+        560,
+        1040
+      ],
+      "bocaY": [
+        318,
+        334
+      ],
+      "escalaMonstruo": 0.8,
+      "asistGrados": 31,
+      "margenBoca": 42,
+      "tema": "mariposas",
+      "voz": "zeus",
+      "instruccion": "¡Más bolitas! ¡Desliza hacia arriba!",
+      "cartel": {
+        "etiqueta": "Nivel 2",
+        "titulo": "¡MÁS BOLITAS!",
+        "sub": "Cuatro bolitas para su pancita"
+      },
+      "logro": "¡Qué contento está el monstruito!",
+      "invita": "¡Ahora vamos a alimentarlo otra vez!"
+    },
+    {
+      "id": 3,
+      "nombre": "¡ALIMENTEMOS AL MONSTRUITO!",
+      "bolas": 5,
+      "radioBola": 58,
+      "variacionTamano": 0.06,
+      "bandeja": "ola",
+      "separacion": 160,
+      "bandejaY": 770,
+      "monstruoX": [
+        470,
+        1130
+      ],
+      "bocaY": [
+        292,
+        308
+      ],
+      "escalaMonstruo": 0.76,
+      "asistGrados": 29,
+      "margenBoca": 40,
+      "tema": "burbujas",
+      "voz": "zoe",
+      "instruccion": "¡Mira dónde está su boquita! Lanza la bolita hacia allá.",
+      "cartel": {
+        "etiqueta": "Nivel 3",
+        "titulo": "¡ALIMENTEMOS AL MONSTRUITO!",
+        "sub": "Cinco bolitas de colores"
+      },
+      "logro": "¡El monstruito salta de alegría!",
+      "invita": "¡Se viene el gran festín!"
+    },
+    {
+      "id": 4,
+      "nombre": "¡EL FESTÍN DE COLORES!",
+      "bolas": 6,
+      "radioBola": 56,
+      "variacionTamano": 0.06,
+      "bandeja": "fiesta",
+      "separacion": 150,
+      "bandejaY": 770,
+      "monstruoX": [
+        430,
+        1170
+      ],
+      "bocaY": [
+        266,
+        282
+      ],
+      "escalaMonstruo": 0.72,
+      "asistGrados": 27,
+      "margenBoca": 40,
+      "tema": "festin",
+      "voz": "zeus",
+      "instruccion": "¡El festín de colores! Lanza todas las bolitas a su boca.",
+      "cartel": {
+        "etiqueta": "Nivel 4",
+        "titulo": "¡EL FESTÍN DE COLORES!",
+        "sub": "Seis bolitas para la gran fiesta"
+      },
+      "logro": "¡Qué festín!",
+      "invita": ""
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "Alimenta al Monstruito Tragabolas",
+    "tituloJuego": "JUEGO 1",
+    "subtituloJuego": "PUNTERÍA · LANZAMIENTO DIRECTO",
+    "botonComenzar": "EMPEZAR",
+    "introZoe": "¡El monstruito tiene hambre! Toma una bolita de color, desliza tu dedo hacia arriba apuntando a su boca y ¡zas!, lánzala para alimentarlo.",
+    "introZeus": "¡Apunta derechito a su boca abierta y desliza tu dedo!",
+    "demoFin": "¡Ahora tú!",
+    "zoeJuego": [
+      "¡Vamos a darle una bolita!",
+      "¡Desliza hacia arriba!",
+      "¡El monstruito tiene hambre!"
+    ],
+    "zeusJuego": [
+      "¡Muy bien! ¡Otra bolita!",
+      "¡Casi lo lograste!",
+      "¡Mira su boca!"
+    ],
+    "apoyo": [
+      "¡Inténtalo otra vez!",
+      "¡Lanza hacia arriba!",
+      "¡Mira su boquita!",
+      "¡Vamos, tú puedes!",
+      "¡Qué divertido!"
+    ],
+    "acierto": [
+      "¡Muy bien! ¡Otra bolita!",
+      "¡Qué divertido!",
+      "¡Ñam, ñam!"
+    ],
+    "casi": "¡Casi lo lograste!",
+    "fallo": [
+      "¡Inténtalo otra vez!",
+      "¡Mira su boquita!",
+      "¡Vamos, tú puedes!"
+    ],
+    "corto": [
+      "¡Desliza hacia arriba!",
+      "¡Lanza hacia arriba!"
+    ],
+    "toque": "¡Desliza hacia arriba!",
+    "ayuda": "¡El monstruito tiene hambre!",
+    "guiaOtraVez": "¡Mira su boca!",
+    "cierre": "¡QUÉ GRAN PUNTERÍA! ¡Alimentaste al monstruito con todas las bolas de colores!",
+    "finalTitulo": "¡LO LOGRASTE!",
+    "finalSub": "¡ERES UN EXPERTO EN PUNTERÍA!",
+    "finalZoe": "¡LO LOGRASTE! ¡ERES UN EXPERTO EN PUNTERÍA!",
+    "finalZeus": "¡El monstruito está feliz y con la pancita llena!",
+    "victoria": "¡ERES UN EXPERTO EN PUNTERÍA!",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe! ¿Escuchas ese ruidito? ¡Grrr, grrr!"
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Es la pancita del Monstruito Tragabolas! Tiene mucha hambre. ¡Vamos a alimentarlo con bolitas de colores!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "3-4 años",
+      "titulo": "Puntería de lanzamiento directo"
+    }
+  ]
+}

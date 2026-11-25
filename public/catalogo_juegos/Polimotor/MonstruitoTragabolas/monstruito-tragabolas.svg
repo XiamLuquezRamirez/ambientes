@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="fondo" cx="0.5" cy="0.4" r="0.7"><stop offset="0" stop-color="#e6fcf5"/><stop offset="1" stop-color="#99e9f2"/></radialGradient>
+    <radialGradient id="piel" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#a8f5e6"/><stop offset="0.5" stop-color="#5fdcc9"/><stop offset="1" stop-color="#239c90"/></radialGradient>
+    <linearGradient id="cuerno" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff4c2"/><stop offset="1" stop-color="#ffc46b"/></linearGradient>
+    <radialGradient id="bola" cx="0.38" cy="0.32" r="0.75"><stop offset="0" stop-color="#ffe9a8"/><stop offset="0.6" stop-color="#ffd43b"/><stop offset="1" stop-color="#f59f00"/></radialGradient>
+  </defs>
+  <rect x="6" y="6" width="244" height="244" rx="56" fill="url(#fondo)" stroke="#ffffff" stroke-width="8"/>
+  <path d="M82 70 Q66 40 78 18 Q86 12 92 20 Q106 40 110 62 Z" fill="url(#cuerno)" stroke="#1b5e5f" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M174 70 Q190 40 178 18 Q170 12 164 20 Q150 40 146 62 Z" fill="url(#cuerno)" stroke="#1b5e5f" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="128" cy="140" r="92" fill="url(#piel)" stroke="#1b5e5f" stroke-width="6"/>
+  <ellipse cx="94" cy="108" rx="24" ry="26" fill="#ffffff" stroke="#1b5e5f" stroke-width="5"/>
+  <ellipse cx="162" cy="108" rx="24" ry="26" fill="#ffffff" stroke="#1b5e5f" stroke-width="5"/>
+  <circle cx="98" cy="114" r="12" fill="#15102a"/><circle cx="158" cy="114" r="12" fill="#15102a"/>
+  <circle cx="94" cy="109" r="5" fill="#ffffff"/><circle cx="154" cy="109" r="5" fill="#ffffff"/>
+  <ellipse cx="66" cy="146" rx="15" ry="9" fill="#ff8fab" opacity="0.7"/><ellipse cx="190" cy="146" rx="15" ry="9" fill="#ff8fab" opacity="0.7"/>
+  <path d="M80 146 Q128 136 176 146 Q172 212 128 214 Q84 212 80 146 Z" fill="#7a1f43" stroke="#1b5e5f" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="196" rx="30" ry="14" fill="#ff8fab"/>
+  <rect x="96" y="142" width="16" height="14" rx="5" fill="#ffffff"/><rect x="144" y="142" width="16" height="14" rx="5" fill="#ffffff"/>
+  <circle cx="128" cy="172" r="20" fill="url(#bola)" stroke="#e67700" stroke-width="4"/>
+  <ellipse cx="121" cy="165" rx="7" ry="4" fill="#ffffff" opacity="0.85"/>
+  <path d="M34 214 L40 200 M46 222 L58 214 M210 214 L218 200 M222 226 L232 216" stroke="#fab005" stroke-width="5" stroke-linecap="round"/>
+</svg>

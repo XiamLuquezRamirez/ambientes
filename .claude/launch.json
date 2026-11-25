@@ -357,6 +357,45 @@
       ],
       "port": 8053,
       "autoPort": false
+    },
+    {
+      "name": "juegos-monstruito",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8054",
+        "--directory",
+        "public"
+      ],
+      "port": 8054,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-diana",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8055",
+        "--directory",
+        "public"
+      ],
+      "port": 8055,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-pescador",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8056",
+        "--directory",
+        "public"
+      ],
+      "port": 8056,
+      "autoPort": false
     }
   ]
 }

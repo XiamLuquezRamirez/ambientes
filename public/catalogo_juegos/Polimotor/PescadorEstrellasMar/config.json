@@ -1,0 +1,174 @@
+{
+  "nombre": "El Pescador de Estrellas de Mar",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 25,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "centroX": 800,
+    "superficieY": 222,
+    "ganchoY": 318,
+    "sueloY": 768,
+    "barcaOffsetX": 160,
+    "fallosParaAyuda": 2,
+    "quietoParaAyudaMs": 9000,
+    "vozPausaMs": 2600,
+    "vozFalloMs": 5200,
+    "pausaEntreIntentosMs": 350
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "nombre": "MI PRIMERA PESCA",
+      "estrellas": 3,
+      "amplitud": 230,
+      "periodoMs": 10000,
+      "radioEstrella": 66,
+      "tolerancia": 1.15,
+      "radioGuia": 1.7,
+      "correccion": 1,
+      "bajadaMs": 1700,
+      "subidaMs": 1700,
+      "guia": "persistente",
+      "tema": "laguna",
+      "voz": "zeus",
+      "instruccion": "¡Mira cómo se mueve el gancho!",
+      "cartel": { "etiqueta": "Nivel 1", "titulo": "MI PRIMERA PESCA", "sub": "Tres estrellas de mar" },
+      "logro": "¡La barca tiene tres estrellas!",
+      "despedida": "zoe",
+      "invita": "¡Vamos a las estrellas del arrecife!"
+    },
+    {
+      "id": 2,
+      "nombre": "LAS ESTRELLAS DEL ARRECIFE",
+      "estrellas": 4,
+      "amplitud": 280,
+      "periodoMs": 9600,
+      "radioEstrella": 62,
+      "tolerancia": 1.0,
+      "radioGuia": 1.5,
+      "correccion": 0.9,
+      "bajadaMs": 1500,
+      "subidaMs": 1500,
+      "guia": "intermitente",
+      "tema": "arrecife",
+      "voz": "zoe",
+      "instruccion": "¡Espera a que esté sobre una estrella!",
+      "cartel": { "etiqueta": "Nivel 2", "titulo": "LAS ESTRELLAS DEL ARRECIFE", "sub": "Cuatro estrellas de mar" },
+      "logro": "¡La red se llena de estrellas!",
+      "despedida": "zeus",
+      "invita": "¡Ahora, el tesoro del fondo marino!"
+    },
+    {
+      "id": 3,
+      "nombre": "EL TESORO DEL FONDO MARINO",
+      "estrellas": 5,
+      "amplitud": 310,
+      "periodoMs": 9000,
+      "radioEstrella": 58,
+      "tolerancia": 0.92,
+      "radioGuia": 1.35,
+      "correccion": 0.8,
+      "bajadaMs": 1350,
+      "subidaMs": 1350,
+      "guia": "breve",
+      "tema": "tesoro",
+      "voz": "zeus",
+      "instruccion": "¡Mira el gancho y toca justo ahí!",
+      "cartel": { "etiqueta": "Nivel 3", "titulo": "EL TESORO DEL FONDO MARINO", "sub": "Cinco estrellas de mar" },
+      "logro": "¡El arrecife brilla para ti!",
+      "despedida": "ambos",
+      "invita": "¡Llegó el gran pescador marino!"
+    },
+    {
+      "id": 4,
+      "nombre": "EL GRAN PESCADOR MARINO",
+      "estrellas": 6,
+      "amplitud": 330,
+      "periodoMs": 8600,
+      "radioEstrella": 56,
+      "tolerancia": 0.86,
+      "radioGuia": 1.3,
+      "correccion": 0.7,
+      "bajadaMs": 1250,
+      "subidaMs": 1250,
+      "guia": "contextual",
+      "tema": "magico",
+      "voz": "zoe",
+      "instruccion": "¡El arrecife mágico! Pesca todas las estrellas.",
+      "cartel": { "etiqueta": "Nivel 4", "titulo": "EL GRAN PESCADOR MARINO", "sub": "Seis estrellas de mar" },
+      "logro": "¡La barca está llena de estrellas!",
+      "despedida": "ambos",
+      "invita": ""
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "El Pescador de Estrellas de Mar",
+    "tituloJuego": "JUEGO 3",
+    "subtituloJuego": "PRECISIÓN CON IMÁN O GANCHO TÁCTIL",
+    "botonComenzar": "EMPEZAR",
+    "introZeus": "¡A pescar estrellas marinas! Observa el gancho que se mueve arriba. Toca la pantalla en el momento exacto en que esté sobre una estrella para bajar la cuerda y atraparla.",
+    "introZoe": "¡Justo ahí... toca ahora para que baje la cuerda!",
+    "demoFin": "¡Ahora puedes intentarlo!",
+    "pasosTitulo": "CÓMO JUGAR — 3 PASOS",
+    "pasos": [
+      "Sigue con la mirada el gancho mágico",
+      "Cuando esté sobre una estrella, toca la pantalla",
+      "La cuerda baja, atrapa la estrella y la sube a la barca"
+    ],
+    "acierto": [
+      "¡Lo lograste!",
+      "¡Qué buena pesca!",
+      "¡Una estrella más!",
+      "¡Muy bien, pescador!",
+      "¡Qué bonita estrella!",
+      "¡Lo estás haciendo genial!"
+    ],
+    "atrapa": "¡Justo ahí!",
+    "fallo": [
+      "¡Vamos a intentarlo otra vez!",
+      "¡Mira dónde está el gancho!",
+      "¡Espera a que esté sobre la estrella!"
+    ],
+    "ayuda": "¡Espera a que esté sobre una estrella!",
+    "quieto": "¡Ahora puedes intentarlo!",
+    "otra": "¡Vamos a pescar otra!",
+    "cierreTitulo": "¡PESCA MARAVILLOSA!",
+    "cierreNivel": "¡Qué buena pesca! ¡La barca brilla con tus estrellas!",
+    "cierre": "¡PESCA MARAVILLOSA! Calculaste el momento justo y atrapaste cada estrella con una precisión digna de un marinero experto. ¡Completaste el Tema de Juegos de Precisión!",
+    "finalTitulo": "¡PESCA MARAVILLOSA!",
+    "finalSub": "¡ERES UN GRAN PESCADOR DE ESTRELLAS!",
+    "finalZoe": "¡Eres un gran pescador de estrellas!",
+    "finalZeus": "¡La barca está llena de estrellas gracias a ti!",
+    "victoria": "¡ERES UN GRAN PESCADOR DE ESTRELLAS!",
+    "pausa": "Pausa",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe! ¡Mira el mar! Nuestra barca mágica tiene un gancho dorado para pescar."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Y en el fondo hay estrellas de mar de colores! Vamos a pescarlas con mucho cuidado."
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "3-4 años",
+      "titulo": "Precisión con gancho táctil"
+    }
+  ]
+}
