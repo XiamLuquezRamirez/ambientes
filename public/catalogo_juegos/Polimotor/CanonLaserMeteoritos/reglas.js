@@ -103,9 +103,20 @@
 
     // ------------------------------------------------------------------ meteoritos
 
+    /**
+     * Distancia recorrida en la pasada (px) a los t ms. La velocidad cambia con suavidad durante el vuelo:
+     * v(t) = vel · (1 + A·sen(2πt/P + F)), con A < 1 (nunca se detiene ni retrocede). Sin A, va a velocidad fija.
+     */
+    function recorrido(m, t) {
+        var A = m.varA || 0;
+        if (!A) return t * m.vel / 1000;
+        var w = 2 * Math.PI / m.varP;
+        return m.vel / 1000 * (t + A / w * (Math.cos(m.varF) - Math.cos(w * t + m.varF)));
+    }
+
     /** Posición en una pasada (t en ms desde que empezó). */
     function posicionPasada(m, t) {
-        var u = (t * m.vel / 1000) / m.largo;            // 0..1 a lo largo de la pasada
+        var u = recorrido(m, t) / m.largo;               // 0..1 a lo largo de la pasada
         var x = m.desdeX + (m.hastaX - m.desdeX) * u;
         var y = m.desdeY + (m.hastaY - m.desdeY) * u;
         if (m.vaiven) y += Math.sin(t / m.vaivenMs * Math.PI * 2 + m.faseV) * m.vaiven;
@@ -133,6 +144,11 @@
         m.hastaY = carril + dy / 2;
         m.largo = Math.sqrt(Math.pow(m.hastaX - m.desdeX, 2) + Math.pow(m.hastaY - m.desdeY, 2));
         m.vel = entre(rnd, num(ronda.velMin, 70), num(ronda.velMax, 70));
+        // cada meteorito acelera y frena a su manera (amplitud, ritmo y fase al azar)
+        var va = ronda.variacionVel;
+        m.varA = va ? entre(rnd, num(va[0], 0), num(va[1], 0)) : 0;
+        m.varP = entre(rnd, 2600, 4600);
+        m.varF = entre(rnd, 0, Math.PI * 2);
         m.vaiven = num(ronda.vaiven, 0) ? entre(rnd, num(ronda.vaiven, 0) * 0.5, num(ronda.vaiven, 0)) : 0;
         m.vaivenMs = entre(rnd, 2600, 3600);
         m.faseV = entre(rnd, 0, Math.PI * 2);
@@ -220,11 +236,14 @@
             var y = y0 + dv;
             [-1, 1].forEach(function (dir) {
                 [-diag, diag].forEach(function (dy) {
-                    var m = { carril: y, dir: dir, desdeX: dir > 0 ? 110 : 1490, hastaX: dir > 0 ? 1490 : 110, desdeY: y - dy / 2, hastaY: y + dy / 2, vel: velMax, vaiven: vai, vaivenMs: 2600, faseV: 0 };
+                    var vA = r.variacionVel ? num(r.variacionVel[1], 0) : 0;
+                    var m = { carril: y, dir: dir, desdeX: dir > 0 ? 110 : 1490, hastaX: dir > 0 ? 1490 : 110, desdeY: y - dy / 2, hastaY: y + dy / 2, vel: velMax, vaiven: vai, vaivenMs: 2600, faseV: 0, varA: vA, varP: 2600, varF: dir > 0 ? 0 : Math.PI };
                     m.largo = Math.sqrt(Math.pow(m.hastaX - m.desdeX, 2) + Math.pow(dy, 2));
-                    var total = m.largo / m.vel * 1000, enVista = 0, alcanzable = 0;
-                    for (var t = 0; t < total; t += 50) {
+                    if (vA >= 0.95) avisos.push("variación de velocidad demasiado grande");
+                    var enVista = 0, alcanzable = 0;
+                    for (var t = 0; t < 120000; t += 50) {
                         var p = posicionPasada(m, t);
+                        if (p.u >= 1) break;
                         if (p.x < VISIBLE.x0 + 40 || p.x > VISIBLE.x1 - 40) continue;
                         enVista++;
                         var a = anguloIntercepcion(c, nv.velProyectil, p, velocidadPasada(m, t));
@@ -361,6 +380,7 @@
         disparar: disparar,
         moverProyectil: moverProyectil,
         posicionPasada: posicionPasada,
+        recorrido: recorrido,
         velocidadPasada: velocidadPasada,
         nuevaPasada: nuevaPasada,
         prepararNivel: prepararNivel,

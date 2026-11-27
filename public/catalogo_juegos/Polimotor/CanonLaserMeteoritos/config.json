@@ -55,8 +55,12 @@
         62,
         80
       ],
-      "velMin": 62,
-      "velMax": 78,
+      "velMin": 55,
+      "velMax": 85,
+      "variacionVel": [
+        0.15,
+        0.3
+      ],
       "diagonal": 0,
       "vaiven": 0,
       "velProyectil": 1250,
@@ -93,8 +97,12 @@
         52,
         72
       ],
-      "velMin": 82,
-      "velMax": 100,
+      "velMin": 68,
+      "velMax": 108,
+      "variacionVel": [
+        0.2,
+        0.35
+      ],
       "diagonal": 60,
       "vaiven": 0,
       "velProyectil": 1250,
@@ -130,8 +138,12 @@
         46,
         66
       ],
-      "velMin": 92,
-      "velMax": 122,
+      "velMin": 82,
+      "velMax": 128,
+      "variacionVel": [
+        0.25,
+        0.4
+      ],
       "diagonal": 70,
       "vaiven": 12,
       "velProyectil": 1200,
@@ -168,8 +180,12 @@
         44,
         58
       ],
-      "velMin": 95,
-      "velMax": 140,
+      "velMin": 90,
+      "velMax": 145,
+      "variacionVel": [
+        0.3,
+        0.45
+      ],
       "diagonal": 30,
       "vaiven": 8,
       "velProyectil": 1200,
