@@ -17,7 +17,39 @@
 
     var COLORES = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8, 0xff922b];
 
+    // Arte del diseñador: fiesta nocturna en el pueblo (1280x720; el tablado empieza en y≈565), piñata de estrella con
+    // centro blanco, palo y 3 globos. Marcos en px de cada textura (cargadas a 1.5x del lienzo original).
+    var ARTE = { w: 1280, h: 720, suelo: 650 };
+    var PIEZAS = {
+        qe_pinata: { f: 'pinata', w: 533, h: 750, rec: [28, 258, 478, 480] },
+        qe_palo: { f: 'palo', w: 533, h: 750, rec: [29, 28, 475, 695] },
+        qe_globo1: { f: 'globo1', w: 272, h: 659, rec: [31, 20, 209, 620] },
+        qe_globo2: { f: 'globo2', w: 272, h: 529, rec: [33, 25, 206, 480] },
+        qe_globo3: { f: 'globo3', w: 272, h: 529, rec: [16, 25, 206, 480] }
+    };
+    // Piñata: el centro de la estrella está en (0.511, 0.456) del marco y el centro blanco mide ≈ 0.21 del ancho del marco.
+    var PIN = { ox: 0.511, oy: 0.456, w: 318, h: 320, arriba: 146 };
+    var PAPELES = [0xff306a, 0x9a17ef, 0x4a78f2, 0x07c2bd, 0xffb300, 0xf9d315];
+
     var escena = {
+        precargar: function () {
+            var self = this;
+            if (!this.textures.exists('qe_fondo')) this.load.svg('qe_fondo', 'img/diseno/fondo.svg', { width: 1280, height: 720 });
+            Object.keys(PIEZAS).forEach(function (k) {
+                if (!self.textures.exists(k)) self.load.svg(k, 'img/diseno/' + PIEZAS[k].f + '.svg', { width: PIEZAS[k].w, height: PIEZAS[k].h });
+            });
+        },
+
+        prepararArte: function () {
+            var self = this;
+            this.arteOk = this.scale.width >= 900 && this.textures.exists('qe_fondo') && Object.keys(PIEZAS).every(function (k) { return self.textures.exists(k); });
+            if (!this.arteOk) return;
+            Object.keys(PIEZAS).forEach(function (k) {
+                var t = self.textures.get(k), r = PIEZAS[k].rec;
+                if (!t.has('rec')) t.add('rec', 0, r[0], r[1], r[2], r[3]);
+            });
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.reunidos = [];
@@ -39,14 +71,39 @@
             L.viga = Math.round(H * 0.15);
             L.suelo = Math.round(H * 0.86);
             L.largo = Math.round(H * 0.24);
+            if (this.arteOk) { L.viga = Math.round(H * 0.02); L.suelo = Math.round(ARTE.suelo * H / ARTE.h); L.largo = Math.round(H * 0.37); }
             L.tam = Math.max(100, Math.min(160, (L.der - 80) / 4.2, H * 0.22));
             L.bocina = { x: 48, y: Math.round(H * 0.3), r: Math.max(24, Math.min(32, hueco * 0.28)) };
             return L;
         },
 
         armar: function (reubicar) {
+            this.prepararArte();
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            if (this.arteOk) {
+                keep(this.add.image(0, 0, 'qe_fondo').setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(1));
+                this.brillosG = keep(this.add.graphics().setDepth(1.5));
+                this.estrellas = [];
+                for (var e = 0; e < 26; e++) this.estrellas.push({ x: Math.random() * L.W, y: Math.random() * L.H * 0.5, ph: Math.random() * 6, r: 1.5 + Math.random() * 2.2 });
+                // Globos del diseño que suben despacito por el cielo de la fiesta.
+                var kk = L.H / ARTE.h, nom = ['qe_globo1', 'qe_globo2', 'qe_globo3'];
+                this.globos = [];
+                for (var gb = 0; gb < 7; gb++) {
+                    var k = nom[gb % 3], r = PIEZAS[k].rec, alto = (gb % 3 === 0 ? 170 : 140) * kk * (0.8 + Math.random() * 0.3);
+                    var im = keep(this.add.image(0, 0, k, 'rec').setDepth(3 + (gb % 2) * 0.1).setOrigin(0.5, 0.35));
+                    im.setDisplaySize(alto * r[2] / r[3], alto);
+                    this.globos.push({ im: im, x: L.W * (0.06 + 0.14 * gb) + Math.random() * 40, y: L.H * (0.25 + Math.random() * 0.6), v: 9 + Math.random() * 10, ph: Math.random() * 6, alto: alto });
+                }
+                this.papelG = keep(this.add.graphics().setDepth(70));
+                this.bate = keep(this.add.container(-200, -200).setDepth(85));
+                var palo = this.add.image(0, 0, 'qe_palo', 'rec').setAngle(34.6);
+                palo.setDisplaySize(PIEZAS.qe_palo.rec[2] / 1.5 * 0.37, PIEZAS.qe_palo.rec[3] / 1.5 * 0.37);
+                this.bate.add(palo); this.bate.setAlpha(0);
+                this.montarHud(keep);
+                if (reubicar) this.ubicarCosas();
+                return;
+            }
             var V = this.montarVida(keep);
             if (V) {
                 V.parque({ horizonte: L.suelo - 90, arboles: [0.04, 0.96], solX: 0.12 });
@@ -86,6 +143,24 @@
 
         crearPinata: function (id, i, lug, tam) {
             var L = this.L;
+            if (this.arteOk) {
+                // Piñata de estrella del diseño: el animal va en su centro blanco; la cuerda se dibuja aparte.
+                var pv = this.add.container(lug.x, L.viga + 8).setDepth(30);
+                var sw = tam * 1.25, k = sw / PIN.w;
+                var cord = this.add.graphics();
+                cord.lineStyle(3, 0xffffff, 0.95); cord.lineBetween(0, 0, 0, L.largo - PIN.arriba * k + 6);
+                var cp = this.add.container(0, L.largo);
+                var estrella = this.add.image(0, 0, 'qe_pinata', 'rec').setOrigin(PIN.ox, PIN.oy).setDisplaySize(PIN.w * k, PIN.h * k);
+                var gr = this.add.graphics();
+                cp.add([estrella, gr]);
+                pv.add([cord, cp]);
+                var im2 = this.add.image(0, 0, 'el_' + id);
+                im2.setScale((tam * 0.4) / Math.max(im2.width, im2.height));
+                cp.add(im2);
+                var o = { id: id, pivote: pv, cuerpo: cp, grietas: gr, img: im2, tam: tam, x0: lug.x, golpes: 0, rot: 0, imp: 0, fase2: Math.random() * 6, rota: false, cx: lug.x, cy: L.viga + L.largo, estrella: estrella };
+                o.pivote.setAlpha(0);
+                return o;
+            }
             var piv = this.add.container(lug.x, L.viga + 8).setDepth(30);
             var cuerda = this.add.graphics();
             cuerda.lineStyle(5, 0xf1e0b0, 1); cuerda.lineBetween(0, 0, 0, L.largo - tam * 0.45);
@@ -163,8 +238,10 @@
             K.tono({ f: 180 + a.golpes * 40, dur: 0.06, vol: 0.04, tipo: 'square' });
             this.cameras.main.shake(70, 0.003);
             // papelitos y grietas
-            for (var i = 0; i < 6; i++) this.papeles.push({ x: a.cx, y: a.cy, vx: (Math.random() - 0.5) * 6 + lado * 2, vy: -2 - Math.random() * 3, col: COLORES[i % COLORES.length], t: 1 });
+            var pal = this.arteOk ? PAPELES : COLORES;
+            for (var i = 0; i < 6; i++) this.papeles.push({ x: a.cx, y: a.cy, vx: (Math.random() - 0.5) * 6 + lado * 2, vy: -2 - Math.random() * 3, col: pal[i % pal.length], t: 1 });
             this.dibujarGrietas(a);
+            if (a.estrella) { this.tweens.killTweensOf(a.cuerpo); a.cuerpo.setScale(1); this.tweens.add({ targets: a.cuerpo, scaleX: 1.12, scaleY: 0.88, angle: lado * 6, duration: 90, yoyo: true, ease: 'Quad.easeOut', onComplete: function () { a.cuerpo.setAngle(0); } }); }
             if (a.golpes >= this.necesarios()) await this.romper(a);
         },
 
@@ -187,7 +264,8 @@
             this.actual = a;
             K.tono({ f: 900, f2: 300, dur: 0.3, vol: 0.06 });
             // lluvia de dulces
-            for (var i = 0; i < 28; i++) this.papeles.push({ x: a.cx, y: a.cy, vx: (Math.random() - 0.5) * 9, vy: -3 - Math.random() * 6, col: COLORES[i % COLORES.length], t: 1.4, dulce: true });
+            var pal2 = this.arteOk ? PAPELES : COLORES;
+            for (var i = 0; i < 28; i++) this.papeles.push({ x: a.cx, y: a.cy, vx: (Math.random() - 0.5) * 9, vy: -3 - Math.random() * 6, col: pal2[i % pal2.length], t: 1.4, dulce: true });
             // el animal sale de la piñata
             var animal = this.crearCosa(a.id, a.cx, a.cy, a.tam * 0.7, { depth: 40 });
             a.animal = animal;
@@ -301,6 +379,21 @@
                 a.cx = a.pivote.x - Math.sin(th) * L.largo;
                 a.cy = a.pivote.y + Math.cos(th) * L.largo;
             });
+            if (this.globos) this.globos.forEach(function (b) {
+                if (!b.im.active) return;
+                b.y -= b.v * dt;
+                if (b.y < -b.alto) { b.y = L.suelo + b.alto * 0.5; b.x = Math.random() * L.der; }
+                b.im.setPosition(b.x + Math.sin(time / 1100 + b.ph) * 14, b.y + Math.sin(time / 700 + b.ph) * 5).setAngle(Math.sin(time / 900 + b.ph) * 4);
+            });
+            var bg2 = this.brillosG;
+            if (bg2 && bg2.active) {
+                bg2.clear();
+                this.estrellas.forEach(function (e) {
+                    var al = 0.25 + 0.6 * Math.max(0, Math.sin(time / 600 + e.ph));
+                    bg2.fillStyle(0xffffff, al * 0.55); bg2.fillCircle(e.x, e.y, e.r * 2);
+                    bg2.fillStyle(0xffffff, al); bg2.fillCircle(e.x, e.y, e.r * 0.7);
+                });
+            }
             var g = this.papelG;
             if (!g || !g.active) return;
             g.clear();

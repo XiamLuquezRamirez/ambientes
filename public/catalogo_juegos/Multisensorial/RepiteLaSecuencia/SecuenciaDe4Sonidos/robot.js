@@ -31,7 +31,30 @@
         g.fillPoints(pts, true);
     }
 
+    // Recursos del diseñador (img/diseno). Si alguno falta, el juego cae al dibujo procedural de siempre.
+    var ARTE = [
+        ['r4_fondo', 'fondo.svg', 1280, 720], ['r4_robot', 'robot.svg', 400, 400], ['r4_placa1', 'placa1.svg', 250, 250],
+        ['r4_placa2', 'placa2.svg', 250, 250], ['r4_sat', 'satelite.svg', 300, 300], ['r4_astro', 'astronauta.svg', 320, 320],
+        ['r4_met', 'meteorito.svg', 160, 160]
+    ];
+    // Planeta con anillos del fondo (1280×720): el satélite lo orbita por la franja libre sobre el tablero.
+    var PLANETA = { x: 739, y: 131, r: 62 };
+
     var escena = {
+        precargar: function () {
+            var self = this;
+            ARTE.forEach(function (a) { if (!self.textures.exists(a[0])) self.load.svg(a[0], 'img/diseno/' + a[1], { width: a[2], height: a[3] }); });
+        },
+
+        /** Las placas traen 104 px de margen vacío (de 500): se recorta la placa en sí. */
+        prepararArte: function () {
+            ['r4_placa1', 'r4_placa2'].forEach(function (k) {
+                if (!this.textures.exists(k)) return;
+                var t = this.textures.get(k);
+                if (!t.has('c')) t.add('c', 0, 52, 52, 146, 146);
+            }, this);
+        },
+
         iniciar: function () {
             this.tabObjs = [];
             this.cartas = [];
@@ -63,10 +86,17 @@
         },
 
         armar: function (reubicar) {
+            this.prepararArte();
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
             if (!this.mapa) this.mapa = this.elegirMapa();
             var g = keep(this.add.graphics().setDepth(1));
+            var fondoOk = this.fondoOk = this.textures.exists('r4_fondo') && L.W >= 900;
+            if (fondoOk) {
+                keep(this.add.image(0, 0, 'r4_fondo').setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(1));
+                var ssx = L.W / 1280, ssy = L.H / 720;
+                this.planeta = { x: PLANETA.x * ssx, y: PLANETA.y * ssy, r: PLANETA.r * Math.min(ssx, ssy) };
+            } else {
             // Espacio exterior visto por el ventanal de la estación.
             var bandas = 18;
             for (var b = 0; b < bandas; b++) {
@@ -112,11 +142,38 @@
             g.fillStyle(0xffd43b, 0.85);
             for (var h = 0; h < L.W; h += 44) g.fillTriangle(h, L.H, h + 22, L.H, h + 11, L.H - 12);
             g.fillStyle(0x4dd4ff, 0.6); g.fillRect(0, L.H - 24, L.W, 2);
+            }
             this.fondoG = keep(this.add.graphics().setDepth(2));   // engranajes y luces que se mueven
+            this.montarVivos(keep);
             this.montarHud(keep);
             this.sembrarMotes(keep, 14, { x: 0, y: 60, w: L.W, h: L.H - 100, depth: 8 }, 0x74c0fc);
             this.construirCartas(keep);
             if (this.nv && this.nv.grid) { this.construirTablero(this.nv, true); }
+        },
+
+        /** Satélite, meteoritos y astronauta del diseño: se mueven solos en paso(). */
+        montarVivos: function (keep) {
+            var L = this.L, k = Math.min(L.W / 1280, L.H / 720);
+            var V = this.vivos = { k: k, met: [], sat: null, astro: null, astroGiro: 0 };
+            var hay = function (self, n) { return self.fondoOk && self.textures.exists(n); };
+            if (hay(this, 'r4_met')) {
+                V.met = [[26, 0.12], [38, 0.29], [20, 0.46], [32, 0.63], [44, 0.8]].map(function (m, a) {
+                    var d = m[0] * k * 4.2;
+                    return { img: keep(this.add.image(-200, L.H * m[1], 'r4_met').setDisplaySize(d, d).setDepth(3)), a: a, v: 14 + a * 6, y: L.H * m[1], giro: (a % 2 ? -1 : 1) * (0.25 + a * 0.08) };
+                }, this);
+            }
+            if (hay(this, 'r4_sat')) V.sat = keep(this.add.image(0, 0, 'r4_sat').setDisplaySize(91 * k, 91 * k).setDepth(3));
+            if (hay(this, 'r4_astro')) V.astro = keep(this.add.image(L.W * 0.058, L.H * 0.5, 'r4_astro').setDisplaySize(220 * k, 220 * k).setDepth(5));
+        },
+
+        /** Tocar al astronauta: da una voltereta y suelta estrellas. */
+        saludarAstronauta: function () {
+            var V = this.vivos, A = V && V.astro;
+            if (!A || !A.active || V.astroGiro) return;
+            V.astroGiro = 1;
+            K.tono({ f: 880, dur: 0.1, vol: 0.05 });
+            Ut.estallido(this, A.x, A.y, { n: 8, tex: 'estrella', tam: 22, dist: 90, depth: 70, sinTinte: true });
+            this.tweens.add({ targets: V, astroGiro: 2, duration: 900, ease: 'Sine.easeInOut', onComplete: function () { V.astroGiro = 0; } });
         },
 
         /* ── Tablero de órdenes (a la derecha) ── */
@@ -205,8 +262,13 @@
             g.lineStyle(3, 0x4dd4ff, 0.85); g.strokeRoundedRect(T.x - 10, T.y - 10, W2 + 20, H2 + 20, 22);
             g.fillStyle(0x8294b4, 1);
             [[-4, -4], [W2 + 4, -4], [-4, H2 + 4], [W2 + 4, H2 + 4]].forEach(function (q) { g.fillCircle(T.x + q[0], T.y + q[1], 3.5); });
+            var placas = this.textures.exists('r4_placa1') && this.textures.exists('r4_placa2');
             for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
                 var tx = T.x + c * cs + 2, ty = T.y + r * cs + 2;
+                if (placas) {
+                    add(this.add.image(tx + (cs - 4) / 2, ty + (cs - 4) / 2, (c + r) % 2 ? 'r4_placa1' : 'r4_placa2', 'c').setDisplaySize(cs - 4, cs - 4).setDepth(10));
+                    continue;
+                }
                 g.fillStyle((c + r) % 2 ? 0x44587a : 0x3a4d6d, 1);
                 g.fillRoundedRect(tx, ty, cs - 4, cs - 4, 10);
                 g.fillStyle(0xffffff, 0.07); g.fillRoundedRect(tx + 3, ty + 3, cs - 10, (cs - 4) * 0.42, 8);
@@ -231,6 +293,20 @@
         },
 
         crearRobot: function (cs) {
+            if (this.textures.exists('r4_robot')) {
+                var c0 = this.add.container(0, 0);
+                var sombra = this.add.ellipse(0, cs * 0.47, cs * 0.62, cs * 0.12, 0x000000, 0.3);
+                var glow = this.add.ellipse(0, cs * 0.44, cs * 0.5, cs * 0.14, 0x4dd4ff, 0.5);
+                var flota = this.add.container(0, 0);
+                var cuerpo = this.add.image(0, 0, 'r4_robot').setDisplaySize(cs * 1.1, cs * 1.1);
+                flota.add(cuerpo);
+                c0.add([sombra, glow, flota]);
+                return { cont: c0, flota: flota, cuerpo: cuerpo, glow: glow, sombra: sombra, cs: cs, s: cs * 0.95, pos: null };
+            }
+            return this.crearRobotDibujado(cs);
+        },
+
+        crearRobotDibujado: function (cs) {
             var s = cs * 0.95;
             var cont = this.add.container(0, 0);
             var g = this.add.graphics();
@@ -253,6 +329,13 @@
         mirar: function (dir) {
             var R = this.robot;
             if (!R) return;
+            if (R.cuerpo) {
+                // El robot se inclina hacia donde va.
+                var dd = DIRS[dir];
+                this.tweens.killTweensOf(R.cuerpo);
+                this.tweens.add({ targets: R.cuerpo, x: dd.dc * R.cs * 0.05, y: dd.dr * R.cs * 0.04, angle: dd.dc * 9, duration: 180, ease: 'Sine.easeOut' });
+                return;
+            }
             var d = DIRS[dir], k = R.s * 0.03;
             R.pl.setPosition(-R.s * 0.09 + d.dc * k, -R.s * 0.23 + d.dr * k);
             R.pr.setPosition(R.s * 0.09 + d.dc * k, -R.s * 0.23 + d.dr * k);
@@ -341,6 +424,8 @@
             var carta = this.cartaEn(p);
             if (carta) { this.pista.reiniciar(); await this.oirCarta(carta); return; }
             var c = this.celdaEn(p);
+            var A = this.vivos && this.vivos.astro;
+            if (!c && A && A.active && Math.abs(p.x - A.x) < A.displayWidth * 0.4 && Math.abs(p.y - A.y) < A.displayHeight * 0.45) { this.saludarAstronauta(); return; }
             if (!c) return;
             this.pista.reiniciar();
             await this.adivinar(c);
@@ -485,15 +570,33 @@
                 g.fillStyle(0xffffff, 0.25 + 0.6 * Math.abs(Math.sin(s * 1.3 + i * 1.7)));
                 g.fillCircle(x, y, 1 + (i % 4) * 0.45);
             }
-            // Asteroides a la deriva.
-            for (var a = 0; a < 5; a++) {
+            var V = this.vivos;
+            // Meteoritos del diseño a la deriva (giran despacio).
+            if (V && V.met.length) V.met.forEach(function (m) {
+                if (!m.img.active) return;
+                m.img.x = ((s * m.v + m.a * 311) % (L.W + 200)) - 100;
+                m.img.y = m.y + Math.sin(s * 0.6 + m.a) * 8;
+                m.img.rotation = s * m.giro;
+            });
+            // Asteroides a la deriva (solo si faltan los meteoritos del diseño).
+            for (var a = 0; a < (V && V.met.length ? 0 : 5); a++) {
                 var v = 14 + a * 6, ax = ((s * v + a * 311) % (L.W + 200)) - 100, ay = L.H * (0.12 + a * 0.17), r = 9 + (a % 3) * 6;
                 g.fillStyle(0x5c677d, 1); g.fillCircle(ax, ay, r); g.fillStyle(0x7d8aa3, 1); g.fillCircle(ax - r * 0.25, ay - r * 0.25, r * 0.55);
                 g.fillStyle(0x3d4659, 1); g.fillCircle(ax + r * 0.35, ay + r * 0.2, r * 0.22);
             }
             // Satélite que orbita el planeta pequeño.
             var P = this.planeta;
-            if (P) {
+            if (P && V && V.sat && V.sat.active) {
+                // Satélite del diseño: órbita inclinada; al pasar por detrás del planeta se esconde.
+                var an = s * 0.6, rx = P.r * 2.2, ry = P.r * 0.4, fi = -0.12, cf = Math.cos(fi), sf = Math.sin(fi);
+                var orb = function (t) { var ex = Math.cos(t) * rx, ey = Math.sin(t) * ry; return { x: P.x + ex * cf - ey * sf, y: P.y - P.r * 0.55 + ex * sf + ey * cf }; };
+                g.lineStyle(1, 0xffffff, 0.13); g.beginPath();
+                for (var q = 0; q <= 48; q++) { var o = orb(q / 48 * Math.PI * 2); if (q === 0) g.moveTo(o.x, o.y); else g.lineTo(o.x, o.y); }
+                g.strokePath();
+                var ps = orb(an), atras = Math.sin(an) < 0, ts = 80 * V.k * (atras ? 0.78 : 1);
+                V.sat.setPosition(ps.x, ps.y).setRotation(Math.sin(s * 1.1) * 0.12 + fi * 0.4).setDisplaySize(ts, ts);
+                V.sat.setAlpha(atras && Math.hypot(ps.x - P.x, ps.y - P.y) < P.r * 0.95 ? 0 : 1);
+            } else if (P) {
                 var ang = s * 0.7, sx = P.x + Math.cos(ang) * P.r * 2.1, sy = P.y + Math.sin(ang) * P.r * 0.8;
                 g.lineStyle(1, 0xffffff, 0.15); g.strokeEllipse(P.x, P.y, P.r * 4.2, P.r * 1.6);
                 g.fillStyle(0xdee2e6, 1); g.fillRect(sx - 5, sy - 3, 10, 6);
@@ -519,9 +622,23 @@
                     g.fillStyle(0xffffff, 0.95); g.fillTriangle(fx - 6, yb, fx + 6, yb, fx, yb + alto * 0.55);
                 });
             }
+            // Astronauta flotando a la izquierda (voltereta al tocarlo).
+            if (V && V.astro && V.astro.active) {
+                V.astro.setPosition(L.W * 0.058 + Math.sin(s * 0.33) * 16, L.H * 0.5 + Math.sin(s * 0.5) * 30);
+                V.astro.setRotation(Math.sin(s * 0.4) * 0.18 + (V.astroGiro ? (V.astroGiro - 1) * Math.PI * 2 : 0));
+            }
+            // El robot flota y su propulsor late (más fuerte mientras ejecuta el programa).
+            var R = this.robot;
+            if (R && R.flota && R.flota.active) {
+                R.flota.y = Math.sin(s * 2.2) * R.cs * 0.025 - R.cs * 0.02;
+                R.flota.angle = Math.sin(s * 1.4) * 2.5;
+                var fuerte = this.fase === 'revelando' ? 1 : 0.5;
+                R.glow.setAlpha((0.3 + 0.25 * Math.sin(s * 12)) * (0.6 + fuerte)).setScale(1 + 0.12 * Math.sin(s * 15), 1);
+                R.sombra.setScale(1 + 0.05 * Math.sin(s * 2.2 + 3), 1);
+            }
             // Luces de estado de la viga (más rápidas mientras el robot se mueve).
             var rapido = this.fase === 'revelando' ? 4 : 1;
-            for (var j = 0; j < 6; j++) {
+            for (var j = 0; j < (this.fondoOk ? 0 : 6); j++) {
                 var on = Math.floor(s * rapido * 1.5 + j) % 3 === 0;
                 g.fillStyle(on ? [0xff6b6b, 0x69db7c, 0x4dabf7][j % 3] : 0x2b3a55, 1);
                 g.fillCircle(L.W - 200 - j * 22, 7, 4);

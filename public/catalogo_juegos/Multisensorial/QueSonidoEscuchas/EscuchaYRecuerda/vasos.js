@@ -17,7 +17,15 @@
 
     var COLORES = [0xe03131, 0x1c7ed6, 0xf08c00, 0x2f9e44, 0x9c36b5];
 
+    // Arte del diseñador (img/diseno): escenario de circo y cuatro vasos de colores (lienzo 353×350; base del vaso en y=334.87).
+    var VASO = { w: 352.97, h: 349.74, cx: 176.5, base: 334.87, alto: 320 };
+
     var escena = {
+        precargar: function () {
+            if (!this.textures.exists('dx_fondo')) this.load.svg('dx_fondo', 'img/diseno/fondo.svg', { width: 1280, height: 720 });
+            for (var q = 1; q <= 4; q++) if (!this.textures.exists('dx_vaso' + q)) this.load.svg('dx_vaso' + q, 'img/diseno/vaso' + q + '.svg', { width: 300, height: 297 });
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.reunidos = [];
@@ -40,6 +48,15 @@
         armar: function (reubicar) {
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            this.arteOk = ['dx_fondo', 'dx_vaso1', 'dx_vaso2', 'dx_vaso3', 'dx_vaso4'].every(function (k) { return this.textures.exists(k); }, this) && L.W >= 900;
+            if (this.arteOk) {
+                keep(this.add.image(0, 0, 'dx_fondo').setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(1));
+                this.focoG = keep(this.add.graphics().setDepth(2));   // focos y estrellas (se animan en paso)
+                this.montarHud(keep);
+                this.sembrarMotes(keep, 14, { x: 0, y: 0, w: L.W, h: L.mesa, depth: 8 }, 0xfff3bf);
+                if (reubicar) this.ubicarCosas();
+                return;
+            }
             K.textura(this, 'vasos_fondo', L.W, L.H, function (x, w, h) {
                 var g = x.createLinearGradient(0, 0, 0, h);
                 g.addColorStop(0, '#2b1a55'); g.addColorStop(1, '#5a2d82');
@@ -72,7 +89,7 @@
             var L = this.L;
             var x0 = 100, disp = L.der - x0 - 40;
             var out = [];
-            for (var i = 0; i < n; i++) out.push({ x: x0 + disp * (i + 0.5) / n, y: L.mesa - L.tam * 0.12 });
+            for (var i = 0; i < n; i++) out.push({ x: x0 + disp * (i + 0.5) / n, y: this.arteOk ? Math.round(L.H * 0.74) : L.mesa - L.tam * 0.12 });
             return out;
         },
 
@@ -86,6 +103,20 @@
 
         crearVaso: function (id, i, lug, tam) {
             var a = this.crearCosa(id, lug.x, lug.y, tam * 0.66, { depth: 30, sinSombra: true });
+            if (this.arteOk) {
+                var ks = tam * 0.95 / VASO.alto;
+                var copa2 = this.add.container(0, 0);
+                copa2.add(this.add.image(0, 0, 'dx_vaso' + ((i % 4) + 1)).setOrigin(VASO.cx / VASO.w, VASO.base / VASO.h).setDisplaySize(VASO.w * ks, VASO.h * ks));
+                a.cont.addAt(this.add.ellipse(0, 2, tam * 0.95, tam * 0.14, 0x000000, 0.25), 0);   // sombra fija en el suelo
+                a.cont.add(copa2);
+                a.copa = copa2;
+                a.cont.bringToTop(copa2);
+                a.img.setY(-tam * 0.32);
+                a.tam = tam; a.pos = i; a.alto = VASO.alto * ks;
+                copa2.setY(-a.alto * 1.1);
+                a.cont.setAlpha(0);
+                return a;
+            }
             var copa = this.add.container(0, 0);
             var g = this.add.graphics();
             var col = COLORES[i % COLORES.length];
@@ -276,6 +307,23 @@
         paso: function (time) {
             var self = this;
             this.cosas.forEach(function (a, i) { if (a.cont.active && a.img && !self.mezclando && !self.tweens.isTweening(a.img)) a.copa.angle = Math.sin(time / 800 + i) * 1.2; });
+            var fg = this.focoG;
+            if (this.arteOk && fg && fg.active) {
+                // Focos de circo que barren el escenario y estrellas que titilan en el fondo.
+                var L = this.L, sc = time / 1000;
+                fg.clear();
+                [[0.3, 0], [0.7, 2.2]].forEach(function (f) {
+                    var ox = L.W * f[0] + Math.sin(sc * 0.5 + f[1]) * L.W * 0.08, tx = L.W * f[0] + Math.sin(sc * 0.7 + f[1] + 1) * L.W * 0.2, w = L.tam * 0.9, y1 = L.H * 0.76;
+                    fg.fillStyle(0xfff3bf, 0.09);
+                    fg.fillPoints([{ x: ox - 30, y: 0 }, { x: ox + 30, y: 0 }, { x: tx + w, y: y1 }, { x: tx - w, y: y1 }], true);
+                    fg.fillStyle(0xfff3bf, 0.12); fg.fillEllipse(tx, y1, w * 2, L.H * 0.06);
+                });
+                for (var e = 0; e < 26; e++) {
+                    var ex = L.W * (0.17 + ((e * 0.6180339) % 1) * 0.66), ey = L.H * (0.06 + ((e * 0.3819) % 1) * 0.5);
+                    fg.fillStyle(0xffffff, 0.15 + 0.55 * Math.abs(Math.sin(sc * 1.4 + e * 2.1)));
+                    fg.fillCircle(ex, ey, 1.4 + (e % 3) * 0.7);
+                }
+            }
         }
     };
 

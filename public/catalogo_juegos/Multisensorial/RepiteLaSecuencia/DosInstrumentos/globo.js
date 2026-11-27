@@ -1004,10 +1004,8 @@
             }
             if (G.pil && G.pil.active) G.pil.y = (G.py || 90) + Math.sin(s * 2.4) * 1.5 - G.llama * 2;
             if (G.aero && G.aero.active) G.aero.scaleY = G.aero.sy0 * (1 + Math.sin(s * 2.2) * 0.01 + G.llama * 0.012);
-            // Sombra del globo sobre la capa del paisaje (más pequeña cuanto más alto).
+            // (Sin sombra del globo sobre el paisaje: se quitó a pedido.)
             var sg = this.efectosG; sg.clear();
-            var alt = Math.max(0, Math.min(1, (L.yMax - gc.y) / (L.yMax - L.yMin)));
-            sg.fillStyle(0x000000, 0.16 * (1 - alt * 0.5)); sg.fillEllipse(gc.x + 20, L.suelo - 8, 120 * sG * (1 - alt * 0.35), 16 * (1 - alt * 0.4));
             // Anillos y chispas de sonido.
             this.efectos = this.efectos.filter(function (a) { return time - a.t0 < 1200; });
             this.efectos.forEach(function (a) { var fr = (time - a.t0) / 1000; if (fr > 1) return; sg.lineStyle(4 * (1 - fr) + 1, a.col, 0.8 * (1 - fr)); sg.strokeCircle(a.x, a.y, 14 + fr * 90); });

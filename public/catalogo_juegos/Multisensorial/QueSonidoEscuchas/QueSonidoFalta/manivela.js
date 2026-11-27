@@ -21,7 +21,24 @@
 
     function norm(a) { while (a > Math.PI) a -= TAU; while (a < -Math.PI) a += TAU; return a; }
 
+    // Arte del diseñador (img/diseno): fondo de feria y máquina partida en 4 piezas (base, engranaje, brazo, encima). Medidas del lienzo 708.56×720.
+    var PASTEL = [0xf7d3a4, 0xa4f7ab, 0xa4c0f7, 0xf9a2e4, 0xfff1a4];
+    var ART = {
+        disc: { x: 223.51, y: 299.97, r: 152.5 }, hub: { x: 551.57, y: 312.44 }, brazo: 118.5, ang0: -2.76,
+        lamp: { x: 354.28, y: 59.57 }, dotY: 516.94,
+        dots: [44.16, 74.93, 105.69, 136.46, 167.22, 197.99, 228.75, 261.94, 292.71, 323.47, 354.24, 385.0, 415.77, 446.53, 474.13, 504.89, 535.64, 566.46, 597.22, 627.99, 658.75]
+    };
+    var PIEZAS = ['dx_m_base', 'dx_m_encima', 'dx_m_engranaje', 'dx_m_brazo'];
+
     var escena = {
+        precargar: function () {
+            if (!this.textures.exists('dx_fondo')) this.load.svg('dx_fondo', 'img/diseno/fondo.svg', { width: 1280, height: 720 });
+            var self = this;
+            ['base', 'encima', 'engranaje', 'brazo'].forEach(function (n) {
+                if (!self.textures.exists('dx_m_' + n)) self.load.svg('dx_m_' + n, 'img/diseno/maquina_' + n + '.svg', { width: 886, height: 900 });
+            });
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.reunidos = [];
@@ -49,12 +66,32 @@
             L.hub = { x: L.cx + L.R + 120, y: L.cy + L.R * 0.1 };
             L.brazo = Math.max(56, L.R * 0.42);
             L.bocina = { x: 48, y: Math.round(H * 0.3), r: Math.max(24, Math.min(32, hueco * 0.28)) };
+            this.arteOk = this.textures.exists('dx_fondo') && PIEZAS.every(function (k) { return this.textures.exists(k); }, this) && W >= 900;
+            if (this.arteOk) {
+                // La máquina del diseño manda: el disco y la manivela se colocan sobre sus piezas.
+                var k = Math.min(H * 0.84 / 648, (L.der - 40) / 652);
+                var ox = (L.der - 652 * k) / 2 - 28 * k, oy = H * 0.965 - 684 * k;
+                L.k = k; L.ox = ox; L.oy = oy;
+                L.R = ART.disc.r * k * 0.99;
+                L.cx = Math.round(ox + ART.disc.x * k); L.cy = Math.round(oy + ART.disc.y * k);
+                L.hub = { x: ox + ART.hub.x * k, y: oy + ART.hub.y * k };
+                L.brazo = ART.brazo * k;
+            }
             return L;
         },
 
         armar: function (reubicar) {
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            if (this.arteOk) {
+                keep(this.add.image(0, 0, 'dx_fondo').setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(1));
+                var kk = L.k, tam = [708.56 * kk, 720 * kk];
+                keep(this.add.image(L.ox, L.oy, 'dx_m_base').setOrigin(0, 0).setDisplaySize(tam[0], tam[1]).setDepth(3));
+                this.luzG = keep(this.add.graphics().setDepth(4));       // luces de la base
+                this.engImg = keep(this.add.image(L.hub.x, L.hub.y, 'dx_m_engranaje').setOrigin(ART.hub.x / 708.56, ART.hub.y / 720).setDisplaySize(tam[0], tam[1]).setDepth(7));
+                this.brazoImg = keep(this.add.image(L.hub.x, L.hub.y, 'dx_m_brazo').setOrigin(ART.hub.x / 708.56, ART.hub.y / 720).setDisplaySize(tam[0], tam[1]).setDepth(14));
+                keep(this.add.image(L.ox, L.oy, 'dx_m_encima').setOrigin(0, 0).setDisplaySize(tam[0], tam[1]).setDepth(12));
+            } else {
             K.textura(this, 'mani_fondo', L.W, L.H, function (x, w, h) {
                 var g = x.createLinearGradient(0, 0, 0, h);
                 g.addColorStop(0, '#5b3a8c'); g.addColorStop(1, '#8e5bb5');
@@ -72,6 +109,7 @@
             caja.fillStyle(0x8a5524, 1); caja.fillRoundedRect(L.cx - bw / 2, L.cy - bh / 2, bw + L.R * 0.9, bh, 26);
             caja.fillStyle(0xb97c3a, 1); caja.fillRoundedRect(L.cx - bw / 2 + 10, L.cy - bh / 2 + 10, bw + L.R * 0.9 - 20, bh - 20, 20);
             caja.fillStyle(0x4a2c10, 1); caja.fillCircle(L.cx, L.cy, L.R + 14);
+            }
             this.discoG = keep(this.add.container(L.cx, L.cy).setDepth(6));
             this.discoG.setRotation(this.rot);
             this.fijoG = keep(this.add.graphics().setDepth(12));
@@ -90,13 +128,14 @@
             g.fillStyle(0xf1e3c8, 1); g.fillCircle(0, 0, L.R);
             for (var i = 0; i < n; i++) {
                 var a0 = (i - 0.5) * TAU / n - Math.PI / 2, a1 = (i + 0.5) * TAU / n - Math.PI / 2;
-                g.fillStyle(this.cosas.length ? COLORES[i % COLORES.length] : 0xe0cba2, this.cosas.length ? 0.35 : 0.5);
+                if (this.arteOk) g.fillStyle(PASTEL[i % PASTEL.length], 1);
+                else g.fillStyle(this.cosas.length ? COLORES[i % COLORES.length] : 0xe0cba2, this.cosas.length ? 0.35 : 0.5);
                 g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, L.R * 0.98, a0, a1, false); g.closePath(); g.fillPath();
             }
-            g.lineStyle(5, 0x8a5524, 1); g.strokeCircle(0, 0, L.R);
-            g.lineStyle(3, 0x8a5524, 0.6);
+            if (this.arteOk) { g.lineStyle(3, 0xffffff, 1); g.strokeCircle(0, 0, L.R); g.lineStyle(3, 0xffffff, 0.9); }
+            else { g.lineStyle(5, 0x8a5524, 1); g.strokeCircle(0, 0, L.R); g.lineStyle(3, 0x8a5524, 0.6); }
             for (var j = 0; j < n; j++) { var a = (j - 0.5) * TAU / n - Math.PI / 2; g.lineBetween(Math.cos(a) * L.R * 0.2, Math.sin(a) * L.R * 0.2, Math.cos(a) * L.R, Math.sin(a) * L.R); }
-            g.fillStyle(0x8a5524, 1); g.fillCircle(0, 0, L.R * 0.12);
+            if (!this.arteOk) { g.fillStyle(0x8a5524, 1); g.fillCircle(0, 0, L.R * 0.12); }
             d.add(g);
             var self = this;
             this.cosas.forEach(function (a, i) {
@@ -288,6 +327,46 @@
             };
         },
 
+        /** Máquina del diseño: lámparas de la tapa, luces que corren, engranaje y brazo girando con la manivela. */
+        pasoArte: function (time, f) {
+            var L = this.L, k = L.k, s = time / 1000;
+            // Lámparas: una por sonido; la del sonido que suena se enciende.
+            if (this.lamparas) {
+                var n = this.lamparas, sp = (n <= 4 ? 75 : 62) * k;
+                for (var i = 0; i < n; i++) {
+                    var lx = L.ox + ART.lamp.x * k + (i - (n - 1) / 2) * sp, ly = L.oy + ART.lamp.y * k;
+                    var on = this.lampOn === i && time - (this.lampT || 0) < 500;
+                    if (on) { f.fillStyle(0xffe066, 0.35); f.fillCircle(lx, ly, 31 * k); }
+                    f.fillStyle(on ? 0xf29700 : 0x8a5410, 1); f.fillCircle(lx, ly, 17.85 * k);
+                    f.fillStyle(on ? 0xfff3a0 : 0xb07514, 1); f.fillCircle(lx, ly, 12.9 * k);
+                    f.fillStyle(0xffffff, on ? 1 : 0.35); f.fillCircle(lx - 4.55 * k, ly - 7 * k, 6 * k);
+                }
+            }
+            // Luces de abajo: una ola de brillo que corre (más rápida mientras se gira).
+            var g = this.luzG;
+            if (g && g.active) {
+                g.clear();
+                var v = this.agarrada ? 11 : 4;
+                ART.dots.forEach(function (x, j) {
+                    var a = 0.8 * Math.max(0, Math.sin(s * v - j * 0.55));
+                    if (a < 0.05) return;
+                    g.fillStyle(0xfff3a0, a); g.fillCircle(L.ox + x * k, L.oy + (ART.dotY - 2.5) * k, 5.4 * k);
+                });
+            }
+            // Engranaje y brazo giran con la manivela.
+            if (this.engImg && this.engImg.active) this.engImg.setRotation(this.phi);
+            if (this.brazoImg && this.brazoImg.active) this.brazoImg.setRotation(this.phi - Math.PI / 2 - ART.ang0);
+            var m = this.manG; m.clear();
+            var mp = this.manija();
+            if (this.fase === 'jugar' && !this.movido && !this.ocupado) {
+                // invitación: el pomo late y flechas circulares lo rodean
+                var t = time / 400;
+                m.lineStyle(5, 0xffffff, 0.35 + 0.3 * Math.abs(Math.sin(t))); m.strokeCircle(mp.x, mp.y, 26 * k + 6 * Math.abs(Math.sin(t)));
+                m.lineStyle(5, 0xffffff, 0.6 + 0.3 * Math.sin(t));
+                m.beginPath(); m.arc(L.hub.x, L.hub.y, L.brazo + 36, -2.2 + Math.sin(t) * 0.1, -0.8, false); m.strokePath();
+            }
+        },
+
         paso: function (time, delta) {
             var L = this.L;
             if (!this.discoG || !this.discoG.active) return;
@@ -304,6 +383,10 @@
             }
             // Flecha fija arriba y lámparas.
             var f = this.fijoG; f.clear();
+            if (this.arteOk) {
+                this.pasoArte(time, f);
+                return;
+            }
             f.fillStyle(0xff6b6b, 1); f.fillTriangle(L.cx - 22, L.cy - L.R - 34, L.cx + 22, L.cy - L.R - 34, L.cx, L.cy - L.R - 2);
             f.lineStyle(4, 0xffffff, 1); f.strokeTriangle(L.cx - 22, L.cy - L.R - 34, L.cx + 22, L.cy - L.R - 34, L.cx, L.cy - L.R - 2);
             if (this.lamparas) {

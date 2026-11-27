@@ -22,7 +22,18 @@
     var COLS = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8];
     var SALAS = [0xcdf5ea, 0xfff1b8, 0xffd6e5, 0xe2d4ff];
 
+    /* ── Arte del diseñador (img/diseno): fondo del consultorio 1280×720 y 3 camas (cabecera y pies por separado) ── */
+    var DIR = 'img/diseno/';
+    var FONDO_W = 1280, FONDO_H = 720, TEX_W = 1600, TEX_H = 900;
+    // Cama en su lienzo de 353×500: pies (y), ancho útil y altura a la que descansa el juguete sobre la cobija.
+    var CAMA = { w: 353, h: 500, pie: 470, ancho: 254, pieCama: 175 };
+    var SUELO_U = 668;                                          // pies de las camas, en unidades del fondo
+    var CRUZ_U = [660, 140];                                    // cruz del consultorio, sobre la pared a la izquierda de la ventana
+    var VENTANA_U = { x0: 800, x1: 1062, y0: 120, y1: 224 };    // cristal de la ventana (bajo las persianas)
+    var ESTRELLAS_U = [[115, 50, 35], [342, 124, 35], [184, 166, 35], [374, 270, 35], [600, 285, 35], [661, 97, 35], [814, 384, 35], [1174, 163, 35], [64, 243, 35], [171, 392, 34], [75, 121, 11], [519, 64, 11], [696, 228, 11], [492, 357, 11], [988, 364, 11], [1228, 273, 11], [1233, 32, 11], [280, 346, 11], [213, 253, 11], [56, 361, 11], [255, 37, 11]];
+
     function rg(i) { var x = Math.sin(i * 127.1 + 11.7) * 43758.5453; return x - Math.floor(x); }
+    function quitarCama(a) { if (a.bedB && a.bedB.active) a.bedB.destroy(); if (a.bedF && a.bedF.active) a.bedF.destroy(); }
     function mezTinte(a, b, t) { var c = C.Interpolate.ColorWithColor(C.ValueToColor(a), C.ValueToColor(b), 100, Math.max(0, Math.min(1, t)) * 100); return C.GetColor(c.r, c.g, c.b); }
 
     var escena = {
@@ -39,6 +50,27 @@
             this.globos = [];
             this.desfile = false;
             this.tocado = null;
+        },
+
+        precargar: function () {
+            if (!this.textures.exists('dc_fondo')) this.load.svg('dc_fondo', DIR + 'fondo.svg', { width: TEX_W, height: TEX_H });
+            for (var i = 1; i <= 3; i++) {
+                if (!this.textures.exists('dc_cama' + i)) this.load.svg('dc_cama' + i, DIR + 'cama' + i + '.svg', { width: 353, height: 500 });
+                if (!this.textures.exists('dc_cama' + i + 'f')) this.load.svg('dc_cama' + i + 'f', DIR + 'cama' + i + '_f.svg', { width: 353, height: 500 });
+            }
+        },
+
+        arteOk: function () {
+            if (!this.textures.exists('dc_fondo')) return false;
+            for (var i = 1; i <= 3; i++) if (!this.textures.exists('dc_cama' + i) || !this.textures.exists('dc_cama' + i + 'f')) return false;
+            return true;
+        },
+
+        /** Encaje del fondo: cubre la pantalla anclado abajo (el suelo rosa siempre se ve). */
+        marcoFondo: function (W, H) {
+            var k = Math.max(W / FONDO_W, H / FONDO_H);
+            var ox = (W - FONDO_W * k) / 2, oy = H - FONDO_H * k;
+            return { k: k, ox: ox, oy: oy, sx: function (x) { return ox + x * k; }, sy: function (y) { return oy + y * k; } };
         },
 
         filtrarPool: function (pool) {
@@ -58,15 +90,26 @@
             L.gancho = { x: Math.round(L.der * 0.41), y: Math.round(H * 0.17) };
             L.monitor = { x: Math.round(L.der * 0.27), y: Math.round(H * 0.2), w: Math.min(220, L.der * 0.2), h: Math.min(130, H * 0.17) };
             L.bocina = { x: 48, y: Math.round(H * 0.3), r: Math.max(24, Math.min(32, hueco * 0.28)) };
+            if (this.arteOk()) {
+                var F = L.F = this.marcoFondo(W, H);
+                L.sb = Math.min(0.9, L.tam * 1.65 / CAMA.ancho);                     // escala de las camas
+                L.suelo = F.sy(SUELO_U);
+                L.camaY = Math.round(L.suelo - CAMA.pieCama * L.sb + L.tam * 0.52);  // el juguete queda sobre la cobija
+                L.cruz = { x: Math.round(F.sx(CRUZ_U[0])), y: Math.round(F.sy(CRUZ_U[1])) };
+            }
             return L;
         },
 
         armar: function (reubicar) {
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
-            var clave = 'doc_fondo_' + L.W + 'x' + L.H;
-            K.textura(this, clave, L.W, L.H, function (x, w, h) { pintarClinica(x, w, h, L); });
-            this.fondoImg = keep(this.add.image(0, 0, clave).setOrigin(0, 0).setDepth(1).setTint(this.tinte));
+            if (L.F) {
+                this.fondoImg = keep(this.add.image(L.F.ox, L.F.oy, 'dc_fondo').setOrigin(0, 0).setScale(L.F.k * FONDO_W / TEX_W).setDepth(1));
+            } else {
+                var clave = 'doc_fondo_' + L.W + 'x' + L.H;
+                K.textura(this, clave, L.W, L.H, function (x, w, h) { pintarClinica(x, w, h, L); });
+                this.fondoImg = keep(this.add.image(0, 0, clave).setOrigin(0, 0).setDepth(1).setTint(this.tinte));
+            }
             this.monG = keep(this.add.graphics().setDepth(3));
             this.camasG = keep(this.add.graphics().setDepth(27));
             this.ondasG = keep(this.add.graphics().setDepth(37));
@@ -88,6 +131,7 @@
             this.montarHud(keep);
             this.sembrarMotes(keep, 8, { x: 0, y: 0, w: L.W, h: L.pared, depth: 6 }, 0xffffff);
             this.pintarCamas();
+            if (L.F) this.montarAmbiente(keep);
             if (reubicar) this.ubicarCosas();
         },
 
@@ -104,6 +148,15 @@
             if (!g || !g.active) return;
             g.clear();
             var t = L.tam;
+            if (L.F) {
+                this.cosas.forEach(function (a) {
+                    if (!a.cont.active) return;
+                    var vis = a.vis == null ? 1 : a.vis;
+                    g.fillStyle(0xa03c6e, 0.22 * vis); g.fillEllipse(a.casa.x, L.suelo + 4, CAMA.ancho * L.sb * 1.02, 24 * L.sb);
+                    if (a.bedB && a.bedB.active) { a.bedB.setAlpha(vis); a.bedF.setAlpha(vis); }
+                });
+                return;
+            }
             this.cosas.forEach(function (a) {
                 if (!a.cont.active) return;
                 var x = a.casa.x, y = a.casa.y, w = t * 1.5, h = t * 0.5, vis = a.vis == null ? 1 : a.vis;
@@ -122,17 +175,24 @@
             var a = this.crearCosa(id, lug.x, lug.y - t * 0.52 + 70, t * 0.82, { depth: 30, sinSombra: true });
             a.casa = { x: lug.x, y: lug.y }; a.vis = 0; a.colcama = COLS[i % COLS.length]; a.tam = t; a.fase2 = Math.random() * 6;
             a.cont.setAlpha(0);
+            if (this.L.F) {
+                // Cama del diseño: cabecera y cobija detrás del juguete, los pies delante (lo arropan).
+                var n = (i + (this.salaN || 0)) % 3 + 1, oy = CAMA.pie / CAMA.h;
+                a.bedB = this.add.image(lug.x, this.L.suelo, 'dc_cama' + n).setOrigin(0.5, oy).setScale(this.L.sb).setDepth(26).setAlpha(0);
+                a.bedF = this.add.image(lug.x, this.L.suelo, 'dc_cama' + n + 'f').setOrigin(0.5, oy).setScale(this.L.sb).setDepth(30.5).setAlpha(0);
+            }
             // zzz del que duerme
             a.zz = this.add.text(lug.x + t * 0.5, lug.y - t * 1.15, 'z z', { fontFamily: 'Arial', fontSize: Math.round(t * 0.28) + 'px', color: '#74c0fc', fontStyle: 'bold' }).setDepth(31).setAlpha(0);
             return a;
         },
 
         ubicarCosas: function () {
-            var lug = this.lugares(this.cosas.length), t = this.L.tam;
+            var lug = this.lugares(this.cosas.length), t = this.L.tam, self = this;
             this.cosas.forEach(function (a, i) {
                 if (!a.cont.active) return;
                 a.casa = { x: lug[i].x, y: lug[i].y };
                 a.cont.setPosition(lug[i].x, lug[i].y - t * 0.52);
+                if (a.bedB && a.bedB.active) { a.bedB.setPosition(lug[i].x, self.L.suelo).setScale(self.L.sb); a.bedF.setPosition(lug[i].x, self.L.suelo).setScale(self.L.sb); }
                 if (a.zz && a.zz.active) a.zz.setPosition(lug[i].x + t * 0.5, lug[i].y - t * 1.15);
             });
             this.pintarCamas();
@@ -157,19 +217,56 @@
         prepararNivel: async function (i, nv) {
             var self = this;
             await this.retirar(this.cosas);
-            this.cosas.forEach(function (a) { if (a.cont.active) a.cont.destroy(); if (a.zz && a.zz.active) a.zz.destroy(); if (a.band && a.band.active) a.band.destroy(); });
+            this.cosas.forEach(function (a) { if (a.cont.active) a.cont.destroy(); if (a.zz && a.zz.active) a.zz.destroy(); if (a.band && a.band.active) a.band.destroy(); quitarCama(a); });
             this.cosas = [];
             this.sobre = null;
             this.pintarCamas();
             this.pieza.setScale(0.001);
             var nuevo = SALAS[(i < 0 ? 0 : i) % 4], desde = this.tinte, o = { t: 0 };
             this.salaN = (i < 0 ? 0 : i) % 4;
+            if (this.L.F) return;
             this.tweens.add({ targets: o, t: 1, duration: 900, onUpdate: function () { self.tinte = mezTinte(desde, nuevo, o.t); if (self.fondoImg && self.fondoImg.active) self.fondoImg.setTint(self.tinte); } });
         },
 
         alSonar: function () {
             this.mon = 1;
             Ut.estallido(this, this.L.monitor.x, this.L.monitor.y + this.L.monitor.h * 0.7, { n: 3, tex: 'nota', tam: 22, dist: 80, depth: 70 });
+        },
+
+
+        /* ── Vida del consultorio (encima del dibujo, sin cambiar la escena) ── */
+
+        montarAmbiente: function (keep) {
+            var self = this, L = this.L, F = L.F, k = F.k, ADD = Phaser.BlendModes.ADD;
+            var amb = this.amb = { f: 0, upd: [] };
+            var u = function (x) { return F.sx(x); }, v = function (y) { return F.sy(y); };
+            var azar = function (a, b) { return a + Math.random() * (b - a); };
+            // Estrellitas de la pared que titilan (en el lugar de las del dibujo).
+            ESTRELLAS_U.forEach(function (e, i) {
+                var st = keep(self.add.star(u(e[0]), v(e[1]), 5, e[2] * 0.2 * k, e[2] * 0.52 * k, 0xffffff, 1).setDepth(2).setBlendMode(ADD).setAlpha(0));
+                var f0 = rg(i + 3) * 6.28, vl = 1100 + rg(i + 9) * 1400;
+                amb.upd.push(function (t) { var q = Math.max(0, Math.sin(t / vl + f0)); q = q * q; st.setAlpha(0.55 * q * amb.f); st.setScale(0.85 + 0.2 * q); st.rotation = Math.sin(t / 2600 + f0) * 0.15; });
+            });
+            // Rayo de sol de la ventana sobre la alfombra.
+            var luz = keep(this.add.graphics().setDepth(2).setBlendMode(ADD));
+            luz.fillStyle(0xfff6c8, 1);
+            luz.fillTriangle(u(800), v(224), u(1062), v(224), u(640), v(640));
+            luz.fillTriangle(u(800), v(224), u(640), v(640), u(400), v(640));
+            amb.upd.push(function (t) { luz.setAlpha((0.028 + 0.014 * Math.sin(t / 2200)) * amb.f); });
+            // Nubecitas que pasan por el cristal de la ventana.
+            var V = VENTANA_U;
+            for (var c = 0; c < 3; c++) (function (c) {
+                var g = keep(self.add.graphics().setDepth(2.5));
+                var w = (18 + c * 6) * k;
+                g.fillStyle(0xffffff, 1); g.fillEllipse(0, 0, w * 2, w * 0.7); g.fillEllipse(-w * 0.5, w * 0.12, w * 1.2, w * 0.5); g.fillEllipse(w * 0.55, w * 0.1, w * 1.1, w * 0.45);
+                var x = azar(V.x0, V.x1), y = V.y0 + 28 + c * 24, vel = 6 + c * 3;
+                amb.upd.push(function (t, dt) {
+                    x += vel * dt / 1000; if (x > V.x1 + 30) x = V.x0 - 30;
+                    g.setPosition(u(x), v(y));
+                    var borde = Math.max(0, Math.min(1, (x - V.x0) / 40, (V.x1 - x) / 40));
+                    g.setAlpha(0.85 * borde * amb.f);
+                });
+            })(c);
         },
 
         /* ── Estetoscopio ── */
@@ -268,7 +365,7 @@
             await esperar(this, 200);
             var self = this;
             await Promise.all(this.cosas.filter(function (a) { return a.curado && a.cont.active; }).map(function (a) { return tw(self, { targets: a.cont, y: a.cont.y - 60, alpha: 0, duration: 400 }); }));
-            this.cosas.forEach(function (a) { if (a.cont.active) a.cont.destroy(); if (a.zz && a.zz.active) a.zz.destroy(); if (a.band && a.band.active) a.band.destroy(); });
+            this.cosas.forEach(function (a) { if (a.cont.active) a.cont.destroy(); if (a.zz && a.zz.active) a.zz.destroy(); if (a.band && a.band.active) a.band.destroy(); quitarCama(a); });
             this.cosas = [];
             this.pintarCamas();
             await tw(this, { targets: this.pieza, scale: 0.001, duration: 200 });
@@ -317,7 +414,7 @@
 
         escenaFinal: async function () {
             var self = this, L = this.L;
-            this.cosas.forEach(function (a) { if (a.cont.active) a.cont.destroy(); if (a.zz && a.zz.active) a.zz.destroy(); if (a.band && a.band.active) a.band.destroy(); });
+            this.cosas.forEach(function (a) { if (a.cont.active) a.cont.destroy(); if (a.zz && a.zz.active) a.zz.destroy(); if (a.band && a.band.active) a.band.destroy(); quitarCama(a); });
             this.cosas = []; this.pintarCamas();
             this.pieza.setScale(0.001);
             var vistos = {};
@@ -359,6 +456,7 @@
         paso: function (time, delta) {
             var L = this.L, dt = Math.min(0.05, (delta || 16) / 1000), s = time / 1000, self = this;
             var pz = this.pieza;
+            if (this.amb && !document.body.classList.contains('sin-animaciones')) { this.amb.f = Math.min(1, this.amb.f + dt / 0.7); for (var ai = 0; ai < this.amb.upd.length; ai++) this.amb.upd[ai](time, dt * 1000); }
             if (!L || !pz || !pz.active || !this.tuboG || !this.tuboG.active) return;
             // La pieza sigue al dedo (en reposo cuelga del gancho).
             if (this.meta && (this.arr || this.fase === 'demo' || this.fase === 'jugar')) {
@@ -420,7 +518,7 @@
             }
             mg.strokePath();
             // Cruz del consultorio (parpadea en rojo al fallar, en verde al curar).
-            var cx = Math.round(L.der * 0.86), cy = Math.round(L.H * 0.17), cr = Math.min(34, L.H * 0.05);
+            var cx = L.cruz ? L.cruz.x : Math.round(L.der * 0.86), cy = L.cruz ? L.cruz.y : Math.round(L.H * 0.17), cr = Math.min(34, L.H * 0.05);
             var cc = al ? 0xff5252 : (this.desfile ? 0x69db7c : 0xffffff);
             mg.fillStyle(0x000000, 0.2); mg.fillCircle(cx + 3, cy + 5, cr * 1.5);
             mg.fillStyle(cc, 1); mg.fillCircle(cx, cy, cr * 1.5);

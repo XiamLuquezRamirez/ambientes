@@ -31,6 +31,28 @@
         { a: 0x5b3bb0, b: 0x0f0731, luz: 0xcdb4ff, arena: 0x5e5784, arena2: 0x4d466f, piedra: 0x8f88bd, lejos: 0x2a1a66, rayos: 0.10, musgo: 0x3a9b8e, medusas: 1, ballena: 1 }
     ];
 
+    // Arte del diseñador (img/diseno/*.svg). El fondo mide 1280x720 y ya trae el templo: puerta de arco
+    // (x 576-711, y 322-486), friso (y 232-276) y escalinata (hasta y≈576). Las piezas sueltas son lienzos
+    // de 500x500: `rec` es el recuadro útil de cada una (x, y, ancho, alto) y `mira` hacia dónde nada.
+    var ARTE = {
+        w: 1280, h: 720, cx: 643.5, friso: 254, paso: 80, rSock: 34,
+        puerta: { x0: 576, x1: 711, yTop: 322, yBot: 486 }, base: 576, pico: 186, ancho: 560,
+        tintes: [0xffffff, 0xd9ecff, 0xb3c4ff, 0x9a8ee6]
+    };
+    var PIEZAS = {
+        tem_pi: { f: 'puerta_izq', rec: [181, 112, 138, 276] },
+        tem_pd: { f: 'puerta_der', rec: [184, 121, 132, 259] },
+        tem_tesoro: { f: 'tesoro', rec: [73, 128, 354, 244] },
+        tem_medusa: { f: 'medusa', rec: [173, 94, 154, 312] },
+        tem_tortuga: { f: 'tortuga', rec: [76, 150, 348, 200], mira: 1 },
+        tem_pez1: { f: 'pez1', rec: [183, 189, 134, 122], mira: -1, ancho: 58 },
+        tem_pez2: { f: 'pez2', rec: [173, 173, 154, 154], mira: -1, ancho: 56 },
+        tem_pez3: { f: 'pez3', rec: [84, 175, 332, 149], mira: -1, ancho: 82 },
+        tem_pez4: { f: 'pez4', rec: [133, 194, 234, 112], mira: 1, ancho: 78 },
+        tem_pez5: { f: 'pez5', rec: [84, 175, 332, 149], mira: -1, ancho: 82 }
+    };
+    function mezTinte(a, b, t) { var c = C.Interpolate.ColorWithColor(C.ValueToColor(a), C.ValueToColor(b), 100, Math.max(0, Math.min(1, t)) * 100); return C.GetColor(c.r, c.g, c.b); }
+
     function cs(n, a) { var c = C.ValueToColor(n); return a == null ? 'rgb(' + c.red + ',' + c.green + ',' + c.blue + ')' : 'rgba(' + c.red + ',' + c.green + ',' + c.blue + ',' + a + ')'; }
     function mez(a, b, t) { var c = C.Interpolate.ColorWithColor(C.ValueToColor(a), C.ValueToColor(b), 100, Math.max(0, Math.min(1, t)) * 100); return C.GetColor(c.r, c.g, c.b); }
     function rg(i) { var x = Math.sin(i * 127.1 + 11.7) * 43758.5453; return x - Math.floor(x); }
@@ -168,7 +190,36 @@
     /* ── La escena ── */
 
     var escena = {
+        precargar: function () {
+            var self = this;
+            if (!this.textures.exists('tem_fondo')) this.load.svg('tem_fondo', 'img/diseno/fondo.svg', { width: 1280, height: 720 });
+            Object.keys(PIEZAS).forEach(function (k) {
+                if (!self.textures.exists(k)) self.load.svg(k, 'img/diseno/' + PIEZAS[k].f + '.svg', { width: 500, height: 500 });
+            });
+        },
+
+        /** ¿Cargó todo el arte? Recorta cada lienzo de 500x500 a su recuadro útil (marco 'rec'). */
+        prepararArte: function () {
+            var self = this;
+            var ok = this.scale.width >= 900 && this.textures.exists('tem_fondo') && Object.keys(PIEZAS).every(function (k) { return self.textures.exists(k); });
+            this.arteOk = ok;
+            if (!ok) return;
+            Object.keys(PIEZAS).forEach(function (k) {
+                var t = self.textures.get(k);
+                if (!t.has('rec')) { var r = PIEZAS[k].rec; t.add('rec', 0, r[0], r[1], r[2], r[3]); }
+            });
+        },
+
+        /** Imagen de una pieza recortada con el ancho y el alto pedidos (px de pantalla). */
+        pieza: function (k, x, y, w, h) {
+            var r = PIEZAS[k].rec;
+            var im = this.add.image(x, y, k, 'rec');
+            im.setDisplaySize(w, h == null ? w * r[3] / r[2] : h);
+            return im;
+        },
+
         iniciar: function () {
+            this.tinteActual = 0xffffff;
             this.cosas = [];
             this.reunidos = [];
             this.pisos = [];
@@ -212,15 +263,41 @@
                 pos: function (k) { return { x: L.tx + (k - (n - 1) / 2) * L.paso, y: L.sockY }; }
             };
             L.puerta = puerta;
+            L.gemEsc = 1;
+            if (this.arteOk) {
+                // Todo se mide sobre el dibujo del diseñador: el fondo se estira al lienzo (sx, sy) y los objetos
+                // con tamaño propio se escalan con kk, para que no se deformen.
+                var sx = W / ARTE.w, sy = H / ARTE.h, kk = Math.min(sx, sy), Pu = ARTE.puerta;
+                L.sx = sx; L.sy = sy; L.kk = kk;
+                L.tx = Math.round(ARTE.cx * sx);
+                L.base = Math.round(ARTE.base * sy);
+                var rS = ARTE.rSock * kk;
+                L.puerta = puerta = { x0: Pu.x0 * sx, x1: Pu.x1 * sx, yTop: Pu.yTop * sy, yBot: Pu.yBot * sy };
+                L.G = {
+                    tx: L.tx, base: L.base, Wt: ARTE.ancho * sx, friso0: 232 * sy, friso1: 276 * sy, puerta: puerta, r: rS,
+                    pico: ARTE.pico * sy,
+                    pos: function (k) { return { x: (ARTE.cx + (k - (n - 1) / 2) * ARTE.paso) * sx, y: ARTE.friso * sy }; }
+                };
+                L.sockY = Math.round(ARTE.friso * sy);
+                L.gemEsc = (rS * 0.96) / (t * 0.58);
+            }
             return L;
         },
 
         armar: function (reubicar) {
+            this.prepararArte();
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
             this.fondoKey = null; this.fondoImg = null;
-            this.ponerFondo(false, keep);
+            this.hojaI = this.hojaD = this.cofre = null;
+            if (this.arteOk) {
+                this.fondoImg = keep(this.add.image(0, 0, 'tem_fondo').setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(1).setTint(this.tinteActual));
+            } else {
+                this.ponerFondo(false, keep);
+            }
             this.rayosG = keep(this.add.graphics().setDepth(2));
+            this.luzG = keep(this.add.graphics().setDepth(3.6));
+            if (this.arteOk) this.montarPuertaArte(keep);
             this.puertaG = keep(this.add.graphics().setDepth(4));
             this.planoG = keep(this.add.graphics().setDepth(5));
             this.algasG = keep(this.add.graphics().setDepth(40));
@@ -250,9 +327,67 @@
         },
 
         /** Peces, algas, burbujas y criaturas del nivel. */
+        /** Hojas de la puerta (se pliegan hacia las jambas), cofre del tesoro y su luz. Todo del diseño. */
+        montarPuertaArte: function (keep) {
+            var L = this.L, D = L.puerta, kk = L.kk, w = (D.x1 - D.x0) / 2 + 1, h = D.yBot - D.yTop;
+            this.cofre = keep(this.pieza('tem_tesoro', L.tx, D.yBot + 2 * L.sy, 108 * kk).setOrigin(0.5, 1).setDepth(3.7).setAlpha(0));
+            this.hojaI = keep(this.pieza('tem_pi', D.x0, D.yBot, w, h).setOrigin(0, 1).setDepth(4));
+            this.hojaD = keep(this.pieza('tem_pd', D.x1, D.yBot, w, h).setOrigin(1, 1).setDepth(4));
+            this.hojaW = w; this.hojaH = h;
+            this.chispG = keep(this.add.graphics().setDepth(3.8));
+        },
+
+        /** Cada nivel baja más hondo: el fondo se oscurece y se vuelve violeta (se funde sin repintar). */
+        cambiarTinte: function (nivel) {
+            var self = this, desde = this.tinteActual, hasta = ARTE.tintes[nivel % 4], o = { t: 0 };
+            if (!this.fondoImg || !this.fondoImg.active) { this.tinteActual = hasta; return Promise.resolve(); }
+            return tw(this, { targets: o, t: 1, duration: 900, onUpdate: function () { self.tinteActual = mezTinte(desde, hasta, o.t); if (self.fondoImg && self.fondoImg.active) self.fondoImg.setTint(self.tinteActual); } });
+        },
+
+        /** Peces, tortuga y medusas del diseño; la ballena lejana sigue siendo una silueta. */
+        crearVidaArte: function (keep) {
+            var self = this, L = this.L, kk = L.kk, P = PAL[this.nivelV % 4];
+            var reg = function (o) { if (keep) keep(o); else self.estaticos.push(o); return o; };
+            var peces = ['tem_pez1', 'tem_pez2', 'tem_pez3', 'tem_pez4', 'tem_pez5'];
+            for (var i = 0; i < 14; i++) {
+                var esc = 0.7 + rg(i + 3) * 0.45, k = peces[i % 5], def = PIEZAS[k], ancho = def.ancho * esc * kk;
+                var im = reg(this.pieza(k, rg(i) * L.W, L.H * (0.1 + rg(i + 20) * 0.5), ancho).setDepth(3));
+                this.peces.push({ im: im, vx: (14 + rg(i + 5) * 30) * (rg(i + 7) > 0.5 ? 1 : -1), y0: im.y, ph: rg(i) * 6, esc: esc, mira: def.mira, sx0: im.scaleX, sy0: im.scaleY });
+            }
+            if (!this.textures.exists('tem_ballena')) K.textura(this, 'tem_ballena', 460, 190, pintarBallena);
+            if (this.nivelV >= 1) {
+                var tim = reg(this.pieza('tem_tortuga', -200, L.H * 0.5, 132 * kk).setDepth(4.4));
+                this.tortuga = { im: tim, vx: 26, sx0: tim.scaleX, sy0: tim.scaleY };
+            }
+            if (this.nivelV >= 3 || this.finalEncendido) {
+                var bim = reg(this.add.image(-400, L.H * 0.14, 'tem_ballena').setDepth(2.5).setScale(1.1 * kk).setAlpha(0.55).setTint(0x2a3f8f));
+                this.ballena = { im: bim, vx: 18 };
+            }
+            if (P.medusas || this.nivelV >= 2) {
+                var tintes = [0xffc2ec, 0xb8e6ff, 0xe0c8ff];
+                for (var m = 0; m < 3; m++) {
+                    var s0 = 0.8 + rg(m + 1) * 0.5;
+                    var mim = reg(this.pieza('tem_medusa', 0, 0, 62 * s0 * kk).setDepth(4.5).setTint(tintes[m]));
+                    this.medusas.push({ im: mim, x: L.W * (0.2 + m * 0.3) + rg(m) * 60, y: L.H * (0.3 + rg(m + 4) * 0.25), ph: rg(m + 2) * 6, s: s0, sx0: mim.scaleX, sy0: mim.scaleY });
+                }
+            }
+        },
+
         crearVida: function (keep) {
             var self = this, L = this.L, P = PAL[this.nivelV % 4];
             (this.peces || []).forEach(function (p) { if (p.im && p.im.active) p.im.destroy(); });
+            (this.medusas || []).forEach(function (m) { if (m.im && m.im.active) m.im.destroy(); });
+            if (this.tortuga && this.tortuga.im && this.tortuga.im.active) this.tortuga.im.destroy();
+            if (this.ballena && this.ballena.im && this.ballena.im.active) this.ballena.im.destroy();
+            this.peces = []; this.medusas = []; this.tortuga = null; this.ballena = null; this.algas = [];
+            this.burbujas = [];
+            for (var q0 = 0; q0 < 28; q0++) this.burbujas.push({ x: rg(q0) * L.der, y: rg(q0 + 9) * L.H, r: 2 + rg(q0 + 3) * 5, vy: 18 + rg(q0 + 5) * 34, ph: rg(q0) * 6 });
+            if (this.arteOk) return this.crearVidaArte(keep);
+            this.crearVidaPintada(keep);
+        },
+
+        crearVidaPintada: function (keep) {
+            var self = this, L = this.L, P = PAL[this.nivelV % 4];
             this.peces = [];
             [['#ff9f43', '#ffffff', '#ffffff'], ['#4dabf7', '#ffd43b', '#1c7ed6'], ['#ffd43b', '#ff922b', '#f08c00'], ['#f783ac', '#ffffff', '#c2255c'], ['#69db7c', '#ffe066', '#2b8a3e']].forEach(function (q, i) {
                 var clave = 'tem_pez_' + i;
@@ -357,7 +492,7 @@
             this.nivelV = nivel;
             if (cambia) {
                 this.L = this.calcular();
-                await this.ponerFondo(true);
+                if (this.arteOk) this.cambiarTinte(nivel); else await this.ponerFondo(true);
                 this.crearVida();
             }
         },
@@ -404,7 +539,8 @@
             a.usada = true;
             a.cont.setDepth(35);
             this.pisos[k] = a;
-            await this.saltarA(a.cont, d.x, d.y, { ms: 300, alto: 30 });
+            this.tweens.killTweensOf(a.cont);
+            await this.saltarA(a.cont, d.x, d.y, { ms: 300, alto: 30, esc: this.L.gemEsc });
             K.tono({ f: 520, f2: 940, dur: 0.14, vol: 0.06, tipo: 'sine' });
             K.ruido({ f: 260, q: 0.8, dur: 0.08, vol: 0.09 });
             this.destello.push({ x: d.x, y: d.y, t0: this.time.now, col: a.col });
@@ -430,7 +566,7 @@
                 a.cont.setDepth(30);
                 this.soltarBurbujas(a.cont.x, a.cont.y, 5);
                 K.tono({ f: 700, f2: 380, dur: 0.12, vol: 0.05 });
-                caen.push(tw(this, { targets: a.cont, x: a.casa.x, y: a.casa.y, angle: 360, duration: 700, ease: 'Cubic.easeInOut', onComplete: (function (q) { return function () { q.cont.angle = 0; }; })(a) }));
+                caen.push(tw(this, { targets: a.cont, x: a.casa.x, y: a.casa.y, scale: 1, angle: 360, duration: 700, ease: 'Cubic.easeInOut', onComplete: (function (q) { return function () { q.cont.angle = 0; }; })(a) }));
                 await esperar(this, 80);
             }
             this.pisos = [];
@@ -515,13 +651,14 @@
             this.finalEncendido = true;
             this.ballena = this.ballena || (function () { var b = self.add.image(-420, L.H * 0.16, 'tem_ballena').setDepth(2.5).setScale(1.15).setAlpha(0.85); self.estaticos.push(b); return { im: b, vx: 70 }; })();
             this.ballena.vx = 70;
+            this.peces.forEach(function (p) { p.vx *= 2.2; });   // desfile: el cardumen pasa más rápido
             for (var k = 0; k < ids.length; k++) {
                 if (!this.sigue()) return;
                 var d = this.pos(k);
                 var a = this.crearGema(ids[k], k, { x: d.x, y: d.y });
                 a.cont.setAlpha(1).setPosition(L.der * 0.5 + (k - 2) * 40, L.H * 0.95);
                 this.pisos[k] = a;
-                await this.saltarA(a.cont, d.x, d.y, { ms: 520, alto: 80 });
+                await this.saltarA(a.cont, d.x, d.y, { ms: 520, alto: 80, esc: L.gemEsc });
                 a.cont.setDepth(35);
                 this.destello.push({ x: d.x, y: d.y, t0: this.time.now, col: a.col });
                 a.latir();
@@ -553,6 +690,37 @@
             };
         },
 
+        /**
+         * Puerta del diseño: las hojas se pliegan hacia las jambas, la luz dorada llena el vano y el cofre del
+         * tesoro asoma con su perla; salen chispas mientras está abierta.
+         */
+        pasoPuertaArte: function (s, ab) {
+            var L = this.L, D = L.puerta, kk = L.kk, cx = L.tx, cy = (D.yTop + D.yBot) / 2;
+            var lg = this.luzG, ch = this.chispG;
+            lg.clear(); ch.clear();
+            var w = this.hojaW * (1 - 0.9 * ab);
+            this.hojaI.setDisplaySize(w, this.hojaH);
+            this.hojaD.setDisplaySize(w, this.hojaH);
+            if (!this.cofre || !this.cofre.active) return;
+            if (ab <= 0.02) { this.cofre.setAlpha(0); return; }
+            var pul = 1 + 0.05 * Math.sin(s * 3);
+            for (var h = 0; h < 7; h++) { lg.fillStyle(0xffe27a, 0.045 * ab); lg.fillCircle(cx, cy + 10 * kk, (60 + h * 22) * ab * kk * pul); }
+            lg.fillStyle(0xffd43b, 0.30 * ab); lg.fillEllipse(cx, cy + 22 * kk, 110 * kk * ab, 140 * kk * ab);
+            lg.fillStyle(0xfff3bf, 0.5 * ab); lg.fillCircle(cx, cy + 40 * kk, 44 * ab * kk * pul);
+            if (!this.cofre.__s0) this.cofre.__s0 = { x: this.cofre.scaleX, y: this.cofre.scaleY };
+            var c0 = this.cofre.__s0, resp = 1 + 0.014 * Math.sin(s * 2.6);
+            this.cofre.setAlpha(Math.min(1, ab * 1.5)).setScale(c0.x * (0.88 + 0.12 * ab) * resp, c0.y * (0.88 + 0.12 * ab) / resp);
+            // Perla flotando sobre el cofre.
+            var py = D.yBot - 74 * kk - (18 + Math.sin(s * 2) * 4) * kk;
+            ch.fillStyle(0xffffff, ab); ch.fillCircle(cx, py, 11 * kk);
+            ch.fillStyle(0xdff1ff, ab); ch.fillCircle(cx - 3.5 * kk, py - 3.5 * kk, 4 * kk);
+            // Chispas que suben del tesoro.
+            if (ab > 0.3) for (var j = 0; j < 9; j++) {
+                var f = (s * 0.7 + j / 9) % 1, x = cx + (rg(j + 3) - 0.5) * 100 * kk + Math.sin(s * 2 + j) * 6, y = D.yBot - 40 * kk - f * 120 * kk, z = (3 + 4 * (1 - f)) * kk;
+                ch.lineStyle(2, 0xffffff, (1 - f) * ab); ch.lineBetween(x - z, y, x + z, y); ch.lineBetween(x, y - z, x, y + z);
+            }
+        },
+
         /* ── Cada cuadro ── */
 
         paso: function (time, delta) {
@@ -563,7 +731,7 @@
             var rg2 = this.rayosG; rg2.clear();
             for (var i = 0; i < 6; i++) {
                 var x0 = L.W * (0.06 + i * 0.18) + Math.sin(s / 4 + i) * 50, ang = Math.sin(s / 5 + i * 1.3) * 0.12;
-                var al = (P.rayos * 0.7 * (0.6 + 0.4 * Math.sin(s / 1.6 + i)) + this.brillo * 0.06);
+                var al = (P.rayos * (this.arteOk ? 0.42 : 0.7) * (0.6 + 0.4 * Math.sin(s / 1.6 + i)) + this.brillo * 0.06);
                 rg2.fillStyle(this.brillo > 0.3 ? mez(P.luz, 0xffe9a0, this.brillo) : P.luz, al);
                 rg2.fillTriangle(x0 - 6, 0, x0 + 20, 0, x0 + 170 + ang * L.H, L.H * 1.1);
                 rg2.fillTriangle(x0 - 6, 0, x0 + 170 + ang * L.H, L.H * 1.1, x0 - 40 + ang * L.H, L.H * 1.1);
@@ -574,13 +742,19 @@
                 p.im.x += p.vx * dt;
                 if (p.vx > 0 && p.im.x > L.W + 60) p.im.x = -60; else if (p.vx < 0 && p.im.x < -60) p.im.x = L.W + 60;
                 p.im.y = p.y0 + Math.sin(s * 1.4 + p.ph) * 14;
-                p.im.setFlipX(p.vx < 0);
+                if (p.mira) {
+                    // Arte del diseño: unos miran a la izquierda y otro a la derecha; la cola ondula al nadar.
+                    p.im.setFlipX((p.vx > 0) === (p.mira < 0));
+                    var on = Math.sin(s * 7 + p.ph);
+                    p.im.setScale(p.sx0 * (1 + 0.035 * on), p.sy0 * (1 - 0.03 * on));
+                } else p.im.setFlipX(p.vx < 0);
                 p.im.angle = Math.sin(s * 3 + p.ph) * 3;
                 var dentro = Math.abs(p.im.x - L.tx) < L.G.Wt / 2 + 20 && p.im.y > L.G.pico - 10 && p.im.y < L.base;
-                p.im.setAlpha(p.im.alpha + ((dentro ? 0.18 : 1) - p.im.alpha) * Math.min(1, dt * 5));
+                p.im.setAlpha(p.im.alpha + ((dentro ? (self.arteOk ? 0.3 : 0.18) : 1) - p.im.alpha) * Math.min(1, dt * 5));
             });
             var T = this.tortuga;
-            if (T && T.im.active) { T.im.x += T.vx * dt; if (T.im.x > L.W + 160) T.im.x = -160; T.im.y = L.H * 0.5 + Math.sin(s * 0.6) * 40; T.im.angle = Math.sin(s * 1.2) * 4; }
+            if (T && T.im.active) { T.im.x += T.vx * dt; if (T.im.x > L.W + 160) T.im.x = -160; T.im.y = L.H * 0.5 + Math.sin(s * 0.6) * 40; T.im.angle = Math.sin(s * 1.2) * 4;
+                if (T.sx0) { var al2 = Math.sin(s * 2.2); T.im.setScale(T.sx0 * (1 + 0.025 * al2), T.sy0 * (1 - 0.05 * al2)); } }
             var BL = this.ballena;
             if (BL && BL.im.active) { BL.im.x += BL.vx * dt; if (BL.im.x > L.W + 300) BL.im.x = -400; BL.im.y = L.H * 0.16 + Math.sin(s * 0.4) * 20; BL.im.angle = Math.sin(s * 0.5) * 2; }
             // Algas.
@@ -605,6 +779,14 @@
             // Medusas luminosas.
             var mg = this.medG; mg.clear();
             this.medusas.forEach(function (m) {
+                if (m.im) {
+                    // Medusa del diseño: flota, late (se encoge al impulsarse) y se mece.
+                    if (!m.im.active) return;
+                    var lt = Math.sin(s * 2 + m.ph), mx = m.x + Math.sin(s * 0.5 + m.ph) * 40, my = m.y + Math.sin(s * 0.9 + m.ph) * 26 - Math.max(0, lt) * 6;
+                    m.im.setPosition(mx, my).setScale(m.sx0 * (1 + 0.08 * lt), m.sy0 * (1 - 0.1 * lt)).setAngle(Math.sin(s * 0.7 + m.ph) * 5);
+                    m.im.setAlpha(0.85 + 0.15 * Math.sin(s * 1.3 + m.ph) + self.brillo * 0.1);
+                    return;
+                }
                 var x = m.x + Math.sin(s * 0.5 + m.ph) * 40, y = m.y + Math.sin(s * 0.9 + m.ph) * 26, pul = 1 + Math.sin(s * 2 + m.ph) * 0.1, r = 28 * m.s;
                 mg.fillStyle(m.col, 0.12); mg.fillCircle(x, y, r * 2.2);
                 mg.fillStyle(m.col, 0.45); mg.fillEllipse(x, y, r * 2 * pul, r * 1.3 / pul);
@@ -614,7 +796,9 @@
             // Puerta del templo: dos hojas de piedra que se deslizan y la luz del tesoro.
             var pg = this.puertaG; pg.clear();
             var D = L.puerta, ab = this.abierta, dw = D.x1 - D.x0, hoja = dw / 2 * (1 - ab);
-            if (ab > 0.02) {
+            var conArte = this.arteOk && this.hojaI && this.hojaI.active;
+            if (conArte) this.pasoPuertaArte(s, ab);
+            if (!conArte && ab > 0.02) {
                 var cx = L.tx, cy = (D.yTop + D.yBot) / 2;
                 pg.fillStyle(0xffe27a, 0.3 * ab); pg.fillCircle(cx, cy, 150 * ab + 40);
                 pg.fillStyle(0xffd43b, 0.55 * ab); pg.fillRoundedRect(D.x0, D.yTop, dw, D.yBot - D.yTop, { tl: 70, tr: 70, bl: 0, br: 0 });
@@ -627,7 +811,7 @@
                 for (var mm = 0; mm < 7; mm++) { pg.fillStyle(0xffe066, ab); pg.fillCircle(cx - 30 + mm * 10, cb - 64 - Math.abs(Math.sin(s * 2 + mm)) * 4, 5); }
                 pg.fillStyle(0xffffff, ab); pg.fillCircle(cx, cb - 88 - Math.sin(s * 2) * 4, 13); pg.fillStyle(0xe7f5ff, ab); pg.fillCircle(cx - 4, cb - 92 - Math.sin(s * 2) * 4, 5);
             }
-            if (hoja > 1) {
+            if (!conArte && hoja > 1) {
                 var piedra = mez(P.piedra, 0x000000, 0.1);
                 var cuerpo = function (x, sgn) {
                     pg.fillStyle(piedra, 1); pg.fillRoundedRect(x, D.yTop - 4, hoja, D.yBot - D.yTop + 4, sgn < 0 ? { tl: 70, bl: 0, tr: 0, br: 0 } : { tr: 70, bl: 0, tl: 0, br: 0 });
@@ -643,6 +827,13 @@
                 var d = this.pos(k), lleno = this.pisos[k];
                 var on = this.lampOn === k && time - (this.lampT || 0) < 450;
                 var r = L.G.r;
+                if (this.arteOk) {
+                    // Engaste de piedra empotrado en el friso del templo.
+                    pl.fillStyle(0x000000, 0.35); pl.fillCircle(d.x + 1.5, d.y + 2.5, r + 3);
+                    pl.fillStyle(0x0b1736, 0.92); pl.fillCircle(d.x, d.y, r);
+                    pl.lineStyle(3.5, 0xa9c6f2, 0.9); pl.strokeCircle(d.x, d.y, r);
+                    pl.lineStyle(1.5, 0x07102a, 0.6); pl.strokeCircle(d.x, d.y, r + 2);
+                }
                 if (!lleno) {
                     pl.lineStyle(3, on ? 0xffd43b : 0x78e6ff, on ? 1 : 0.35 + 0.15 * Math.sin(s * 2 + k));
                     pl.strokeCircle(d.x, d.y, r - 8);
@@ -655,7 +846,7 @@
             // Destellos de encaje.
             var bl = this.brilloG; bl.clear();
             this.destello = this.destello.filter(function (e) { return time - e.t0 < 800; });
-            this.destello.forEach(function (e) { var f = (time - e.t0) / 800; bl.lineStyle(5 * (1 - f) + 1, e.col, 0.9 * (1 - f)); bl.strokeCircle(e.x, e.y, (e.grande ? 60 : 30) + f * (e.grande ? 140 : 70)); });
+            this.destello.forEach(function (e) { var f = (time - e.t0) / 800; var kz = self.arteOk ? L.kk * 0.8 : 1; bl.lineStyle(5 * (1 - f) + 1, e.col, 0.9 * (1 - f)); bl.strokeCircle(e.x, e.y, ((e.grande ? 60 : 30) + f * (e.grande ? 140 : 70)) * kz); });
             if (this.brillo > 0.01) { bl.fillStyle(0xffe9a0, 0.1 * this.brillo + 0.04 * this.brillo * Math.sin(s * 3)); bl.fillRect(0, 0, L.W, L.H); }
             // Mecer las gemas y los pisos.
             this.cosas.forEach(function (a) {

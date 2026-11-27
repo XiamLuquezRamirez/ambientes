@@ -303,10 +303,16 @@
             var anchoEst = 4 * tam + 3 * 10;
             var x0 = Math.round((L.W - anchoEst) / 2);
             var y0 = 14;
-            keep(this.add.rectangle(x0 + anchoEst / 2, y0 + tam / 2, anchoEst + 28, tam + 18, 0x12263f, 0.6).setStrokeStyle(3, 0xffffff, 0.5).setDepth(79));
+            var repite = /RepiteLaSecuencia/.test(global.location ? global.location.pathname : '');
+            // Repite la secuencia: panel claro para que las estrellas doradas se vean doradas (en el azul oscuro se apagaban).
+            keep(this.add.rectangle(x0 + anchoEst / 2, y0 + tam / 2, anchoEst + 28, tam + 18, repite ? 0xfffbea : 0x12263f, repite ? 0.9 : 0.6).setStrokeStyle(3, repite ? 0xf59f00 : 0xffffff, repite ? 0.9 : 0.5).setDepth(79));
             for (var i = 0; i < 4; i++) {
                 var e = keep(this.add.image(x0 + i * (tam + 10) + tam / 2, y0 + tam / 2, A.textura(this, 'estrella', 64)).setDisplaySize(tam, tam).setDepth(80));
-                if (i >= this.nivelActual) e.setTint(0x8a8f98).setAlpha(0.55);
+                if (i >= this.nivelActual) {
+                    // Repite la secuencia: las que faltan siguen doradas (con su carita), solo más suaves; las demás temáticas conservan el gris.
+                    if (repite) e.setAlpha(0.55);
+                    else e.setTint(0x8a8f98).setAlpha(0.55);
+                }
                 this.estrellas.push(e);
             }
             this.montarPresentador();

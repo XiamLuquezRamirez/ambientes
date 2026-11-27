@@ -28,7 +28,7 @@
     var POR_NIVEL = [['cubo'], ['cubo', 'tablon'], ['cubo', 'tablon', 'alto'], ['cubo', 'tablon', 'alto', 'pequeno']];
     var COLORES = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8, 0xff922b, 0x20c997, 0xf783ac];
 
-    var ARTE = { w: 1280, h: 720, suelo: 680, pedTop: 606, pedX: 532.75, pedW: 272.5, elfoX: 125, elfoY: 686 };
+    var ARTE = { w: 1280, h: 720, suelo: 680, pedTop: 606, pedX: 532.75, pedW: 272.5, elfoX: 125, elfoY: 686, embudoX: 1112, embudoY: 300 };
     // Cajas de regalo del diseño: centro y tamaño del cuerpo (sin lazo) en unidades del dibujo.
     var CAJAS = {
         caja1: { cx: 250, cy: 282.1, bw: 284.9, bh: 292.4 },
@@ -124,8 +124,10 @@
                 L.ped = { x: Math.round(W * ARTE.pedX / ARTE.w), w: Math.round(W * ARTE.pedW / ARTE.w) };
                 L.ped.top = Math.round(H * ARTE.pedTop / ARTE.h);
                 L.ped.alto = L.banco - L.ped.top;
-                L.cinta = { x0: Math.round(L.ped.x + L.ped.w / 2 + 90), x1: L.der - 20, y: Math.round(H * 0.66) };
-                L.tolva = { x: L.cinta.x1 - 140, y: Math.round(H * 0.28) };
+                // El embudo del diseño (la boca de la tubería) es de donde caen los regalos: la cinta llega hasta debajo de él.
+                var fx = Math.round(W * ARTE.embudoX / ARTE.w);
+                L.cinta = { x0: Math.round(L.ped.x + L.ped.w / 2 + 90), x1: fx + 60, y: Math.round(H * 0.66) };
+                L.tolva = { x: fx, y: Math.round(H * ARTE.embudoY / ARTE.h) };
                 L.caja = { x: Math.round(W * 0.268), y: L.banco - 40 };
             }
             L.bocina = { x: 48, y: Math.round(H * 0.2), r: 30 };
@@ -209,6 +211,7 @@ if (!this.arteOk) {
             g.fillStyle(0x495057, 1); g.fillRoundedRect(C.x0 - 16, C.y, C.x1 - C.x0 + 40, 26, 13);
             g.fillStyle(0x343a40, 1); g.fillRect(C.x0 + 20, C.y + 24, 14, L.banco - C.y - 24); g.fillRect(C.x1 - 40, C.y + 24, 14, L.banco - C.y - 24);
             var T = L.tolva;
+            if (this.arteOk) return;
             g.fillStyle(this.arteOk ? 0x0f6f63 : 0x6d3d16, 1); g.fillPoints([{ x: T.x - 62, y: T.y - 50 }, { x: T.x + 62, y: T.y - 50 }, { x: T.x + 30, y: T.y + 30 }, { x: T.x - 30, y: T.y + 30 }], true);
             g.fillStyle(this.arteOk ? 0xd90b3c : 0x8b5524, 1); g.fillRect(T.x - 70, T.y - 56, 140, 12);
             g.fillStyle(0x343a40, 1); g.fillRect(T.x - 4, T.y - 140, 8, 90);
@@ -236,7 +239,7 @@ if (!this.arteOk) {
             bailarina.setPosition(0, -4);
             c.add(bailarina);
             this.caja = { cont: c, bailarina: bailarina, giro: 0, luz: 0 };
-            if (this.arteOk) c.setScale(0.8);
+            if (this.arteOk) { c.destroy(); this.caja = null; }   // con el arte del diseño no hay caja de música que gira
             // Duende: gorro rojo, barba blanca y delantal, a la izquierda del pedestal.
             if (this.arteOk) {
                 var ea = keep(this.add.container(Math.round(L.W * ARTE.elfoX / ARTE.w), L.banco - 4).setDepth(9));
