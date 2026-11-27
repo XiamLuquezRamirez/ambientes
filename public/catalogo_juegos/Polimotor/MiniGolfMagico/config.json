@@ -1,0 +1,1583 @@
+{
+  "nombre": "El Mini Golf Mágico de Pendiente y Obstáculos",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 25,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "radio": 0.16,
+    "radioHoyo": 0.34,
+    "vCaptura": 2.1,
+    "friccion": 0.1,
+    "friccionEstatica": 0.12,
+    "velMin": 0.9,
+    "velMax": 5.6,
+    "velMaxima": 6.5,
+    "velParada": 0.05,
+    "rebote": 0.62,
+    "reboteCurva": 0.8,
+    "rocePared": 0.985,
+    "reboteAspa": 0.5,
+    "reboteAsteroide": 0.75,
+    "atraccionHoyo": 2.5,
+    "tiempoMaximo": 20,
+    "hondonadaHoyo": 2.6,
+    "hondoHoyo": 0.05,
+    "pendienteMaxima": 0.3,
+    "tensionMin": 0.07,
+    "arrastreMaxPantalla": 0.24,
+    "zonaToquePx": 70,
+    "fallosParaAyuda": 3,
+    "quietoParaAyudaMs": 12000,
+    "vozPausaMs": 2600,
+    "vozFalloMs": 5000,
+    "rebotePoste": 0.8
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "nombre": "MI PRIMER GOLPE MÁGICO",
+      "par": 2,
+      "vCaptura": 2.6,
+      "prediccion": null,
+      "voz": "zoe",
+      "instruccion": "¡Arrastra tu dedito hacia atrás de la pelota y suelta para darle un empujoncito!",
+      "instruccion2": "¡Prueba con diferentes fuerzas! Observa hasta dónde llega tu pelota.",
+      "voz2": "zeus",
+      "cartel": {
+        "etiqueta": "Nivel 1",
+        "titulo": "MI PRIMER GOLPE MÁGICO",
+        "sub": "Mete la pelota en el hoyo dorado"
+      },
+      "logro": "¡Tu primer hoyo dorado!",
+      "despedida": "zoe",
+      "invita": "¡Ahora el molino giratorio!",
+      "mundos": [
+        {
+          "nombre": "Isla Esmeralda",
+          "tema": "esmeralda",
+          "pista": {
+            "inicio": [
+              -4.4,
+              0.7
+            ],
+            "rumbo": -8,
+            "ancho": 2.8,
+            "tramos": [
+              {
+                "recto": 8.4
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.5,
+              0.8
+            ],
+            "lado": [
+              -0.5,
+              0.5
+            ]
+          },
+          "hoyo": {
+            "s": [
+              4.6,
+              7.6
+            ],
+            "lado": [
+              -0.75,
+              0.75
+            ],
+            "r": 0.4
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                2.3,
+                4.3
+              ],
+              "alto": [
+                -0.07,
+                -0.04
+              ]
+            }
+          ],
+          "molino": {
+            "decorativo": true,
+            "pos": [
+              -1.6,
+              -2.8
+            ],
+            "yaw": -90,
+            "periodo": [
+              9,
+              10
+            ]
+          }
+        },
+        {
+          "nombre": "Planeta Turquesa",
+          "tema": "turquesa",
+          "pista": {
+            "inicio": [
+              -4.2,
+              1.6
+            ],
+            "rumbo": -22,
+            "ancho": 2.8,
+            "tramos": [
+              {
+                "recto": 8
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.5,
+              0.8
+            ],
+            "lado": [
+              -0.5,
+              0.5
+            ]
+          },
+          "hoyo": {
+            "s": [
+              4.4,
+              7.2
+            ],
+            "lado": [
+              -0.75,
+              0.75
+            ],
+            "r": 0.4
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                2,
+                4
+              ],
+              "alto": [
+                -0.08,
+                -0.05
+              ]
+            }
+          ],
+          "molino": {
+            "decorativo": true,
+            "pos": [
+              -2.4,
+              -2.8
+            ],
+            "yaw": -90,
+            "periodo": [
+              9,
+              10
+            ]
+          }
+        },
+        {
+          "nombre": "Cometa Rosado",
+          "tema": "rosado",
+          "pista": {
+            "inicio": [
+              -4.8,
+              0.2
+            ],
+            "rumbo": 10,
+            "ancho": 2.8,
+            "tramos": [
+              {
+                "recto": 4.2
+              },
+              {
+                "curva": [
+                  3.2,
+                  -35
+                ]
+              },
+              {
+                "recto": 3.2
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.5,
+              0.8
+            ],
+            "lado": [
+              -0.5,
+              0.5
+            ]
+          },
+          "hoyo": {
+            "s": [
+              5.2,
+              8.6
+            ],
+            "lado": [
+              -0.75,
+              0.75
+            ],
+            "r": 0.4
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                1.5,
+                3.5
+              ],
+              "alto": [
+                -0.06,
+                -0.04
+              ]
+            }
+          ],
+          "molino": {
+            "decorativo": true,
+            "pos": [
+              -0.4,
+              -2.4
+            ],
+            "yaw": -90,
+            "periodo": [
+              9,
+              10
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nombre": "EL MOLINO GIRATORIO",
+      "par": 2,
+      "vCaptura": 2.3,
+      "prediccion": null,
+      "voz": "zoe",
+      "instruccion": "¡El molino está girando! Observa sus aspas y busca un espacio libre para que pase tu pelota.",
+      "instruccion2": "¡Un golpe suave puede ser suficiente! No necesitas lanzar demasiado fuerte.",
+      "voz2": "zeus",
+      "cartel": {
+        "etiqueta": "Nivel 2",
+        "titulo": "EL MOLINO GIRATORIO",
+        "sub": "Pasa por el espacio libre de las aspas"
+      },
+      "logro": "¡Superaste el molino giratorio!",
+      "despedida": "zeus",
+      "invita": "¡Vamos a la curva del rebote mágico!",
+      "mundos": [
+        {
+          "nombre": "Molino de la Nebulosa",
+          "tema": "esmeralda",
+          "pista": {
+            "inicio": [
+              -3.9,
+              2.5
+            ],
+            "rumbo": -40,
+            "ancho": 2.6,
+            "tramos": [
+              {
+                "recto": 8.6
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.6,
+              0.9
+            ],
+            "lado": [
+              -0.3,
+              0.3
+            ]
+          },
+          "hoyo": {
+            "s": [
+              6.4,
+              8.1
+            ],
+            "lado": [
+              -0.65,
+              0.65
+            ],
+            "r": 0.37
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                5.2,
+                6.4
+              ],
+              "alto": [
+                -0.06,
+                -0.03
+              ]
+            }
+          ],
+          "molino": {
+            "s": 4.3,
+            "periodo": [
+              8.5,
+              9.5
+            ],
+            "w": 1.2,
+            "bw": 0.12
+          }
+        },
+        {
+          "nombre": "Molino del Mar Estelar",
+          "tema": "turquesa",
+          "pista": {
+            "inicio": [
+              -4.6,
+              1.5
+            ],
+            "rumbo": -25,
+            "ancho": 2.6,
+            "tramos": [
+              {
+                "recto": 8.8
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.6,
+              0.9
+            ],
+            "lado": [
+              -0.3,
+              0.3
+            ]
+          },
+          "hoyo": {
+            "s": [
+              6.5,
+              8.3
+            ],
+            "lado": [
+              -0.65,
+              0.65
+            ],
+            "r": 0.37
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                5.3,
+                6.5
+              ],
+              "alto": [
+                -0.06,
+                -0.03
+              ]
+            }
+          ],
+          "molino": {
+            "s": 4.4,
+            "periodo": [
+              8.5,
+              9.5
+            ],
+            "w": 1.2,
+            "bw": 0.12
+          }
+        },
+        {
+          "nombre": "Molino de Caramelo",
+          "tema": "rosado",
+          "pista": {
+            "inicio": [
+              -4.2,
+              2.6
+            ],
+            "rumbo": -55,
+            "ancho": 2.6,
+            "tramos": [
+              {
+                "recto": 5.4
+              },
+              {
+                "curva": [
+                  2.6,
+                  50
+                ]
+              },
+              {
+                "recto": 2.6
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.5,
+              0.7
+            ],
+            "lado": [
+              -0.3,
+              0.3
+            ]
+          },
+          "hoyo": {
+            "s": [
+              7.6,
+              9.6
+            ],
+            "lado": [
+              -0.65,
+              0.65
+            ],
+            "r": 0.37
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                4,
+                5.2
+              ],
+              "alto": [
+                -0.07,
+                -0.04
+              ]
+            }
+          ],
+          "molino": {
+            "s": 3.3,
+            "periodo": [
+              8.5,
+              9.5
+            ],
+            "w": 1.2,
+            "bw": 0.12
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "nombre": "LA CURVA DEL REBOTE MÁGICO",
+      "par": 4,
+      "prediccion": 7.5,
+      "voz": "zoe",
+      "instruccion": "¡Mira la pared curva! Tu pelota puede rebotar en ella para acercarse al hoyo.",
+      "instruccion2": "¡Observa la línea de trayectoria y calcula tu golpe!",
+      "voz2": "zeus",
+      "cartel": {
+        "etiqueta": "Nivel 3",
+        "titulo": "LA CURVA DEL REBOTE MÁGICO",
+        "sub": "Un recorrido largo con curvas, asteroides y pilares"
+      },
+      "logro": "¡La pared curva brilla con tu rebote!",
+      "despedida": "ambos",
+      "invita": "¡Llegó el gran desafío del hoyo dorado!",
+      "mundos": [
+        {
+          "nombre": "Curva de la Luna Violeta",
+          "tema": "violeta",
+          "pista": {
+            "inicio": [
+              -7.0,
+              3.0
+            ],
+            "rumbo": 0,
+            "ancho": 2.5,
+            "tramos": [
+              {
+                "recto": 7.0
+              },
+              {
+                "curva": [
+                  1.7,
+                  -90
+                ]
+              },
+              {
+                "recto": 4.5
+              },
+              {
+                "curva": [
+                  1.7,
+                  -90
+                ]
+              },
+              {
+                "recto": 6.5
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.6,
+              0.8
+            ],
+            "lado": [
+              -0.4,
+              0.4
+            ]
+          },
+          "hoyo": {
+            "s": [
+              20.4,
+              22.6
+            ],
+            "lado": [
+              -0.6,
+              0.6
+            ],
+            "r": 0.35
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                4.6,
+                6.2
+              ],
+              "alto": [
+                -0.2,
+                -0.16
+              ]
+            },
+            {
+              "rampa": [
+                10.6,
+                12.2
+              ],
+              "alto": [
+                0.06,
+                0.09
+              ]
+            },
+            {
+              "rampa": [
+                17.2,
+                18.6
+              ],
+              "alto": [
+                -0.18,
+                -0.14
+              ]
+            }
+          ],
+          "asteroides": [
+            {
+              "s": [
+                2.6,
+                3.4
+              ],
+              "r": 0.3,
+              "periodo": [
+                5.0,
+                6.2
+              ]
+            },
+            {
+              "s": [
+                18.0,
+                18.6
+              ],
+              "r": 0.3,
+              "periodo": [
+                5.0,
+                6.2
+              ]
+            }
+          ],
+          "postes": [
+            {
+              "s": [
+                12.6,
+                13.6
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            },
+            {
+              "s": [
+                15.6,
+                16.4
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            }
+          ]
+        },
+        {
+          "nombre": "Zigzag del Cometa",
+          "tema": "dorado",
+          "pista": {
+            "inicio": [
+              -7.0,
+              -3.0
+            ],
+            "rumbo": 15,
+            "ancho": 2.5,
+            "tramos": [
+              {
+                "recto": 6.0
+              },
+              {
+                "curva": [
+                  1.7,
+                  -105
+                ]
+              },
+              {
+                "recto": 4.5
+              },
+              {
+                "curva": [
+                  1.7,
+                  90
+                ]
+              },
+              {
+                "recto": 7.0
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.6,
+              0.8
+            ],
+            "lado": [
+              -0.4,
+              0.4
+            ]
+          },
+          "hoyo": {
+            "s": [
+              20.6,
+              22.8
+            ],
+            "lado": [
+              -0.6,
+              0.6
+            ],
+            "r": 0.35
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                3.6,
+                5.2
+              ],
+              "alto": [
+                -0.2,
+                -0.16
+              ]
+            },
+            {
+              "rampa": [
+                9.6,
+                11.0
+              ],
+              "alto": [
+                0.06,
+                0.09
+              ]
+            },
+            {
+              "rampa": [
+                17.4,
+                18.8
+              ],
+              "alto": [
+                -0.18,
+                -0.14
+              ]
+            }
+          ],
+          "asteroides": [
+            {
+              "s": [
+                2.6,
+                3.2
+              ],
+              "r": 0.3,
+              "periodo": [
+                5.0,
+                6.2
+              ]
+            },
+            {
+              "s": [
+                18.3,
+                18.9
+              ],
+              "r": 0.3,
+              "periodo": [
+                5.0,
+                6.2
+              ]
+            }
+          ],
+          "postes": [
+            {
+              "s": [
+                10.6,
+                12.2
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            },
+            {
+              "s": [
+                16.8,
+                17.4
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            }
+          ]
+        },
+        {
+          "nombre": "Valle Helado",
+          "tema": "hielo",
+          "pista": {
+            "inicio": [
+              -7.0,
+              -4.0
+            ],
+            "rumbo": 10,
+            "ancho": 2.5,
+            "tramos": [
+              {
+                "recto": 6.0
+              },
+              {
+                "curva": [
+                  1.7,
+                  90
+                ]
+              },
+              {
+                "recto": 4.0
+              },
+              {
+                "curva": [
+                  1.7,
+                  -90
+                ]
+              },
+              {
+                "recto": 7.0
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.6,
+              0.8
+            ],
+            "lado": [
+              -0.4,
+              0.4
+            ]
+          },
+          "hoyo": {
+            "s": [
+              20.3,
+              22.0
+            ],
+            "lado": [
+              -0.6,
+              0.6
+            ],
+            "r": 0.35
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                3.4,
+                5.0
+              ],
+              "alto": [
+                -0.2,
+                -0.16
+              ]
+            },
+            {
+              "rampa": [
+                9.0,
+                10.6
+              ],
+              "alto": [
+                -0.16,
+                -0.12
+              ]
+            },
+            {
+              "rampa": [
+                16.6,
+                17.8
+              ],
+              "alto": [
+                0.06,
+                0.09
+              ]
+            }
+          ],
+          "asteroides": [
+            {
+              "s": [
+                2.6,
+                3.2
+              ],
+              "r": 0.3,
+              "periodo": [
+                5.0,
+                6.2
+              ]
+            },
+            {
+              "s": [
+                18.2,
+                18.8
+              ],
+              "r": 0.3,
+              "periodo": [
+                5.0,
+                6.2
+              ]
+            }
+          ],
+          "postes": [
+            {
+              "s": [
+                9.4,
+                9.9
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            },
+            {
+              "s": [
+                11.6,
+                12.2
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            },
+            {
+              "s": [
+                15.6,
+                16.2
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            }
+          ]
+        }
+      ],
+      "camara": "seguir"
+    },
+    {
+      "id": 4,
+      "nombre": "EL GRAN DESAFÍO DEL HOYO DORADO",
+      "par": 5,
+      "prediccion": 6,
+      "voz": "zoe",
+      "instruccion": "¡Este es el gran desafío! Observa la pendiente, calcula tu golpe y encuentra el camino hasta el hoyo dorado.",
+      "instruccion2": "¡Puedes conseguirlo! Prueba con otra fuerza y descubre cómo se mueve la pelota.",
+      "voz2": "zeus",
+      "cartel": {
+        "etiqueta": "Nivel 4",
+        "titulo": "EL GRAN DESAFÍO DEL HOYO DORADO",
+        "sub": "Dos molinos, pendientes, curvas y asteroides"
+      },
+      "logro": "¡Eres un gran golfista espacial!",
+      "despedida": "ambos",
+      "invita": "",
+      "mundos": [
+        {
+          "nombre": "Gran Isla Dorada",
+          "tema": "dorado",
+          "pista": {
+            "inicio": [
+              -6.0,
+              3.0
+            ],
+            "rumbo": -45,
+            "ancho": 2.5,
+            "tramos": [
+              {
+                "recto": 6.0
+              },
+              {
+                "curva": [
+                  1.7,
+                  135
+                ]
+              },
+              {
+                "recto": 3.5
+              },
+              {
+                "curva": [
+                  1.7,
+                  -135
+                ]
+              },
+              {
+                "recto": 8.0
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.25,
+              0.45
+            ],
+            "lado": [
+              -0.3,
+              0.3
+            ]
+          },
+          "hoyo": {
+            "s": [
+              23.0,
+              24.6
+            ],
+            "lado": [
+              -0.6,
+              0.6
+            ],
+            "r": 0.35
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                4.2,
+                5.8
+              ],
+              "alto": [
+                -0.22,
+                -0.18
+              ]
+            },
+            {
+              "rampa": [
+                17.6,
+                18.6
+              ],
+              "alto": [
+                0.06,
+                0.09
+              ]
+            },
+            {
+              "rampa": [
+                22.4,
+                23.4
+              ],
+              "alto": [
+                -0.08,
+                -0.05
+              ]
+            }
+          ],
+          "molinos": [
+            {
+              "s": 3.0,
+              "periodo": [
+                6.8,
+                7.8
+              ],
+              "w": 1.15,
+              "bw": 0.13
+            },
+            {
+              "s": 20.0,
+              "periodo": [
+                6.2,
+                7.2
+              ],
+              "w": 1.15,
+              "bw": 0.13
+            }
+          ],
+          "asteroides": [
+            {
+              "s": [
+                11.6,
+                12.2
+              ],
+              "r": 0.3,
+              "periodo": [
+                5.0,
+                6.2
+              ]
+            }
+          ],
+          "postes": [
+            {
+              "s": [
+                5.0,
+                5.6
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            },
+            {
+              "s": [
+                15.6,
+                16.4
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            }
+          ]
+        },
+        {
+          "nombre": "Gran Isla del Espejo",
+          "tema": "turquesa",
+          "pista": {
+            "inicio": [
+              6.0,
+              3.0
+            ],
+            "rumbo": -135,
+            "ancho": 2.5,
+            "tramos": [
+              {
+                "recto": 6.0
+              },
+              {
+                "curva": [
+                  1.7,
+                  -135
+                ]
+              },
+              {
+                "recto": 3.5
+              },
+              {
+                "curva": [
+                  1.7,
+                  135
+                ]
+              },
+              {
+                "recto": 8.0
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.25,
+              0.45
+            ],
+            "lado": [
+              -0.3,
+              0.3
+            ]
+          },
+          "hoyo": {
+            "s": [
+              23.0,
+              24.6
+            ],
+            "lado": [
+              -0.6,
+              0.6
+            ],
+            "r": 0.35
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                4.2,
+                5.8
+              ],
+              "alto": [
+                -0.22,
+                -0.18
+              ]
+            },
+            {
+              "rampa": [
+                17.6,
+                18.6
+              ],
+              "alto": [
+                0.06,
+                0.09
+              ]
+            },
+            {
+              "rampa": [
+                22.4,
+                23.4
+              ],
+              "alto": [
+                -0.08,
+                -0.05
+              ]
+            }
+          ],
+          "molinos": [
+            {
+              "s": 3.0,
+              "periodo": [
+                6.8,
+                7.8
+              ],
+              "w": 1.15,
+              "bw": 0.13
+            },
+            {
+              "s": 20.0,
+              "periodo": [
+                6.2,
+                7.2
+              ],
+              "w": 1.15,
+              "bw": 0.13
+            }
+          ],
+          "asteroides": [
+            {
+              "s": [
+                11.6,
+                12.2
+              ],
+              "r": 0.3,
+              "periodo": [
+                5.0,
+                6.2
+              ]
+            }
+          ],
+          "postes": [
+            {
+              "s": [
+                5.0,
+                5.6
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            },
+            {
+              "s": [
+                15.6,
+                16.4
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            }
+          ]
+        },
+        {
+          "nombre": "Gran Vuelta del Cometa",
+          "tema": "violeta",
+          "pista": {
+            "inicio": [
+              -7.0,
+              2.4
+            ],
+            "rumbo": -15,
+            "ancho": 2.5,
+            "tramos": [
+              {
+                "recto": 6.5
+              },
+              {
+                "curva": [
+                  1.8,
+                  -150
+                ]
+              },
+              {
+                "recto": 5.0
+              },
+              {
+                "curva": [
+                  1.8,
+                  150
+                ]
+              },
+              {
+                "recto": 7.5
+              }
+            ]
+          },
+          "salida": {
+            "s": [
+              0.3,
+              0.5
+            ],
+            "lado": [
+              -0.3,
+              0.3
+            ]
+          },
+          "hoyo": {
+            "s": [
+              25.6,
+              27.6
+            ],
+            "lado": [
+              -0.6,
+              0.6
+            ],
+            "r": 0.35
+          },
+          "pendientes": [
+            {
+              "rampa": [
+                4.6,
+                6.2
+              ],
+              "alto": [
+                -0.22,
+                -0.18
+              ]
+            },
+            {
+              "rampa": [
+                12.6,
+                14.0
+              ],
+              "alto": [
+                -0.16,
+                -0.12
+              ]
+            },
+            {
+              "rampa": [
+                25.0,
+                26.0
+              ],
+              "alto": [
+                -0.08,
+                -0.05
+              ]
+            }
+          ],
+          "molinos": [
+            {
+              "s": 3.0,
+              "periodo": [
+                6.8,
+                7.8
+              ],
+              "w": 1.15,
+              "bw": 0.13
+            },
+            {
+              "s": 22.8,
+              "periodo": [
+                6.2,
+                7.2
+              ],
+              "w": 1.15,
+              "bw": 0.13
+            }
+          ],
+          "asteroides": [
+            {
+              "s": [
+                11.8,
+                12.4
+              ],
+              "r": 0.3,
+              "periodo": [
+                5.0,
+                6.2
+              ]
+            },
+            {
+              "s": [
+                14.6,
+                15.2
+              ],
+              "r": 0.3,
+              "periodo": [
+                5.0,
+                6.2
+              ]
+            }
+          ],
+          "postes": [
+            {
+              "s": [
+                5.0,
+                5.8
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            },
+            {
+              "s": [
+                19.0,
+                19.8
+              ],
+              "lado": [
+                -0.45,
+                0.45
+              ],
+              "r": 0.27
+            }
+          ]
+        }
+      ],
+      "camara": "seguir"
+    }
+  ],
+  "demo": {
+    "id": 0,
+    "par": 1,
+    "pista": {
+      "inicio": [
+        -4.6,
+        2.4
+      ],
+      "rumbo": -45,
+      "ancho": 2.5,
+      "tramos": [
+        {
+          "recto": 5
+        },
+        {
+          "curva": [
+            1.7,
+            135
+          ]
+        },
+        {
+          "recto": 2.8
+        }
+      ]
+    },
+    "salida": {
+      "s": 0.35,
+      "lado": 0
+    },
+    "hoyo": {
+      "s": 9.2,
+      "lado": 0,
+      "r": 0.37
+    },
+    "vCaptura": 2.4,
+    "pendientes": [
+      {
+        "rampa": [
+          3.6,
+          5
+        ],
+        "alto": -0.22
+      }
+    ],
+    "molino": {
+      "s": 2.9,
+      "periodo": 8,
+      "sentido": 1,
+      "w": 1.15,
+      "bw": 0.12
+    },
+    "prediccion": null,
+    "golpe": {
+      "angulo": 5.52,
+      "tension": 0.705,
+      "fase": 0.65
+    },
+    "tema": "esmeralda"
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "El Mini Golf Mágico",
+    "botonComenzar": "EMPEZAR",
+    "introZoe": "¡Desafío de Mini Golf espacial! Arrastra tu dedo hacia atrás de la pelota para calcular la fuerza del golpe. Pasa por el espacio libre del molino giratorio y mete la pelota en el hoyo de oro.",
+    "introZeus": "¡Golpéala suavemente para que pase por debajo del molino sin pasarse de largo!",
+    "zonas": {
+      "suave": "SUAVE",
+      "media": "MEDIA",
+      "potente": "POTENTE"
+    },
+    "tensa": [
+      "¡Arrastra hacia atrás!",
+      "¡Calcula la dirección!",
+      "¡Prueba con un golpe suave!"
+    ],
+    "alTope": "¡Esa es toda la fuerza! Puedes soltar.",
+    "rodando": "¡La pelota está rodando!",
+    "rebote": [
+      "¡Buen rebote!",
+      "¡La pelota puede rebotar!"
+    ],
+    "molinoSuperado": [
+      "¡Superaste el molino!",
+      "¡Muy buen golpe!"
+    ],
+    "aspa": [
+      "¡Observa el espacio libre del molino!",
+      "¡Espera el momento adecuado!"
+    ],
+    "asteroide": [
+      "¡Uy, el asteroide se cruzó!",
+      "¡Espera a que el asteroide se aparte!"
+    ],
+    "sobreHoyo": "¡Pasó por encima! Un poquito menos de fuerza.",
+    "consejos": {
+      "casi": "¡Casi llega!",
+      "mas": "¡Prueba con un poco más de fuerza!",
+      "menos": "¡No necesitas demasiada fuerza!",
+      "direccion": "¡Calcula la dirección! Mira la línea de luz.",
+      "molino": "¡Espera el momento adecuado para pasar el molino!",
+      "pendiente": "¡Mira la pendiente!"
+    },
+    "fallo": [
+      "¡Inténtalo de nuevo!",
+      "¡Mira la pendiente!",
+      "¡Tú puedes, golfista!"
+    ],
+    "quieto": [
+      "¡Arrastra hacia atrás!",
+      "¡Toca la pelota y arrastra tu dedo!",
+      "¡Calcula la dirección!"
+    ],
+    "ayuda": "¡Mira, ahora la línea de luz te muestra todo el camino!",
+    "hoyo": [
+      "¡Dentro del hoyo!",
+      "¡Qué gran golfista!"
+    ],
+    "hoyoEnUno": "¡Hoyo en uno!",
+    "cierreTitulo": "¡DENTRO DEL HOYO!",
+    "cierreNivel": "¡Dentro del hoyo! ¡Qué gran golfista!",
+    "cierre": "¡HOYO EN UNO ESPECTACULAR! Calculaste la fuerza, superaste los obstáculos y demostraste una precisión de golfista profesional.",
+    "finalTitulo": "¡HOYO EN UNO ESPECTACULAR!",
+    "finalSub": "¡ERES UN GRAN GOLFISTA ESPACIAL!",
+    "finalZoe": "¡Qué gran golfista!",
+    "victoria": "¡GRAN GOLFISTA ESPACIAL!",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe! ¡Encontré un campo de mini golf en una isla del espacio!"
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Qué lindo! Tiene un molino que gira, una pared curva y un hoyo de oro. ¡Vamos a jugar!"
+      }
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Cálculo de impulso y trayectoria"
+    }
+  ],
+  "temas": {
+    "esmeralda": {
+      "cesped": [
+        "#2fb84a",
+        "#3fcc5a"
+      ],
+      "tierra": "#4c3d8f",
+      "pared": "#6741d9",
+      "lomo": "#d0bfff",
+      "cielo": "#ffffff"
+    },
+    "turquesa": {
+      "cesped": [
+        "#19a98f",
+        "#26c2a6"
+      ],
+      "tierra": "#27408f",
+      "pared": "#1864ab",
+      "lomo": "#a5d8ff",
+      "cielo": "#b9e6ff"
+    },
+    "rosado": {
+      "cesped": [
+        "#6cc23a",
+        "#80d24c"
+      ],
+      "tierra": "#7a2f6e",
+      "pared": "#c2255c",
+      "lomo": "#ffc9e3",
+      "cielo": "#ffd1ec"
+    },
+    "violeta": {
+      "cesped": [
+        "#34b05c",
+        "#45c46e"
+      ],
+      "tierra": "#3d2a7a",
+      "pared": "#7048e8",
+      "lomo": "#e5dbff",
+      "cielo": "#d9c8ff"
+    },
+    "dorado": {
+      "cesped": [
+        "#43b53c",
+        "#55c84c"
+      ],
+      "tierra": "#7a4a22",
+      "pared": "#d9480f",
+      "lomo": "#ffe8a3",
+      "cielo": "#ffe3b3"
+    },
+    "hielo": {
+      "cesped": [
+        "#2fbfa0",
+        "#43d2b4"
+      ],
+      "tierra": "#4a62a8",
+      "pared": "#4dabf7",
+      "lomo": "#e7f5ff",
+      "cielo": "#d6ecff"
+    }
+  }
+}

@@ -1,0 +1,345 @@
+{
+  "nombre": "El Arquero de las Estrellas",
+  "mostrarFeedBack": true,
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarIntro": true,
+    "ayudaAutomatica": true,
+    "mostrarProgreso": true,
+    "letterSpacing": 2,
+    "volumenFondo": 25,
+    "rate": 5
+  },
+  "audios": {
+    "tema": "polimotor",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "juego": {
+    "arcoX": 470,
+    "arcoY": 640,
+    "angulo": 35,
+    "cuerdaAtras": 30,
+    "largoFlecha": 150,
+    "tironMax": 170,
+    "tensionMin": 0.12,
+    "zonaToque": 165,
+    "velMin": 380,
+    "velMax": 1320,
+    "gravedad": 760,
+    "suelo": 800,
+    "radios": [
+      0.3,
+      0.64,
+      1
+    ],
+    "dianaArriba": 175,
+    "dianaAbajo": 775,
+    "dianaDerecha": 1370,
+    "tensionAlta": 0.94,
+    "tensionBaja": 0.3,
+    "velDianaMax": 280,
+    "giroMax": 2.6,
+    "amplitudMin": 30,
+    "fallosParaAyuda": 2,
+    "fallosParaMarca": 3,
+    "fallosParaAsistir": 4,
+    "quietoParaAyudaMs": 12000,
+    "recargaMs": 550,
+    "vozPausaMs": 2600,
+    "vozFalloMs": 5000,
+    "velObstaculoMax": 240,
+    "huecoMin": 0.35
+  },
+  "rondas": [
+    {
+      "id": 1,
+      "nombre": "MI PRIMERA FLECHA ESTELAR",
+      "aciertos": 3,
+      "cambiaCada": 3,
+      "distancia": [
+        560,
+        620
+      ],
+      "radio": 125,
+      "amplitud": [
+        55,
+        70
+      ],
+      "periodo": [
+        6.5,
+        7.5
+      ],
+      "variacion": 0,
+      "giro": [
+        0.35,
+        0.5
+      ],
+      "alturaCentro": 0.5,
+      "prediccion": 1,
+      "marcaLlegada": true,
+      "tema": "nebulosa",
+      "voz": "zoe",
+      "instruccion": "¡Arrastra la cuerda hacia atrás para tensar el arco y suelta para lanzar tu flecha luminosa!",
+      "instruccion2": "¡Observa la diana y prueba cuánta fuerza necesitas!",
+      "voz2": "zeus",
+      "cartel": {
+        "etiqueta": "Nivel 1",
+        "titulo": "MI PRIMERA FLECHA ESTELAR",
+        "sub": "Tres flechas en la diana"
+      },
+      "logro": "¡Tu primera diana estelar se ilumina!",
+      "despedida": "zoe",
+      "invita": "¡Ahora el torneo de las tres distancias!"
+    },
+    {
+      "id": 2,
+      "nombre": "EL TORNEO DE LAS TRES DISTANCIAS",
+      "aciertos": 3,
+      "cambiaCada": 1,
+      "distancias": [
+        560,
+        680,
+        780
+      ],
+      "radio": 115,
+      "amplitud": [
+        75,
+        95
+      ],
+      "periodo": [
+        5.2,
+        6
+      ],
+      "variacion": 0,
+      "giro": [
+        0.7,
+        0.9
+      ],
+      "prediccion": 1,
+      "marcaLlegada": true,
+      "tema": "galaxiaAzul",
+      "voz": "zoe",
+      "instruccion": "¡La diana cambiará de distancia! Mira la curva de luz y ajusta tu fuerza.",
+      "cartel": {
+        "etiqueta": "Nivel 2",
+        "titulo": "EL TORNEO DE LAS TRES DISTANCIAS",
+        "sub": "Una flecha en cada distancia"
+      },
+      "logro": "¡Tres distancias, tres estrellas!",
+      "despedida": "zeus",
+      "invita": "¡Vamos a la diana giratoria mágica!"
+    },
+    {
+      "id": 3,
+      "nombre": "LA DIANA GIRATORIA MÁGICA",
+      "aciertos": 4,
+      "cambiaCada": 2,
+      "distancia": [
+        700,
+        760
+      ],
+      "radio": 105,
+      "amplitud": [
+        100,
+        125
+      ],
+      "periodo": [
+        5.6,
+        6.4
+      ],
+      "variacion": [
+        0.1,
+        0.16
+      ],
+      "giro": [
+        1.4,
+        1.7
+      ],
+      "prediccion": 0.8,
+      "marcaLlegada": false,
+      "tema": "violeta",
+      "voz": "zeus",
+      "instruccion": "¡Cuidado con el meteorito que sube y baja! Calcula tu fuerza y suelta cuando el camino esté libre.",
+      "cartel": {
+        "etiqueta": "Nivel 3",
+        "titulo": "LA DIANA GIRATORIA MÁGICA",
+        "sub": "Cuatro flechas, ¡ojo con el meteorito!"
+      },
+      "logro": "¡La diana mágica brilla en violeta y oro!",
+      "despedida": "ambos",
+      "invita": "¡Llegó el momento del gran arquero de las estrellas!",
+      "obstaculos": [
+        {
+          "x": [
+            0.4,
+            0.6
+          ],
+          "radio": 56,
+          "amplitud": [
+            245,
+            265
+          ],
+          "periodo": [
+            7.2,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "nombre": "EL GRAN ARQUERO DE LAS ESTRELLAS",
+      "aciertos": 5,
+      "cambiaCada": 1,
+      "distancia": [
+        760,
+        800
+      ],
+      "radio": 98,
+      "amplitud": [
+        100,
+        125
+      ],
+      "periodo": [
+        5,
+        5.8
+      ],
+      "variacion": [
+        0.12,
+        0.2
+      ],
+      "giro": [
+        1.8,
+        2.2
+      ],
+      "alturasDistintas": true,
+      "prediccion": 0.65,
+      "marcaLlegada": false,
+      "tema": "dorado",
+      "voz": "zoe",
+      "instruccion": "¡Cinco flechas para el gran arquero! El meteorito cuida el camino: tensa, observa y suelta en el momento justo.",
+      "cartel": {
+        "etiqueta": "Nivel 4",
+        "titulo": "EL GRAN ARQUERO DE LAS ESTRELLAS",
+        "sub": "Cinco flechas y un meteorito"
+      },
+      "logro": "¡Eres el gran arquero de las estrellas!",
+      "despedida": "ambos",
+      "invita": "",
+      "obstaculos": [
+        {
+          "x": [
+            0.45,
+            0.65
+          ],
+          "radio": 46,
+          "amplitud": [
+            150,
+            175
+          ],
+          "periodo": [
+            4.6,
+            5.4
+          ]
+        }
+      ]
+    }
+  ],
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "tituloIntro": "El Arquero de las Estrellas",
+    "tituloJuego": "JUEGO 2",
+    "subtituloJuego": "TIRO AL BLANCO MÓVIL — ¡PUNTERÍA, FUERZA Y DISTANCIA!",
+    "botonComenzar": "EMPEZAR",
+    "introZoe": "¡Gran torneo de arquería! Tensa el arco de luz arrastrando tu dedo hacia atrás. Calcula la distancia mientras la diana se mueve y suelta para clavar la flecha en el centro de 50 puntos.",
+    "introZeus": "¡Ténsalo un poco más y suéltalo justo cuando la diana pase frente a la flecha!",
+    "pasosTitulo": "CÓMO JUGAR",
+    "pasos": [
+      {
+        "titulo": "Paso 1: Tensión de fuerza",
+        "texto": "Toca la cuerda y arrastra hacia atrás"
+      },
+      {
+        "titulo": "Paso 2: Alineación",
+        "texto": "Mira la diana que sube y baja"
+      },
+      {
+        "titulo": "Paso 3: Liberación",
+        "texto": "Suelta el dedo en el momento justo"
+      }
+    ],
+    "puntos": {
+      "10": {
+        "mensaje": "¡Buen lanzamiento!",
+        "voz": "¡Diez puntos!"
+      },
+      "30": {
+        "mensaje": "¡Muy buena puntería!",
+        "voz": "¡Treinta puntos!"
+      },
+      "50": {
+        "mensaje": "¡Centro exacto!",
+        "voz": "¡Centro de cincuenta!"
+      }
+    },
+    "acierto": [
+      "¡Acertaste!",
+      "¡Qué gran arquero!",
+      "¡Muy buena puntería!"
+    ],
+    "tensa": [
+      "¡Arrastra hacia atrás!",
+      "¡Mira cuánta fuerza tienes!",
+      "¡La flecha llegará más lejos!"
+    ],
+    "alTope": "¡Ahora puedes soltar!",
+    "consejos": {
+      "mas": "¡Tensa un poquito más!",
+      "menos": "¡Un poquito menos de fuerza!",
+      "momento": "¡Espera el momento adecuado!",
+      "obstaculo": "¡Uy, la flecha chocó con el meteorito! Espera a que se aparte."
+    },
+    "fallo": [
+      "¡Inténtalo de nuevo!",
+      "¡Observa cómo se mueve la diana!",
+      "¡Tú puedes, arquero!"
+    ],
+    "quieto": [
+      "¡Arrastra hacia atrás!",
+      "¡Observa cómo se mueve la diana!",
+      "¡Tensa la cuerda de luz!"
+    ],
+    "masLejos": "¡La diana está un poquito más lejos! Prueba tensar un poco más.",
+    "masCerca": "¡Ahora la diana está más cerca! Un poquito menos de fuerza.",
+    "otraAltura": "¡La diana cambió de altura! Observa antes de soltar.",
+    "cierreTitulo": "¡NIVEL SUPERADO!",
+    "cierreNivel": "¡Qué gran arquero! ¡La diana brilla con tus flechas!",
+    "cierre": "¡PULSO DE ARQUERO EXPERTO! Controlaste la fuerza del arco y diste en el blanco móvil con una precisión asombrosa.",
+    "finalTitulo": "¡PULSO DE ARQUERO EXPERTO!",
+    "finalSub": "¡ERES EL GRAN ARQUERO DE LAS ESTRELLAS!",
+    "finalZoe": "¡Qué gran arquero!",
+    "victoria": "¡PULSO DE ARQUERO EXPERTO!",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Zoe! ¡Hoy es el gran torneo de arquería de las estrellas!"
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Vamos! Con el arco de luz lanzaremos flechas a la diana que se mueve."
+      }
+    ],
+    "obstaculo": [
+      "¡El meteorito se cruzó!",
+      "¡Espera el hueco libre!",
+      "¡Mira cuándo se aparta el meteorito!"
+    ]
+  },
+  "niveles": [
+    {
+      "id": "1",
+      "edad": "5-6 años",
+      "titulo": "Puntería, fuerza y distancia"
+    }
+  ]
+}

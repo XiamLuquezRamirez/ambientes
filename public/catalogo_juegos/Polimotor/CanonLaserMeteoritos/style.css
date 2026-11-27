@@ -570,64 +570,6 @@ body.nivel-4 { --c1: #b197fc; --cartel: #6741d9; }
 body.presentando .progreso, body.en-final .progreso, body.sin-progreso .progreso { display: none; }
 @keyframes progresoPop { 0% { transform: scale(0.3); } 100% { transform: scale(1); } }
 
-/* ---------------------------------------------------------------- pausa */
-
-.btn-pausa {
-  position: fixed;
-  top: 12px;
-  right: 150px;
-  z-index: 1500;
-  display: grid;
-  place-items: center;
-  width: 58px;
-  height: 58px;
-  padding: 0;
-  border: 6px solid #ffffff;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #74c0fc, #1c7ed6 70%);
-  color: #ffffff;
-  font-size: 22px;
-  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-}
-.btn-pausa:active { transform: translateY(2px); }
-.btn-pausa:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-body.esperando-inicio .btn-pausa, body.intro3d-activa .btn-pausa, body.presentando .btn-pausa, body.en-final .btn-pausa { visibility: hidden; }
-
-.pausa {
-  position: fixed;
-  inset: 0;
-  z-index: 1400;
-  display: grid;
-  place-items: center;
-  background: rgba(11, 59, 92, 0.45);
-}
-.pausa[hidden] { display: none; }
-.pausa-caja {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  padding: 22px 46px;
-  border: 6px solid #fff;
-  border-radius: 32px;
-  background: linear-gradient(180deg, #e3fafc, #99e9f2);
-  box-shadow: 0 16px 30px rgba(11, 59, 92, 0.4);
-}
-.pausa-caja strong { font-size: clamp(30px, 4vw, 52px); color: #0b7285; }
-.btn-seguir {
-  padding: 8px 34px;
-  border: 5px solid #fff;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #8ce99a, #2f9e44);
-  color: #fff;
-  font: inherit;
-  font-weight: 700;
-  font-size: clamp(22px, 2.6vw, 32px);
-  box-shadow: 0 6px 0 #2b8a3e;
-  cursor: pointer;
-}
-
 /* ---------------------------------------------------------------- victoria compartida */
 
 .final {
@@ -763,10 +705,6 @@ body.presentando .nivel-ind, body.en-final .nivel-ind { visibility: hidden; }
 body.en-final .puntos { visibility: hidden; }
 @keyframes puntosSube { 0% { transform: scale(1); } 40% { transform: scale(1.14); box-shadow: 0 0 30px rgba(255, 224, 102, 0.9); } 100% { transform: scale(1); } }
 @keyframes estrellaGira { from { transform: rotate(0) scale(1.6); } to { transform: rotate(360deg) scale(1); } }
-
-/* Pausa: a la izquierda de reiniciar y salir. */
-.btn-pausa { right: 150px; background: radial-gradient(circle at 35% 30%, #9775fa, #5f3dc4 70%); }
-body.presentando .btn-pausa { visibility: hidden; }
 
 /* Panel de comunicación de la cabina (voces de Zoe y Zeus durante la partida). */
 /* Arriba al centro, por encima de los carriles de los meteoritos (el título ya no está en la partida). */

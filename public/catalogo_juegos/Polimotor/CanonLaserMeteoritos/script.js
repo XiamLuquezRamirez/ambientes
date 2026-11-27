@@ -494,17 +494,6 @@ function pausar(on) {
     pausado = on;
     sfx("pausa", on);
     document.body.classList.toggle("en-pausa", on);
-    var capa = document.getElementById("pausa");
-    if (capa) capa.hidden = !on;
-    var t = document.getElementById("pausa-titulo");
-    if (t) t.textContent = textos().pausa || "Pausa";
-    var btn = document.getElementById("btn-pausa");
-    if (btn) {
-        btn.setAttribute("aria-pressed", on ? "true" : "false");
-        btn.title = on ? "Seguir" : "Pausa";
-        var i = btn.querySelector("i");
-        if (i) i.className = on ? "fa-solid fa-play" : "fa-solid fa-pause";
-    }
     if (esc()) esc().pausar(on);
     if (on) {
         callar();
@@ -1015,8 +1004,6 @@ document.addEventListener("DOMContentLoaded", function () {
     on("btn-empecemos", empecemosJuego);
     on("btn-omitir-intro3d", omitirIntro3d);
     on("btn-continuar-intro3d", function (ev) { ev.preventDefault(); empezarJuegoTrasIntro(); });
-    on("btn-pausa", function () { sfx("boton"); pausar(!pausado); });
-    on("btn-seguir", function () { sfx("boton"); pausar(false); });
     window.addEventListener("victory-continue", empezarJuegoTrasIntro);
     window.addEventListener("resize", function () { if (esc()) esc().reacomodar(); });
     window.addEventListener("pagehide", function () {

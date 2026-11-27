@@ -409,6 +409,32 @@
       ],
       "port": 8057,
       "autoPort": false
+    },
+    {
+      "name": "juegos-arquero",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8058",
+        "--directory",
+        "public"
+      ],
+      "port": 8058,
+      "autoPort": false
+    },
+    {
+      "name": "juegos-golf",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8059",
+        "--directory",
+        "public"
+      ],
+      "port": 8059,
+      "autoPort": false
     }
   ]
 }
