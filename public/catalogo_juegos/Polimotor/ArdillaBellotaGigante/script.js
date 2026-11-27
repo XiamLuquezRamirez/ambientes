@@ -690,7 +690,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.ArdillaDemo && demoRec) {
         enDemo = true;
         try {
-            await window.ArdillaDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.ArdillaDemo.correr, apiDemo()) : window.ArdillaDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[Ardilla] demo", e);
         }

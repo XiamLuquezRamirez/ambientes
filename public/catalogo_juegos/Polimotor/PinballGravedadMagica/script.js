@@ -654,7 +654,7 @@
         if (acc().mostrarIntro === false || !window.DemoPinball) { estado.bola = null; return Promise.resolve(); }
         fase = FASE.DEMO;
         document.body.classList.add("demo-lock");
-        return window.DemoPinball.ejecutar(apiDemo())
+        return (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.DemoPinball.ejecutar, apiDemo()) : window.DemoPinball.ejecutar(apiDemo()))
             .catch(function (e) { console.warn("[pinball] demo interrumpida", e); })
             .then(function () {
                 document.body.classList.remove("demo-lock");

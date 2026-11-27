@@ -138,24 +138,30 @@
         T = Math.max(0, Math.min(1, Number(T) || 0));
         var t = ahora();
         if (!hum) {
-            var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
+            // zumbido grave por un filtro pasa bajos: sube solo una octava para no volverse un pitido
+            var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = ctx.createGain();
             o1.type = "sine";
-            o2.type = "triangle";
-            o1.frequency.value = 160;
-            o2.frequency.value = 321;
+            o2.type = "sine";
+            o1.frequency.value = 120;
+            o2.frequency.value = 180;
+            f.type = "lowpass";
+            f.frequency.value = 700;
+            f.Q.value = 0.5;
             g.gain.setValueAtTime(0.0001, t);
-            o1.connect(g);
-            o2.connect(g);
+            o1.connect(f);
+            o2.connect(f);
+            f.connect(g);
             g.connect(busEfectos);
             o1.start(t);
             o2.start(t);
             hum = { o1: o1, o2: o2, g: g };
         }
-        hum.o1.frequency.setTargetAtTime(160 + 380 * T, t, 0.05);
-        hum.o2.frequency.setTargetAtTime(321 + 760 * T, t, 0.05);
-        hum.g.gain.setTargetAtTime(T < 0.02 ? 0.0001 : 0.012 + 0.03 * T, t, 0.06);
-        if (Math.abs(T - ultimaT) > 0.07) {
-            if (libre("cruje", 70)) tono("triangle", 900 + 500 * T, 820 + 500 * T, 0.03, 0.012 + 0.012 * T);
+        hum.o1.frequency.setTargetAtTime(120 + 120 * T, t, 0.08);
+        hum.o2.frequency.setTargetAtTime(180 + 180 * T, t, 0.08);
+        hum.g.gain.setTargetAtTime(T < 0.02 ? 0.0001 : 0.012 + 0.022 * T, t, 0.08);
+        if (Math.abs(T - ultimaT) > 0.1) {
+            // crujido suave de la cuerda (antes era agudo)
+            if (libre("cruje", 80)) tono("triangle", 330 + 220 * T, 300 + 200 * T, 0.04, 0.012);
             ultimaT = T;
         }
     }
@@ -172,8 +178,8 @@
     /** Tensión máxima: "ding" brillante. */
     function alTope() {
         if (!libre("alTope", 400)) return;
-        campana(1567.98, 0.04, 0, 0.45);
-        tono("sine", 2093, 2093, 0.2, 0.012, 0.05);
+        campana(783.99, 0.035, 0, 0.45);
+        tono("sine", 523.25, 523.25, 0.2, 0.012, 0.05);
     }
 
     /** La cuerda vuelve sin disparar. */

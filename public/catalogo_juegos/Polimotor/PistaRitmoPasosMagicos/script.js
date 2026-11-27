@@ -1039,7 +1039,7 @@ async function demostrar() {
     const sec = (demoCfg.secuencia || ReglasPista.DEMO).slice();
     armarRanuras(sec.length);
     limpiarRanuras();
-    await window.PistaDemo.correr({
+    await (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(window.PistaDemo.correr, {
         secuencia: function () { return sec; },
         cancelado: function () { return !vigente(id); },
         texto: function (clave) { return textos()[clave] || ""; },

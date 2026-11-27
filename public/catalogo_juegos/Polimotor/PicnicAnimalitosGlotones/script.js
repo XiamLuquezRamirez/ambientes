@@ -723,7 +723,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.PicnicDemo) {
         enDemo = true;
         try {
-            await window.PicnicDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.PicnicDemo.correr, apiDemo()) : window.PicnicDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[PicnicAnimalitos] demo", e);
         }

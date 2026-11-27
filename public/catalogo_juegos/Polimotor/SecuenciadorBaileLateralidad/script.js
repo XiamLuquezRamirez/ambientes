@@ -1076,7 +1076,7 @@ async function demostrar() {
     const sec = (demoCfg.secuencia || ReglasSimon.DEMO).slice();
     armarRanuras(sec.length);
     limpiarRanuras();
-    await window.SimonDemo.correr({
+    await (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(window.SimonDemo.correr, {
         secuencia: function () { return sec; },
         cancelado: function () { return !vigente(id); },
         texto: function (clave) { return textos()[clave] || ""; },

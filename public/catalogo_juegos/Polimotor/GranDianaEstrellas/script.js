@@ -560,10 +560,13 @@ async function entrar(i, opciones) {
             await decir(textos().introZeus, "zeus", "saluda", 5000);
             if (!vivo(tk)) return;
             var voz = decir(textos().introZoe, "zoe", "senala", 11000);
-            if (demoOn) await Promise.all([demoConMano(e, tk), voz]);
-            else await voz;
+            var omitida = false;
+            if (demoOn) {
+                var demoP = Promise.all([demoConMano(e, tk), voz]);
+                omitida = await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.esperar(demoP) : demoP.then(function () { return false; }));
+            } else await voz;
             if (!vivo(tk)) return;
-            if (demoOn) await decir(textos().demoFin, "zeus", "celebra", 2500);
+            if (demoOn && !omitida) await decir(textos().demoFin, "zeus", "celebra", 2500);
             if (!vivo(tk)) return;
         }
     } catch (err) {

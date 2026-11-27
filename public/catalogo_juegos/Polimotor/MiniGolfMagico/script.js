@@ -624,6 +624,7 @@ async function entrar(i, opciones) {
     e.ayudaAutomatica(acc().ayudaAutomatica !== false);
     var presentacion = nivelIdx === 0 && o.boton !== false;
 
+    var omitirD = null;
     if (presentacion) {
         document.body.classList.add("presentando", "demo-lock");
         try {
@@ -632,15 +633,25 @@ async function entrar(i, opciones) {
             if (!vivo(tk)) return;
             await Promise.all([zoe(true), zeus(true)]);
             if (!vivo(tk)) return;
-            if (acc().mostrarIntro !== false) bucleDemo(e, tk);
+            if (acc().mostrarIntro !== false) {
+                bucleDemo(e, tk);
+                // «Omitir demo» (comun/omitir-demo.js): corta el bucle de la demo y lo que falta de la explicación
+                if (window.PedniaOmitirDemo) {
+                    omitirD = window.PedniaOmitirDemo.mostrar(function () {
+                        demoActiva = false;
+                        e.detenerDemo();
+                    });
+                }
+            }
             await decir(textos().introZoe, "zoe", "saluda", 16000);
             if (!vivo(tk)) return;
-            await decir(textos().introZeus, "zeus", "senala", 6000);
+            if (!(omitirD && omitirD.omitida())) await decir(textos().introZeus, "zeus", "senala", 6000);
             if (!vivo(tk)) return;
         } catch (err) {
             console.warn("[MiniGolf] presentación", err);
         }
         var sigue = await esperarBoton(tk, textos().botonComenzar || "EMPEZAR");
+        if (omitirD) omitirD.ocultar();
         if (!vivo(tk) || !sigue) return;
         demoActiva = false;
         e.detenerDemo();

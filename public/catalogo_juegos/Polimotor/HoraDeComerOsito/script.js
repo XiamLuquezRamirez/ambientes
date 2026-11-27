@@ -721,7 +721,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.ComerDemo) {
         enDemo = true;
         try {
-            await window.ComerDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.ComerDemo.correr, apiDemo()) : window.ComerDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[HoraDeComer] demo", e);
         }

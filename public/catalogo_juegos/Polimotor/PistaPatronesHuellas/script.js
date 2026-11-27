@@ -1178,7 +1178,7 @@ async function demostrar() {
     const sec = (demoCfg.secuencia || ReglasHuellas.DEMO).slice();
     armarRanuras(sec.length);
     limpiarRanuras();
-    await window.PistaHuellasDemo.correr({
+    await (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(window.PistaHuellasDemo.correr, {
         secuencia: function () { return sec; },
         cancelado: function () { return !vigente(id); },
         texto: function (clave) { return textos()[clave] || ""; },

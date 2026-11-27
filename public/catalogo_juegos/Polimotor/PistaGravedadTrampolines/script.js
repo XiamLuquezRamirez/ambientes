@@ -761,7 +761,7 @@ async function iniciarJuego() {
         enDemo = true;
         pintarProgreso();
         try {
-            await window.GravedadDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.GravedadDemo.correr, apiDemo()) : window.GravedadDemo.correr(apiDemo()));
         } catch (err) {
             console.warn("[Gravedad] demo", err);
         }

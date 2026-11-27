@@ -681,7 +681,7 @@ async function iniciarJuego() {
         enDemo = true;
         document.body.classList.add("en-demo");
         try {
-            await window.AnillosDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.AnillosDemo.correr, apiDemo()) : window.AnillosDemo.correr(apiDemo()));
         } catch (err) {
             console.warn("[LanzadorAnillos] demo", err);
         }

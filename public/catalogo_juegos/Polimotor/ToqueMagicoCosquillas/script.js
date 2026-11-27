@@ -617,7 +617,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.CosquillasDemo) {
         enDemo = true;
         try {
-            await window.CosquillasDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.CosquillasDemo.correr, apiDemo()) : window.CosquillasDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[Cosquillas] demo", e);
         }

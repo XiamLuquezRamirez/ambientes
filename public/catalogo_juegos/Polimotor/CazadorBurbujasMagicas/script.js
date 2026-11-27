@@ -715,7 +715,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.BurbujasDemo) {
         enDemo = true;
         try {
-            await window.BurbujasDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.BurbujasDemo.correr, apiDemo()) : window.BurbujasDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[CazadorBurbujas] demo", e);
         }

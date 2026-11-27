@@ -1324,7 +1324,7 @@
         const prog = document.getElementById("progreso");
         iniciarLaberintoActual();
         if (prog) prog.hidden = true;
-        await PedniaTutorial.correr({
+        await (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(PedniaTutorial.correr, {
             texto: textos().demostracion,
             textoFin: textos().demostracionFin,
             cancelado: function () { return !!juegoTerminado; },

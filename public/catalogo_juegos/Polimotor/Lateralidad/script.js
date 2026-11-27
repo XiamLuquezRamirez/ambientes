@@ -660,7 +660,7 @@
             if (acc().mostrarIntro && window.PedniaTutorial) {
                 const prog = document.getElementById("progreso");
                 if (prog) prog.hidden = true;
-                PedniaTutorial.correr({
+                (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(PedniaTutorial.correr, {
                     texto: textos().demostracion,
                     textoFin: textos().demostracionFin,
                     cancelado: function () { return gen !== retoGen; },

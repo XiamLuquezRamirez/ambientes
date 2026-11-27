@@ -694,7 +694,7 @@ async function iniciarJuego() {
         if (sfx()) sfx().motor(true);
         arrancarMotor();
         try {
-            await window.CoheteDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.CoheteDemo.correr, apiDemo()) : window.CoheteDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[CaminoCohete] demo", e);
         }

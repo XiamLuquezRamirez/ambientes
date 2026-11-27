@@ -1234,7 +1234,7 @@ function lanzarTutorialPieza() {
     const t = (gameConfig && gameConfig.textos) || {};
     const prog = document.getElementById("progreso");
     if (prog) prog.hidden = true;
-    PedniaTutorial.correr({
+    (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(PedniaTutorial.correr, {
         texto: t.demostracion,
         textoFin: t.demostracionFin,
         cancelado: function () { return !!juegoTerminado; },

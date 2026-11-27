@@ -776,7 +776,7 @@ async function iniciarJuego() {
         await e.aparecerNave();
         enDemo = true;
         try {
-            await window.MapaDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.MapaDemo.correr, apiDemo()) : window.MapaDemo.correr(apiDemo()));
         } catch (err) {
             console.warn("[Mapa] demo", err);
         }

@@ -753,7 +753,7 @@ async function demostrar() {
     const orden = ReglasMemorama.repartir(rondaCfg, Math.random, null);
     escenario().asignar(orden);
     const esc = escenario();
-    await window.MemoramaDemo.correr({
+    await (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(window.MemoramaDemo.correr, {
         orden: function () { return orden; },
         cancelado: function () { return partidaId > 0; },
         texto: function (clave) { return textos()[clave] || ""; },

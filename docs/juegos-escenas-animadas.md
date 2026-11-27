@@ -56,6 +56,11 @@ pantalla de inicio (¡Empecemos!)
 ```
 
 - "Mostrar intro (demostración)" en el menú de accesibilidad apaga la demo; el botón "¡Comenzar a jugar!" sigue.
+- Botón **«Omitir»** de la demo (común, `../comun/omitir-demo.js`, se carga justo después de `comun/volumen.js`): se ve igual que el «Omitir» de la intro 3D y sale solo mientras corre la demo. Llamar la demo con
+  `await (window.PedniaOmitirDemo ? PedniaOmitirDemo.correr(window.XDemo.correr, apiDemo(tk)) : window.XDemo.correr(apiDemo(tk)))`:
+  al tocarlo calla la voz, oculta la mano, el `api` deja de responder (`cancelado()` → true, lo demás lanza), espera el
+  último paso en curso (máx. 8 s) y llama `api.terminar`; el flujo sigue normal. Demo escrita en script.js:
+  `await PedniaOmitirDemo.esperar(promesaDemo, alOmitir)` (devuelve true si se omitió: no decir "¡Excelente!").
 - Todo error del niño es amable: sin vidas, sin puntos negativos, sin mensajes agresivos.
 - Ayuda automática: tras unos segundos sin tocar nada, se destaca un elemento pendiente y Zoe da una pista con voz;
   tras varios errores con el mismo elemento, la respuesta brilla suave (sin resolverla).

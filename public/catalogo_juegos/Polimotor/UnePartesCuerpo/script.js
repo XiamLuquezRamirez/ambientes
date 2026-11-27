@@ -778,7 +778,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.UneDemo) {
         enDemo = true;
         try {
-            await window.UneDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.UneDemo.correr, apiDemo()) : window.UneDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[UnePartesCuerpo] demo", e);
         }

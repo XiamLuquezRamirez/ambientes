@@ -703,7 +703,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.PezDemo && demoRec) {
         enDemo = true;
         try {
-            await window.PezDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.PezDemo.correr, apiDemo()) : window.PezDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[ViajePez] demo", e);
         }

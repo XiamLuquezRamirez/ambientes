@@ -594,7 +594,7 @@ async function entrar(i, opciones) {
             var otro = guiaDemo === "zoe" ? "zeus" : "zoe";
             var voz = decir(textos().introZeus, guiaDemo, "saluda", 12000);
             if (demoOn) {
-                await Promise.all([demoConMano(e, tk), voz]);
+                await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.esperar(Promise.all([demoConMano(e, tk), voz])) : Promise.all([demoConMano(e, tk), voz]));
             } else {
                 await voz;
             }

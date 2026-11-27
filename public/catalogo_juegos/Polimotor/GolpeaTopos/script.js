@@ -815,7 +815,7 @@ async function iniciarJuego() {
     if (conDemo) {
         enDemo = true;
         try {
-            await window.ToposDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.ToposDemo.correr, apiDemo()) : window.ToposDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[GolpeaTopos] demo", e);
         }

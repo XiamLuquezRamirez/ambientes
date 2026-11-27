@@ -1165,7 +1165,7 @@
         if (anim()) anim().nuevaRuta(aroNodes, document.getElementById("meta-estrella"), coheteEl, true);
         const enun = document.getElementById("enunciado");
         if (enun) enun.textContent = textos().demostracion || "";
-        await PedniaTutorial.correr({
+        await (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(PedniaTutorial.correr, {
             texto: textos().demostracion,
             textoFin: textos().demostracionFin,
             cancelado: function () { return !!juegoTerminado; },

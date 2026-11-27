@@ -1589,6 +1589,21 @@ function crearPelota(scene, r) {
     sombra.rotation.x = -Math.PI / 2;
     sombra.renderOrder = 3;
     scene.add(sombra);
+    // silueta: se dibuja por encima de todo y solo aparece cuando un molino, un poste o un asteroide tapa la pelota
+    const fantasma = new THREE.Group();
+    const fCuerpo = new THREE.Mesh(new THREE.SphereGeometry(r * 1.12, 24, 16), new THREE.MeshBasicMaterial({ color: 0x99f6ff, transparent: true, opacity: 0, depthTest: false, depthWrite: false, toneMapped: false }));
+    fCuerpo.renderOrder = 30;
+    fantasma.add(fCuerpo);
+    const fHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.brillo, color: 0x66f5ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, toneMapped: false }));
+    fHalo.scale.set(r * 7, r * 7, 1);
+    fHalo.renderOrder = 31;
+    fantasma.add(fHalo);
+    fantasma.visible = false;
+    g.add(fantasma);
+    B.fantasma = fantasma;
+    B.fCuerpo = fCuerpo;
+    B.fHalo = fHalo;
+    B.fOp = 0;
     scene.add(g);
     B.grupo = g;
     B.cuerpo = cuerpo;
@@ -1629,6 +1644,103 @@ function ubicarPelota(dt, vx, vz) {
     });
     B.grupo.scale.setScalar(B.escala);
     B.grupo.visible = B.visible;
+}
+
+// ------------------------------------------------------------------ pelota tapada: silueta y giro de la cámara
+
+const RAYO = new THREE.Raycaster();
+const RAYO_DIR = new THREE.Vector3();
+const RAYO_P = new THREE.Vector3();
+const EJE_Y = new THREE.Vector3(0, 1, 0);
+const GIROS = [30, -30, 55, -55, 80, -80].map(function (g) { return g * Math.PI / 180; });
+
+/** Junta las mallas que pueden tapar la pelota: fijas (torres y postes) y móviles (aspas y asteroides). */
+function recogerTapas() {
+    C.tapanFijos = [];
+    C.tapanMoviles = [];
+    C.molinos.forEach(function (gm) {
+        const aspas = gm.userData.aspas;
+        gm.traverse(function (o) {
+            if (!o.isMesh) return;
+            let movil = false;
+            for (let p = o; p && p !== gm; p = p.parent) if (p === aspas) movil = true;
+            (movil ? C.tapanMoviles : C.tapanFijos).push(o);
+        });
+    });
+    C.postes.forEach(function (gp) { gp.traverse(function (o) { if (o.isMesh) C.tapanFijos.push(o); }); });
+    C.asteroides.forEach(function (ga) { ga.traverse(function (o) { if (o.isMesh) C.tapanMoviles.push(o); }); });
+}
+
+/**
+ * ¿Está tapada la pelota vista desde camPos? Mira cuatro puntos de la pelota (centro, arriba y los dos lados) y
+ * cuenta cuántos rayos chocan antes de llegar. Tapada = la mitad o más.
+ */
+function pelotaTapada(camPos, conMoviles) {
+    const b = E.bola;
+    if (!b || !C.tapanFijos) return false;
+    const lista = conMoviles ? C.tapanFijos.concat(C.tapanMoviles) : C.tapanFijos;
+    if (!lista.length) return false;
+    const r = B.r;
+    const yc = alt(b.x, b.z) + r;
+    const lado = new THREE.Vector3(b.x - camPos.x, 0, b.z - camPos.z).normalize();
+    lado.set(-lado.z, 0, lado.x).multiplyScalar(r * 0.8);
+    const pts = [[0, 0, 0], [0, r * 0.8, 0], [lado.x, 0, lado.z], [-lado.x, 0, -lado.z]];
+    let tapados = 0;
+    for (let i = 0; i < pts.length; i++) {
+        RAYO_P.set(b.x + pts[i][0], yc + pts[i][1], b.z + pts[i][2]);
+        RAYO_DIR.subVectors(RAYO_P, camPos);
+        const d = RAYO_DIR.length();
+        RAYO_DIR.divideScalar(d);
+        RAYO.set(camPos, RAYO_DIR);
+        RAYO.far = d - r * 0.3;
+        if (RAYO.intersectObjects(lista, false).length) tapados++;
+    }
+    return tapados >= 2;
+}
+
+/** Posición de cámara que tendría la pelota quieta con el giro g (sin el vaivén). */
+function camaraConGiro(g) {
+    if (E.seguir) {
+        const m = objetivoSeguir();
+        return m.add(E.ofsSeguir.clone().applyAxisAngle(EJE_Y, g));
+    }
+    return encuadre(E.nv, g).pos;
+}
+
+/**
+ * Cuando la pelota se detiene detrás de un molino o un poste, la cámara gira despacio hacia un lado desde donde se
+ * vea. Si ya se ve desde el ángulo de siempre, vuelve a él; si no hay ningún ángulo libre, queda la silueta.
+ */
+function elegirGiro() {
+    if (!E.nv || E.demo || E.presentacion) return;
+    const actual = E.giroObj || 0;
+    let nuevo = null;
+    if (!pelotaTapada(camaraConGiro(0), false)) nuevo = 0;
+    else if (actual !== 0 && !pelotaTapada(camaraConGiro(actual), false)) nuevo = actual;
+    else {
+        const orden = GIROS.slice().sort(function (a, b) { return Math.abs(a - actual) - Math.abs(b - actual); });
+        for (let i = 0; i < orden.length && nuevo === null; i++) if (!pelotaTapada(camaraConGiro(orden[i]), false)) nuevo = orden[i];
+    }
+    if (nuevo === null || nuevo === actual) return;
+    E.giroObj = nuevo;
+    if (!E.seguir) {
+        const desde = { pos: E.camAct.pos.clone(), mira: E.camAct.mira.clone() };
+        E.camObj = encuadre(E.nv, nuevo);
+        E.camTween = { t: 0, dur: reducido ? 0.25 : 1.1, desde: desde, arco: true };
+    }
+    emitir("giroCamara", { giro: nuevo });
+}
+
+/** La silueta se enciende con suavidad mientras algo tapa la pelota (también rodando). */
+function vigilarTapada(dt) {
+    if (!B.fantasma) return;
+    const ver = B.visible && B.hundir <= 0 && E.estado !== "hoyo" && E.estado !== "inactivo" && pelotaTapada(E.camera.position, true);
+    B.fOp = lerp(B.fOp, ver ? 1 : 0, Math.min(1, dt * (ver ? 12 : 6)));
+    B.fantasma.visible = B.fOp > 0.02;
+    if (!B.fantasma.visible) return;
+    const pulso = 0.5 + 0.5 * Math.sin(E.reloj * 6);
+    B.fCuerpo.material.opacity = B.fOp * (0.5 + 0.25 * pulso);
+    B.fHalo.material.opacity = B.fOp * (0.45 + 0.3 * pulso);
 }
 
 // ------------------------------------------------------------------ trayectoria predictiva, flecha y goma
@@ -2053,6 +2165,7 @@ function detenida() {
     sfx("parada");
     E.quietoDesde = performance.now();
     onda(new THREE.Vector3(b.x, alt(b.x, b.z) + 0.02, b.z), 0xffe066, 0.1, 0.55, 0.6, null, 0.7);
+    elegirGiro();
     emitir("detenida", { consejo: cons, cerca: dHoyo < 0.9, dist: dHoyo, demo: gi.demo, empujada: gi.empujada, info: gi });
 }
 
@@ -2098,8 +2211,8 @@ function animarHoyoBola(dt) {
 const DIR_CAM = new THREE.Vector3(-Math.sin(AZIMUT) * Math.cos(ELEVACION), Math.sin(ELEVACION), Math.cos(AZIMUT) * Math.cos(ELEVACION));
 
 /** Cámara que deja todos los puntos dentro de la pantalla (con márgenes para el HUD). */
-function encuadrarPuntos(pts, cx, cz) {
-    const dir = DIR_CAM;
+function encuadrarPuntos(pts, cx, cz, dir) {
+    dir = dir || DIR_CAM;
     const r = E.host.getBoundingClientRect();
     const cam = E.camera;
     cam.aspect = Math.max(0.5, r.width / Math.max(1, r.height));
@@ -2144,7 +2257,7 @@ function encuadrarPuntos(pts, cx, cz) {
     return { pos: cam.position.clone(), mira: mira.clone() };
 }
 
-function encuadre(nv) {
+function encuadre(nv, giro) {
     const pts = [];
     nv.borde.forEach(function (p) { pts.push(new THREE.Vector3(p[0], 0, p[1]), new THREE.Vector3(p[0], ALTO_PARED, p[1])); });
     nv.molinos.forEach(function (m) { pts.push(new THREE.Vector3(m.x, m.decorativo ? 2.2 : 2.4, m.z)); });
@@ -2152,7 +2265,7 @@ function encuadre(nv) {
     pts.push(new THREE.Vector3(ho.x, 1.4, ho.z));
     let cx = 0, cz = 0;
     nv.borde.forEach(function (p) { cx += p[0]; cz += p[1]; });
-    return encuadrarPuntos(pts, cx / nv.borde.length, cz / nv.borde.length);
+    return encuadrarPuntos(pts, cx / nv.borde.length, cz / nv.borde.length, giro ? DIR_CAM.clone().applyAxisAngle(EJE_Y, giro) : DIR_CAM);
 }
 
 /**
@@ -2179,7 +2292,8 @@ function objetivoSeguir() {
 }
 
 function camaraEn(mira) {
-    return { pos: mira.clone().add(E.ofsSeguir), mira: mira.clone() };
+    const ofs = E.giro ? E.ofsSeguir.clone().applyAxisAngle(EJE_Y, E.giro) : E.ofsSeguir;
+    return { pos: mira.clone().add(ofs), mira: mira.clone() };
 }
 
 function aplicarCamara(dt) {
@@ -2188,8 +2302,19 @@ function aplicarCamara(dt) {
         const tw = E.camTween;
         tw.t += dt;
         const u = suave((tw.t - (tw.espera || 0)) / tw.dur);
-        E.camAct.pos.lerpVectors(tw.desde.pos, E.camObj.pos, u);
         E.camAct.mira.lerpVectors(tw.desde.mira, E.camObj.mira, u);
+        if (tw.arco) {
+            // giro alrededor de la mira: ángulo, distancia y altura por separado (no corta por dentro del campo)
+            const o0 = tw.desde.pos.clone().sub(tw.desde.mira), o1 = E.camObj.pos.clone().sub(E.camObj.mira);
+            const a0 = Math.atan2(o0.x, o0.z);
+            let da = Math.atan2(o1.x, o1.z) - a0;
+            while (da > Math.PI) da -= Math.PI * 2;
+            while (da < -Math.PI) da += Math.PI * 2;
+            const a = a0 + da * u, h = lerp(Math.hypot(o0.x, o0.z), Math.hypot(o1.x, o1.z), u);
+            E.camAct.pos.set(E.camAct.mira.x + Math.sin(a) * h, E.camAct.mira.y + lerp(o0.y, o1.y, u), E.camAct.mira.z + Math.cos(a) * h);
+        } else {
+            E.camAct.pos.lerpVectors(tw.desde.pos, E.camObj.pos, u);
+        }
         if (tw.t >= tw.dur + (tw.espera || 0)) {
             E.camTween = null;
             if (E.seguir) E.miraSeguir = E.camAct.mira.clone();
@@ -2199,6 +2324,9 @@ function aplicarCamara(dt) {
         if (E.estado !== "apuntando") {
             const k = 1 - Math.exp(-dt * (E.estado === "rodando" ? 3.2 : 2));
             E.miraSeguir.lerp(objetivoSeguir(), k);
+            // giro hacia el lado desde donde se ve la pelota (nunca mientras se apunta)
+            E.giro = lerp(E.giro || 0, E.giroObj || 0, 1 - Math.exp(-dt * (reducido ? 8 : 2.6)));
+            if (Math.abs(E.giro - (E.giroObj || 0)) < 1e-3) E.giro = E.giroObj || 0;
         }
         E.camAct = camaraEn(E.miraSeguir);
     }
@@ -2275,7 +2403,7 @@ function reacomodar() {
             E.camObj = camaraEn(E.miraSeguir || objetivoSeguir());
             if (!E.camTween) E.camAct = camaraEn(E.miraSeguir || objetivoSeguir());
         } else {
-            const c = encuadre(E.nv);
+            const c = encuadre(E.nv, E.giroObj || 0);
             E.camObj = c;
             if (!E.camTween) E.camAct = { pos: c.pos.clone(), mira: c.mira.clone() };
         }
@@ -2441,6 +2569,8 @@ function tick() {
     ES.actualizar(dt);
     CF.actualizar(dt);
     aplicarCamara(dt);
+    E.camera.updateMatrixWorld();
+    vigilarTapada(dt);
     acompanarSol();
     flechaHoyo();
     vigilarQuieto();
@@ -2607,6 +2737,8 @@ function montar(host, cfg) {
 /** Carga un nivel (preparado por ReglasGolf.prepararNivel): rehace el campo, el molino, el hoyo y los adornos. */
 function cargar(nv, ronda, opciones) {
     E.margenX = opciones && opciones.presentacion ? 0.58 : 0.86;
+    E.presentacion = !!(opciones && opciones.presentacion);
+    E.giro = E.giroObj = 0;
     if (C.grupo) {
         E.scene.remove(C.grupo);
         liberar(C.grupo);
@@ -2655,6 +2787,7 @@ function cargar(nv, ronda, opciones) {
     });
     C.hoyo = crearHoyo(nv);
     g.add(C.hoyo);
+    recogerTapas();
     crearAdornos(nv, g);
     // centro y radio para luces, confeti y sombras
     let cx = 0, cz = 0;
@@ -2982,8 +3115,7 @@ window.EscenarioGolf = {
     aPantalla: aPantalla,
     puntoPelota: function () { return E.bola ? pantallaPelota() : null; },
     estado: function () { return { estado: E.estado, tFis: E.tFis, bola: E.bola ? { x: E.bola.x, z: E.bola.z, vx: E.bola.vx, vz: E.bola.vz } : null, demo: E.demo, entrada: E.entrada, pausado: E.pausado }; },
-    nivel: function () { return E.nv; },
-    prediccion: function () { return E.pred; },
+    nivel: function () { return E.nv; },    prediccion: function () { return E.pred; },
     /** Pruebas: golpe directo con ángulo (rad) y tensión (0..1), como si el niño soltara. */
     golpear: function (ang, T) {
         if (E.estado !== "listo") return false;

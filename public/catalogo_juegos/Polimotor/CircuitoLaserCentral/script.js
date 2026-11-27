@@ -722,7 +722,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.CircuitoDemo && demoCirc) {
         enDemo = true;
         try {
-            await window.CircuitoDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.CircuitoDemo.correr, apiDemo()) : window.CircuitoDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[Circuito] demo", e);
         }

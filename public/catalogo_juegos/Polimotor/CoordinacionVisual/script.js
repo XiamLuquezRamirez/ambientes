@@ -701,7 +701,30 @@
         return Promise.resolve();
     }
 
+    /* Botón «Omitir demo» (comun/omitir-demo.js) mientras corre el recorrido de demostración. */
+    let omitirDemoCtl = null;
+
+    function quitarBotonOmitir() {
+        if (!omitirDemoCtl) return;
+        const c = omitirDemoCtl;
+        omitirDemoCtl = null;
+        c.ocultar();
+    }
+
+    /** Omitir: la pelota de la demo se detiene, el personaje se va y se pasa al primer recorrido real. */
+    function omitirDemostracion() {
+        pausarAnimacionDemo();
+        demoVozPromise = null;
+        ocultarPersonajeTutorial3d();
+        pelotaVisible = false;
+        posicionarPelotaDom();
+        programarRedibujo();
+        quitarBotonOmitir();
+        if (!juegoTerminado && esRecorridoDemo()) avanzarRecorrido();
+    }
+
     function detenerDemostracion() {
+        quitarBotonOmitir();
         demoActiva = false;
         demoVozPromise = null;
         if (demoRafId != null) {
@@ -764,6 +787,7 @@
     }
 
     function completarDemostracion() {
+        quitarBotonOmitir();
         if (esperandoFeedback || juegoTerminado) return;
         esperandoFeedback = true;
         // Para la pelota, pero el personaje se queda hasta el final y luego se va.
@@ -840,6 +864,7 @@
         }
         demoActiva = true;
         document.body.classList.add("demo-activa");
+        if (window.PedniaOmitirDemo) omitirDemoCtl = window.PedniaOmitirDemo.mostrar(omitirDemostracion);
 
         const msg = textos().demostracion ||
             "¡Vamos a un tutorial! Mira cómo se hace: la pelota sigue la línea hasta la canasta.";

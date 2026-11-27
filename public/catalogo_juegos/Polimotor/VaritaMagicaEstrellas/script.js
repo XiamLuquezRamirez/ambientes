@@ -517,7 +517,7 @@ async function entrar(i, opciones) {
             if (!vivo(tk)) return;
             if (demoOn) {
                 var voz = decir(textos().demoZeus, "zeus", "senala", 6000);
-                await Promise.all([demoConMano(e, tk), voz]);
+                await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.esperar(Promise.all([demoConMano(e, tk), voz])) : Promise.all([demoConMano(e, tk), voz]));
                 if (!vivo(tk)) return;
             }
             zeus(false);
@@ -528,7 +528,7 @@ async function entrar(i, opciones) {
         } else {
             // demostración breve de cada cielo mientras se dice la instrucción del nivel
             var habla = decir(cielo().instruccion, cielo().voz === "zeus" ? "zeus" : "zoe", "senala", 6500);
-            if (demoOn) await Promise.all([demoConMano(e, tk), habla]);
+            if (demoOn) await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.esperar(Promise.all([demoConMano(e, tk), habla])) : Promise.all([demoConMano(e, tk), habla]));
             else await habla;
             if (!vivo(tk)) return;
         }

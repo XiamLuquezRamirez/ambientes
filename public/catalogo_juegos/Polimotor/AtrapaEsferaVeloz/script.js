@@ -728,7 +728,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.EsferaDemo && escenario()) {
         enDemo = true;
         try {
-            await window.EsferaDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.EsferaDemo.correr, apiDemo()) : window.EsferaDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[AtrapaEsfera] demo", e);
         }

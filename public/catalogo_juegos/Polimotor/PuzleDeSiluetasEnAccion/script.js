@@ -494,7 +494,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.SiluetasDemo) {
         enDemo = true;
         try {
-            await window.SiluetasDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.SiluetasDemo.correr, apiDemo()) : window.SiluetasDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[Siluetas] demo", e);
         }

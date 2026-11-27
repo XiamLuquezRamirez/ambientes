@@ -474,7 +474,7 @@ async function entrar(i, opciones) {
                 await zeus(true);
                 if (!vivo(tk)) return;
                 enDemo = true;
-                await window.TrenDemo.correr(apiDemo(tk));
+                await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.TrenDemo.correr, apiDemo(tk)) : window.TrenDemo.correr(apiDemo(tk)));
                 enDemo = false;
                 if (window.PedniaTutorial) window.PedniaTutorial.quitarManos();
                 if (!vivo(tk)) return;

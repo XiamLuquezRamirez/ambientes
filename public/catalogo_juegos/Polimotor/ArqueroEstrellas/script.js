@@ -640,7 +640,14 @@ async function entrar(i, opciones) {
             if (!vivo(tk)) return;
             var voz = decir(textos().introZoe, "zoe", "saluda", 15000);
             if (demoOn) {
-                await Promise.all([demoConMano(e, tk), voz]);
+                // «Omitir demo» (comun/omitir-demo.js): cargar de nuevo el nivel corta la demo de la escena
+                var omitirD = window.PedniaOmitirDemo ? window.PedniaOmitirDemo.mostrar(function () {
+                    pintarPuntos(0, true);
+                    e.cargar(partida[nivelIdx], ronda());
+                }) : null;
+                var demoP = Promise.all([demoConMano(e, tk), voz]);
+                await (omitirD ? omitirD.esperar(demoP) : demoP);
+                if (omitirD) omitirD.ocultar();
             } else {
                 await voz;
             }

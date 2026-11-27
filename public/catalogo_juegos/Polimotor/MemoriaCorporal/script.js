@@ -923,7 +923,7 @@ async function correrDemoMemoria() {
     const caja = document.getElementById("secuencia");
     const ops = document.getElementById("opciones");
     setEnunciado(textos().demostracion);
-    await PedniaTutorial.correr({
+    await (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(PedniaTutorial.correr, {
         texto: textos().demostracion,
         textoFin: textos().demostracionFin,
         cancelado: function () { return !!juegoTerminado; },

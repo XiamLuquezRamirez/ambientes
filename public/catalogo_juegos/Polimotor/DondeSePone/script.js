@@ -652,7 +652,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.DondeDemo) {
         enDemo = true;
         try {
-            await window.DondeDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.DondeDemo.correr, apiDemo()) : window.DondeDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[DondeSePone] demo", e);
         }

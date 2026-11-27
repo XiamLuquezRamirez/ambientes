@@ -443,7 +443,7 @@ async function entrar(i, opciones) {
             if (!vivo(tk)) return;
             if (o.demo && acc().mostrarIntro !== false && window.TuberiaDemo) {
                 enDemo = true;
-                await window.TuberiaDemo.correr(apiDemo(tk));
+                await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.TuberiaDemo.correr, apiDemo(tk)) : window.TuberiaDemo.correr(apiDemo(tk)));
                 enDemo = false;
                 if (window.PedniaTutorial) window.PedniaTutorial.quitarManos();
                 if (!vivo(tk)) return;

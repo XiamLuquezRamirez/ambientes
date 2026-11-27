@@ -774,7 +774,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.TiroDemo) {
         enDemo = true;
         try {
-            await window.TiroDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.TiroDemo.correr, apiDemo()) : window.TiroDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[TiroBlanco] demo", e);
         }

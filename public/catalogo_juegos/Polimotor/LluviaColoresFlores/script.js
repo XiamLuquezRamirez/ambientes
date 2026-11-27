@@ -538,7 +538,7 @@ async function entrar(i, opciones) {
             if (!vivo(tk)) return;
             if (demoOn) {
                 var voz = decir(textos().demoZeus, "zeus", "senala", 6000);
-                await Promise.all([demoConMano(e, tk), voz]);
+                await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.esperar(Promise.all([demoConMano(e, tk), voz])) : Promise.all([demoConMano(e, tk), voz]));
                 if (!vivo(tk)) return;
             }
             zeus(false);

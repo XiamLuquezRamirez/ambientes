@@ -484,7 +484,7 @@ async function entrar(i, opciones) {
             if (!vivo(tk)) return;
             enDemo = true;
             document.body.classList.add("demo-lock");
-            await window.EstacionDemo.correr(apiDemo(tk));
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.EstacionDemo.correr, apiDemo(tk)) : window.EstacionDemo.correr(apiDemo(tk)));
             enDemo = false;
             document.body.classList.remove("demo-lock");
             if (window.PedniaTutorial) window.PedniaTutorial.quitarManos();

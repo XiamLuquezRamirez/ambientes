@@ -531,7 +531,7 @@ async function iniciarJuego() {
     if (acc().mostrarIntro && window.LinternaDemo) {
         enDemo = true;
         try {
-            await window.LinternaDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.LinternaDemo.correr, apiDemo()) : window.LinternaDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[Linterna] demo", e);
         }

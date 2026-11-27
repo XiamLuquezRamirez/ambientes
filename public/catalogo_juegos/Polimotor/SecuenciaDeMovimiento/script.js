@@ -811,7 +811,7 @@
         if (prog) prog.hidden = true;
         limpiarEscena();
         aceptaRespuesta = false;
-        await PedniaTutorial.correr({
+        await (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(PedniaTutorial.correr, {
             texto: textos().demostracion,
             textoFin: textos().demostracionFin,
             cancelado: function () { return gen !== retoGen || juegoTerminado; },

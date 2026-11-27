@@ -132,7 +132,8 @@
         campana(1567.98, 0.02, 0.03, 0.3);
     }
 
-    // Energía acumulada: zumbido que sube con la fuerza mientras se mantiene el arrastre (sin perder tensión).
+    // Energía acumulada: zumbido grave y suave que sube con la fuerza mientras se mantiene el arrastre. Va por un
+    // filtro pasa bajos y sube solo una octava, para que con la fuerza máxima no se vuelva un pitido.
     var hum = null, ultimaT = 0;
 
     function tension(T) {
@@ -140,24 +141,29 @@
         T = Math.max(0, Math.min(1, Number(T) || 0));
         var t = ahora();
         if (!hum) {
-            var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
+            var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = ctx.createGain();
             o1.type = "sine";
-            o2.type = "triangle";
-            o1.frequency.value = 200;
-            o2.frequency.value = 401;
+            o2.type = "sine";
+            o1.frequency.value = 110;
+            o2.frequency.value = 165;
+            f.type = "lowpass";
+            f.frequency.value = 700;
+            f.Q.value = 0.5;
             g.gain.setValueAtTime(0.0001, t);
-            o1.connect(g);
-            o2.connect(g);
+            o1.connect(f);
+            o2.connect(f);
+            f.connect(g);
             g.connect(busEfectos);
             o1.start(t);
             o2.start(t);
             hum = { o1: o1, o2: o2, g: g };
         }
-        hum.o1.frequency.setTargetAtTime(200 + 420 * T, t, 0.05);
-        hum.o2.frequency.setTargetAtTime(401 + 840 * T, t, 0.05);
-        hum.g.gain.setTargetAtTime(T < 0.02 ? 0.0001 : 0.01 + 0.028 * T, t, 0.06);
+        hum.o1.frequency.setTargetAtTime(110 + 110 * T, t, 0.08);
+        hum.o2.frequency.setTargetAtTime(165 + 165 * T, t, 0.08);
+        hum.g.gain.setTargetAtTime(T < 0.02 ? 0.0001 : 0.012 + 0.02 * T, t, 0.08);
         if (Math.abs(T - ultimaT) > 0.1) {
-            if (libre("chispa", 80)) tono("sine", 1200 + 900 * T, 1100 + 900 * T, 0.04, 0.012 + 0.01 * T);
+            // "tic" suave de madera a cada décimo de fuerza (antes era un destello agudo)
+            if (libre("chispa", 80)) tono("triangle", 330 + 220 * T, 300 + 200 * T, 0.05, 0.012);
             ultimaT = T;
         }
     }
@@ -174,8 +180,8 @@
     /** Fuerza máxima: "ding" brillante. */
     function alTope() {
         if (!libre("alTope", 400)) return;
-        campana(1567.98, 0.04, 0, 0.45);
-        tono("sine", 2093, 2093, 0.2, 0.012, 0.05);
+        campana(783.99, 0.035, 0, 0.45);
+        tono("sine", 523.25, 523.25, 0.2, 0.012, 0.05);
     }
 
     /** La pelota vuelve a reposo sin golpe. */

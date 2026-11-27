@@ -625,7 +625,7 @@
                     aceptaArrastre = false;
                     PedniaArrastrePhaser.setInteractivo(false);
                     return PedniaArrastrePhaser.cargarRonda(["manzana"], ["caja_manzana"]).then(function () {
-                        return PedniaTutorial.correr({
+                        return (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(PedniaTutorial.correr, {
                             texto: textos().demostracion,
                             textoFin: textos().demostracionFin,
                             cancelado: function () { return juegoTerminado; },

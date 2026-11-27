@@ -405,7 +405,7 @@ async function entrarNivel(i, opciones) {
         if (conDemo) {
             enDemo = true;
             document.body.classList.add("demo-lock");
-            try { await window.CanastaDemo.correr(apiDemo(tk)); }
+            try { await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.CanastaDemo.correr, apiDemo(tk)) : window.CanastaDemo.correr(apiDemo(tk))); }
             catch (err) { console.warn("[Canasta] demo", err); }
             enDemo = false;
             document.body.classList.remove("demo-lock");

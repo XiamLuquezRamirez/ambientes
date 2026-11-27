@@ -488,7 +488,7 @@ function iniciarEscenario() {
     if (acc().mostrarIntro && window.PedniaTutorial) {
         const prog = document.getElementById("progreso");
         if (prog) prog.hidden = true;
-        PedniaTutorial.correr({
+        (window.PedniaOmitirDemo || { correr: function (f, a) { return f(a); } }).correr(PedniaTutorial.correr, {
             texto: (gameConfig.textos && gameConfig.textos.demostracion) || "",
             textoFin: (gameConfig.textos && gameConfig.textos.demostracionFin) || "",
             onTexto: function (t) {

@@ -520,7 +520,7 @@ async function iniciarJuego() {
         enDemo = true;
         ajustarPersonajeDemo();
         try {
-            await window.EspejoDemo.correr(apiDemo());
+            await (window.PedniaOmitirDemo ? window.PedniaOmitirDemo.correr(window.EspejoDemo.correr, apiDemo()) : window.EspejoDemo.correr(apiDemo()));
         } catch (e) {
             console.warn("[Espejo] demo", e);
         }
