@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>El Mini Golf Mágico</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" href="../../../assets/css/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../../assets/css/fontawesome/css/all.min.css">
+	<link rel="stylesheet" href="../../../assets/css/sweetalert2.min.css">
+	<script src="../../../assets/js/jquery-4.0.0.min.js"></script>
+	<script src="../../../assets/js/sweetalert.js"></script>
+	<link rel="stylesheet" href="../comun/inicio-fondo.css?v=20261030d">
+	<script src="../comun/inicio-fondo.js?v=20261030d"></script>
+	<script src="../comun/inicio-puertas.js?v=20261125h" data-transicion="acercamiento"></script>
+	<script src="../comun/volumen.js?v=20261123vol6"></script>
+	<link rel="stylesheet" href="../../intro3d/css/intro.css">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261005a">
+	<link rel="stylesheet" href="../../final/final.css">
+	<link rel="stylesheet" href="style.css?v=20261127e">
+	<link rel="stylesheet" href="../comun/interfaz.css?v=20261022o">
+	<link rel="stylesheet" href="../comun/inicio-puertas.css?v=20261125h">
+</head>
+<body class="esperando-inicio">
+
+	<div id="pantalla-inicio" class="pantalla-inicio">
+		<button type="button" id="btn-inicio-volver" class="inicio-volver" hidden>
+			<img src="../../../assets/images/selector-aula/volver.png" alt="Volver">
+		</button>
+		<div class="inicio-mancha" aria-hidden="true"></div>
+		<div class="inicio-contenido">
+			<img class="inicio-icono" src="mini-golf-magico.svg" alt="" aria-hidden="true">
+			<p class="inicio-kicker">El Mini Golf Mágico</p>
+			<button type="button" id="btn-empecemos" class="btn-empecemos">
+				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
+				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
+				<span class="btn-empecemos-texto">¡Empecemos!</span>
+			</button>
+		</div>
+	</div>
+
+	<div id="intro3d-root" hidden>
+		<div id="three-container"></div>
+		<div id="phaser-container"></div>
+		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;">
+			Omitir <i class="fa fa-forward" aria-hidden="true"></i>
+		</button>
+		<div id="intro3d-continuar" hidden>
+			<div class="intro3d-continuar-card">
+				<div class="intro3d-titulo-wrap">
+					<span class="intro3d-ray intro3d-ray-l1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l3" aria-hidden="true"></span>
+					<h2>¡Listo!</h2>
+					<span class="intro3d-ray intro3d-ray-r1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r3" aria-hidden="true"></span>
+				</div>
+				<p>Toca el botón para empezar el juego</p>
+				<div class="intro3d-btn-wrap">
+					<span class="intro3d-ray intro3d-ray-bl1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-bl2" aria-hidden="true"></span>
+					<button type="button" id="btn-continuar-intro3d">
+						<span class="intro3d-btn-shine" aria-hidden="true"></span>
+						<span class="intro3d-play" aria-hidden="true"></span>
+						<span>CONTINUAR</span>
+					</button>
+					<span class="intro3d-ray intro3d-ray-br1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-br2" aria-hidden="true"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="principal">
+		<!-- Campo de mini golf en una isla espacial: césped con pendientes, molino con aspas, pared curva y hoyo dorado (three.js). -->
+		<div id="escenario" class="escenario" role="application" aria-label="Mini golf espacial: toca la pelota, arrastra tu dedo hacia atrás para elegir la fuerza y la dirección y suelta para golpearla hasta el hoyo dorado"></div>
+
+		<!-- Arriba a la izquierda: nivel, progreso de los cuatro niveles y objetivo pendiente. -->
+		<div id="nivel-ind" class="nivel-ind" aria-label="Nivel">
+			<span class="nivel-etq">Nivel <b id="nivel-num">1</b>
+				<span class="nivel-estrellas" aria-hidden="true"><i class="fa-solid fa-star nivel-estrella"></i><i class="fa-solid fa-star nivel-estrella"></i><i class="fa-solid fa-star nivel-estrella"></i><i class="fa-solid fa-star nivel-estrella"></i></span>
+			</span>
+			<span id="titulo-nivel" class="nivel-nombre"></span>
+			<span id="mundo-nivel" class="nivel-mundo"></span>
+			<span id="objetivo" class="objetivo"><i class="fa-solid fa-flag" aria-hidden="true"></i> Hoyo dorado</span>
+		</div>
+
+		<!-- Arriba a la derecha (debajo de reiniciar y salir): golpes del nivel. -->
+		<div id="golpes" class="golpes" aria-live="polite">
+			<i class="fa-solid fa-golf-ball-tee golpes-icono" aria-hidden="true"></i>
+			<span class="golpes-etq">GOLPES</span>
+			<b id="golpes-num" class="golpes-num">0</b>
+		</div>
+
+		<!-- Abajo al centro: indicador de fuerza (sin números: tres zonas de color). -->
+		<div id="fuerza" class="fuerza" aria-hidden="true">
+			<span class="fuerza-titulo"><i class="fa-solid fa-bolt"></i> FUERZA</span>
+			<div class="fuerza-barra">
+				<div id="fuerza-relleno" class="fuerza-relleno"></div>
+				<span class="fuerza-corte c1"></span><span class="fuerza-corte c2"></span>
+			</div>
+			<div class="fuerza-zonas"><span class="z-suave"><i class="fa-solid fa-feather"></i> SUAVE</span><span class="z-media"><i class="fa-solid fa-hand-fist"></i> MEDIA</span><span class="z-potente"><i class="fa-solid fa-bolt"></i> POTENTE</span></div>
+		</div>
+
+		<!-- Zoe y Zeus 3D: presentación y celebración final. -->
+		<aside id="guia" class="guia" aria-live="polite">
+			<div class="guia-pj">
+				<img id="guia-img" src="../../img/zoe_normal.gif" alt="">
+				<div id="zoe-nube" class="nube" hidden><b class="nube-nombre">Zoe</b><span id="zoe-nube-texto"></span></div>
+			</div>
+		</aside>
+		<aside id="guia-zeus" class="guia-zeus">
+			<div class="guia-pj">
+				<img id="guia-zeus-img" src="../../img/zeus_normal.gif" alt="">
+				<div id="zeus-nube" class="nube" hidden><b class="nube-nombre">Zeus</b><span id="zeus-nube-texto"></span></div>
+			</div>
+		</aside>
+	</div>
+
+	<div class="controles-arriba hud-nav">
+		<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+		<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
+	</div>
+
+	<div id="pista" hidden>
+		<img id="pista-cara" src="../../img/zoe_normal.gif" alt="">
+		<p><b id="pista-nombre">Zoe</b><span id="pista-texto"></span></p>
+	</div>
+
+	<div id="cartel" class="cartel" hidden>
+		<span id="cartel-etiqueta" class="cartel-etiqueta"></span>
+		<strong id="cartel-titulo"></strong>
+		<span id="cartel-sub" class="cartel-sub"></span>
+		<span id="cartel-estrellas" class="cartel-estrellas" aria-hidden="true"></span>
+	</div>
+
+	<!-- Gran final: «¡HOYO EN UNO ESPECTACULAR! ¡ERES UN GRAN GOLFISTA ESPACIAL!» con el resumen real del recorrido. -->
+	<div id="mensaje-final" class="mensaje-final" hidden>
+		<h1 id="mensaje-final-titulo"></h1>
+		<p id="mensaje-final-sub"></p>
+		<div class="final-datos">
+			<span><i class="fa-solid fa-flag" aria-hidden="true"></i> Niveles: <b id="final-niveles">0</b></span>
+			<span><i class="fa-solid fa-golf-ball-tee" aria-hidden="true"></i> Golpes: <b id="final-golpes">0</b></span>
+			<span><i class="fa-solid fa-fan" aria-hidden="true"></i> Obstáculos superados: <b id="final-obstaculos">0</b></span>
+			<span><i class="fa-solid fa-star" aria-hidden="true"></i> Estrellas: <b id="final-estrellas">0</b></span>
+			<span><i class="fa-solid fa-trophy" aria-hidden="true"></i> Trofeo de oro</span>
+		</div>
+	</div>
+
+	<div id="comenzar-wrap" class="comenzar-wrap" hidden>
+		<button type="button" id="btn-comenzar" class="btn-comenzar"><i class="fa-solid fa-play"></i><span class="btn-comenzar-texto">EMPEZAR</span></button>
+	</div>
+
+	<!-- Abajo a la derecha: accesibilidad y volumen. -->
+	<div id="menu-acc" class="control-flotante">
+		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
+			<i class="fa-solid fa-universal-access"></i>
+		</button>
+		<div id="menu-acc-panel" class="panel-flotante" hidden>
+			<div class="panel-cab">
+				<strong>Accesibilidad</strong>
+				<button type="button" id="btn-cerrar-menu-acc" class="panel-cerrar" aria-label="Cerrar">&times;</button>
+			</div>
+			<div id="menu-acc-ops" class="panel-ops"></div>
+		</div>
+	</div>
+
+	<div id="menu-vol" class="control-flotante">
+		<button type="button" id="btn-menu-vol" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-vol-panel" title="Sonido">
+			<i class="fa-solid fa-volume-high"></i>
+		</button>
+		<div id="menu-vol-panel" class="panel-flotante" hidden>
+			<div class="panel-cab">
+				<strong>Sonido</strong>
+				<button type="button" id="btn-cerrar-menu-vol" class="panel-cerrar" aria-label="Cerrar">&times;</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Victoria compartida (final/final.js). -->
+	<div id="final" class="final" hidden>
+		<div id="victoria">
+			<img src="../../img/fondo.png" class="fondo" alt="">
+			<div class="contenido">
+				<img src="../../img/excelente.png" class="excelente" alt="¡Excelente!">
+				<p class="texto-final" id="texto_final"></p>
+				<img src="../../img/trofeo.png" class="trofeo" alt="">
+				<img src="../../img/zeus_normal.gif" class="personaje zeus" alt="">
+				<img src="../../img/zoe_normal.gif" class="personaje zoe" alt="">
+				<div class="destello destello-1"></div>
+				<div class="destello destello-2"></div>
+				<div class="destello destello-3"></div>
+			</div>
+			<img src="../../img/cortina_izq.png" class="cortina cortina-izq" alt="">
+			<img src="../../img/cortina_der.png" class="cortina cortina-der" alt="">
+			<div class="confeti" id="confeti"></div>
+		</div>
+		<div class="final-acciones" id="final-acciones">
+			<p class="final-pregunta">¿Quieres jugar nuevamente?</p>
+			<div class="final-botones">
+				<button type="button" class="btn btn-success" onclick="window.location.reload(1)"><i class="fa-solid fa-play"></i> Sí</button>
+				<button type="button" class="btn btn-danger" onclick="history.back()"><i class="fa-solid fa-home"></i> No</button>
+			</div>
+		</div>
+	</div>
+
+
+	<script src="../../texto_voz.js?v=20261119vol"></script>
+	<script src="../../shared/edad-nivel.js"></script>
+	<script src="../../../assets/vendor/phaser/phaser.min.js"></script>
+	<script src="../../intro3d/js/config.js?v=20261007a"></script>
+	<script src="../../intro3d/js/ambientes-tema.js?v=20261105a"></script>
+	<script type="importmap">
+	{
+	  "imports": {
+	    "three": "../../../assets/vendor/three/three.module.js",
+	    "three/addons/": "../../../assets/vendor/three/addons/"
+	  }
+	}
+	</script>
+	<script type="module" src="../../intro3d/js/three-scene.js?v=20261105a"></script>
+	<script type="module" src="../../intro3d/js/final-scene.js?v=20261105a"></script>
+	<script src="../../tutorial/tutorial.js?v=20261019c"></script>
+	<script src="../../intro3d/js/intro.js?v=20261028p4"></script>
+	<script src="../../shared/aplicar-perfil-juego.js?v=20261013a"></script>
+	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
+	<script src="reglas.js?v=20261127e"></script>
+	<script src="sonidos.js?v=20261127a"></script>
+	<script type="module" src="escena-golf.js?v=20261127e"></script>
+	<script src="../../final/final.js?v=20261120h"></script>
+	<script src="script.js?v=20261127e"></script>
+	<script type="module" src="guia-3d.js?v=20261127a"></script>
+</body>
+</html>
