@@ -21,8 +21,19 @@
         return d1 * d2 < 0 && d3 * d4 < 0;
     }
 
+    // Arte del diseñador: fondo del granero (1280x720; viga principal y 102-138, paja desde y≈568) y marco colgante
+    // (lienzo de 350.83x500: cuerda arriba, cuerpo 318 de ancho con centro en 175.4, 331.5 y panel blanco útil).
+    var ARTE = { w: 1280, h: 720, viga: 132, suelo: 640 };
+    var CUADRO = { w: 350.83, h: 500, cx: 175.4, cy: 331.5, cuerpo: 318, arriba: 319.5, img: [6, -1] };
+
     var escena = {
+        precargar: function () {
+            if (!this.textures.exists('cd_fondo')) this.load.svg('cd_fondo', 'img/diseno/fondo.svg', { width: 1280, height: 720 });
+            if (!this.textures.exists('cd_cuadro')) this.load.svg('cd_cuadro', 'img/diseno/cuadro.svg', { width: 526, height: 750 });
+        },
+
         iniciar: function () {
+            this.cortes = [];
             this.cosas = [];
             this.reunidos = [];
             this.trazo = null;
@@ -42,15 +53,27 @@
             L.der = L.pres ? W - 168 : W - 16;
             L.viga = Math.round(H * 0.17);
             L.suelo = Math.round(H * 0.86);
+            if (this.arteOk) { L.viga = Math.round(ARTE.viga * H / ARTE.h); L.suelo = Math.round(ARTE.suelo * H / ARTE.h); }
             L.tam = Math.max(86, Math.min(140, (L.der - 60) / 4.4, H * 0.2));
-            L.largo = Math.round(H * 0.2);
+            L.largo = Math.round(H * (this.arteOk ? 0.1 : 0.2));
             L.bocina = { x: 48, y: Math.round(H * 0.3), r: Math.max(24, Math.min(32, hueco * 0.28)) };
             return L;
         },
 
         armar: function (reubicar) {
+            this.arteOk = this.textures.exists('cd_fondo') && this.textures.exists('cd_cuadro') && this.scale.width >= 900;
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            if (this.arteOk) {
+                keep(this.add.image(0, 0, 'cd_fondo').setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(1));
+                this.rayosG = keep(this.add.graphics().setDepth(2));
+                this.sogasG = keep(this.add.graphics().setDepth(12));
+                this.trazoG = keep(this.add.graphics().setDepth(80));
+                this.montarHud(keep);
+                this.sembrarMotes(keep, 26, { x: 0, y: L.viga, w: L.W, h: L.suelo - L.viga, depth: 7 }, 0xffe9a8);
+                if (reubicar) this.ubicarCosas();
+                return;
+            }
             K.textura(this, 'cuerda_fondo', L.W, L.H, function (x, w, h) {
                 K.madera(x, 0, 0, w, h, { claro: '#c58b4f', medio: '#a96d34', oscuro: '#8a5524', r: 0 });
                 // tablones verticales con juntas
@@ -84,7 +107,7 @@
             var L = this.L;
             var x0 = 90, disp = L.der - x0 - 40;
             var out = [];
-            for (var i = 0; i < n; i++) out.push({ x: x0 + disp * (i + 0.5) / n, y: L.viga + L.largo + (i % 2 ? L.tam * 0.25 : 0) + L.tam * 0.5 });
+            for (var i = 0; i < n; i++) out.push({ x: x0 + disp * (i + 0.5) / n, y: L.viga + L.largo + (i % 2 ? L.tam * 0.25 : 0) + (this.arteOk ? L.tam * 1.0 : L.tam * 0.5) });
             return out;
         },
 
@@ -94,6 +117,18 @@
         },
 
         crearCaja: function (id, i, lug, tam) {
+            if (this.arteOk) {
+                // Marco colgante del diseño: la cuerda corta de arriba viaja con la caja; el animal va en el panel blanco.
+                var k = tam / CUADRO.cuerpo, b = this.crearCosa(id, lug.x, lug.y - 120, tam * 0.7, { depth: 30, sinSombra: true });
+                var fr = this.add.image(0, 0, 'cd_cuadro').setOrigin(CUADRO.cx / CUADRO.w, CUADRO.cy / CUADRO.h).setDisplaySize(CUADRO.w * k, CUADRO.h * k);
+                b.cont.addAt(fr, 0);
+                b.img.setPosition(CUADRO.img[0] * k, CUADRO.img[1] * k);
+                b.arriba = CUADRO.arriba * k;
+                b.tam = tam; b.x0 = lug.x; b.casa = { x: lug.x, y: lug.y }; b.prof = 30; b.fase2 = Math.random() * 6;
+                b.cortada = false;
+                b.cont.setAlpha(0);
+                return b;
+            }
             var a = this.crearCosa(id, lug.x, lug.y - 120, tam * 0.62, { depth: 30, sinSombra: true });
             var g = this.add.graphics();
             var t = tam;
@@ -138,7 +173,7 @@
 
         extremos: function (a) {
             var L = this.L;
-            return { a: { x: a.x0, y: L.viga + 8 }, b: { x: a.cont.x, y: a.cont.y - a.tam * 0.5 } };
+            return { a: { x: a.x0, y: L.viga + 8 }, b: { x: a.cont.x, y: a.cont.y - a.tam * 0.45 } };
         },
 
         alTocar: function (p) { if (this.fase === 'jugar') this.trazo = { x: p.x, y: p.y }; },
@@ -165,10 +200,12 @@
             a.cortada = true;
             K.tono({ f: 1400, f2: 500, dur: 0.12, vol: 0.06, tipo: 'sawtooth' });
             Ut.estallido(this, a.cont.x, a.cont.y - a.tam * 0.7, { n: 6, tex: 'chispa', tam: 16, dist: 50, depth: 60, sinTinte: true });
+            // El cabo que queda en la viga se balancea y se desvanece.
+            this.cortes.push({ x: a.x0, t0: this.time.now, tope: a.arriba ? a.cont.y - a.arriba : null });
             a.cont.setDepth(40);
             await tw(this, { targets: a.cont, y: this.L.suelo - a.tam * 0.5, angle: a.cont.x < this.L.der / 2 ? -8 : 8, duration: 520, ease: 'Bounce.easeOut' });
             this.cameras.main.shake(100, 0.003);
-            Ut.estallido(this, a.cont.x, this.L.suelo, { n: 8, tex: 'humo', tam: 26, dist: 60, depth: 50 });
+            Ut.estallido(this, a.cont.x, this.L.suelo, this.arteOk ? { n: 12, tex: 'humo', tam: 24, dist: 70, depth: 50, colores: [0xe9c46a, 0xf3d98a, 0xd9a93a] } : { n: 8, tex: 'humo', tam: 26, dist: 60, depth: 50 });
             this.cajaActual = a;
             var ok = await this.elegir(a.id, { x: a.cont.x, y: a.cont.y });
             if (ok === false) await this.colgarDeNuevo(a);
@@ -258,6 +295,17 @@
         paso: function (time) {
             var L = this.L, self = this;
             var g = this.sogasG;
+            var rg = this.rayosG;
+            if (rg && rg.active) {
+                // Haces de luz que se cuelan entre las tablas del techo.
+                rg.clear();
+                var s = time / 1000;
+                [[0.27, 0.0], [0.56, 1.7], [0.80, 3.1]].forEach(function (q, i) {
+                    var x0 = L.W * q[0], al = 0.05 + 0.035 * Math.sin(s * 0.8 + q[1]), w = 26 + 8 * Math.sin(s * 0.5 + i), dx = L.W * 0.12;
+                    rg.fillStyle(0xfff3bf, al); rg.fillTriangle(x0, L.viga, x0 + w, L.viga, x0 + dx + w, L.suelo);
+                    rg.fillTriangle(x0, L.viga, x0 + dx + w, L.suelo, x0 + dx - w * 0.4, L.suelo);
+                });
+            }
             this.cosas.forEach(function (a, i) {
                 if (!a.cont.active || a.cortada || self.tweens.isTweening(a.cont)) return;
                 a.cont.x = a.x0 + Math.sin(time / 900 + a.fase2) * 10;
@@ -267,8 +315,20 @@
             g.clear();
             this.cosas.forEach(function (a) {
                 if (!a.cont.active || a.cortada) return;
+                if (a.arriba) {
+                    // Cuerda del mismo color que el cabo del marco; termina donde empieza el cabo (sigue el balanceo).
+                    var ang = a.cont.rotation, tx = a.cont.x + Math.sin(ang) * a.arriba, ty = a.cont.y - Math.cos(ang) * a.arriba;
+                    g.lineStyle(Math.max(5, a.tam * 0.075), 0xb86135, 1); g.lineBetween(a.x0, L.viga + 4, tx, ty);
+                    g.lineStyle(2, 0x8b3020, 0.8); g.lineBetween(a.x0 + 2, L.viga + 4, tx + 2, ty);
+                    return;
+                }
                 g.lineStyle(6, 0xf1e0b0, 1); g.lineBetween(a.x0, L.viga + 8, a.cont.x, a.cont.y - a.tam * 0.5);
                 g.lineStyle(2, 0x9c7a3c, 0.7); g.lineBetween(a.x0 + 2, L.viga + 8, a.cont.x + 2, a.cont.y - a.tam * 0.5);
+            });
+            this.cortes = (this.cortes || []).filter(function (c) { return time - c.t0 < 900; });
+            this.cortes.forEach(function (c) {
+                var t = (time - c.t0) / 1000, ang = Math.sin(t * 14) * 0.55 * Math.exp(-t * 3), len = 54;
+                g.lineStyle(6, 0xb86135, 1 - t / 0.9); g.lineBetween(c.x, L.viga + 4, c.x + Math.sin(ang) * len, L.viga + 4 + Math.cos(ang) * len);
             });
         }
     };

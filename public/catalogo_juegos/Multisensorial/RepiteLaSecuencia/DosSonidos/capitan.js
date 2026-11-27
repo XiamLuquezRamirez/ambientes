@@ -57,10 +57,27 @@
     var ARTE_FONDO = { w: 1280, h: 720, horiz: 258.5 };
     var LINEA_AGUA = 4;   // altura (en el dibujo del barco) a la que el agua corta el casco
 
+    // Piezas sueltas: archivo, tamaño de rasterizado y recuadro útil (x, y, ancho, alto) en px de la textura.
+    var EXTRAS = {
+        dd_delfin: { f: 'delfin', w: 500, h: 500, rec: [35, 141, 430, 217] },
+        dd_sp1: { f: 'sombra_pez1', w: 782, h: 500, rec: [70, 118, 642, 263] },
+        dd_sp2: { f: 'sombra_pez2', w: 500, h: 500, rec: [87, 187, 325, 125] },
+        dd_sp3: { f: 'sombra_pez3', w: 500, h: 500, rec: [120, 166, 260, 167] },
+        dd_ave: { f: 'ave_cuerpo', w: 520, h: 400 },
+        dd_ala: { f: 'ave_ala', w: 520, h: 400 }
+    };
+    // Ave del diseño (lienzo de 260x315 unidades): mide 250 de ancho y el ala gira desde el hombro (118, 192).
+    var AVE = { w: 260, h: 200, ancho: 224, hx: 118, hy: 98 };
+
     var escena = {
         precargar: function () {
             if (!this.textures.exists('dd_fondo')) this.load.svg('dd_fondo', 'img/diseno/fondo.svg', { width: 1280, height: 720 });
             if (!this.textures.exists('dd_arte')) this.load.svg('dd_arte', 'img/diseno/arte.svg', { width: 2700, height: 1466 });
+            // Piezas sueltas del diseñador: delfín, sombras de peces y ave (cuerpo + ala que bate).
+            var self = this;
+            Object.keys(EXTRAS).forEach(function (k) {
+                if (!self.textures.exists(k)) self.load.svg(k, 'img/diseno/' + EXTRAS[k].f + '.svg', { width: EXTRAS[k].w, height: EXTRAS[k].h });
+            });
         },
 
         /** Registra los marcos de la hoja de arte (una sola vez) y avisa si el diseño está disponible. */
@@ -68,6 +85,12 @@
             var A = global.DosSonidosArte;
             var tex = this.textures.exists('dd_arte') ? this.textures.get('dd_arte') : null;
             this.arteOk = !!(A && tex && this.textures.exists('dd_fondo'));
+            var self = this;
+            this.extraOk = this.arteOk && Object.keys(EXTRAS).every(function (k) { return self.textures.exists(k); });
+            if (this.extraOk) Object.keys(EXTRAS).forEach(function (k) {
+                var t = self.textures.get(k), r = EXTRAS[k].rec;
+                if (r && !t.has('rec')) t.add('rec', 0, r[0], r[1], r[2], r[3]);
+            });
             if (!this.arteOk || tex.__ddMarcos) return;
             Object.keys(A.frames).forEach(function (n) { var m = A.frames[n]; tex.add(n, 0, m.x, m.y, m.w, m.h); });
             tex.__ddMarcos = true;
@@ -136,6 +159,8 @@
             this.ondasG = keep(this.add.graphics().setDepth(9.4));
             this.reflejoG = keep(this.add.graphics().setDepth(9.6));
             this.pajarosG = keep(this.add.graphics().setDepth(24));
+            this.sombrasPez = []; this.aves = [];
+            if (this.extraOk) this.montarExtras(keep);
             this.marcaG = keep(this.add.graphics().setDepth(58));
             this.pintarCielo();
             this.montarHud(keep);
@@ -981,8 +1006,43 @@
             });
         },
 
+        /** Ave del diseño: cuerpo + ala que bate desde el hombro. Mira a la izquierda; ancho = px del cuerpo. */
+        crearAve: function (ancho) {
+            var kb = ancho / AVE.ancho, c = this.add.container(0, 0);
+            var cuerpo = this.add.image(0, 0, 'dd_ave').setDisplaySize(AVE.w * kb, AVE.h * kb);
+            var ala = this.add.image((AVE.hx - AVE.w / 2) * kb, (AVE.hy - AVE.h / 2) * kb, 'dd_ala').setDisplaySize(AVE.w * kb, AVE.h * kb).setOrigin(AVE.hx / AVE.w, AVE.hy / AVE.h);
+            c.add([cuerpo, ala]);
+            c.ala = ala;
+            return c;
+        },
+
+        /** Sombras de peces bajo el agua y aves (3 que acompañan al barco y 3 lejanas) con el arte del diseño. */
+        montarExtras: function (keep) {
+            var L = this.L, kk = L.H / 720;
+            var tipos = [['dd_sp1', 104, 642, 263], ['dd_sp2', 70, 325, 125], ['dd_sp3', 58, 260, 167]];
+            for (var i = 0; i < 6; i++) {
+                var t = tipos[i % 3], ancho = t[1] * kk * (0.85 + 0.15 * (i % 2));
+                var im = keep(this.add.image(0, 0, t[0], 'rec').setDepth(3.2));
+                im.setDisplaySize(ancho, ancho * t[3] / t[2]);
+                this.sombrasPez.push(im);
+            }
+            for (var j = 0; j < 5; j++) {
+                var lejos = j >= 2;
+                var ave = keep(this.crearAve((lejos ? 30 : 74) * kk).setDepth(lejos ? 1.2 : 24));
+                ave.lejos = lejos; ave.k = lejos ? j - 2 : j; ave.dirS = 1;
+                this.aves.push(ave);
+            }
+        },
+
         /** Delfín dibujado una vez: cada tanto salta por el mar. */
         crearDelfin: function () {
+            if (this.extraOk) {
+                // Delfín del diseño: mira a la derecha, igual que el dibujo anterior (el salto lo orienta en paso()).
+                var c = this.add.container(0, 0), im = this.add.image(0, 0, 'dd_delfin', 'rec');
+                im.setDisplaySize(190, 190 * 217 / 430);
+                c.add(im); c.setVisible(false);
+                return c;
+            }
             var g = this.add.graphics();
             g.fillStyle(0x6f8ba3, 1); g.fillEllipse(0, 0, 96, 30);
             g.fillStyle(0xdde9f0, 1); g.fillEllipse(6, 7, 76, 15);
@@ -994,6 +1054,35 @@
             g.fillStyle(0xffffff, 0.35); g.fillEllipse(0, -8, 60, 6);
             g.setVisible(false);
             return g;
+        },
+
+        /** Aves: las lejanas cruzan el cielo; las cercanas escoltan al barco. Baten el ala y miran hacia donde vuelan. */
+        animarAves: function (s, dt, P, B, dir, sB, L) {
+            this.aves.forEach(function (a, i) {
+                if (!a.active) return;
+                var dia = a.lejos ? P.noche < 0.5 : P.noche < 0.6;
+                a.setVisible(dia);
+                if (!dia) return;
+                var gv = a.k, ph = gv * 2 + i, x, y, rumbo;
+                if (a.lejos) {
+                    var v = 38 + gv * 12, sentido = gv === 1 ? -1 : 1;
+                    var t = (s * v + gv * 400) % (L.W + 200);
+                    x = sentido > 0 ? t - 100 : L.W + 100 - t;
+                    y = L.horiz * (0.35 + gv * 0.15) + Math.sin(s * 2 + gv) * 8;
+                    rumbo = sentido;
+                } else {
+                    x = B.x - dir * (70 + gv * 46) + Math.cos(s * 0.9 + gv * 3) * 70;
+                    y = B.y - 200 * sB - 78 - gv * 30 + Math.sin(s * 1.3 + gv * 2) * 20;
+                    rumbo = dir;
+                }
+                // El dibujo mira a la izquierda: al ir a la derecha se espeja (con un giro suave).
+                a.dirS += (rumbo - a.dirS) * Math.min(1, dt * 5);
+                var bate = Math.sin(s * (a.lejos ? 8 : 10) + ph);
+                a.setPosition(x, y + bate * 2);
+                a.setScale(-a.dirS, 1).setAngle(Math.sin(s * 1.3 + ph) * 4 * a.dirS);
+                a.setAlpha((a.lejos ? 0.8 : 1) * (1 - P.noche));
+                a.ala.setRotation(-0.2 + bate * 0.6);
+            });
         },
 
         /* ── Cada cuadro ── */
@@ -1022,7 +1111,7 @@
             var f = this.fondoG; f.clear();
             if (P.noche > 0.02) for (var e = 0; e < 55; e++) { f.fillStyle(0xffffff, P.noche * (0.3 + 0.6 * Math.abs(Math.sin(s * 1.2 + e * 2.3)))); f.fillCircle((e * 977 + 50) % L.W, 8 + (e * 613) % (L.horiz - 20), 1 + (e % 3) * 0.6); }
             f.fillStyle(P.astro, 0.2); f.fillCircle(ax, ay, 80 - 18 * P.noche);
-            if (P.noche < 0.5) for (var gv = 0; gv < 3; gv++) {
+            if (!(this.aves && this.aves.length) && P.noche < 0.5) for (var gv = 0; gv < 3; gv++) {
                 var gx = ((s * (38 + gv * 12) + gv * 400) % (L.W + 200)) - 100, gy = L.horiz * (0.35 + gv * 0.15) + Math.sin(s * 2 + gv) * 8, al = Math.sin(s * 9 + gv) * 6;
                 f.lineStyle(3, 0x343a40, 0.8); f.beginPath(); f.moveTo(gx - 12, gy - al); f.lineTo(gx, gy); f.lineTo(gx + 12, gy - al); f.strokePath();
             }
@@ -1041,6 +1130,7 @@
             }
             for (var pk = 0; pk < 6; pk++) {
                 var fx = L.W + 80 - ((this.mundo * 0.6 + s * (18 + pk * 5) + pk * 260) % (L.W + 220)), fy = L.horiz + alto * (0.22 + (pk % 3) * 0.24) + Math.sin(s * 1.2 + pk) * 6;
+                if (this.sombrasPez && this.sombrasPez[pk] && this.sombrasPez[pk].active) { this.sombrasPez[pk].setPosition(fx, fy + Math.sin(s * 2 + pk) * 3).setAngle(Math.sin(s * 1.5 + pk) * 4); continue; }
                 g.fillStyle(0x08305a, 0.15 + 0.04 * (pk % 2)); g.fillEllipse(fx, fy, 30, 11); g.fillTriangle(fx + 13, fy, fx + 26, fy - 8, fx + 26, fy + 8);
             }
             if (!this.arteOk) for (var l = 0; l < 5; l++) {
@@ -1251,7 +1341,8 @@
 
             // ── Gaviotas que acompañan al barco (de día) ──
             var pg = this.pajarosG; pg.clear();
-            if (P.noche < 0.6) for (var gi2 = 0; gi2 < 2; gi2++) {
+            if (this.aves && this.aves.length) this.animarAves(s, dt, P, B, dir, sB, L);
+            else if (P.noche < 0.6) for (var gi2 = 0; gi2 < 2; gi2++) {
                 var gbx = B.x - dir * 70 + Math.cos(s * 0.9 + gi2 * 3) * 70, gby = B.y - 200 * sB / 0.6 * 0.6 - 60 + Math.sin(s * 1.3 + gi2 * 2) * 20, flap = Math.sin(s * 10 + gi2 * 2) * 7;
                 pg.lineStyle(3, 0xffffff, 0.95 * (1 - P.noche)); pg.beginPath(); pg.moveTo(gbx - 15, gby - flap); pg.lineTo(gbx, gby + 2); pg.lineTo(gbx + 15, gby - flap); pg.strokePath();
             }

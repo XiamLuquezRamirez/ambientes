@@ -37,7 +37,7 @@
     var COL_TECLA = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8, 0xff922b];
 
     // Dibujo del diseñador (1280x720): máquina de chicles en el fondo, suelo de caramelo desde y=575.
-    var ARTE = { w: 1280, h: 720, suelo: 590, maq: [149, 207], globoR: 60 };
+    var ARTE = { w: 1280, h: 720, suelo: 590, maq: [149, 150], globoR: 60 };
 
     function mezcla(a, b, t) {
         var c = C.Interpolate.ColorWithColor(C.ValueToColor(a), C.ValueToColor(b), 100, Math.max(0, Math.min(1, t)) * 100);
@@ -48,7 +48,7 @@
     var escena = {
         precargar: function () {
             var self = this;
-            [1, 2, 3, 4].forEach(function (i) { if (!self.textures.exists('gf_fondo' + i)) self.load.svg('gf_fondo' + i, 'img/diseno/fondo' + i + '.svg', { width: 1280, height: 720 }); });
+            [1, 2, 3, 4].forEach(function (i) { if (!self.textures.exists('gf_fondo' + i)) self.load.svg('gf_fondo' + i, 'img/diseno/fondo' + i + '.svg?v=20261127', { width: 1280, height: 720 }); });
             if (!this.textures.exists('gf_arte')) this.load.svg('gf_arte', 'img/diseno/arte.svg', { width: 1400, height: 488 });
         },
 
@@ -104,8 +104,9 @@
             L.salida = { x: Math.round(W * 0.195), y: Math.round(H * 0.3) };
             if (this.arteOk) {
                 L.maq = { x: Math.round(W * ARTE.maq[0] / ARTE.w), y: Math.round(H * ARTE.maq[1] / ARTE.h) };
-                L.salida = { x: Math.round(W * 0.195), y: Math.round(H * 0.3) };   // la boca sale del costado del globo, bien arriba: la bola solo baja, y las teclas de arriba deben quedar por debajo
+                L.salida = { x: Math.round(W * 145 / ARTE.w), y: Math.round(H * 203 / ARTE.h) };   // la bola sale por la ranura gris de la base (149, 203 del dibujo, ya subida); no hay tubo aparte
             }
+            L.dibujoX0 = this.arteOk ? 24 : L.zona.x0;   // con el arte se puede dibujar desde junto a la máquina
             L.goma = { x: 58, y: H - 62, r: 38 };
             L.bocina = { x: 48, y: Math.round(H * 0.17), r: 30 };
             return L;
@@ -195,19 +196,7 @@
                 var ra = Math.round(L.H * 80 / ARTE.h);
                 this.maquina = { cont: ca, r: ra, bolas: this.add.container(0, 0), mani: this.add.graphics() };
                 ca.add([this.maquina.bolas, this.maquina.mani]);
-                // Boca: un tubo rojo que sale de la ranura de la máquina; cada bola asoma por su extremo.
-                var hT = Math.round(L.k * 58), bx0 = Math.round(L.W * 190 / ARTE.w), lar = L.salida.x + 26 - bx0;
-                var bo = keep(this.add.container(bx0, L.salida.y).setDepth(9));
-                var bg = this.add.graphics();
-                bg.fillStyle(0x000000, 0.2); bg.fillRoundedRect(2, -hT / 2 + 6, lar, hT, 14);
-                bg.fillStyle(0xb81d2b, 1); bg.fillRoundedRect(0, -hT / 2, lar, hT, 14);
-                bg.fillStyle(0xe03131, 1); bg.fillRoundedRect(0, -hT / 2, lar, hT * 0.62, 12);
-                bg.fillStyle(0xff8787, 0.8); bg.fillRoundedRect(8, -hT / 2 + 5, lar - 40, 7, 3);
-                bg.fillStyle(0xffffff, 0.9); bg.fillRoundedRect(lar * 0.35, -hT / 2 - 1, 8, hT + 2, 3);
-                bg.fillStyle(0x5a0f18, 1); bg.fillEllipse(lar, 0, hT * 0.42, hT * 0.98);
-                bg.lineStyle(5, 0xffd43b, 1); bg.strokeEllipse(lar, 0, hT * 0.42, hT * 0.98);
-                bo.add(bg);
-                this.boca = bo; this.bocaLar = lar;
+                this.boca = null; this.bocaLar = 0;
                 return;
             }
             var c = keep(this.add.container(L.maq.x, L.maq.y).setDepth(8));
@@ -245,9 +234,8 @@
             this.estaticosF = [];
             var add = function (x, y, w, h, o) { var b = M.Bodies.rectangle(x, y, w, h, Object.assign({ isStatic: true, friction: 0.4, restitution: 0.35 }, o || {})); self.estaticosF.push(b); return b; };
             add(L.W / 2, L.suelo + 40, L.W * 3, 80);
-            add(L.zona.x0 - 40, L.H / 2, 40, L.H * 2);
+            add(this.arteOk ? -20 : L.zona.x0 - 40, L.H / 2, 40, L.H * 2);   // con el arte la bola nace en la ranura, a la izquierda de la zona de juego
             add(L.zona.x1 + 40, L.H / 2, 40, L.H * 2);
-            if (this.arteOk) add(L.salida.x + 6, L.salida.y + Math.round(L.k * 20) + 5, 80, 8, { angle: 0.15, friction: 0.02, restitution: 0.1 });   // fondo de la boca
             M.Composite.add(mundo, this.estaticosF);
         },
 
@@ -323,19 +311,17 @@
             var cuerpo = M.Bodies.circle(x, y, r, { restitution: 0.6, friction: 0.04, frictionAir: 0.002, density: 0.0022 });
             M.Composite.add(this.motor.world, cuerpo);
             cuerpo.plugin = { bola: true };
-            M.Body.setVelocity(cuerpo, { x: 0.9 + Math.random() * 0.8, y: 0 });
+            M.Body.setVelocity(cuerpo, this.arteOk ? { x: 2.4 + Math.random() * 0.8, y: -1.5 } : { x: 0.9 + Math.random() * 0.8, y: 0 });
             var c = this.add.container(x, y).setDepth(30);
             var g = this.add.graphics();
             var col = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8][(Math.random() * 5) | 0];
             if (this.arteOk) {
                 var pq = 1 + ((Math.random() * 6) | 0);
-                g.fillStyle(0x000000, 0.13); g.fillEllipse(0, r * 0.7, r * 1.5, r * 0.6);
                 c.add(g);
                 c.add(this.pieza('p' + pq, 0, 0, r * 2.15));
                 col = [0xff922b, 0xcc5de8, 0xff6b6b, 0x69db7c, 0x4dabf7, 0xf06595][pq - 1];
             } else {
             g.fillStyle(col, 1); g.fillCircle(0, 0, r);
-            g.fillStyle(0x000000, 0.13); g.fillEllipse(0, r * 0.55, r * 1.5, r * 0.8);
             g.fillStyle(0xffffff, 0.75); g.fillCircle(-r * 0.35, -r * 0.35, r * 0.3);
             g.lineStyle(2, 0x000000, 0.18); g.strokeCircle(0, 0, r);
             c.add(g);
@@ -368,7 +354,7 @@
             var d = Math.hypot(p.x - u.x, p.y - u.y);
             if (d < 14) return;
             var Z = this.L.zona;
-            var q = { x: Math.max(Z.x0 + 6, Math.min(Z.x1 - 6, p.x)), y: Math.max(40, Math.min(this.L.suelo - 6, p.y)) };
+            var q = { x: Math.max(this.L.dibujoX0 + 6, Math.min(Z.x1 - 6, p.x)), y: Math.max(40, Math.min(this.L.suelo - 6, p.y)) };
             var ang = Math.atan2(q.y - u.y, q.x - u.x), len = Math.hypot(q.x - u.x, q.y - u.y);
             var b = M.Bodies.rectangle((q.x + u.x) / 2, (q.y + u.y) / 2, len + 6, 12, { isStatic: true, angle: ang, friction: 0.15, restitution: 0.3 });
             M.Composite.add(this.motor.world, b);
@@ -401,7 +387,7 @@
             var L = this.L;
             if (Math.hypot(p.x - L.goma.x, p.y - L.goma.y) < L.goma.r) { this.borrarTodo(); return; }
             if (Math.hypot(p.x - L.maq.x, p.y - L.maq.y) < this.maquina.r * 1.3) { this.crearBola(); return; }
-            if (p.x < L.zona.x0 || p.y > L.suelo) return;
+            if (p.x < L.dibujoX0 || p.y > L.suelo) return;
             this.pista.reiniciar();
             this.iniciarTrazo(p);
         },

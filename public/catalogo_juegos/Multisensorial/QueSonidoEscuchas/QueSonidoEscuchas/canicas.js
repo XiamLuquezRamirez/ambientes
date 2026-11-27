@@ -17,7 +17,23 @@
 
     var COLORES = [0xff6b6b, 0x4dabf7, 0xffd43b, 0x69db7c, 0xcc5de8];
 
+    // Arte del diseñador (img/diseno): fondo de terraza, 4 casitas con ventana redonda, palanca roja y canica.
+    // Palanca (lienzo 500×224): pivote = centro de la perilla (411.5, 81); el brazo apunta a ~165° (abajo-izquierda).
+    var PAL = { ox: 411.5 / 500, oy: 81 / 224, ang: 164.9 * Math.PI / 180, ancho: 500, largo: 150 };
+    var ARTE = ['dx_fondo', 'dx_canica', 'dx_palanca', 'dx_casa1', 'dx_casa2', 'dx_casa3', 'dx_casa4'];
+
     var escena = {
+        precargar: function () {
+            var self = this;
+            var cola = [['dx_fondo', 'fondo.svg', 1280, 720], ['dx_canica', 'canica.svg', 160, 160], ['dx_palanca', 'flecha.svg', 500, 224],
+                ['dx_casa1', 'casa1.svg', 400, 400], ['dx_casa2', 'casa2.svg', 400, 400], ['dx_casa3', 'casa3.svg', 400, 400], ['dx_casa4', 'casa4.svg', 400, 400]];
+            cola.forEach(function (c) { if (!self.textures.exists(c[0])) self.load.svg(c[0], 'img/diseno/' + c[1], { width: c[2], height: c[3] }); });
+        },
+
+        arte: function () {
+            return ARTE.every(function (k) { return this.textures.exists(k); }, this);
+        },
+
         iniciar: function () {
             this.cosas = [];
             this.juntas = [];
@@ -33,7 +49,7 @@
             L.pres = W >= 900 ? { x: W - 88, piso: H - 70, alto: Math.min(165, H * 0.28), giro: 0.35 } : null;
             L.der = L.pres ? W - 168 : W - 16;
             L.ax = 120; L.aw = L.der - 160;
-            L.suelo = Math.round(H * 0.88);
+            L.suelo = Math.round(H * (this.arte() ? 0.945 : 0.88));
             L.tam = Math.max(80, Math.min(118, L.aw / 4.6, H * 0.16));
             L.bocina = { x: 48, y: Math.round(H * 0.3), r: Math.max(24, Math.min(32, hueco * 0.28)) };
             return L;
@@ -42,6 +58,15 @@
         armar: function (reubicar) {
             var L = this.L = this.calcular();
             var keep = this.limpiarEscenario();
+            (this.palancas || []).forEach(function (q) { if (q && q.active) q.destroy(); });
+            this.palancas = [];
+            this.cieloG = null;
+            if (this.arte()) {
+                keep(this.add.image(0, 0, 'dx_fondo').setOrigin(0, 0).setDisplaySize(L.W, L.H).setDepth(1));
+                this.cieloG = keep(this.add.graphics().setDepth(2));   // gaviotas y destellos del mar
+                this.brillos = [];
+                for (var b = 0; b < 9; b++) this.brillos.push({ x: 0.08 + Math.random() * 0.84, y: 0.56 + Math.random() * 0.1, f: Math.random() * 6, v: 1.2 + Math.random() * 1.5 });
+            } else
             K.textura(this, 'can_fondo', L.W, L.H, function (x, w, h) {
                 var g = x.createLinearGradient(0, 0, 0, h);
                 g.addColorStop(0, '#ffe8a3'); g.addColorStop(1, '#ffc078');
@@ -51,7 +76,7 @@
                 x.fillStyle = 'rgba(120,80,30,0.45)';
                 [[L.ax - 50, 40], [L.ax + L.aw + 50, 40], [L.ax - 50, h - 60], [L.ax + L.aw + 50, h - 60]].forEach(function (p) { x.beginPath(); x.arc(p[0], p[1], 7, 0, Math.PI * 2); x.fill(); });
             });
-            keep(this.add.image(0, 0, 'can_fondo').setOrigin(0, 0).setDepth(1));
+            if (!this.cieloG) keep(this.add.image(0, 0, 'can_fondo').setOrigin(0, 0).setDepth(1));
             this.tubosG = keep(this.add.graphics().setDepth(5));
             this.palG = keep(this.add.graphics().setDepth(8));
             this.montarHud(keep);
@@ -62,7 +87,8 @@
         disponer: function (n) {
             var L = this.L;
             this.hojas = [];
-            for (var i = 0; i < n; i++) this.hojas.push({ x: L.ax + L.aw * (i + 0.5) / n, y: L.suelo - L.tam * 0.6 });
+            var S0 = this.tamCasa(n), yc = this.arte() ? L.suelo - S0 * 0.47 : L.suelo - L.tam * 0.6;
+            for (var i = 0; i < n; i++) this.hojas.push({ x: L.ax + L.aw * (i + 0.5) / n, y: yc });
             var gap = L.aw / n;
             var y0 = L.H * 0.24, paso = (L.H * 0.4) / Math.max(n - 1, 1);
             this.nodos = [];
@@ -75,7 +101,23 @@
 
         /* ── Casitas ── */
 
-        crearCasita: function (id, i, tam) {
+        /** Lado del dibujo de cada casita para n casitas (con arte) o tamaño clásico. */
+        tamCasa: function (n) {
+            var L = this.L;
+            if (!this.arte()) return Math.min(L.tam, L.aw / n * 0.8);
+            return Math.min(L.tam * 1.75, L.aw / n * 0.92);
+        },
+
+        /** Distancia del centro de la casita a su techo (por donde entra la canica). */
+        techo: function () {
+            var a = this.cosas && this.cosas[0];
+            var S = a ? a.tam : this.L.tam;
+            return this.arte() ? S * 0.45 : this.L.tam * 0.6;
+        },
+
+        crearCasita: function (id, i, n) {
+            var tam = this.tamCasa(n);
+            if (this.arte()) return this.crearCasitaArte(id, i, tam);
             var a = this.crearCosa(id, -300, 0, tam * 0.56, { depth: 30, sinSombra: true });
             var t = tam, col = COLORES[i % COLORES.length];
             var g = this.add.graphics();
@@ -92,11 +134,22 @@
             return a;
         },
 
+        /** Casita del diseño: la ventana redonda (centro del dibujo, radio 0.243) lleva la imagen del sonido. */
+        crearCasitaArte: function (id, i, S) {
+            var a = this.crearCosa(id, -300, 0, S * 0.42, { depth: 30, sinSombra: true });
+            var casa = this.add.image(0, 0, 'dx_casa' + (i % 4 + 1)).setDisplaySize(S, S);
+            var aro = this.add.graphics(); aro.lineStyle(Math.max(6, S * 0.035), 0x51cf66, 1); aro.strokeCircle(0, 0, S * 0.262); aro.setAlpha(0);
+            a.cont.addAt(casa, 0); a.cont.addAt(aro, 1);
+            a.img.setPosition(0, 0);
+            a.aro = aro; a.tam = S; a.casaImg = casa;
+            a.cont.setAlpha(0);
+            return a;
+        },
+
         mostrarOpciones: async function (nv) {
             var self = this;
             var n = nv.opciones.length;
-            var tam = Math.min(this.L.tam, this.L.aw / n * 0.8);
-            this.cosas = nv.opciones.map(function (id, i) { return self.crearCasita(id, i, tam); });
+            this.cosas = nv.opciones.map(function (id, i) { return self.crearCasita(id, i, n); });
             this.juntas = [];
             this.disponer(n);
             this.crearMarmol();
@@ -110,11 +163,20 @@
         crearMarmol: function () {
             if (this.marmol && this.marmol.active) this.marmol.destroy();
             var m = this.add.container(this.inicio.x, this.inicio.y).setDepth(40);
+            if (this.arte()) {
+                var d = Math.max(48, Math.min(62, this.L.H * 0.085));
+                var sombra = this.add.ellipse(3, d * 0.42, d * 0.8, d * 0.2, 0x000000, 0.0);
+                m.img = this.add.image(0, 0, 'dx_canica').setDisplaySize(d, d);
+                m.r = d / 2;
+                m.add([sombra, m.img]);
+            } else {
             var g = this.add.graphics();
             g.fillStyle(0x4dabf7, 1); g.fillCircle(0, 0, 20);
             g.fillStyle(0xffffff, 0.55); g.fillCircle(-7, -7, 7);
             g.lineStyle(3, 0x1c7ed6, 1); g.strokeCircle(0, 0, 20);
             m.add(g);
+            }
+            m.ux = m.x; m.uy = m.y;
             this.marmol = m;
             this.tweens.add({ targets: m, scale: 1.08, duration: 500, yoyo: true, repeat: -1 });
         },
@@ -126,6 +188,65 @@
             if (this.marmol && this.marmol.active) { this.marmol.destroy(); this.marmol = null; }
             this.nodos = []; this.hojas = []; this.juntas = [];
             this.ocupado = false;
+        },
+
+        /** Gaviotas que cruzan el cielo y destellos sobre el mar. */
+        pasoCielo: function (time) {
+            var cg = this.cieloG;
+            if (!cg || !cg.active) return;
+            cg.clear();
+            var W = this.L.W, H = this.L.H, sc = time / 1000;
+            for (var gv = 0; gv < 3; gv++) {
+                var gx = ((sc * (24 + gv * 8) + gv * 430) % (W + 160)) - 80, gy = H * (0.09 + gv * 0.075) + Math.sin(sc * 0.8 + gv * 2) * 10;
+                var ala = Math.sin(sc * 5 + gv * 1.7) * 7 + 3, ks = 1 + gv * 0.15;
+                cg.lineStyle(3 * ks, 0xffffff, 0.95);
+                cg.beginPath(); cg.moveTo(gx - 15 * ks, gy - ala); cg.lineTo(gx - 6 * ks, gy - ala * 0.5 - 2); cg.lineTo(gx, gy); cg.lineTo(gx + 6 * ks, gy - ala * 0.5 - 2); cg.lineTo(gx + 15 * ks, gy - ala); cg.strokePath();
+            }
+            (this.brillos || []).forEach(function (b) {
+                var a = Math.max(0, Math.sin(sc * b.v + b.f));
+                if (a < 0.05) return;
+                var x = b.x * W, y = b.y * H, r = 3 + a * 5;
+                cg.fillStyle(0xffffff, 0.85 * a);
+                cg.fillTriangle(x - r, y, x, y - r * 0.5, x + r, y); cg.fillTriangle(x - r, y, x, y + r * 0.5, x + r, y);
+            });
+        },
+
+        /** La canica gira según lo que avanza. */
+        rodar: function () {
+            var m = this.marmol;
+            if (!m || !m.active || !m.img) return;
+            var d = Math.hypot(m.x - m.ux, m.y - m.uy);
+            if (d > 0.01) m.img.rotation += (m.x - m.ux >= 0 ? 1 : -1) * d / (m.r || 24);
+            m.ux = m.x; m.uy = m.y;
+        },
+
+        /** Palancas del diseño: una imagen por bifurcación, con el brazo sobre el tubo por el que irá la canica. */
+        pasoPalancas: function (dt) {
+            var self = this, L = this.L;
+            var n = this.nodos ? this.nodos.length : 0;
+            this.palancas = this.palancas || [];
+            this.palPop = this.palPop || [];
+            while (this.palancas.length > n) { var q = this.palancas.pop(); if (q && q.active) q.destroy(); }
+            var k0 = Math.max(46, Math.min(66, L.H * 0.085)) / 98;          // la perilla mide ~98 u: ≥ 46 px para el dedo
+            var k0b = PAL.largo / 380;
+            var esc = Math.max(k0, k0b);
+            for (var k = 0; k < n; k++) {
+                var nd = this.nodos[k];
+                var q2 = this.palancas[k];
+                if (!q2 || !q2.active) {
+                    q2 = this.palancas[k] = this.add.image(nd.x, nd.y, 'dx_palanca').setOrigin(PAL.ox, PAL.oy).setDepth(9);
+                    q2.ang = null;
+                }
+                var dest = this.juntas[k] ? (this.nodos[k + 1] ? { x: this.nodos[k + 1].x, y: this.nodos[k + 1].y } : { x: this.hojas[k + 1].x, y: this.hojas[k + 1].y - this.techo() })
+                    : { x: this.hojas[k].x, y: this.hojas[k].y - this.techo() };
+                var meta = Math.atan2(dest.y - nd.y, dest.x - nd.x) - PAL.ang;
+                if (q2.ang === null) q2.ang = meta;
+                var dif = meta - q2.ang;
+                q2.ang += dif * Math.min(1, 0.22 * dt);
+                var pop = this.palPop[k] || 0;
+                this.palPop[k] = Math.max(0, pop - 0.06 * dt);
+                q2.setPosition(nd.x, nd.y).setRotation(q2.ang).setScale(esc * (1 + Math.sin(pop * Math.PI) * 0.14));
+            }
         },
 
         alSonar: function () {
@@ -148,6 +269,7 @@
             this.juntas[k] = this.juntas[k] ? 0 : 1;
             K.tono({ f: 520, f2: 760, dur: 0.07, vol: 0.05, tipo: 'square' });
             var n = this.nodos[k];
+            if (this.palPop) this.palPop[k] = 1;
             Ut.estallido(this, n.x, n.y, { n: 3, tex: 'chispa', tam: 16, dist: 40, depth: 60, sinTinte: true });
         },
 
@@ -175,7 +297,7 @@
                 K.ruido({ f: 1300, q: 3, dur: 0.05, vol: 0.07 });
                 if (this.juntas[k] === 0) {
                     var h = this.hojas[k];
-                    await tw(this, { targets: m, x: h.x, y: h.y - this.L.tam * 0.6, duration: 600, ease: 'Quad.easeIn' });
+                    await tw(this, { targets: m, x: h.x, y: h.y - this.techo(), duration: 600, ease: 'Quad.easeIn' });
                     this.llego = k; break;
                 }
                 if (k + 1 < this.nodos.length) {
@@ -184,7 +306,7 @@
                     k++;
                 } else {
                     var h2 = this.hojas[this.hojas.length - 1];
-                    await tw(this, { targets: m, x: h2.x, y: h2.y - this.L.tam * 0.6, duration: 600, ease: 'Quad.easeIn' });
+                    await tw(this, { targets: m, x: h2.x, y: h2.y - this.techo(), duration: 600, ease: 'Quad.easeIn' });
                     this.llego = this.hojas.length - 1; break;
                 }
             }
@@ -271,7 +393,7 @@
             var vistos = {};
             var ids = this.reunidos.filter(function (id) { if (vistos[id]) return false; vistos[id] = 1; return true; }).slice(0, 4);
             while (ids.length < 3) ids.push(['perro', 'gato', 'campana'][ids.length]);
-            this.cosas = ids.map(function (id, i) { return self.crearCasita(id, i, Math.min(L.tam, L.aw / ids.length * 0.8)); });
+            this.cosas = ids.map(function (id, i) { return self.crearCasita(id, i, ids.length); });
             this.juntas = [];
             this.disponer(ids.length);
             await Promise.all(this.cosas.map(function (a, i) { return esperar(self, i * 100).then(function () { return tw(self, { targets: a.cont, alpha: 1, duration: 300 }); }); }));
@@ -296,10 +418,16 @@
             };
         },
 
-        paso: function (time) {
+        paso: function (time, delta) {
             var g = this.tubosG, p = this.palG, L = this.L;
             if (!g || !g.active) return;
             g.clear(); p.clear();
+            var dt = (delta || 16) / 16;
+            if (this.arte()) {
+                this.pasoCielo(time);
+                this.pasoPalancas(dt);
+                this.rodar();
+            }
             if (!this.nodos || !this.nodos.length) return;
             var self = this;
             var tubo = function (x1, y1, x2, y2) {
@@ -310,11 +438,11 @@
             tubo(this.inicio.x, this.inicio.y, this.nodos[0].x, this.nodos[0].y);
             this.nodos.forEach(function (n, k) {
                 var h = self.hojas[k];
-                tubo(n.x, n.y, h.x, h.y - L.tam * 0.55);
+                tubo(n.x, n.y, h.x, h.y - self.techo());
                 var sig = self.nodos[k + 1];
-                if (sig) tubo(n.x, n.y, sig.x, sig.y); else tubo(n.x, n.y, self.hojas[k + 1].x, self.hojas[k + 1].y - L.tam * 0.55);
+                if (sig) tubo(n.x, n.y, sig.x, sig.y); else tubo(n.x, n.y, self.hojas[k + 1].x, self.hojas[k + 1].y - self.techo());
             });
-            this.nodos.forEach(function (n, k) {
+            if (!this.arte()) this.nodos.forEach(function (n, k) {
                 // palanca: disco con flecha hacia donde irá la canica (izquierda = casita, derecha = seguir)
                 p.fillStyle(0x000000, 0.25); p.fillCircle(n.x + 3, n.y + 5, 28);
                 p.fillStyle(0xfcc419, 1); p.fillCircle(n.x, n.y, 28);

@@ -744,13 +744,13 @@ if (!this.arteOk) {
 
             // Mechones de hierba del suelo (parallax cercano), por detrás y por delante de los animales.
             var sh = this.sombraG; sh.clear();
-            for (var gt = 0; gt < 26; gt++) {
+            for (var gt = 0; gt < (this.arteOk ? 0 : 26); gt++) {
                 var gx = ((gt * 97 - M * 0.9) % (W + 100) + W + 100) % (W + 100) - 50, gy = L.carriles[gt % 3] + 6 + (hash(gt) * 12);
                 sh.fillStyle(P.hierba, 0.8);
                 sh.fillTriangle(gx - 8, gy, gx - 2, gy - 22 - (gt % 4) * 4, gx + 2, gy); sh.fillTriangle(gx - 2, gy, gx + 6, gy - 30, gx + 10, gy); sh.fillTriangle(gx + 4, gy, gx + 14, gy - 20, gx + 16, gy);
             }
             var fg = this.frenteG; fg.clear();
-            for (var ft = 0; ft < 10; ft++) {
+            for (var ft = 0; ft < (this.arteOk ? 0 : 10); ft++) {
                 var fx = ((ft * 211 - M * 1.5) % (W + 200) + W + 200) % (W + 200) - 100, fy = H + 6;
                 fg.fillStyle(P.hierba, 1);
                 for (var bl = 0; bl < 6; bl++) fg.fillTriangle(fx - 22 + bl * 8, fy, fx - 18 + bl * 8, fy - 70 - ((ft + bl) % 4) * 14, fx - 12 + bl * 8, fy);
