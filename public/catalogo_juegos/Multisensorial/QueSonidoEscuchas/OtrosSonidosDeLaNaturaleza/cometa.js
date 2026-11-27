@@ -127,7 +127,8 @@
             this.kiteC.add(kg);
             }
             this.kiteS = s;
-            if (!this.kite.x) { this.kite.x = L.der * 0.28; this.kite.y = L.H * 0.4; }
+            this.inicio = { x: L.der * 0.28, y: L.H * 0.4 };   // posición de salida de la cometa
+            if (!this.kite.x) { this.kite.x = this.inicio.x; this.kite.y = this.inicio.y; }
             if (!this.cola.length) for (var i = 0; i < 7; i++) this.cola.push({ x: this.kite.x, y: this.kite.y + i * 12 });
             this.montarHud(keep);
             if (reubicar) this.ubicarCosas();
@@ -201,7 +202,7 @@
 
         /* ── Pilotar ── */
 
-        alTocar: function (p) { if (this.fase === 'jugar') { this.pulsado = true; this.meta = { x: p.x, y: p.y }; this.pista.reiniciar(); } },
+        alTocar: function (p) { if (this.fase === 'jugar' && !this.regreso) { this.pulsado = true; this.meta = { x: p.x, y: p.y }; this.pista.reiniciar(); } },
         alMover: function (p) { if (this.pulsado && this.fase === 'jugar') this.meta = { x: p.x, y: p.y }; },
         alSoltar: function () { this.pulsado = false; },
 
@@ -223,6 +224,19 @@
             a.saltito(0.3, 3);
             await this.sonar(a.id, { breve: true, bocina: false });
             await esperar(this, 250);
+            await this.volverInicio();   // la cometa siempre sale de su sitio: no se queda sobre el lugar donde pasaría la siguiente respuesta
+        },
+
+        /** La cometa regresa suavemente a su posición inicial (sin viento ni dedo mientras vuelve). */
+        volverInicio: async function () {
+            var k = this.kite, I = this.inicio;
+            if (!I || !this.kiteC || !this.kiteC.active) return;
+            this.regreso = true;
+            this.meta = null; this.pulsado = false; this.autoObj = null;
+            k.vx = 0; k.vy = 0;
+            await tw(this, { targets: k, x: I.x, y: I.y, duration: 800, ease: 'Sine.easeInOut' });
+            k.vx = 0; k.vy = 0;
+            this.regreso = false;
         },
 
         alFallar: async function () {
@@ -318,11 +332,12 @@
             // Cometa: sigue al dedo (o a la nube en la demo), con viento.
             var k = this.kite;
             var meta = this.autoObj ? { x: this.autoObj.cont.x, y: this.autoObj.cont.y } : this.meta;
-            if (meta) { k.vx += (meta.x - k.x) * 6 * dt; k.vy += (meta.y - k.y) * 6 * dt; }
+            if (this.regreso) { k.vx = 0; k.vy = 0; k.ang += (0 - k.ang) * 0.1; }
+            else if (meta) { k.vx += (meta.x - k.x) * 6 * dt; k.vy += (meta.y - k.y) * 6 * dt; }
             else { k.vx += Math.sin(time / 900) * 20 * dt; k.vy += Math.cos(time / 1100) * 14 * dt; }
             if ((this.nivelActual || 0) >= 2 && this.fase === 'jugar') k.vx += Math.sin(time / 1700) * 90 * dt * (this.nivelActual - 1);   // ráfagas
             k.vx *= 0.9; k.vy *= 0.9;
-            k.x += k.vx * dt * 6; k.y += k.vy * dt * 6;
+            if (!this.regreso) { k.x += k.vx * dt * 6; k.y += k.vy * dt * 6; }
             k.x = Math.max(40, Math.min(L.der - 20, k.x)); k.y = Math.max(40, Math.min(L.horizonte - 60, k.y));
             k.ang += ((k.vx * 0.6) - k.ang) * 0.1;
             this.kiteC.setPosition(k.x, k.y).setAngle(Math.max(-35, Math.min(35, k.ang)));
@@ -338,7 +353,7 @@
             g.clear();
             g.lineStyle(2, 0xf8f9fa, 0.95);
             g.beginPath(); g.moveTo(L.ancla.x, L.ancla.y);
-            g.lineTo(k.x, k.y + this.kiteS * 1.2);
+            g.lineTo(k.x, k.y);   // el hilo llega al centro de la cometa (va por detrás de ella)
             g.strokePath();
             var arteCola = this.lazos && this.lazos.length;
             g.lineStyle(arteCola ? 2 : 3, arteCola ? 0xe8501b : 0xff6b6b, arteCola ? 0.85 : 1); g.beginPath(); g.moveTo(k.x, k.y + this.kiteS * 1.2);
@@ -375,7 +390,7 @@
             if (!this.arteOk) for (var i = 0; i < 90; i++) { var gx = (i * 61) % L.W, gy = L.horizonte + 10 + ((i * 37) % (L.H - L.horizonte - 12)); var sw = Math.sin(time / 500 + i) * 6 * (1 + (this.nivelActual || 0) * 0.3); p.fillTriangle(gx, gy, gx + 5, gy, gx + 2 + sw, gy - 16); }
             // Elegir quedándose sobre una nube.
             var ar = this.anilloG; ar.clear();
-            if (this.fase === 'jugar' && !this.ocupado) {
+            if (this.fase === 'jugar' && !this.ocupado && !this.regreso) {
                 this.cosas.forEach(function (a) {
                     if (!a.cont.active) return;
                     var d = Math.hypot(k.x - a.cont.x, k.y - a.cont.y);

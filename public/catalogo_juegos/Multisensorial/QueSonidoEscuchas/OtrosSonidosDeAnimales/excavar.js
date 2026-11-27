@@ -198,6 +198,33 @@
                 self.tweens.add({ targets: a.terrones, alfa: 1, duration: 450, delay: i * 120 });
             });
             await esperar(this, 500 + this.cosas.length * 120);
+            if (this.arteOk && this.cosas[0] && this.cosas[0].rt) await this.asomar();
+        },
+
+        /**
+         * Para que no sea cuestión de suerte: antes de excavar, cada animal asoma por detrás de su castillo,
+         * dice quién es con su propio sonido y se vuelve a esconder. Luego hay que recordar dónde estaba el que sonó.
+         */
+        asomar: async function () {
+            var self = this;
+            this.fase = 'mirando';
+            for (var i = 0; i < this.cosas.length; i++) {
+                var a = this.cosas[i];
+                if (!this.sigue() || !a.cont.active) return;
+                var reposo = a.casa.y - a.tam * 0.1;
+                var alto = a.cy - a.S * 0.4;
+                a.cont.setPosition(a.casa.x, a.cy).setAlpha(1);
+                var anillo = this.add.circle(a.casa.x, alto, a.tam * 0.45, 0xffffff, 0).setStrokeStyle(5, 0xffe066, 0.9).setDepth(29);
+                this.tweens.add({ targets: anillo, scale: 1.5, alpha: 0, duration: 700, onComplete: function () { anillo.destroy(); } });
+                await tw(this, { targets: a.cont, y: alto, duration: 300, ease: 'Back.easeOut' });
+                a.saltito(0.25, 2);
+                await this.sonar(a.id, { breve: true, bocina: false });
+                if (!this.sigue() || !a.cont.active) return;
+                await tw(this, { targets: a.cont, y: a.cy, alpha: 0, duration: 240 });
+                a.cont.setY(reposo);
+                await esperar(this, 120);
+            }
+            await esperar(this, 250);
         },
 
         prepararNivel: async function () {

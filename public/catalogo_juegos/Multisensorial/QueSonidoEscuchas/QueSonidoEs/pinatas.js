@@ -230,10 +230,13 @@
             if (a.rota || this.ocupado) return;
             a.golpes++;
             a.imp = lado * 0.55;                         // el golpe la hace balancearse
+            // El palo se ve: se levanta (190 ms), golpea (150 ms), se queda un instante sobre la piñata y se desvanece.
             var b = this.bate;
-            b.setPosition(a.cx - lado * a.tam * 0.7, a.cy).setAlpha(1).setAngle(lado * -70);
             this.tweens.killTweensOf(b);
-            this.tweens.add({ targets: b, angle: lado * 20, duration: 110, ease: 'Quad.easeIn', onComplete: function () { b.setAlpha(0); } });
+            b.setPosition(a.cx - lado * a.tam * 0.95, a.cy + a.tam * 0.1).setAlpha(0).setAngle(lado * -105);
+            await tw(this, { targets: b, alpha: 1, angle: lado * -72, x: a.cx - lado * a.tam * 0.8, y: a.cy, duration: 190, ease: 'Sine.easeOut' });
+            await tw(this, { targets: b, angle: lado * 18, x: a.cx - lado * a.tam * 0.6, duration: 150, ease: 'Quad.easeIn' });
+            this.tweens.add({ targets: b, alpha: 0, delay: 320, duration: 260 });
             K.ruido({ f: 220, q: 0.8, dur: 0.1, vol: 0.14 });
             K.tono({ f: 180 + a.golpes * 40, dur: 0.06, vol: 0.04, tipo: 'square' });
             this.cameras.main.shake(70, 0.003);

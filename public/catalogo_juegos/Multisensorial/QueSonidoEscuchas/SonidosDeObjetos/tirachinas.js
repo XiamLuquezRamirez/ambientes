@@ -35,7 +35,7 @@
             this.ocupado = false;
             this.bola = null;
             this.objetivoGuia = null;
-            this.theta = -0.1;
+            this.theta = -Math.PI / 2;
             this.volando = false;
             this.retro = 0;
         },
@@ -49,13 +49,16 @@
             var W = this.scale.width, H = this.scale.height;
             var L = { W: W, H: H };
             var hueco = Math.max(60, H * 0.16);
+            var arteTam = this.textures.exists('dx_ballesta') && W >= 900;
             L.pres = W >= 900 ? { x: W - 88, piso: H - 70, alto: Math.min(165, H * 0.28), giro: 0.35 } : null;
             L.der = L.pres ? W - 168 : W - 16;
             L.horizonte = Math.round(H * 0.42);
             L.suelo = Math.round(H * 0.84);
-            L.tam = Math.max(86, Math.min(124, (L.der - 300) / 3.2, H * 0.17));
-            L.reposo = { x: Math.round(Math.max(this.textures.exists('dx_ballesta') ? 205 : 130, L.der * 0.14)), y: Math.round(H * 0.6) };
-            L.maxTiro = Math.max(110, Math.min(170, L.der * 0.12));
+            L.tam = Math.max(86, Math.min(arteTam ? 150 : 124, (L.der - 300) / 3.2, H * (arteTam ? 0.22 : 0.17)));
+            var arte = this.textures.exists('dx_ballesta') && W >= 900;
+            // Vista frontal con arte: la ballesta abajo, al centro, apuntando hacia arriba; las dianas de frente en una fila.
+            L.reposo = arte ? { x: Math.round(L.der / 2), y: Math.round(H * 0.74) } : { x: Math.round(Math.max(130, L.der * 0.14)), y: Math.round(H * 0.6) };
+            L.maxTiro = Math.max(110, Math.min(arte ? 130 : 170, L.der * 0.12));
             L.bocina = { x: 48, y: Math.round(H * 0.26), r: Math.max(24, Math.min(32, hueco * 0.28)) };
             return L;
         },
@@ -93,7 +96,7 @@
             this.fTira = f;
             if (this.arteOk) {
                 // Ballesta del diseño: el cuerpo gira para apuntar; la flecha y las cuerdas se dibujan aparte.
-                var kb = Math.max(200, Math.min(300, L.der * 0.24)) / BAL.anchoArco;
+                var kb = Math.max(130, Math.min(190, L.der * 0.15, L.H * 0.3)) / BAL.anchoArco;   // ballesta compacta
                 this.kb = kb;
                 this.reposoBola = { x: R0.x, y: R0.y };
                 this.puntas = [];
@@ -135,10 +138,19 @@
 
         lugares: function (n) {
             var L = this.L;
-            var x0 = L.reposo.x + 300, disp = L.der - x0 - L.tam * 0.6;
+            var out = [], i;
+            if (this.arteOk || (this.textures.exists('dx_ballesta') && L.W >= 900)) {
+                // Fila frontal, repartida a lo ancho; las del medio un poco más arriba (suave arco).
+                var x0 = L.tam * 0.9 + 70, x1 = L.der - L.tam * 0.9;
+                for (i = 0; i < n; i++) {
+                    var sp = Math.min(1, 0.34 * (n - 1)), u = n === 1 ? 0.5 : 0.5 - sp / 2 + sp * i / (n - 1);
+                    out.push({ x: x0 + (x1 - x0) * u, y: L.H * 0.4 - Math.sin(u * Math.PI) * L.H * 0.05 });
+                }
+                return out;
+            }
+            var xa = L.reposo.x + 300, disp = L.der - xa - L.tam * 0.6;
             var y0 = L.H * 0.3, y1 = L.suelo - L.tam * 0.7;
-            var out = [];
-            for (var i = 0; i < n; i++) out.push({ x: x0 + disp * (i % 2 ? 0.88 : 0.35) + (n === 3 && i === 1 ? disp * 0.05 : 0), y: y0 + (y1 - y0) * (i + 0.5) / n });
+            for (i = 0; i < n; i++) out.push({ x: xa + disp * (i % 2 ? 0.88 : 0.35) + (n === 3 && i === 1 ? disp * 0.05 : 0), y: y0 + (y1 - y0) * (i + 0.5) / n });
             return out;
         },
 
@@ -175,7 +187,7 @@
         mostrarOpciones: async function (nv) {
             var self = this;
             var lug = this.lugares(nv.opciones.length);
-            var tam = Math.min(this.L.tam, 120);
+            var tam = Math.min(this.L.tam, this.arteOk ? 150 : 120);
             this.cosas = nv.opciones.map(function (id, i) { return self.crearDiana(id, i, lug[i], tam); });
             this.thetaReposo = this.apuntarMedio();
             K.ruido({ f: 1100, q: 1, dur: 0.1, vol: 0.05 });
@@ -187,7 +199,7 @@
         /** Ángulo de reposo de la ballesta: hacia el centro del grupo de dianas. */
         apuntarMedio: function () {
             var R = this.reposoBola, n = this.cosas.length;
-            if (!n) return -0.1;
+            if (!n) return this.arteOk ? -Math.PI / 2 : -0.1;
             var mx = 0, my = 0;
             this.cosas.forEach(function (a) { mx += a.casa.x; my += a.casa.y; });
             return Math.atan2(my / n - R.y, mx / n - R.x);
@@ -202,7 +214,7 @@
         },
 
         alSonar: function () {
-            Ut.estallido(this, this.L.reposo.x + 40, this.L.reposo.y - 80, { n: 3, tex: 'nota', tam: 24, dist: 90, depth: 70 });
+            Ut.estallido(this, this.L.reposo.x + (this.arteOk ? 90 : 40), this.L.reposo.y - (this.arteOk ? 40 : 80), { n: 3, tex: 'nota', tam: 24, dist: 90, depth: 70 });
         },
 
         /* ── Estirar y soltar ── */
@@ -211,7 +223,7 @@
             // Dirección del tiro = del punto estirado hacia el reposo; gana la diana más cercana en ángulo.
             var R = this.reposoBola;
             var vx = R.x - pos.x, vy = R.y - pos.y;
-            if (Math.hypot(vx, vy) < 28 || vx <= 0) return null;
+            if (Math.hypot(vx, vy) < 28 || (this.arteOk ? vy >= 0 : vx <= 0)) return null;
             var ang = Math.atan2(vy, vx), mejor = null, dm = 0.7;
             this.cosas.forEach(function (a) {
                 var d = Math.abs(Math.atan2(a.cont.y - R.y, a.cont.x - R.x) - ang);
@@ -232,8 +244,14 @@
             var dx = p.x - R.x, dy = p.y - R.y, d = Math.hypot(dx, dy);
             if (d > L.maxTiro) { dx *= L.maxTiro / d; dy *= L.maxTiro / d; }
             this.bola.setPosition(R.x + dx, R.y + dy);
-            if (this.arteOk && Math.hypot(dx, dy) >= 28 && dx < 0) this.theta = Math.atan2(-dy, -dx);
+            if (this.arteOk && Math.hypot(dx, dy) >= 28 && dy > 0) this.theta = Math.atan2(-dy, -dx);
             var obj = this.objetivoPara(this.bola);
+            if (this.arteOk && obj) {
+                // La ballesta gira hacia la diana elegida y la flecha se echa atrás SOBRE ese eje: el tiro va recto al centro.
+                var ta = Math.atan2(obj.cont.y - R.y, obj.cont.x - R.x), dd = Math.hypot(dx, dy);
+                this.theta = ta;
+                this.bola.setPosition(R.x - Math.cos(ta) * dd, R.y - Math.sin(ta) * dd);
+            }
             this.cosas.forEach(function (a) { a.aro.setAlpha(a === obj ? 1 : 0); });
             this.objetivoGuia = obj;
         },
@@ -252,13 +270,17 @@
         /** Vuelo del proyectil hasta la diana. Con arte: la flecha apunta a donde va y queda clavada un momento. */
         volarA: async function (b, obj, ms, alto) {
             if (!this.arteOk) { await this.saltarA(b, obj.cont.x, obj.cont.y, { ms: ms, alto: alto }); return; }
-            var ang = Math.atan2(obj.cont.y - b.y, obj.cont.x - b.x), punta = BAL.tip * this.kb * 0.85;
-            var tx = obj.cont.x - Math.cos(ang) * punta, ty = obj.cont.y - Math.sin(ang) * punta;
+            var ang = Math.atan2(obj.cont.y - b.y, obj.cont.x - b.x), punta = b.originY * b.height * b.scaleX;   // distancia real del pivote a la punta
+            var tx = obj.cont.x - Math.cos(ang) * punta, ty = obj.cont.y - Math.sin(ang) * punta;           // la punta se clava en el CENTRO de la diana
             this.volando = true; this.ultimo = { x: b.x, y: b.y };
+            this.theta = ang;
             this.retro = 16 * (this.kb / 0.6);
-            await this.saltarA(b, tx, ty, { ms: ms, alto: alto * 0.6 });
+            b.setRotation(ang + Math.PI / 2);
+            Ut.estallido(this, this.reposoBola.x, this.reposoBola.y - 20, { n: 6, tex: 'chispa', tam: 14, dist: 60, depth: 49, sinTinte: true });
+            // Vuelo en línea recta, acelerando (sin arco: el arco hacía que la flecha pasara de largo y volviera).
+            await tw(this, { targets: b, x: tx, y: ty, duration: Math.min(ms || 520, 520), ease: 'Cubic.easeIn' });
             this.volando = false;
-            var cl = this.add.image(b.x, b.y, 'dx_flecha').setOrigin(b.originX, b.originY).setScale(b.scaleX).setRotation(b.rotation).setDepth(40);
+            var cl = this.add.image(b.x, b.y, 'dx_flecha').setOrigin(b.originX, b.originY).setScale(b.scaleX).setRotation(ang + Math.PI / 2).setDepth(40);   // clavada mirando al centro de la diana
             this.tweens.add({ targets: cl, x: cl.x + Math.cos(ang) * 6, y: cl.y + Math.sin(ang) * 6, duration: 90 });
             this.tweens.add({ targets: cl, alpha: 0, delay: 1300, duration: 400, onComplete: function () { cl.destroy(); } });
         },
@@ -268,11 +290,14 @@
             this.ocupado = true;
             var R = this.reposoBola, b = this.bola;
             K.tono({ f: 300, f2: 900, dur: 0.18, vol: 0.05, tipo: 'triangle' });
+            if (this.arteOk) this.theta = Math.atan2(obj.cont.y - R.y, obj.cont.x - R.x);
             await this.volarA(b, obj, 620, 80);
             b.setAlpha(0);
             b.setPosition(R.x, R.y);
             K.ruido({ f: 600, q: 1, dur: 0.1, vol: 0.1 });
             this.cameras.main.shake(100, 0.003);
+            var onda = this.add.circle(obj.cont.x, obj.cont.y, 20, 0xffffff, 0).setStrokeStyle(6, 0xffffff, 0.9).setDepth(69);
+            this.tweens.add({ targets: onda, scale: 4, alpha: 0, duration: 450, onComplete: function () { onda.destroy(); } });
             Ut.estallido(this, obj.cont.x, obj.cont.y, { n: 8, tex: 'chispa', tam: 22, dist: 90, depth: 70, sinTinte: true });
             this.dianaActual = obj;
             var ok = await this.elegir(obj.id, { x: obj.cont.x, y: obj.cont.y });
@@ -340,16 +365,20 @@
             var vistos = {};
             var ids = this.reunidos.filter(function (id) { if (vistos[id]) return false; vistos[id] = 1; return true; }).slice(0, 5);
             if (!ids.length) ids = ['campana', 'pelota', 'carro'];
-            var lug = ids.map(function (id, i) { return { x: L.reposo.x + 260 + (L.der - L.reposo.x - 320) * (i + 0.5) / ids.length, y: L.suelo - L.tam * 0.8 }; });
+            var lug = ids.map(function (id, i) { return self.arteOk ? { x: L.tam + 70 + (L.der - L.tam * 2 - 70) * (i + 0.5) / ids.length, y: L.H * 0.43 } : { x: L.reposo.x + 260 + (L.der - L.reposo.x - 320) * (i + 0.5) / ids.length, y: L.suelo - L.tam * 0.8 }; });
             var dianas = ids.map(function (id, i) { return self.crearDiana(id, i, lug[i], L.tam); });
             await Promise.all(dianas.map(function (a, i) { return esperar(self, i * 100).then(function () { return tw(self, { targets: a.cont, alpha: 1, y: a.casa.y, duration: 320, ease: 'Back.easeOut' }); }); }));
             this.cosas = dianas;
             for (var i = 0; i < dianas.length; i++) {
                 if (!this.sigue()) return;
-                this.bola.setAlpha(1);
-                this.bola.setPosition(this.reposoBola.x, this.reposoBola.y);
-                this.bola.setRotation(this.theta + Math.PI / 2);
+                var Rf = this.reposoBola;
+                this.bola.setAlpha(0).setPosition(Rf.x, Rf.y);
+                this.thetaReposo = Math.atan2(dianas[i].cont.y - Rf.y, dianas[i].cont.x - Rf.x);   // la ballesta gira hacia la diana
+                await esperar(this, this.arteOk ? 520 : 150);
+                if (!this.sigue()) return;
+                this.bola.setAlpha(1).setRotation(this.theta + Math.PI / 2);
                 await this.volarA(this.bola, dianas[i], 480, 70);
+                this.bola.setAlpha(0).setPosition(Rf.x, Rf.y);   // la flecha queda clavada; la cuerda vuelve a la ballesta
                 Ut.estallido(this, dianas[i].cont.x, dianas[i].cont.y, { n: 12, tex: 'estrella', tam: 26, dist: 130, depth: 70, sinTinte: true });
                 dianas[i].saltito(0.2, 2);
                 await this.sonar(ids[i], { breve: true, bocina: false });
@@ -386,7 +415,7 @@
                     var R = this.reposoBola;
                     for (var k = 1; k <= 8; k++) {
                         var t = k / 9;
-                        var x = this.bola.x + (o.cont.x - this.bola.x) * t, y = this.bola.y + (o.cont.y - this.bola.y) * t - Math.sin(t * Math.PI) * 70;
+                        var x = this.bola.x + (o.cont.x - this.bola.x) * t, y = this.bola.y + (o.cont.y - this.bola.y) * t - (this.arteOk ? 0 : Math.sin(t * Math.PI) * 70);
                         gg.fillStyle(0xffffff, 0.85); gg.fillCircle(x, y, 6 - k * 0.3);
                     }
                 }
@@ -404,6 +433,11 @@
         nubes: function (time) {
             var c = this.cieloG, L = this.L, s = time / 1000;
             c.clear();
+            c.lineStyle(3, 0x34495e, 0.8);
+            for (var q = 0; q < 3; q++) {
+                var bx = ((s * (38 + q * 9) + q * 520) % (L.W + 200)) - 100, by = L.H * (0.16 + q * 0.07) + Math.sin(s * 1.3 + q) * 8, ala = Math.sin(s * 9 + q * 2) * 5;
+                c.beginPath(); c.moveTo(bx - 10, by - ala); c.lineTo(bx, by); c.lineTo(bx + 10, by - ala); c.strokePath();
+            }
             for (var n = 0; n < 4; n++) {
                 var x = ((s * (7 + n * 3) + n * 380) % (L.W + 300)) - 150, y = L.H * (0.07 + n * 0.055), w = 70 + n * 14;
                 c.fillStyle(0xffffff, 0.8);
@@ -416,8 +450,8 @@
             var B = this.cuerpoB, b = this.bola, R = this.reposoBola;
             if (!B || !B.active || !g || !g.active) return;
             if (!this.apuntando && !this.volando && !this.ocupado) {
-                var tr = this.thetaReposo != null ? this.thetaReposo : -0.1;
-                this.theta += (tr - this.theta) * 0.12;
+                var tr = this.thetaReposo != null ? this.thetaReposo : -Math.PI / 2;
+                this.theta += (tr + Math.sin(time / 900) * 0.025 - this.theta) * 0.12;
             }
             var th = this.theta, rho = th + Math.PI / 2, ux = Math.cos(th), uy = Math.sin(th);
             this.retro *= 0.86;
